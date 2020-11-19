@@ -11,6 +11,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -75,4 +76,17 @@ public class FtPrepaymentDao implements Serializable {
      */
     @Excel(name = "结算标志")
     private Long settlementFlag;
+
+    /**
+     * 预付费金额
+     */
+    @Excel(name = "预付费金额")
+    private BigDecimal prepaid;
+
+    /**
+     * 预付费时间
+     */
+    @Excel(name = "预付费时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date prepaidAt;
 }

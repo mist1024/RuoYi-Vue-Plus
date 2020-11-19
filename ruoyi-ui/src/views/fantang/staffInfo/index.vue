@@ -42,7 +42,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:staffInfo:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -52,7 +53,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:staffInfo:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -62,7 +64,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['fantang:staffInfo:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -71,18 +74,19 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['fantang:staffInfo:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="staffInfoList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
-      <el-table-column label="姓名" align="center" prop="name" />
-      <el-table-column label="岗位" align="center" prop="post" />
-      <el-table-column label="角色" align="center" prop="role" />
-      <el-table-column label="补贴余额" align="center" prop="balance" />
+      <el-table-column label="姓名" align="center" prop="name"/>
+      <el-table-column label="岗位" align="center" prop="post"/>
+      <el-table-column label="角色" align="center" prop="role"/>
+      <el-table-column label="补贴余额" align="center" prop="balance"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -91,18 +95,20 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:staffInfo:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:staffInfo:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -115,19 +121,19 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入姓名" />
+          <el-input v-model="form.name" placeholder="请输入姓名"/>
         </el-form-item>
         <el-form-item label="岗位" prop="post">
-          <el-input v-model="form.post" placeholder="请输入岗位" />
+          <el-input v-model="form.post" placeholder="请输入岗位"/>
         </el-form-item>
         <el-form-item label="角色" prop="role">
-          <el-input v-model="form.role" placeholder="请输入角色" />
+          <el-input v-model="form.role" placeholder="请输入角色"/>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" placeholder="请输入密码" />
+          <el-input v-model="form.password" placeholder="请输入密码"/>
         </el-form-item>
         <el-form-item label="补贴余额" prop="balance">
-          <el-input v-model="form.balance" placeholder="请输入补贴余额" />
+          <el-input v-model="form.balance" placeholder="请输入补贴余额"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -139,12 +145,18 @@
 </template>
 
 <script>
-import { listStaffInfo, getStaffInfo, delStaffInfo, addStaffInfo, updateStaffInfo, exportStaffInfo } from "@/api/fantang/staffInfo";
+import {
+  addStaffInfo,
+  delStaffInfo,
+  exportStaffInfo,
+  getStaffInfo,
+  listStaffInfo,
+  updateStaffInfo
+} from "@/api/fantang/staffInfo";
 
 export default {
   name: "StaffInfo",
-  components: {
-  },
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -178,19 +190,19 @@ export default {
       // 表单校验
       rules: {
         name: [
-          { required: true, message: "姓名不能为空", trigger: "blur" }
+          {required: true, message: "姓名不能为空", trigger: "blur"}
         ],
         post: [
-          { required: true, message: "岗位不能为空", trigger: "blur" }
+          {required: true, message: "岗位不能为空", trigger: "blur"}
         ],
         role: [
-          { required: true, message: "角色不能为空", trigger: "blur" }
+          {required: true, message: "角色不能为空", trigger: "blur"}
         ],
         password: [
-          { required: true, message: "密码不能为空", trigger: "blur" }
+          {required: true, message: "密码不能为空", trigger: "blur"}
         ],
         balance: [
-          { required: true, message: "补贴余额不能为空", trigger: "blur" }
+          {required: true, message: "补贴余额不能为空", trigger: "blur"}
         ]
       }
     };
@@ -242,7 +254,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.staffId)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -285,28 +297,28 @@ export default {
     handleDelete(row) {
       const staffIds = row.staffId || this.ids;
       this.$confirm('是否确认删除员工管理编号为"' + staffIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delStaffInfo(staffIds);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delStaffInfo(staffIds);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有员工管理数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportStaffInfo(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return exportStaffInfo(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     }
   }
 };

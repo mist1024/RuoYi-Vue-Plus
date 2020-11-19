@@ -13,6 +13,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="settlementBy"    column="settlement_by"    />
         <result property="settlementId"    column="settlement_id"    />
         <result property="settlementFlag"    column="settlement_flag"    />
+        <result property="prepaid"    column="prepaid"    />
+        <result property="prepaidAt"    column="prepaid_at"    />
     </resultMap>
 
 

@@ -3,18 +3,18 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="收款时间" prop="collectAt">
         <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.collectAt"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择收款时间">
+                        v-model="queryParams.collectAt"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择收款时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结算时间" prop="settlementAt">
         <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.settlementAt"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择结算时间">
+                        v-model="queryParams.settlementAt"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择结算时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结算标志" prop="settlementFlag">
@@ -25,6 +25,23 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+      </el-form-item>
+      <el-form-item label="预付费金额" prop="prepaid">
+        <el-input
+          v-model="queryParams.prepaid"
+          placeholder="请输入预付费金额"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="预付费时间" prop="prepaidAt">
+        <el-date-picker clearable size="small" style="width: 200px"
+                        v-model="queryParams.prepaidAt"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择预付费时间">
+        </el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -40,7 +57,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:prepayment:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -50,7 +68,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:prepayment:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -60,7 +79,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['fantang:prepayment:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -69,13 +89,14 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['fantang:prepayment:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="prepaymentList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="预付费id" align="center" prop="prepaymentId" v-if="false"/>
       <el-table-column label="收款时间" align="center" prop="collectAt" width="180">
         <template slot-scope="scope">
@@ -87,7 +108,13 @@
           <span>{{ parseTime(scope.row.settlementAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="结算标志" align="center" prop="settlementFlag" />
+      <el-table-column label="结算标志" align="center" prop="settlementFlag"/>
+      <el-table-column label="预付费金额" align="center" prop="prepaid"/>
+      <el-table-column label="预付费时间" align="center" prop="prepaidAt" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.prepaidAt, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -96,18 +123,20 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:prepayment:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:prepayment:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -119,6 +148,20 @@
     <!-- 添加或修改收费管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="病人id" prop="patientId">
+          <el-input v-model="form.patientId" placeholder="请输入病人id"/>
+        </el-form-item>
+        <el-form-item label="预付费金额" prop="prepaid">
+          <el-input v-model="form.prepaid" placeholder="请输入预付费金额"/>
+        </el-form-item>
+        <el-form-item label="预付费时间" prop="prepaidAt">
+          <el-date-picker clearable size="small" style="width: 200px"
+                          v-model="form.prepaidAt"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="选择预付费时间">
+          </el-date-picker>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -129,12 +172,18 @@
 </template>
 
 <script>
-import { listPrepayment, getPrepayment, delPrepayment, addPrepayment, updatePrepayment, exportPrepayment } from "@/api/fantang/prepayment";
+import {
+  addPrepayment,
+  delPrepayment,
+  exportPrepayment,
+  getPrepayment,
+  listPrepayment,
+  updatePrepayment
+} from "@/api/fantang/prepayment";
 
 export default {
   name: "Prepayment",
-  components: {
-  },
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -161,12 +210,23 @@ export default {
         pageSize: 10,
         collectAt: null,
         settlementAt: null,
-        settlementFlag: null
+        settlementFlag: null,
+        prepaid: null,
+        prepaidAt: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        patientId: [
+          {required: true, message: "病人id不能为空", trigger: "blur"}
+        ],
+        prepaid: [
+          {required: true, message: "预付费金额不能为空", trigger: "blur"}
+        ],
+        prepaidAt: [
+          {required: true, message: "预付费时间不能为空", trigger: "blur"}
+        ]
       }
     };
   },
@@ -198,7 +258,9 @@ export default {
         settlementAt: null,
         settlementBy: null,
         settlementId: null,
-        settlementFlag: null
+        settlementFlag: null,
+        prepaid: null,
+        prepaidAt: null
       };
       this.resetForm("form");
     },
@@ -215,7 +277,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.prepaymentId)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -258,28 +320,28 @@ export default {
     handleDelete(row) {
       const prepaymentIds = row.prepaymentId || this.ids;
       this.$confirm('是否确认删除收费管理编号为"' + prepaymentIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delPrepayment(prepaymentIds);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delPrepayment(prepaymentIds);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有收费管理数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportPrepayment(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return exportPrepayment(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     }
   }
 };

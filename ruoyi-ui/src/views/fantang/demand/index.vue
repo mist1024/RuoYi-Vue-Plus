@@ -3,15 +3,15 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="用餐类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择用餐类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option label="请选择字典生成" value=""/>
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间" prop="createAt">
         <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.createAt"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择创建时间">
+                        v-model="queryParams.createAt"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择创建时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="总价" prop="price">
@@ -46,7 +46,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:demand:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -56,7 +57,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:demand:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -66,7 +68,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['fantang:demand:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -75,23 +78,24 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['fantang:demand:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="demandList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-      <el-table-column label="订单详情" align="center" prop="foods" />
-      <el-table-column label="用餐类型" align="center" prop="type" />
+      <el-table-column label="订单详情" align="center" prop="foods"/>
+      <el-table-column label="用餐类型" align="center" prop="type"/>
       <el-table-column label="创建时间" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="总价" align="center" prop="price" />
-      <el-table-column label="有效期" align="center" prop="term" />
+      <el-table-column label="总价" align="center" prop="price"/>
+      <el-table-column label="有效期" align="center" prop="term"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -100,18 +104,20 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:demand:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:demand:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -124,18 +130,18 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="订单详情" prop="foods">
-          <el-input v-model="form.foods" placeholder="请输入订单详情" />
+          <el-input v-model="form.foods" placeholder="请输入订单详情"/>
         </el-form-item>
         <el-form-item label="用餐类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择用餐类型">
-            <el-option label="请选择字典生成" value="" />
+            <el-option label="请选择字典生成" value=""/>
           </el-select>
         </el-form-item>
         <el-form-item label="总价" prop="price">
-          <el-input v-model="form.price" placeholder="请输入总价" />
+          <el-input v-model="form.price" placeholder="请输入总价"/>
         </el-form-item>
         <el-form-item label="有效期" prop="term">
-          <el-input v-model="form.term" placeholder="请输入有效期" />
+          <el-input v-model="form.term" placeholder="请输入有效期"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,12 +153,11 @@
 </template>
 
 <script>
-import { listDemand, getDemand, delDemand, addDemand, updateDemand, exportDemand } from "@/api/fantang/demand";
+import {addDemand, delDemand, exportDemand, getDemand, listDemand, updateDemand} from "@/api/fantang/demand";
 
 export default {
   name: "Demand",
-  components: {
-  },
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -187,16 +192,16 @@ export default {
       // 表单校验
       rules: {
         foods: [
-          { required: true, message: "订单详情不能为空", trigger: "blur" }
+          {required: true, message: "订单详情不能为空", trigger: "blur"}
         ],
         type: [
-          { required: true, message: "用餐类型不能为空", trigger: "change" }
+          {required: true, message: "用餐类型不能为空", trigger: "change"}
         ],
         price: [
-          { required: true, message: "总价不能为空", trigger: "blur" }
+          {required: true, message: "总价不能为空", trigger: "blur"}
         ],
         term: [
-          { required: true, message: "有效期不能为空", trigger: "blur" }
+          {required: true, message: "有效期不能为空", trigger: "blur"}
         ],
       }
     };
@@ -248,7 +253,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -291,28 +296,28 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除特殊用餐管理编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delDemand(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delDemand(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有特殊用餐管理数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportDemand(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return exportDemand(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     }
   }
 };

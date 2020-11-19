@@ -48,6 +48,12 @@ public class FtPrepaymentDaoController extends BaseController {
         if (ftPrepaymentDao.getSettlementFlag() != null) {
             lqw.eq(FtPrepaymentDao::getSettlementFlag, ftPrepaymentDao.getSettlementFlag());
         }
+        if (ftPrepaymentDao.getPrepaid() != null) {
+            lqw.eq(FtPrepaymentDao::getPrepaid, ftPrepaymentDao.getPrepaid());
+        }
+        if (ftPrepaymentDao.getPrepaidAt() != null) {
+            lqw.eq(FtPrepaymentDao::getPrepaidAt, ftPrepaymentDao.getPrepaidAt());
+        }
         List<FtPrepaymentDao> list = iFtPrepaymentDaoService.list(lqw);
         return getDataTable(list);
     }
