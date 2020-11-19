@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtReportMealsDaoMapper">
+    
+    <resultMap type="FtReportMealsDao" id="FtReportMealsDaoResult">
+        <result property="id"    column="id"    />
+        <result property="createAt"    column="create_at"    />
+        <result property="type"    column="type"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="foods"    column="foods"    />
+        <result property="price"    column="price"    />
+        <result property="settlementFlag"    column="settlement_flag"    />
+    </resultMap>
+
+
+</mapper>

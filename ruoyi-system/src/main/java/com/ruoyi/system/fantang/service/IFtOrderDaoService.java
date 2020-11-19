@@ -1,0 +1,14 @@
+package com.ruoyi.system.fantang.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
+
+/**
+ * 订单管理Service接口
+ *
+ * @author ft
+ * @date 2020-11-19
+ */
+public interface IFtOrderDaoService extends IService<FtOrderDao> {
+
+}

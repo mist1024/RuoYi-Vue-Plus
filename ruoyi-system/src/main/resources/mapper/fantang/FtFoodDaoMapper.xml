@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtFoodDaoMapper">
+    
+    <resultMap type="FtFoodDao" id="FtFoodDaoResult">
+        <result property="foodId"    column="food_id"    />
+        <result property="name"    column="name"    />
+        <result property="pictureUrl"    column="picture_url"    />
+        <result property="price"    column="price"    />
+        <result property="flag"    column="flag"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+
+
+</mapper>

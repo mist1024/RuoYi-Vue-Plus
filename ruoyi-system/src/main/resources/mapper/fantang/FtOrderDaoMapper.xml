@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtOrderDaoMapper">
+    
+    <resultMap type="FtOrderDao" id="FtOrderDaoResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="orderType"    column="order_type"    />
+        <result property="workerId"    column="worker_id"    />
+        <result property="orderList"    column="order_list"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="discount"    column="discount"    />
+        <result property="receipts"    column="receipts"    />
+        <result property="createAt"    column="create_at"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="orderSrc"    column="order_src"    />
+        <result property="currentPrice"    column="current_price"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="payFlag"    column="pay_flag"    />
+        <result property="expiredFlag"    column="expired_flag"    />
+        <result property="writeOffFlag"    column="write_off_flag"    />
+        <result property="writeOffAt"    column="write_off_at"    />
+        <result property="isExpired"    column="is_expired"    />
+        <result property="deviceId"    column="device_id"    />
+    </resultMap>
+
+
+</mapper>
