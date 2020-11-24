@@ -11,22 +11,29 @@
         />
       </el-form-item>
       <el-form-item label="岗位" prop="post">
-        <el-input
-          v-model="queryParams.post"
-          placeholder="请输入岗位"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-select v-model="queryParams.post" placeholder="请选择岗位" clearable size="small">
+          <el-option
+            v-for="dict in postOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          ></el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="角色" prop="role">
-        <el-input
-          v-model="queryParams.role"
-          placeholder="请输入角色"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+      <!--      <el-form-item label="角色" prop="role">-->
+      <!--        <el-select v-model="queryParams.role" placeholder="请选择角色" clearable size="small">-->
+      <!--          <el-option label="请选择字典生成" value=""/>-->
+      <!--        </el-select>-->
+      <!--      </el-form-item>-->
+      <el-form-item label="是否启用" prop="flag">
+        <el-select v-model="queryParams.flag" placeholder="请选择是否启用" clearable size="small">
+          <el-option
+            v-for="item in flagOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -84,9 +91,17 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
       <el-table-column label="姓名" align="center" prop="name"/>
+      <el-table-column label="性别" align="center" prop="sex"/>
+      <el-table-column label="手机号码" align="center" prop="tel"/>
       <el-table-column label="岗位" align="center" prop="post"/>
-      <el-table-column label="角色" align="center" prop="role"/>
+      <!--      <el-table-column label="角色" align="center" prop="role"/>-->
       <el-table-column label="补贴余额" align="center" prop="balance"/>
+      <el-table-column label="创建日期" align="center" prop="createAt" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否启用" align="center" prop="flag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -123,17 +138,55 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名"/>
         </el-form-item>
+        <el-form-item label="性别" prop="sex">
+          <el-select v-model="form.sex" placeholder="请选性别">
+            <el-option
+              v-for="dict in sexOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="手机号码" prop="tel">
+          <el-input v-model="form.tel" placeholder="请输入手机号码"/>
+        </el-form-item>
         <el-form-item label="岗位" prop="post">
-          <el-input v-model="form.post" placeholder="请输入岗位"/>
+          <el-select v-model="form.post" placeholder="请选择岗位">
+            <el-option
+              v-for="dict in postOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-input v-model="form.role" placeholder="请输入角色"/>
+        <el-form-item label="科室" prop="deptList">
+          <el-select v-model="form.deptList" placeholder="请选择科室">
+            <el-option
+              v-for="item in deptListOptions"
+              :key="item.departName"
+              :label="item.departName"
+              :value="item.departName">
+            </el-option>
+          </el-select>
         </el-form-item>
+        <!--        <el-form-item label="角色" prop="role">-->
+        <!--          <el-select v-model="form.role" placeholder="请选择角色">-->
+        <!--            <el-option label="请选择字典生成" value=""/>-->
+        <!--          </el-select>-->
+        <!--        </el-form-item>-->
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" placeholder="请输入密码"/>
         </el-form-item>
-        <el-form-item label="补贴余额" prop="balance">
-          <el-input v-model="form.balance" placeholder="请输入补贴余额"/>
+        <el-form-item label="启用标志" prop="flag">
+          <el-switch
+            v-model="form.flag"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="启用"
+            inactive-text="禁用">
+          </el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -153,12 +206,23 @@ import {
   listStaffInfo,
   updateStaffInfo
 } from "@/api/fantang/staffInfo";
+import {listDepart} from "@/api/fantang/depart";
 
 export default {
   name: "StaffInfo",
   components: {},
   data() {
     return {
+      deptListOptions: [],
+      sexOptions: [],
+      postOptions: [],
+      flagOptions: [{
+        value: 1,
+        label: '启用'
+      }, {
+        value: 0,
+        label: '禁用'
+      }],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -184,6 +248,7 @@ export default {
         name: null,
         post: null,
         role: null,
+        flag: null,
       },
       // 表单参数
       form: {},
@@ -193,22 +258,34 @@ export default {
           {required: true, message: "姓名不能为空", trigger: "blur"}
         ],
         post: [
-          {required: true, message: "岗位不能为空", trigger: "blur"}
+          {required: true, message: "岗位不能为空", trigger: "change"}
         ],
         role: [
-          {required: true, message: "角色不能为空", trigger: "blur"}
+          {required: true, message: "角色不能为空", trigger: "change"}
         ],
-        password: [
-          {required: true, message: "密码不能为空", trigger: "blur"}
+        flag: [
+          {required: true, message: "启用标志不能为空", trigger: "change"}
         ],
-        balance: [
-          {required: true, message: "补贴余额不能为空", trigger: "blur"}
+        sex: [
+          {required: true, message: "性别不能为空", trigger: "change"}
+        ],
+        deptList: [
+          {required: true, message: "性别不能为空", trigger: "change"}
+        ],
+        tel: [
+          {required: true, message: "手机号码不能为空", trigger: "change"}
         ]
       }
     };
   },
   created() {
     this.getList();
+    this.getDicts("sys_user_sex").then(response => {
+      this.sexOptions = response.data;
+    });
+    this.getDicts("ft_post").then(response => {
+      this.postOptions = response.data;
+    });
   },
   methods: {
     /** 查询员工管理列表 */
@@ -218,7 +295,11 @@ export default {
         this.staffInfoList = response.rows;
         this.total = response.total;
         this.loading = false;
+        console.log("flag-----", response);
       });
+      listDepart(this.queryParams).then(response => {
+        this.deptListOptions = response.rows;
+      })
     },
     // 取消按钮
     cancel() {
@@ -236,8 +317,15 @@ export default {
         password: null,
         createAt: null,
         createBy: null,
-        flag: null,
-        balance: null
+        flag: true,
+        balance: null,
+        staffType: null,
+        corpName: null,
+        pictureUrl: null,
+        deptList: null,
+        qrCode: null,
+        sex: null,
+        tel: null,
       };
       this.resetForm("form");
     },
@@ -278,12 +366,23 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.staffId != null) {
+            if (this.form.flag === true) {
+              this.form.flag = 1;
+            } else {
+              this.form.flag = 0;
+            }
             updateStaffInfo(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
+            console.log(this.form);
+            if (this.form.flag === true) {
+              this.form.flag = 1;
+            } else {
+              this.form.flag = 0;
+            }
             addStaffInfo(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;

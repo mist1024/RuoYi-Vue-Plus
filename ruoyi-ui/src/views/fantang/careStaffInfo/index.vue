@@ -10,23 +10,29 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="所属公司名称" prop="corpName">
+      <!--      <el-form-item label="员工类别" prop="staffType">-->
+      <!--        <el-select v-model="queryParams.staffType" placeholder="请选择员工类别" clearable size="small">-->
+      <!--          <el-option label="请选择字典生成" value="" />-->
+      <!--        </el-select>-->
+      <!--      </el-form-item>-->
+      <el-form-item label="所属公司" prop="corpName">
         <el-input
           v-model="queryParams.corpName"
-          placeholder="请输入所属公司名称"
+          placeholder="请输入所属公司"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="所属科室清单" prop="departList">
-        <el-input
-          v-model="queryParams.departList"
-          placeholder="请输入所属科室清单"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="报餐科室" prop="deptList">
+        <el-select v-model="queryParams.deptList" placeholder="请选择报餐科室" clearable size="small">
+          <el-option
+            v-for="item in deptListOptions"
+            :key="item.departName"
+            :label="item.departName"
+            :value="item.departName">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -41,7 +47,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['fantang:careStaffInfo:add']"
+          v-hasPermi="['fantang:staffInfo:add']"
         >新增
         </el-button>
       </el-col>
@@ -52,7 +58,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['fantang:careStaffInfo:edit']"
+          v-hasPermi="['fantang:staffInfo:edit']"
         >修改
         </el-button>
       </el-col>
@@ -63,7 +69,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['fantang:careStaffInfo:remove']"
+          v-hasPermi="['fantang:staffInfo:remove']"
         >删除
         </el-button>
       </el-col>
@@ -73,20 +79,26 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['fantang:careStaffInfo:export']"
+          v-hasPermi="['fantang:staffInfo:export']"
         >导出
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="careStaffInfoList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="staffInfoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="护工 id" align="center" prop="careStaffId" v-if="false"/>
+      <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
       <el-table-column label="姓名" align="center" prop="name"/>
-      <el-table-column label="所属公司名称" align="center" prop="corpName"/>
-      <el-table-column label="所属科室清单" align="center" prop="departList"/>
-      <el-table-column label="照片" align="center" prop="photo"/>
+      <el-table-column label="所属公司" align="center" prop="corpName"/>
+<!--      <el-table-column label="员工类别" align="center" prop="staffType"/>-->
+      <el-table-column label="报餐科室" align="center" prop="deptList"/>
+      <el-table-column label="补贴余额" align="center" prop="balance"/>
+      <el-table-column label="创建日期" align="center" prop="createAt" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="二维码" align="center" prop="qrCode"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -95,7 +107,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['fantang:careStaffInfo:edit']"
+            v-hasPermi="['fantang:staffInfo:edit']"
           >修改
           </el-button>
           <el-button
@@ -103,7 +115,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['fantang:careStaffInfo:remove']"
+            v-hasPermi="['fantang:staffInfo:remove']"
           >删除
           </el-button>
         </template>
@@ -118,23 +130,42 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改护工信息对话框 -->
+    <!-- 添加或修改员工管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名"/>
         </el-form-item>
-        <el-form-item label="所属公司名称" prop="corpName">
-          <el-input v-model="form.corpName" placeholder="请输入所属公司名称"/>
+        <el-form-item label="性别" prop="sex">
+          <el-select v-model="form.sex" placeholder="请选性别">
+            <el-option
+              v-for="dict in sexOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="所属科室清单" prop="departList">
-          <el-input v-model="form.departList" placeholder="请输入所属科室清单"/>
+        <!--        <el-form-item label="员工类别" prop="staffType">-->
+        <!--          <el-select v-model="form.staffType" placeholder="请选择员工类别">-->
+        <!--            <el-option label="请选择字典生成" value="" />-->
+        <!--          </el-select>-->
+        <!--        </el-form-item>-->
+        <el-form-item label="所属公司" prop="corpName">
+          <el-input v-model="form.corpName" placeholder="请输入所属公司"/>
         </el-form-item>
-        <el-form-item label="照片" prop="photo">
-          <el-input v-model="form.photo" placeholder="请输入照片"/>
+        <el-form-item label="照片" prop="pictureUrl">
+          <el-input v-model="form.pictureUrl" placeholder="请输入照片"/>
         </el-form-item>
-        <el-form-item label="二维码" prop="qrCode">
-          <el-input v-model="form.qrCode" placeholder="请输入二维码"/>
+        <el-form-item label="报餐科室" prop="deptList">
+          <el-select v-model="form.deptList" placeholder="请选择报餐科室">
+            <el-option
+              v-for="item in deptListOptions"
+              :key="item.departName"
+              :label="item.departName"
+              :value="item.departName">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,19 +178,22 @@
 
 <script>
 import {
-  addCareStaffInfo,
-  delCareStaffInfo,
-  exportCareStaffInfo,
-  getCareStaffInfo,
-  listCareStaffInfo,
-  updateCareStaffInfo
-} from "@/api/fantang/careStaffInfo";
+  addStaffInfo,
+  delStaffInfo,
+  exportStaffInfo,
+  getStaffInfo,
+  listStaffInfo,
+  updateStaffInfo
+} from "@/api/fantang/staffInfo";
+import {listDepart} from "@/api/fantang/depart";
 
 export default {
-  name: "CareStaffInfo",
+  name: "StaffInfo",
   components: {},
   data() {
     return {
+      sexOptions: [],
+      deptListOptions: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -172,8 +206,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 护工信息表格数据
-      careStaffInfoList: [],
+      // 员工管理表格数据
+      staffInfoList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -183,8 +217,9 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
+        staffType: null,
         corpName: null,
-        departList: null,
+        deptList: null,
       },
       // 表单参数
       form: {},
@@ -194,26 +229,36 @@ export default {
           {required: true, message: "姓名不能为空", trigger: "blur"}
         ],
         corpName: [
-          {required: true, message: "所属公司名称不能为空", trigger: "blur"}
+          {required: true, message: "所属公司不能为空", trigger: "blur"}
         ],
-        departList: [
-          {required: true, message: "所属科室清单不能为空", trigger: "blur"}
+        sex: [
+          {required: true, message: "性别不能为空", trigger: "blur"}
+        ],
+        deptList: [
+          {required: true, message: "报餐科室不能为空", trigger: "blur"}
         ],
       }
     };
   },
   created() {
     this.getList();
+    this.getDicts("sys_user_sex").then(response => {
+      this.sexOptions = response.data;
+    });
   },
   methods: {
-    /** 查询护工信息列表 */
+    /** 查询员工管理列表 */
     getList() {
       this.loading = true;
-      listCareStaffInfo(this.queryParams).then(response => {
-        this.careStaffInfoList = response.rows;
+      listStaffInfo(this.queryParams).then(response => {
+        this.staffInfoList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
+      listDepart(this.queryParams).then(response => {
+        // console.log("depart", response);
+        this.deptListOptions = response.rows;
+      })
     },
     // 取消按钮
     cancel() {
@@ -223,12 +268,20 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        careStaffId: null,
+        staffId: null,
+        departId: null,
         name: null,
-        corpName: null,
-        departList: null,
+        post: null,
+        role: null,
+        password: null,
+        createAt: null,
+        createBy: null,
         flag: null,
-        photo: null,
+        balance: null,
+        staffType: null,
+        corpName: null,
+        pictureUrl: null,
+        deptList: null,
         qrCode: null
       };
       this.resetForm("form");
@@ -245,7 +298,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.careStaffId)
+      this.ids = selection.map(item => item.staffId)
       this.single = selection.length !== 1
       this.multiple = !selection.length
     },
@@ -253,30 +306,30 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加护工信息";
+      this.title = "添加员工管理";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const careStaffId = row.careStaffId || this.ids
-      getCareStaffInfo(careStaffId).then(response => {
+      const staffId = row.staffId || this.ids
+      getStaffInfo(staffId).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改护工信息";
+        this.title = "修改员工管理";
       });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.careStaffId != null) {
-            updateCareStaffInfo(this.form).then(response => {
+          if (this.form.staffId != null) {
+            updateStaffInfo(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addCareStaffInfo(this.form).then(response => {
+            addStaffInfo(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -287,13 +340,13 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const careStaffIds = row.careStaffId || this.ids;
-      this.$confirm('是否确认删除护工信息编号为"' + careStaffIds + '"的数据项?', "警告", {
+      const staffIds = row.staffId || this.ids;
+      this.$confirm('是否确认删除员工管理编号为"' + staffIds + '"的数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(function () {
-        return delCareStaffInfo(careStaffIds);
+        return delStaffInfo(staffIds);
       }).then(() => {
         this.getList();
         this.msgSuccess("删除成功");
@@ -302,12 +355,12 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有护工信息数据项?', "警告", {
+      this.$confirm('是否确认导出所有员工管理数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(function () {
-        return exportCareStaffInfo(queryParams);
+        return exportStaffInfo(queryParams);
       }).then(response => {
         this.download(response.msg);
       })

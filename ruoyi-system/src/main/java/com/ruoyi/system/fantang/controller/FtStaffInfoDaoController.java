@@ -11,19 +11,21 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
+import com.ruoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
  * 员工管理Controller
  *
  * @author ft
- * @date 2020-11-19
+ * @date 2020-11-24
  */
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
@@ -31,6 +33,8 @@ import java.util.List;
 public class FtStaffInfoDaoController extends BaseController {
 
     private final IFtStaffInfoDaoService iFtStaffInfoDaoService;
+
+    private final ISysUserService userService;
 
     /**
      * 查询员工管理列表
@@ -48,6 +52,9 @@ public class FtStaffInfoDaoController extends BaseController {
         }
         if (StringUtils.isNotBlank(ftStaffInfoDao.getRole())) {
             lqw.eq(FtStaffInfoDao::getRole, ftStaffInfoDao.getRole());
+        }
+        if (ftStaffInfoDao.getFlag() != null) {
+            lqw.eq(FtStaffInfoDao::getFlag, ftStaffInfoDao.getFlag());
         }
         List<FtStaffInfoDao> list = iFtStaffInfoDaoService.list(lqw);
         return getDataTable(list);
@@ -82,7 +89,31 @@ public class FtStaffInfoDaoController extends BaseController {
     @Log(title = "员工管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtStaffInfoDao ftStaffInfoDao) {
-        return toAjax(iFtStaffInfoDaoService.save(ftStaffInfoDao) ? 1 : 0);
+
+        List<FtStaffInfoDao> list = iFtStaffInfoDaoService.list(null);
+        for (FtStaffInfoDao staffInfoDao : list) {
+            if (ftStaffInfoDao.getTel().equals(staffInfoDao.getTel())) {
+                return AjaxResult.error("该电话号码已存在");
+            }
+        }
+
+        // 判断是否有所属公司
+        if (ftStaffInfoDao.getCorpName() == null) {
+            ftStaffInfoDao.setStaffType(1L);
+        } else {
+            ftStaffInfoDao.setStaffType(2L);
+        }
+
+        // 判断密码是否为空
+        if (ftStaffInfoDao.getPassword() == null) {
+            ftStaffInfoDao.setPassword("123456");
+        }
+
+        ftStaffInfoDao.setCreateAt(new Date());
+
+        boolean save = iFtStaffInfoDaoService.save(ftStaffInfoDao);
+
+        return AjaxResult.success("添加成功");
     }
 
     /**

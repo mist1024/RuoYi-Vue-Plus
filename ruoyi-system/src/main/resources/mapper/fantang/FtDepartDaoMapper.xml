@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="FtDepartDao" id="FtDepartDaoResult">
         <result property="departId"    column="depart_id"    />
         <result property="departName"    column="depart_name"    />
+        <result property="departCode"    column="depart_code"    />
     </resultMap>
 
 

@@ -9,6 +9,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="name"    column="name"    />
         <result property="departId"    column="depart_id"    />
         <result property="bedId"    column="bed_id"    />
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="syncFlag"    column="sync_flag"    />
+        <result property="offFlag"    column="off_flag"    />
+        <result property="createAt"    column="create_at"    />
     </resultMap>
 
 

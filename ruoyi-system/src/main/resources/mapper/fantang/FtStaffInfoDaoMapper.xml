@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.fantang.mapper.FtStaffInfoDaoMapper">
-    
+
     <resultMap type="FtStaffInfoDao" id="FtStaffInfoDaoResult">
-        <result property="staffId"    column="staff_id"    />
-        <result property="departId"    column="depart_id"    />
-        <result property="name"    column="name"    />
-        <result property="post"    column="post"    />
-        <result property="role"    column="role"    />
-        <result property="password"    column="password"    />
-        <result property="createAt"    column="create_at"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="flag"    column="flag"    />
-        <result property="balance"    column="balance"    />
+        <result property="staffId" column="staff_id"/>
+        <result property="departId" column="depart_id"/>
+        <result property="name" column="name"/>
+        <result property="post" column="post"/>
+        <result property="role" column="role"/>
+        <result property="password" column="password"/>
+        <result property="createAt" column="create_at"/>
+        <result property="createBy" column="create_by"/>
+        <result property="flag" column="flag"/>
+        <result property="balance" column="balance"/>
+        <result property="staffType" column="staff_type"/>
+        <result property="corpName" column="corp_name"/>
+        <result property="pictureUrl" column="picture_url"/>
+        <result property="deptList" column="dept_list"/>
+        <result property="qrCode" column="qr_code"/>
+        <result property="sex" column="sex"/>
+        <result property="tel" column="tel"/>
     </resultMap>
 
 

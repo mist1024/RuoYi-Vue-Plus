@@ -10,6 +10,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="科室编号" prop="departCode">
+        <el-input
+          v-model="queryParams.departCode"
+          placeholder="请输入科室编号"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -24,8 +33,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:depart:add']"
-        >新增
-        </el-button>
+        >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -35,8 +43,7 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:depart:edit']"
-        >修改
-        </el-button>
+        >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -46,8 +53,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['fantang:depart:remove']"
-        >删除
-        </el-button>
+        >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -56,16 +62,16 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['fantang:depart:export']"
-        >导出
-        </el-button>
+        >导出</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="departList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="科室编号" align="center" prop="departId" v-if="false"/>
-      <el-table-column label="科室名称" align="center" prop="departName"/>
+      <el-table-column label="科室名称" align="center" prop="departName" />
+      <el-table-column label="科室编号" align="center" prop="departCode" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -74,20 +80,18 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:depart:edit']"
-          >修改
-          </el-button>
+          >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:depart:remove']"
-          >删除
-          </el-button>
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-
+    
     <pagination
       v-show="total>0"
       :total="total"
@@ -100,7 +104,10 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="科室名称" prop="departName">
-          <el-input v-model="form.departName" placeholder="请输入科室名称"/>
+          <el-input v-model="form.departName" placeholder="请输入科室名称" />
+        </el-form-item>
+        <el-form-item label="科室编号" prop="departCode">
+          <el-input v-model="form.departCode" placeholder="请输入科室编号" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -112,11 +119,12 @@
 </template>
 
 <script>
-import {addDepart, delDepart, exportDepart, getDepart, listDepart, updateDepart} from "@/api/fantang/depart";
+import { listDepart, getDepart, delDepart, addDepart, updateDepart, exportDepart } from "@/api/fantang/depart";
 
 export default {
   name: "Depart",
-  components: {},
+  components: {
+  },
   data() {
     return {
       // 遮罩层
@@ -141,14 +149,18 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        departName: null
+        departName: null,
+        departCode: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         departName: [
-          {required: true, message: "科室名称不能为空", trigger: "blur"}
+          { required: true, message: "科室名称不能为空", trigger: "blur" }
+        ],
+        departCode: [
+          { required: true, message: "科室编号不能为空", trigger: "blur" }
         ]
       }
     };
@@ -175,7 +187,8 @@ export default {
     reset() {
       this.form = {
         departId: null,
-        departName: null
+        departName: null,
+        departCode: null
       };
       this.resetForm("form");
     },
@@ -192,7 +205,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.departId)
-      this.single = selection.length !== 1
+      this.single = selection.length!==1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -235,28 +248,28 @@ export default {
     handleDelete(row) {
       const departIds = row.departId || this.ids;
       this.$confirm('是否确认删除科室管理编号为"' + departIds + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return delDepart(departIds);
-      }).then(() => {
-        this.getList();
-        this.msgSuccess("删除成功");
-      })
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return delDepart(departIds);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有科室管理数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return exportDepart(queryParams);
-      }).then(response => {
-        this.download(response.msg);
-      })
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportDepart(queryParams);
+        }).then(response => {
+          this.download(response.msg);
+        })
     }
   }
 };

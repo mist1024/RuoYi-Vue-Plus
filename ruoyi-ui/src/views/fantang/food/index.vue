@@ -1,27 +1,32 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="名称" prop="name">
+      <el-form-item label="食品名称" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入名称"
+          placeholder="请输入食品名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="售价" prop="price">
-        <el-input
-          v-model="queryParams.price"
-          placeholder="请输入售价"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="售价" prop="price">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.price"-->
+<!--          placeholder="请输入售价"-->
+<!--          clearable-->
+<!--          size="small"-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
       <el-form-item label="食品分类" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择食品分类" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+          <el-option
+            v-for="dict in typeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -38,8 +43,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:food:add']"
-        >新增
-        </el-button>
+        >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -49,8 +53,7 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:food:edit']"
-        >修改
-        </el-button>
+        >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -60,8 +63,7 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['fantang:food:remove']"
-        >删除
-        </el-button>
+        >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -70,19 +72,17 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['fantang:food:export']"
-        >导出
-        </el-button>
+        >导出</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="foodList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="食品id" align="center" prop="foodId" v-if="false"/>
-      <el-table-column label="名称" align="center" prop="name"/>
-      <el-table-column label="图片地址" align="center" prop="pictureUrl"/>
-      <el-table-column label="售价" align="center" prop="price"/>
-      <el-table-column label="食品分类" align="center" prop="type"/>
+      <el-table-column label="食品名称" align="center" prop="name" />
+      <el-table-column label="售价" align="center" prop="price" />
+      <el-table-column label="食品分类" align="center" prop="type" :formatter="typeFormat" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -91,16 +91,14 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:food:edit']"
-          >修改
-          </el-button>
+          >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:food:remove']"
-          >删除
-          </el-button>
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -116,18 +114,23 @@
     <!-- 添加或修改食品管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入名称"/>
+        <el-form-item label="食品名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入食品名称" />
         </el-form-item>
-        <el-form-item label="图片地址" prop="pictureUrl">
-          <el-input v-model="form.pictureUrl" placeholder="请输入图片地址"/>
+        <el-form-item label="图片">
+          <uploadImage v-model="form.pictureUrl"/>
         </el-form-item>
         <el-form-item label="售价" prop="price">
-          <el-input v-model="form.price" placeholder="请输入售价"/>
+          <el-input v-model="form.price" placeholder="请输入售价" />
         </el-form-item>
         <el-form-item label="食品分类" prop="type">
           <el-select v-model="form.type" placeholder="请选择食品分类">
-            <el-option label="请选择字典生成" value=""/>
+            <el-option
+              v-for="dict in typeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="parseInt(dict.dictValue)"
+            ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -140,11 +143,14 @@
 </template>
 
 <script>
-import {addFood, delFood, exportFood, getFood, listFood, updateFood} from "@/api/fantang/food";
+import { listFood, getFood, delFood, addFood, updateFood, exportFood } from "@/api/fantang/food";
+import UploadImage from '@/components/UploadImage';
 
 export default {
   name: "Food",
-  components: {},
+  components: {
+    UploadImage,
+  },
   data() {
     return {
       // 遮罩层
@@ -165,6 +171,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 食品分类字典
+      typeOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -178,19 +186,22 @@ export default {
       // 表单校验
       rules: {
         name: [
-          {required: true, message: "名称不能为空", trigger: "blur"}
+          { required: true, message: "食品名称不能为空", trigger: "blur" }
         ],
         price: [
-          {required: true, message: "售价不能为空", trigger: "blur"}
+          { required: true, message: "售价不能为空", trigger: "blur" }
         ],
         type: [
-          {required: true, message: "食品分类不能为空", trigger: "change"}
+          { required: true, message: "食品分类不能为空", trigger: "change" }
         ]
       }
     };
   },
   created() {
     this.getList();
+    this.getDicts("ft_food_type").then(response => {
+      this.typeOptions = response.data;
+    });
   },
   methods: {
     /** 查询食品管理列表 */
@@ -201,6 +212,10 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+    // 食品分类字典翻译
+    typeFormat(row, column) {
+      return this.selectDictLabel(this.typeOptions, row.type);
     },
     // 取消按钮
     cancel() {
@@ -232,7 +247,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.foodId)
-      this.single = selection.length !== 1
+      this.single = selection.length!==1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -275,28 +290,28 @@ export default {
     handleDelete(row) {
       const foodIds = row.foodId || this.ids;
       this.$confirm('是否确认删除食品管理编号为"' + foodIds + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return delFood(foodIds);
-      }).then(() => {
-        this.getList();
-        this.msgSuccess("删除成功");
-      })
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return delFood(foodIds);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有食品管理数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return exportFood(queryParams);
-      }).then(response => {
-        this.download(response.msg);
-      })
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportFood(queryParams);
+        }).then(response => {
+          this.download(response.msg);
+        })
     }
   }
 };

@@ -19,6 +19,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="住院号" prop="hospitalId">
+        <el-input
+          v-model="queryParams.hospitalId"
+          placeholder="请输入住院号"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -76,6 +85,7 @@
       <el-table-column label="病人id" align="center" prop="patientId" v-if="false"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="床号" align="center" prop="bedId"/>
+      <el-table-column label="住院号" align="center" prop="hospitalId"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -112,8 +122,21 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名"/>
         </el-form-item>
+        <el-form-item label="所属部门" prop="departId">
+          <el-select v-model="form.departId" placeholder="请选择科室列表">
+            <el-option
+              v-for="item in deptListOptions"
+              :key="item.departName"
+              :label="item.departName"
+              :value="item.departId">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="床号" prop="bedId">
           <el-input v-model="form.bedId" placeholder="请输入床号"/>
+        </el-form-item>
+        <el-form-item label="住院号" prop="hospitalId">
+          <el-input v-model="form.hospitalId" placeholder="请输入住院号"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -126,12 +149,14 @@
 
 <script>
 import {addPatient, delPatient, exportPatient, getPatient, listPatient, updatePatient} from "@/api/fantang/patient";
+import {listDepart} from "@/api/fantang/depart";
 
 export default {
   name: "Patient",
   components: {},
   data() {
     return {
+      deptListOptions: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -155,7 +180,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        bedId: null
+        bedId: null,
+        hospitalId: null,
       },
       // 表单参数
       form: {},
@@ -164,9 +190,15 @@ export default {
         name: [
           {required: true, message: "姓名不能为空", trigger: "blur"}
         ],
+        departId: [
+          {required: true, message: "所属部门不能为空", trigger: "blur"}
+        ],
         bedId: [
           {required: true, message: "床号不能为空", trigger: "blur"}
-        ]
+        ],
+        hospitalId: [
+          {required: true, message: "住院号不能为空", trigger: "blur"}
+        ],
       }
     };
   },
@@ -182,6 +214,10 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+      listDepart(this.queryParams).then(response => {
+        console.log("depart", response);
+        this.deptListOptions = response.rows;
+      })
     },
     // 取消按钮
     cancel() {
@@ -194,7 +230,11 @@ export default {
         patientId: null,
         name: null,
         departId: null,
-        bedId: null
+        bedId: null,
+        hospitalId: null,
+        syncFlag: null,
+        offFlag: null,
+        createAt: null
       };
       this.resetForm("form");
     },
