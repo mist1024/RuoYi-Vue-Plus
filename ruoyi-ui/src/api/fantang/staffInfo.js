@@ -3,7 +3,16 @@ import request from '@/utils/request'
 // 查询员工管理列表
 export function listStaffInfo(query) {
   return request({
-    url: '/fantang/staffInfo/list',
+    url: '/fantang/staffInfo/staffList',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询护工管理列表
+export function careStaffList(query) {
+  return request({
+    url: '/fantang/staffInfo/careStaffList',
     method: 'get',
     params: query
   })

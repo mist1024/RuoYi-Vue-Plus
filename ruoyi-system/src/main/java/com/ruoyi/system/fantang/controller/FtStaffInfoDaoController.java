@@ -40,21 +40,38 @@ public class FtStaffInfoDaoController extends BaseController {
      * 查询员工管理列表
      */
     @PreAuthorize("@ss.hasPermi('fantang:staffInfo:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(FtStaffInfoDao ftStaffInfoDao) {
+    @GetMapping("/staffList")
+    public TableDataInfo staffList(FtStaffInfoDao ftStaffInfoDao) {
         startPage();
         LambdaQueryWrapper<FtStaffInfoDao> lqw = Wrappers.lambdaQuery(ftStaffInfoDao);
+        lqw.eq(FtStaffInfoDao::getStaffType, 1);
         if (StringUtils.isNotBlank(ftStaffInfoDao.getName())) {
             lqw.like(FtStaffInfoDao::getName, ftStaffInfoDao.getName());
         }
         if (StringUtils.isNotBlank(ftStaffInfoDao.getPost())) {
             lqw.eq(FtStaffInfoDao::getPost, ftStaffInfoDao.getPost());
         }
-        if (StringUtils.isNotBlank(ftStaffInfoDao.getRole())) {
-            lqw.eq(FtStaffInfoDao::getRole, ftStaffInfoDao.getRole());
-        }
         if (ftStaffInfoDao.getFlag() != null) {
             lqw.eq(FtStaffInfoDao::getFlag, ftStaffInfoDao.getFlag());
+        }
+        List<FtStaffInfoDao> list = iFtStaffInfoDaoService.list(lqw);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询护工管理列表
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:staffInfo:list')")
+    @GetMapping("/careStaffList")
+    public TableDataInfo careStaffList(FtStaffInfoDao ftStaffInfoDao) {
+        startPage();
+        LambdaQueryWrapper<FtStaffInfoDao> lqw = Wrappers.lambdaQuery(ftStaffInfoDao);
+        lqw.eq(FtStaffInfoDao::getStaffType, 2);
+        if (StringUtils.isNotBlank(ftStaffInfoDao.getName())) {
+            lqw.like(FtStaffInfoDao::getName, ftStaffInfoDao.getName());
+        }
+        if (StringUtils.isNotBlank(ftStaffInfoDao.getPost())) {
+            lqw.eq(FtStaffInfoDao::getPost, ftStaffInfoDao.getPost());
         }
         List<FtStaffInfoDao> list = iFtStaffInfoDaoService.list(lqw);
         return getDataTable(list);
@@ -92,7 +109,7 @@ public class FtStaffInfoDaoController extends BaseController {
 
         List<FtStaffInfoDao> list = iFtStaffInfoDaoService.list(null);
         for (FtStaffInfoDao staffInfoDao : list) {
-            if (ftStaffInfoDao.getTel().equals(staffInfoDao.getTel())) {
+            if (ftStaffInfoDao.getTel() != null && ftStaffInfoDao.getTel().equals(staffInfoDao.getTel())) {
                 return AjaxResult.error("该电话号码已存在");
             }
         }
@@ -110,8 +127,9 @@ public class FtStaffInfoDaoController extends BaseController {
         }
 
         ftStaffInfoDao.setCreateAt(new Date());
+        ftStaffInfoDao.setDepartId(Long.parseLong(ftStaffInfoDao.getDeptList()));
 
-        boolean save = iFtStaffInfoDaoService.save(ftStaffInfoDao);
+        iFtStaffInfoDaoService.save(ftStaffInfoDao);
 
         return AjaxResult.success("添加成功");
     }

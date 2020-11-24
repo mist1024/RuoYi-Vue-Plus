@@ -167,7 +167,7 @@
               v-for="item in deptListOptions"
               :key="item.departName"
               :label="item.departName"
-              :value="item.departName">
+              :value="item.departId">
             </el-option>
           </el-select>
         </el-form-item>

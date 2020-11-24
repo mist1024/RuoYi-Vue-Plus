@@ -91,7 +91,7 @@
       <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="所属公司" align="center" prop="corpName"/>
-<!--      <el-table-column label="员工类别" align="center" prop="staffType"/>-->
+      <!--      <el-table-column label="员工类别" align="center" prop="staffType"/>-->
       <el-table-column label="报餐科室" align="center" prop="deptList"/>
       <el-table-column label="补贴余额" align="center" prop="balance"/>
       <el-table-column label="创建日期" align="center" prop="createAt" width="180">
@@ -154,8 +154,8 @@
         <el-form-item label="所属公司" prop="corpName">
           <el-input v-model="form.corpName" placeholder="请输入所属公司"/>
         </el-form-item>
-        <el-form-item label="照片" prop="pictureUrl">
-          <el-input v-model="form.pictureUrl" placeholder="请输入照片"/>
+        <el-form-item label="照片">
+          <uploadImage v-model="form.pictureUrl"/>
         </el-form-item>
         <el-form-item label="报餐科室" prop="deptList">
           <el-select v-model="form.deptList" placeholder="请选择报餐科室">
@@ -179,17 +179,20 @@
 <script>
 import {
   addStaffInfo,
+  careStaffList,
   delStaffInfo,
   exportStaffInfo,
   getStaffInfo,
-  listStaffInfo,
   updateStaffInfo
 } from "@/api/fantang/staffInfo";
 import {listDepart} from "@/api/fantang/depart";
+import UploadImage from '@/components/UploadImage';
 
 export default {
   name: "StaffInfo",
-  components: {},
+  components: {
+    UploadImage,
+  },
   data() {
     return {
       sexOptions: [],
@@ -250,7 +253,7 @@ export default {
     /** 查询员工管理列表 */
     getList() {
       this.loading = true;
-      listStaffInfo(this.queryParams).then(response => {
+      careStaffList(this.queryParams).then(response => {
         this.staffInfoList = response.rows;
         this.total = response.total;
         this.loading = false;
