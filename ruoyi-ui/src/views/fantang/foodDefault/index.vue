@@ -1,32 +1,14 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="姓名" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入姓名"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="所属公司" prop="corpName">
-        <el-input
-          v-model="queryParams.corpName"
-          placeholder="请输入所属公司"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="报餐科室" prop="deptList">
-        <el-select v-model="queryParams.deptList" placeholder="请选择报餐科室" clearable size="small">
+      <el-form-item label="报餐类型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择报餐类型" clearable size="small">
           <el-option
-            v-for="item in deptListOptions"
-            :key="item.departName"
-            :label="item.departName"
-            :value="item.departName">
-          </el-option>
+            v-for="dict in typeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -42,7 +24,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['fantang:staffInfo:add']"
+          v-hasPermi="['fantang:foodDefault:add']"
         >新增
         </el-button>
       </el-col>
@@ -53,7 +35,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['fantang:staffInfo:edit']"
+          v-hasPermi="['fantang:foodDefault:edit']"
         >修改
         </el-button>
       </el-col>
@@ -64,7 +46,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['fantang:staffInfo:remove']"
+          v-hasPermi="['fantang:foodDefault:remove']"
         >删除
         </el-button>
       </el-col>
@@ -74,24 +56,22 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['fantang:staffInfo:export']"
+          v-hasPermi="['fantang:foodDefault:export']"
         >导出
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="staffInfoList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="foodDefaultList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
-      <el-table-column label="姓名" align="center" prop="name"/>
-      <el-table-column label="所属公司" align="center" prop="corpName"/>
-      <el-table-column label="创建日期" align="center" prop="createAt" width="180">
+      <el-table-column label="id" align="center" prop="id" v-if="false"/>
+      <el-table-column label="报餐类型" align="center" prop="type" :formatter="typeFormat"/>
+      <el-table-column label="创建日期" align="center" prop="createdAt" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.createdAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="二维码" align="center" prop="qrCode"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -99,7 +79,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['fantang:staffInfo:edit']"
+            v-hasPermi="['fantang:foodDefault:edit']"
           >修改
           </el-button>
           <el-button
@@ -107,7 +87,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['fantang:staffInfo:remove']"
+            v-hasPermi="['fantang:foodDefault:remove']"
           >删除
           </el-button>
         </template>
@@ -122,35 +102,29 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改员工管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入姓名"/>
-        </el-form-item>
-        <el-form-item label="性别" prop="sex">
-          <el-select v-model="form.sex" placeholder="请选性别">
+    <!-- 添加或修改默认报餐管理对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="报餐类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择报餐类型">
             <el-option
-              v-for="dict in sexOptions"
+              v-for="dict in typeOptions"
               :key="dict.dictValue"
               :label="dict.dictLabel"
-              :value="dict.dictValue"
+              :value="parseInt(dict.dictValue)"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属公司" prop="corpName">
-          <el-input v-model="form.corpName" placeholder="请输入所属公司"/>
-        </el-form-item>
-        <el-form-item label="照片">
-          <uploadImage v-model="form.pictureUrl"/>
-        </el-form-item>
-        <el-form-item label="报餐科室" prop="deptList">
-          <el-select v-model="form.deptList" multiple placeholder="请选择报餐科室">
+        <!--        <el-form-item label="菜品列表" prop="foodList">-->
+        <!--          <el-input v-model="form.foodList" placeholder="请输入菜品列表" />-->
+        <!--        </el-form-item>-->
+        <el-form-item label="菜品" prop="foodList">
+          <el-select v-model="queryParams.foodList" multiple placeholder="请选择菜品" clearable size="small">
             <el-option
-              v-for="item in deptListOptions"
-              :key="item.departName"
-              :label="item.departName"
-              :value="item.departId">
+              v-for="item in foodListOptions"
+              :key="item.name"
+              :label="item.name"
+              :value="item.foodId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -165,25 +139,21 @@
 
 <script>
 import {
-  addStaffInfo,
-  careStaffList,
-  delStaffInfo,
-  exportStaffInfo,
-  getNursingInfo,
-  updateNursingInfo,
-} from "@/api/fantang/staffInfo";
-import {listDepart} from "@/api/fantang/depart";
-import UploadImage from '@/components/UploadImage';
+  addFoodDefault,
+  delFoodDefault,
+  exportFoodDefault,
+  getFoodDefault,
+  listFoodDefault,
+  updateFoodDefault
+} from "@/api/fantang/foodDefault";
+import {listFood} from "@/api/fantang/food";
 
 export default {
-  name: "StaffInfo",
-  components: {
-    UploadImage,
-  },
+  name: "FoodDefault",
+  components: {},
   data() {
     return {
-      sexOptions: [],
-      deptListOptions: [],
+      foodListOptions: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -196,59 +166,49 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 员工管理表格数据
-      staffInfoList: [],
+      // 默认报餐管理表格数据
+      foodDefaultList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      // 报餐类型字典
+      typeOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        name: null,
-        staffType: null,
-        corpName: null,
-        deptList: null,
+        type: null,
       },
       // 表单参数
       form: {},
       // 表单校验
-      rules: {
-        name: [
-          {required: true, message: "姓名不能为空", trigger: "blur"}
-        ],
-        corpName: [
-          {required: true, message: "所属公司不能为空", trigger: "blur"}
-        ],
-        sex: [
-          {required: true, message: "性别不能为空", trigger: "blur"}
-        ],
-        deptList: [
-          {required: true, message: "报餐科室不能为空", trigger: "blur"}
-        ],
-      }
+      rules: {}
     };
   },
   created() {
     this.getList();
-    this.getDicts("sys_user_sex").then(response => {
-      this.sexOptions = response.data;
+    this.getDicts("ft_book_type").then(response => {
+      this.typeOptions = response.data;
     });
   },
   methods: {
-    /** 查询员工管理列表 */
+    /** 查询默认报餐管理列表 */
     getList() {
       this.loading = true;
-      careStaffList(this.queryParams).then(response => {
-        this.staffInfoList = response.rows;
+      listFoodDefault(this.queryParams).then(response => {
+        this.foodDefaultList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
-      listDepart(this.queryParams).then(response => {
-        // console.log("depart", response);
-        this.deptListOptions = response.rows;
+      listFood(this.queryParams).then(response => {
+        console.log("depart", response);
+        this.foodListOptions = response.rows;
       })
+    },
+    // 报餐类型字典翻译
+    typeFormat(row, column) {
+      return this.selectDictLabel(this.typeOptions, row.type);
     },
     // 取消按钮
     cancel() {
@@ -258,21 +218,13 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        staffId: null,
-        departId: null,
-        name: null,
-        post: null,
-        role: null,
-        password: null,
-        createAt: null,
-        createBy: null,
-        flag: null,
-        balance: null,
-        staffType: null,
-        corpName: null,
-        pictureUrl: null,
-        deptList: null,
-        qrCode: null
+        id: null,
+        type: null,
+        foodList: null,
+        createdAt: null,
+        createdBy: null,
+        updatedAt: null,
+        updatedBy: null
       };
       this.resetForm("form");
     },
@@ -288,7 +240,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.staffId)
+      this.ids = selection.map(item => item.id)
       this.single = selection.length !== 1
       this.multiple = !selection.length
     },
@@ -296,34 +248,30 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加员工管理";
+      this.title = "添加默认报餐管理";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const staffId = row.staffId || this.ids;
-      getNursingInfo(staffId).then(response => {
+      const id = row.id || this.ids
+      getFoodDefault(id).then(response => {
         this.form = response.data;
-        this.form.deptList = response.data.deptList.split(',').map(Number);
-        // this.form.deptList =['2','3'].map(Number);
         this.open = true;
-        this.title = "修改护工管理";
+        this.title = "修改默认报餐管理";
       });
     },
     /** 提交按钮 */
     submitForm() {
-      this.form.deptList = this.form.deptList.toString();
-      console.log("form-->convert-->", this.form);
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.staffId != null) {
-            updateNursingInfo(this.form).then(response => {
+          if (this.form.id != null) {
+            updateFoodDefault(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addStaffInfo(this.form).then(response => {
+            addFoodDefault(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -334,13 +282,13 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const staffIds = row.staffId || this.ids;
-      this.$confirm('是否确认删除员工管理编号为"' + staffIds + '"的数据项?', "警告", {
+      const ids = row.id || this.ids;
+      this.$confirm('是否确认删除默认报餐管理编号为"' + ids + '"的数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(function () {
-        return delStaffInfo(staffIds);
+        return delFoodDefault(ids);
       }).then(() => {
         this.getList();
         this.msgSuccess("删除成功");
@@ -349,12 +297,12 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有员工管理数据项?', "警告", {
+      this.$confirm('是否确认导出所有默认报餐管理数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(function () {
-        return exportStaffInfo(queryParams);
+        return exportFoodDefault(queryParams);
       }).then(response => {
         this.download(response.msg);
       })
