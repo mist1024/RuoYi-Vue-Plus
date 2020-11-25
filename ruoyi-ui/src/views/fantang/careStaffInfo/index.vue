@@ -10,11 +10,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <!--      <el-form-item label="员工类别" prop="staffType">-->
-      <!--        <el-select v-model="queryParams.staffType" placeholder="请选择员工类别" clearable size="small">-->
-      <!--          <el-option label="请选择字典生成" value="" />-->
-      <!--        </el-select>-->
-      <!--      </el-form-item>-->
       <el-form-item label="所属公司" prop="corpName">
         <el-input
           v-model="queryParams.corpName"
@@ -131,8 +126,8 @@
     />
 
     <!-- 添加或修改员工管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名"/>
         </el-form-item>
@@ -146,11 +141,6 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <!--        <el-form-item label="员工类别" prop="staffType">-->
-        <!--          <el-select v-model="form.staffType" placeholder="请选择员工类别">-->
-        <!--            <el-option label="请选择字典生成" value="" />-->
-        <!--          </el-select>-->
-        <!--        </el-form-item>-->
         <el-form-item label="所属公司" prop="corpName">
           <el-input v-model="form.corpName" placeholder="请输入所属公司"/>
         </el-form-item>
@@ -158,7 +148,7 @@
           <uploadImage v-model="form.pictureUrl"/>
         </el-form-item>
         <el-form-item label="报餐科室" prop="deptList">
-          <el-select v-model="form.deptList" placeholder="请选择报餐科室">
+          <el-select v-model="form.deptList" multiple placeholder="请选择报餐科室">
             <el-option
               v-for="item in deptListOptions"
               :key="item.departName"
@@ -183,7 +173,8 @@ import {
   delStaffInfo,
   exportStaffInfo,
   getStaffInfo,
-  updateStaffInfo
+  getNursingInfo,
+  updateNursingInfo,
 } from "@/api/fantang/staffInfo";
 import {listDepart} from "@/api/fantang/depart";
 import UploadImage from '@/components/UploadImage';
@@ -314,19 +305,24 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const staffId = row.staffId || this.ids
-      getStaffInfo(staffId).then(response => {
+      const staffId = row.staffId || this.ids;
+      getNursingInfo(staffId).then(response => {
         this.form = response.data;
+        // this.form.deptList = response.data.deptList.split(',');
+        this.form.deptList =[2,3];
         this.open = true;
-        this.title = "修改员工管理";
+        this.title = "修改护工管理";
+        console.log("form-->", this.form);
       });
     },
     /** 提交按钮 */
     submitForm() {
+      this.form.deptList = this.form.deptList.toString();
+      console.log("form-->convert-->", this.form);
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.staffId != null) {
-            updateStaffInfo(this.form).then(response => {
+            updateNursingInfo(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();

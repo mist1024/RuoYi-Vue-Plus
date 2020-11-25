@@ -23,6 +23,4 @@
         <result property="sex" column="sex"/>
         <result property="tel" column="tel"/>
     </resultMap>
-
-
 </mapper>

@@ -26,6 +26,14 @@ export function getStaffInfo(staffId) {
   })
 }
 
+export function getNursingInfo(nursingId) {
+  return request({
+    url: '/fantang/staffInfo/nursing/' + nursingId,
+    method: 'get'
+  })
+}
+
+
 // 新增员工管理
 export function addStaffInfo(data) {
   return request({
@@ -58,5 +66,13 @@ export function exportStaffInfo(query) {
     url: '/fantang/staffInfo/export',
     method: 'get',
     params: query
+  })
+}
+
+export function updateNursingInfo(data) {
+  return request({
+    url: '/fantang/staffInfo/nursing',
+    method: 'put',
+    data: data
   })
 }
