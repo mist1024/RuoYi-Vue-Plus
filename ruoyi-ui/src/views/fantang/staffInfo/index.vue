@@ -160,10 +160,10 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="科室" prop="deptList">
-          <el-select v-model="form.deptList" placeholder="请选择科室">
+        <el-form-item label="科室" prop="departId">
+          <el-select v-model="form.departId" placeholder="请选择科室">
             <el-option
-              v-for="item in deptListOptions"
+              v-for="item in departIdOptions"
               :key="item.departName"
               :label="item.departName"
               :value="item.departId">
@@ -212,7 +212,7 @@ export default {
   components: {},
   data() {
     return {
-      deptListOptions: [],
+      departIdOptions: [],
       sexOptions: [],
       postOptions: [],
       flagOptions: [{
@@ -268,8 +268,8 @@ export default {
         sex: [
           {required: true, message: "性别不能为空", trigger: "change"}
         ],
-        deptList: [
-          {required: true, message: "性别不能为空", trigger: "change"}
+        departId: [
+          {required: true, message: "科室不能为空", trigger: "change"}
         ],
         tel: [
           {required: true, message: "手机号码不能为空", trigger: "change"}
@@ -305,7 +305,7 @@ export default {
         console.log("flag-----", response);
       });
       listDepart(this.queryParams).then(response => {
-        this.deptListOptions = response.rows;
+        this.departIdOptions = response.rows;
       })
     },
     // 取消按钮
