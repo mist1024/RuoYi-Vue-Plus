@@ -51,7 +51,7 @@ private static final long serialVersionUID=1L;
     private String cycle;
 
     /** 启用标志 */
-    private Integer flag;
+    private Boolean flag;
 
     /** 创建日期 */
     @Excel(name = "创建日期" , width = 30, dateFormat = "yyyy-MM-dd")

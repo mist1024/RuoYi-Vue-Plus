@@ -99,7 +99,7 @@
           <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建人" align="center" prop="createBy"/>
+      <el-table-column label="启用标志" align="center" prop="flag" :formatter="formatFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -224,6 +224,14 @@ export default {
     });
   },
   methods: {
+    // 控制补贴列表启用状态的回显
+    formatFlag(row) {
+      if (row.flag)
+        return '启用';
+      else
+        return '禁用';
+    },
+
     /** 查询补贴管理列表 */
     getList() {
       this.loading = true;

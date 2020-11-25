@@ -81,7 +81,7 @@ public class FtStaffInfoDao implements Serializable {
      * 启用标志
      */
     @Excel(name = "启用标志")
-    private Integer flag;
+    private Boolean flag;
 
     /**
      * 补贴余额

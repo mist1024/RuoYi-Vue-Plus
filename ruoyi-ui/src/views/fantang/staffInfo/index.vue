@@ -94,14 +94,13 @@
       <el-table-column label="性别" align="center" prop="sex"/>
       <el-table-column label="手机号码" align="center" prop="tel"/>
       <el-table-column label="岗位" align="center" prop="post"/>
-      <!--      <el-table-column label="角色" align="center" prop="role"/>-->
       <el-table-column label="补贴余额" align="center" prop="balance"/>
       <el-table-column label="创建日期" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="是否启用" align="center" prop="flag"/>
+      <el-table-column label="是否启用" align="center" prop="flag" :formatter="formatFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -288,6 +287,14 @@ export default {
     });
   },
   methods: {
+    // 控制员工列表启用状态的回显
+    formatFlag(row) {
+      if (row.flag)
+        return '启用';
+      else
+        return '禁用';
+    },
+
     /** 查询员工管理列表 */
     getList() {
       this.loading = true;
