@@ -1,5 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
+import cn.hutool.core.date.DateTime;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
@@ -94,10 +96,20 @@ public class FtStaffInfoDaoController extends BaseController {
      * 获取员工管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('fantang:staffInfo:query')")
+    @GetMapping(value = "/nursing/{staffId}")
+    public AjaxResult getNursingInfo(@PathVariable("staffId") Long staffId) {
+        return AjaxResult.success(iFtStaffInfoDaoService.getById(staffId));
+    }
+
+    /**
+     * 获取护工管理详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:staffInfo:query')")
     @GetMapping(value = "/{staffId}")
     public AjaxResult getInfo(@PathVariable("staffId") Long staffId) {
         return AjaxResult.success(iFtStaffInfoDaoService.getById(staffId));
     }
+
 
     /**
      * 新增员工管理
@@ -127,7 +139,7 @@ public class FtStaffInfoDaoController extends BaseController {
         }
 
         ftStaffInfoDao.setCreateAt(new Date());
-        ftStaffInfoDao.setDepartId(Long.parseLong(ftStaffInfoDao.getDeptList()));
+        ftStaffInfoDao.setDeptList(ftStaffInfoDao.getDeptList());
 
         iFtStaffInfoDaoService.save(ftStaffInfoDao);
 
@@ -143,6 +155,26 @@ public class FtStaffInfoDaoController extends BaseController {
     public AjaxResult edit(@RequestBody FtStaffInfoDao ftStaffInfoDao) {
         return toAjax(iFtStaffInfoDaoService.updateById(ftStaffInfoDao) ? 1 : 0);
     }
+
+
+    /**
+     * 修改护工管理
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:staffInfo:edit')")
+    @Log(title = "护工管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/nursing")
+    public AjaxResult nursingEdit(@RequestBody JSONObject param) {
+        FtStaffInfoDao dao = new FtStaffInfoDao();
+        dao.setStaffId(param.getLong("staffId"));
+        dao.setCorpName(param.getString("corpName"));
+        dao.setCreateAt(new DateTime());
+        dao.setSex(param.getInteger("sex"));
+        dao.setDeptList(param.getString("deptList"));
+        dao.setStaffType(param.getLong("staffType"));
+        dao.setName(param.getString("name"));
+        return toAjax(iFtStaffInfoDaoService.updateById(dao) ? 1 : 0);
+    }
+
 
     /**
      * 删除员工管理
