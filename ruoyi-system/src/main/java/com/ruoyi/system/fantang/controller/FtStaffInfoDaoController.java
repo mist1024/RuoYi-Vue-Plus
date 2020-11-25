@@ -13,7 +13,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
-import com.ruoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +34,6 @@ import java.util.List;
 public class FtStaffInfoDaoController extends BaseController {
 
     private final IFtStaffInfoDaoService iFtStaffInfoDaoService;
-
-    private final ISysUserService userService;
 
     /**
      * 查询员工管理列表

@@ -115,11 +115,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <!--        <el-form-item label="菜品列表" prop="foodList">-->
-        <!--          <el-input v-model="form.foodList" placeholder="请输入菜品列表" />-->
-        <!--        </el-form-item>-->
         <el-form-item label="菜品" prop="foodList">
-          <el-select v-model="queryParams.foodList" multiple placeholder="请选择菜品" clearable size="small">
+          <el-select v-model="form.foodList" multiple placeholder="请选择菜品" clearable size="small">
             <el-option
               v-for="item in foodListOptions"
               :key="item.name"
@@ -183,7 +180,14 @@ export default {
       // 表单参数
       form: {},
       // 表单校验
-      rules: {}
+      rules: {
+        type: [
+          {required: true, message: "报餐类型不能为空", trigger: "blur"}
+        ],
+        foodList: [
+          {required: true, message: "菜品不能为空", trigger: "blur"}
+        ],
+      }
     };
   },
   created() {
@@ -202,7 +206,6 @@ export default {
         this.loading = false;
       });
       listFood(this.queryParams).then(response => {
-        console.log("depart", response);
         this.foodListOptions = response.rows;
       })
     },
@@ -256,12 +259,14 @@ export default {
       const id = row.id || this.ids
       getFoodDefault(id).then(response => {
         this.form = response.data;
+        this.form.foodList = response.data.foodList.split(',').map(Number);
         this.open = true;
         this.title = "修改默认报餐管理";
       });
     },
     /** 提交按钮 */
     submitForm() {
+      this.form.foodList = this.form.foodList.toString();
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
@@ -271,6 +276,7 @@ export default {
               this.getList();
             });
           } else {
+            console.log(this.form);
             addFoodDefault(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
