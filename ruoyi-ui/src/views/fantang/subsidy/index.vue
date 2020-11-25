@@ -20,24 +20,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="范围" prop="range">
-        <el-input
-          v-model="queryParams.range"
-          placeholder="请输入范围"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="周期" prop="cycle">
-        <el-input
-          v-model="queryParams.cycle"
-          placeholder="请输入周期"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="创建日期" prop="createAt">
         <el-date-picker clearable size="small" style="width: 200px"
                         v-model="queryParams.createAt"
@@ -112,8 +94,6 @@
       <el-table-column label="补贴 id" align="center" prop="subsidyId" v-if="false"/>
       <el-table-column label="补贴类型" align="center" prop="type" :formatter="typeFormat"/>
       <el-table-column label="金额" align="center" prop="price"/>
-      <el-table-column label="范围" align="center" prop="range"/>
-      <el-table-column label="周期" align="center" prop="cycle"/>
       <el-table-column label="创建日期" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
@@ -166,11 +146,14 @@
         <el-form-item label="金额" prop="price">
           <el-input v-model="form.price" placeholder="请输入金额"/>
         </el-form-item>
-        <el-form-item label="范围" prop="range">
-          <el-input v-model="form.range" placeholder="请输入范围"/>
-        </el-form-item>
-        <el-form-item label="周期" prop="cycle">
-          <el-input v-model="form.cycle" placeholder="请输入周期"/>
+        <el-form-item label="启用标志" prop="flag">
+          <el-switch
+            v-model="form.flag"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="启用"
+            inactive-text="禁用">
+          </el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -215,8 +198,6 @@ export default {
         pageSize: 10,
         type: null,
         price: null,
-        range: null,
-        cycle: null,
         createAt: null,
         createBy: null
       },
@@ -230,11 +211,8 @@ export default {
         price: [
           {required: true, message: "金额不能为空", trigger: "blur"}
         ],
-        range: [
-          {required: true, message: "范围不能为空", trigger: "blur"}
-        ],
-        cycle: [
-          {required: true, message: "周期不能为空", trigger: "blur"}
+        flag: [
+          {required: true, message: "启用标志不能为空", trigger: "blur"}
         ],
       }
     };
@@ -270,11 +248,11 @@ export default {
         subsidyId: null,
         type: null,
         price: null,
-        range: null,
+        subsidyRange: null,
         cycle: null,
-        flag: null,
+        flag: true,
         createAt: null,
-        createBy: null
+        createBy: null,
       };
       this.resetForm("form");
     },
@@ -315,12 +293,22 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.subsidyId != null) {
+            if (this.form.flag === true) {
+              this.form.flag = 1;
+            } else {
+              this.form.flag = 0;
+            }
             updateSubsidy(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
+            if (this.form.flag === true) {
+              this.form.flag = 1;
+            } else {
+              this.form.flag = 0;
+            }
             addSubsidy(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;

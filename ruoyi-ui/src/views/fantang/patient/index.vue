@@ -123,7 +123,7 @@
           <el-input v-model="form.name" placeholder="请输入姓名"/>
         </el-form-item>
         <el-form-item label="所属部门" prop="departId">
-          <el-select v-model="form.departId" placeholder="请选择科室列表">
+          <el-select v-model="form.departId" placeholder="请选择科室">
             <el-option
               v-for="item in deptListOptions"
               :key="item.departName"

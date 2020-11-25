@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Arrays;
 
@@ -91,6 +92,9 @@ public class FtPatientDaoController extends BaseController {
     @Log(title = "病人管理" , businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtPatientDao ftPatientDao) {
+
+        ftPatientDao.setCreateAt(new Date());
+
         return toAjax(iFtPatientDaoService.save(ftPatientDao) ? 1 : 0);
     }
 

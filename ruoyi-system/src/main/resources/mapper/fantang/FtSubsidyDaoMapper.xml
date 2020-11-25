@@ -8,7 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="subsidyId"    column="subsidy_id"    />
         <result property="type"    column="type"    />
         <result property="price"    column="price"    />
-        <result property="range"    column="range"    />
+        <result property="subsidy_range"    column="subsidyRange"    />
         <result property="cycle"    column="cycle"    />
         <result property="flag"    column="flag"    />
         <result property="createAt"    column="create_at"    />
