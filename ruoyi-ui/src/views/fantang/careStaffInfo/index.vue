@@ -86,9 +86,6 @@
       <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="所属公司" align="center" prop="corpName"/>
-      <!--      <el-table-column label="员工类别" align="center" prop="staffType"/>-->
-      <el-table-column label="报餐科室" align="center" prop="deptList"/>
-      <el-table-column label="补贴余额" align="center" prop="balance"/>
       <el-table-column label="创建日期" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
@@ -308,11 +305,10 @@ export default {
       const staffId = row.staffId || this.ids;
       getNursingInfo(staffId).then(response => {
         this.form = response.data;
-        // this.form.deptList = response.data.deptList.split(',');
-        this.form.deptList =[2,3];
+        this.form.deptList = response.data.deptList.split(',').map(Number);
+        // this.form.deptList =['2','3'].map(Number);
         this.open = true;
         this.title = "修改护工管理";
-        console.log("form-->", this.form);
       });
     },
     /** 提交按钮 */
