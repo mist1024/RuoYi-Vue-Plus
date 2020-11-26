@@ -18,16 +18,16 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['fantang:foodDefault:add']"
-        >新增
-        </el-button>
-      </el-col>
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="primary"-->
+      <!--          icon="el-icon-plus"-->
+      <!--          size="mini"-->
+      <!--          @click="handleAdd"-->
+      <!--          v-hasPermi="['fantang:foodDefault:add']"-->
+      <!--        >新增-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -39,26 +39,26 @@
         >修改
         </el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['fantang:foodDefault:remove']"
-        >删除
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['fantang:foodDefault:export']"
-        >导出
-        </el-button>
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="danger"-->
+      <!--          icon="el-icon-delete"-->
+      <!--          size="mini"-->
+      <!--          :disabled="multiple"-->
+      <!--          @click="handleDelete"-->
+      <!--          v-hasPermi="['fantang:foodDefault:remove']"-->
+      <!--        >删除-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
+      <!--      <el-col :span="1.5">-->
+      <el-button
+        type="warning"
+        icon="el-icon-download"
+        size="mini"
+        @click="handleExport"
+        v-hasPermi="['fantang:foodDefault:export']"
+      >导出
+      </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -67,9 +67,9 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="报餐类型" align="center" prop="type" :formatter="typeFormat"/>
-      <el-table-column label="创建日期" align="center" prop="createdAt" width="180">
+      <el-table-column label="更新日期" align="center" prop="updatedAt" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createdAt, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.updatedAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -82,14 +82,14 @@
             v-hasPermi="['fantang:foodDefault:edit']"
           >修改
           </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['fantang:foodDefault:remove']"
-          >删除
-          </el-button>
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-delete"-->
+          <!--            @click="handleDelete(scope.row)"-->
+          <!--            v-hasPermi="['fantang:foodDefault:remove']"-->
+          <!--          >删除-->
+          <!--          </el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -201,11 +201,12 @@ export default {
     getList() {
       this.loading = true;
       listFoodDefault(this.queryParams).then(response => {
+        console.log(response.rows)
         this.foodDefaultList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
-      listFood(this.queryParams).then(response => {
+      listFood().then(response => {
         this.foodListOptions = response.rows;
       })
     },

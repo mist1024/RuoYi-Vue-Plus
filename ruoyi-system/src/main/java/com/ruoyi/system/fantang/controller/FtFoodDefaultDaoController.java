@@ -87,6 +87,7 @@ public class FtFoodDefaultDaoController extends BaseController {
     @Log(title = "默认报餐管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody FtFoodDefaultDao ftFoodDefaultDao) {
+        ftFoodDefaultDao.setUpdatedAt(new Date());
         return toAjax(iFtFoodDefaultDaoService.updateById(ftFoodDefaultDao) ? 1 : 0);
     }
 

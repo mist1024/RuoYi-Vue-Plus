@@ -52,6 +52,8 @@ private static final long serialVersionUID=1L;
     private Long createdBy;
 
     /** 更新日期 */
+    @Excel(name = "更新日期" , width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
 
     /** 更新人 */
