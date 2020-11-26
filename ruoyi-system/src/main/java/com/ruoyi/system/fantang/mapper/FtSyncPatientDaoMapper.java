@@ -2,8 +2,8 @@ package com.ruoyi.system.fantang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtRemotePatientDao;
+import org.springframework.stereotype.Repository;
 
-
-public interface ftRemotePatientDaoMapper extends BaseMapper<FtRemotePatientDao> {
-
+@Repository
+public interface FtSyncPatientDaoMapper  extends BaseMapper<FtRemotePatientDao> {
 }

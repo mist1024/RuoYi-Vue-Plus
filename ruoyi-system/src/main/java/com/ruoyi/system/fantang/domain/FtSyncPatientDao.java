@@ -1,9 +1,7 @@
 package com.ruoyi.system.fantang.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.common.annotation.Excel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,7 +22,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_sync")
-public class FtRemotePatientDao implements Serializable {
+public class FtSyncPatientDao implements Serializable {
 
 private static final long serialVersionUID=1L;
 
