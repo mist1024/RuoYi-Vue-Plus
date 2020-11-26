@@ -23,7 +23,7 @@ public class SyncPatientServiceImpl implements ISyncPatientService {
     // 从远程数据源插上病患数据
     @Override
     public Integer insertToLocalSync(List<FtRemotePatientDao> remotePatientDaoList) {
-        // 情况本地中间表数据
+        // 清空本地中间表数据，准备接收同步数据
         syncPatientDaoMapper.delete(null);
 
         // 遍历数据源，逐条插入本地中间表
@@ -34,20 +34,19 @@ public class SyncPatientServiceImpl implements ISyncPatientService {
         // 初始化本地病患表准备同步，将标志位置“0”
         int ret = patientDaoMapper.initForSync();
 
-        // 更新住院号相同的记录，并标注
+        // 更新住院号相同的记录，并标注flag=1
         ret = patientDaoMapper.syncEqualHospitalId();
         System.out.println(ret);
 
-        // 从中间表添加新增病患数据
+        // 从中间表添加新增病患数据，并标注flag=2
         ret = patientDaoMapper.syncNewHospitalId();
         System.out.println(ret);
 
-        // 将没有同步的病患数据设置为出院状态
+        // 将没有同步的病患数据设置为出院状态, off_flag=1
         patientDaoMapper.updateOffHospitalFlag();
 
-
-
-
+        // 为新病患记录填入对应的科室id
+        patientDaoMapper.updateDepartIDToNewPatient();
 
         return remotePatientDaoList.size();
     }

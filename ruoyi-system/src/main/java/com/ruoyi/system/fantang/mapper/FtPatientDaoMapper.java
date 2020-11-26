@@ -26,5 +26,8 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     @Update("update ft_patient set off_flag = 1 where sync_flag = 0")
     public int updateOffHospitalFlag();
 
+    @Update("update ft_patient a inner join ft_sync b on a.hospital_id = b.hospital_id and a.sync_flag = 2 set a.depart_id = (select depart_id from ft_depart c where b.depart_name = c.depart_name )")
+    public int updateDepartIDToNewPatient();
+
 
 }
