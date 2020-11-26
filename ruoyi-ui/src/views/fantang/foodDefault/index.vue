@@ -50,15 +50,15 @@
       <!--        >删除-->
       <!--        </el-button>-->
       <!--      </el-col>-->
-      <!--      <el-col :span="1.5">-->
-      <el-button
-        type="warning"
-        icon="el-icon-download"
-        size="mini"
-        @click="handleExport"
-        v-hasPermi="['fantang:foodDefault:export']"
-      >导出
-      </el-button>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['fantang:foodDefault:export']"
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -67,6 +67,7 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="报餐类型" align="center" prop="type" :formatter="typeFormat"/>
+      <el-table-column label="总价格" align="center" prop="price"/>
       <el-table-column label="更新日期" align="center" prop="updatedAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updatedAt, '{y}-{m}-{d}') }}</span>

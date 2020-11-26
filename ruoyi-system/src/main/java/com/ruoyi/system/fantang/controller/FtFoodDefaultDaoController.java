@@ -9,12 +9,14 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtFoodDefaultDao;
+import com.ruoyi.system.fantang.service.IFtFoodDaoService;
 import com.ruoyi.system.fantang.service.IFtFoodDefaultDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,8 @@ import java.util.List;
 public class FtFoodDefaultDaoController extends BaseController {
 
     private final IFtFoodDefaultDaoService iFtFoodDefaultDaoService;
+
+    private final IFtFoodDaoService iFtFoodDaoService;
 
     /**
      * 查询默认报餐管理列表
@@ -87,6 +91,15 @@ public class FtFoodDefaultDaoController extends BaseController {
     @Log(title = "默认报餐管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody FtFoodDefaultDao ftFoodDefaultDao) {
+        String foodList = ftFoodDefaultDao.getFoodList();
+        String[] temp = foodList.split(",");
+        BigDecimal totalPrice = new BigDecimal(0);
+        for (String foodId : temp) {
+            BigDecimal price = iFtFoodDaoService.getById(Long.parseLong(foodId)).getPrice();
+            totalPrice = totalPrice.add(price);
+        }
+        ftFoodDefaultDao.setPrice(totalPrice);
+
         ftFoodDefaultDao.setUpdatedAt(new Date());
         return toAjax(iFtFoodDefaultDaoService.updateById(ftFoodDefaultDao) ? 1 : 0);
     }

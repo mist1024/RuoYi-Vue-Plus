@@ -58,4 +58,8 @@ private static final long serialVersionUID=1L;
 
     /** 更新人 */
     private Long updatedBy;
+
+    /** 总价格 */
+    @Excel(name = "总价格")
+    private BigDecimal price;
 }
