@@ -12,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IFtFoodDemandDaoService extends IService<FtFoodDemandDao> {
     public Integer GenerateOrderByPatientId(Long patientId);
 
+    public Integer GenerateOrderForNewPatient() ;
+
+
 }

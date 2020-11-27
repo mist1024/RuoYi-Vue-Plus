@@ -16,6 +16,6 @@ public class FtGenerateOrderTask {
     private FtFoodDemandDaoServiceImpl foodDemandDaoService;
     public void GenerateOrderTask() {
         System.out.println("执行生成一条病患默认订餐配置记录");
-        foodDemandDaoService.GenerateOrderByPatientId(4L);
+        foodDemandDaoService.GenerateOrderForNewPatient();
     }
 }
