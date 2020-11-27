@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @DataSource(value = DataSourceType.SLAVE)
 @Component("SyncPatient")
-public class ftSyncPatient {
+public class ftSyncPatientTask {
     @Autowired
     private FtRemotePatientDaoMapper ftRemotePatientDaoMapper;
 
