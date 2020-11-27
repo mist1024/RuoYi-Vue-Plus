@@ -3,12 +3,17 @@ package com.ruoyi.system.service.impl;
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.system.fantang.domain.FtRemotePatientDao;
+import com.ruoyi.system.fantang.domain.FtSyncLogDao;
 import com.ruoyi.system.fantang.mapper.FtPatientDaoMapper;
+import com.ruoyi.system.fantang.mapper.FtSyncLogDaoMapper;
 import com.ruoyi.system.fantang.mapper.FtSyncPatientDaoMapper;
 import com.ruoyi.system.service.ISyncPatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @DataSource(value = DataSourceType.MASTER)
@@ -20,7 +25,11 @@ public class SyncPatientServiceImpl implements ISyncPatientService {
     @Autowired
     private FtPatientDaoMapper patientDaoMapper;
 
+    @Autowired
+    private FtSyncLogDaoMapper syncLogDaoMapper;
+
     // 从远程数据源插上病患数据
+    @Transactional
     @Override
     public Integer insertToLocalSync(List<FtRemotePatientDao> remotePatientDaoList) {
         // 清空本地中间表数据，准备接收同步数据
@@ -35,8 +44,7 @@ public class SyncPatientServiceImpl implements ISyncPatientService {
         int ret = patientDaoMapper.initForSync();
 
         // 更新住院号相同的记录，并标注flag=1
-        ret = patientDaoMapper.syncEqualHospitalId();
-        System.out.println(ret);
+        int syncCount = patientDaoMapper.syncEqualHospitalId();
 
         // 从中间表添加新增病患数据，并标注flag=2
         ret = patientDaoMapper.syncNewHospitalId();
@@ -47,6 +55,13 @@ public class SyncPatientServiceImpl implements ISyncPatientService {
 
         // 为新病患记录填入对应的科室id
         patientDaoMapper.updateDepartIDToNewPatient();
+
+        // 创建同步日志记录
+        FtSyncLogDao syncLogDao = new FtSyncLogDao();
+        syncLogDao.setCreateAt(new Date());
+        syncLogDao.setTotalRecord((long) remotePatientDaoList.size());
+        syncLogDao.setSyncRecord((long) syncCount);
+        syncLogDaoMapper.insert(syncLogDao);
 
         return remotePatientDaoList.size();
     }
