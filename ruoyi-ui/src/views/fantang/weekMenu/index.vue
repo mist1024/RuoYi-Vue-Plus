@@ -11,7 +11,7 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:weekMenu:edit']"
-        >修改
+        >保存
         </el-button>
       </el-col>
       <el-col :span="1.5">
@@ -36,9 +36,28 @@
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="星期几" align="center" prop="weekday"/>
       <el-table-column label="用餐类型" align="center" prop="dinnerType"/>
-      <el-table-column label="菜品列表" align="center" prop="foods"/>
+      <el-table-column label="菜品列表" align="center" prop="foods">
+        <template slot-scope="scope">
+          <el-select v-model="scope.row.foods" multiple>
+            <el-option
+              v-for="item in foodList"
+              :key="item.foodId"
+              :label="item.name"
+              :value="item.foodId">
+            </el-option>
+          </el-select>
+        </template>
+      </el-table-column>
       <el-table-column label="总价格" align="center" prop="price"/>
-      <el-table-column label="启用标志" align="center" prop="flag" :formatter="formatStartFlag"/>
+      <el-table-column label="启用标志" align="center" prop="flag" :formatter="formatStartFlag">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.flag"
+            active-text="启用"
+            inactive-text="禁用">
+          </el-switch>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -47,7 +66,7 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:weekMenu:edit']"
-          >修改
+          >保存
           </el-button>
         </template>
       </el-table-column>
@@ -143,7 +162,7 @@
         // 菜品列表
         foodList: [],
         // queryParams
-        foodQueryParams:{
+        foodQueryParams: {
           pageNum: 1,
           pageSize: 9,
           name: null,
@@ -154,35 +173,35 @@
         // 是否显示弹出层
         open: false,
         dinnerTypeOptions: [{
-            value: '早餐',
-            label: '早餐'
-          }, {
-            value: '午餐',
-            label: '午餐'
-          }, {
-            value: '晚餐',
-            label: '晚餐'
-          }
+          value: '早餐',
+          label: '早餐'
+        }, {
+          value: '午餐',
+          label: '午餐'
+        }, {
+          value: '晚餐',
+          label: '晚餐'
+        }
         ],
-        weekdayOptions : [{
+        weekdayOptions: [{
           value: '周一',
           label: '周一'
         }, {
           value: '周二',
           label: '周二'
-        },{
+        }, {
           value: '周三',
           label: '周三'
-        },{
+        }, {
           value: '周四',
           label: '周四'
-        },{
+        }, {
           value: '周五',
           label: '周五'
-        },{
+        }, {
           value: '周六',
           label: '周六'
-        },{
+        }, {
           value: '周日',
           label: '周日'
         }],
@@ -217,7 +236,7 @@
       this.getList();
     },
     methods: {
-      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+      objectSpanMethod({row, column, rowIndex, columnIndex}) {
         if (columnIndex === 1) {
           if (rowIndex % 3 === 0) {
             return {
@@ -234,7 +253,7 @@
       },
 
       formatStartFlag(row) {
-        if(row.flag)
+        if (row.flag)
           return "启用";
         else
           return "禁用";
@@ -245,6 +264,13 @@
         listWeekMenu(this.queryParams).then(response => {
           this.weekMenuList = response.rows;
           this.total = response.total;
+          console.log("before-->", this.weekMenuList);
+          for (let i = 0; i < this.weekMenuList.length; i++) {
+            if (this.weekMenuList[i].foods !== null)
+              this.weekMenuList[i].foods = this.weekMenuList[i].foods.split(',').map(Number);
+
+          }
+          console.log("after-->", this.weekMenuList);
           this.loading = false;
         });
         listFood(this.queryParams).then(response => {
@@ -289,13 +315,19 @@
       },
       /** 修改按钮操作 */
       handleUpdate(row) {
-        this.reset();
-        const id = row.id || this.ids
-        getWeekMenu(id).then(response => {
-          this.form = response.data;
-          this.open = true;
-          this.title = "修改每周菜单";
+        row.foods = row.foods.toLocaleString();
+        updateWeekMenu(row).then(response => {
+          this.msgSuccess("修改成功");
+          row.foods = row.foods.split(',').map(Number);
         });
+
+        // this.reset();
+        // const id = row.id || this.ids
+        // getWeekMenu(id).then(response => {
+        //   this.form = response.data;
+        //   this.open = true;
+        //   this.title = "修改每周菜单";
+        // });
       },
       /** 提交按钮 */
       submitForm() {
