@@ -7,6 +7,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtWeekMenuDao;
 import com.ruoyi.system.fantang.service.IFtWeekMenuDaoService;
@@ -38,31 +39,21 @@ public class FtWeekMenuDaoController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(FtWeekMenuDao ftWeekMenuDao) {
         startPage();
-        LambdaQueryWrapper<FtWeekMenuDao> lqw = Wrappers.lambdaQuery(ftWeekMenuDao);
-        if (ftWeekMenuDao.getDinnerType() != null) {
-            lqw.eq(FtWeekMenuDao::getDinnerType, ftWeekMenuDao.getDinnerType());
-        }
-        if (ftWeekMenuDao.getWeekday() != null) {
-            lqw.eq(FtWeekMenuDao::getWeekday, ftWeekMenuDao.getWeekday());
-        }
-        if (ftWeekMenuDao.getFlag() != null) {
-            lqw.eq(FtWeekMenuDao::getFlag, ftWeekMenuDao.getFlag());
-        }
-        List<FtWeekMenuDao> list = iFtWeekMenuDaoService.list(lqw);
+        List<FtWeekMenuDao> list = iFtWeekMenuDaoService.list(null);
         return getDataTable(list);
     }
 
     /**
      * 导出每周菜单列表
      */
-    @PreAuthorize("@ss.hasPermi('fantang:weekMenu:export')")
-    @Log(title = "每周菜单", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
+    @PreAuthorize("@ss.hasPermi('fantang:weekMenu:export')" )
+    @Log(title = "每周菜单" , businessType = BusinessType.EXPORT)
+    @GetMapping("/export" )
     public AjaxResult export(FtWeekMenuDao ftWeekMenuDao) {
         LambdaQueryWrapper<FtWeekMenuDao> lqw = new LambdaQueryWrapper<FtWeekMenuDao>(ftWeekMenuDao);
         List<FtWeekMenuDao> list = iFtWeekMenuDaoService.list(lqw);
-        ExcelUtil<FtWeekMenuDao> util = new ExcelUtil<FtWeekMenuDao>(FtWeekMenuDao.class);
-        return util.exportExcel(list, "weekMenu");
+        ExcelUtil<FtWeekMenuDao> util = new ExcelUtil<FtWeekMenuDao>(FtWeekMenuDao. class);
+        return util.exportExcel(list, "weekMenu" );
     }
 
     /**

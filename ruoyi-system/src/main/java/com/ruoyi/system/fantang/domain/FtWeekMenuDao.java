@@ -54,5 +54,5 @@ private static final long serialVersionUID=1L;
 
     /** 启用标志 */
     @Excel(name = "启用标志")
-    private Integer flag;
+    private Boolean flag;
 }
