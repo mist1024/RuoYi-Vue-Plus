@@ -31,14 +31,15 @@
 
     <el-table v-loading="loading" :data="weekMenuList"
               :span-method="objectSpanMethod"
+              border="true"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-      <el-table-column label="星期几" align="center" prop="weekday"/>
-      <el-table-column label="用餐类型" align="center" prop="dinnerType"/>
-      <el-table-column label="菜品列表" align="center" prop="foods">
+      <el-table-column label="星期几" align="center" prop="weekday" width="80px"/>
+      <el-table-column label="类型" align="center" prop="dinnerType"  width="80px"/>
+      <el-table-column label="菜品列表" align="center" prop="foods"  width="500px">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.foods" multiple>
+          <el-select v-model="scope.row.foods" multiple style="width: 400px">
             <el-option
               v-for="item in foodList"
               :key="item.foodId"
@@ -51,8 +52,9 @@
           </el-select>
         </template>
       </el-table-column>
-      <el-table-column label="总价格" align="center" prop="price"/>
-      <el-table-column label="启用标志" align="center" prop="flag" :formatter="formatStartFlag">
+      <el-table-column label="总价格" align="center" prop="price" width="100px"/>
+      <el-table-column label="启用标志" align="center" prop="flag" width="180px"
+                       :formatter="formatStartFlag">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.flag"
