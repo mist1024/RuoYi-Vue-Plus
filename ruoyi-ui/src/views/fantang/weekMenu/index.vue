@@ -248,13 +248,11 @@
       },
       // 根据菜单选择的变化，计算总价
       changeFoods(row) {
-        console.log("row-->", row);
         let ret = 0;
         for(let i =0 ; i < row.foods.length; i++) {
           ret += this.foodList[i].price;
         }
         this.weekMenuList[row.id -1 ].price = ret;
-
       },
 
       // 控制合并列
@@ -289,7 +287,6 @@
         listFood(this.queryParams).then(response => {
           this.foodList = response.rows;
           this.loading = false;
-          console.log("foods", this.foodList);
         });
 
       },
