@@ -38,11 +38,11 @@ private static final long serialVersionUID=1L;
 
     /** 用餐类型 */
     @Excel(name = "用餐类型")
-    private Integer dinnerType;
+    private String dinnerType;
 
     /** 星期几 */
     @Excel(name = "星期几")
-    private Integer weekday;
+    private String weekday;
 
     /** 菜品列表 */
     @Excel(name = "菜品列表")
