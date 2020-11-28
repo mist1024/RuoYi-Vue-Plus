@@ -31,7 +31,7 @@
 
     <el-table v-loading="loading" :data="weekMenuList"
               :span-method="objectSpanMethod"
-              border="true"
+              :border="true"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
@@ -39,7 +39,9 @@
       <el-table-column label="类型" align="center" prop="dinnerType"  width="80px"/>
       <el-table-column label="菜品列表" align="center" prop="foods"  width="500px">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.foods" multiple style="width: 400px">
+          <el-select v-model="scope.row.foods"
+                     @change="changeFoods(scope.row)"
+                     multiple style="width: 400px">
             <el-option
               v-for="item in foodList"
               :key="item.foodId"
@@ -52,9 +54,8 @@
           </el-select>
         </template>
       </el-table-column>
-      <el-table-column label="总价格" align="center" prop="price" width="100px"/>
-      <el-table-column label="启用标志" align="center" prop="flag" width="180px"
-                       :formatter="formatStartFlag">
+      <el-table-column label="总价格" align="center" prop="price" width="100px" :formatter="formatPrice"/>
+      <el-table-column label="启用标志" align="center" prop="flag" width="180px">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.flag"
@@ -241,6 +242,22 @@
       this.getList();
     },
     methods: {
+      // 格式化总价的显示，加上“元”
+      formatPrice(row) {
+        return row.price + " 元";
+      },
+      // 根据菜单选择的变化，计算总价
+      changeFoods(row) {
+        console.log("row-->", row);
+        let ret = 0;
+        for(let i =0 ; i < row.foods.length; i++) {
+          ret += this.foodList[i].price;
+        }
+        this.weekMenuList[row.id -1 ].price = ret;
+
+      },
+
+      // 控制合并列
       objectSpanMethod({row, column, rowIndex, columnIndex}) {
         if (columnIndex === 1) {
           if (rowIndex % 3 === 0) {
@@ -257,25 +274,16 @@
         }
       },
 
-      formatStartFlag(row) {
-        if (row.flag)
-          return "启用";
-        else
-          return "禁用";
-      },
       /** 查询每周菜单列表 */
       getList() {
         this.loading = true;
         listWeekMenu(this.queryParams).then(response => {
           this.weekMenuList = response.rows;
           this.total = response.total;
-          console.log("before-->", this.weekMenuList);
           for (let i = 0; i < this.weekMenuList.length; i++) {
             if (this.weekMenuList[i].foods !== null)
               this.weekMenuList[i].foods = this.weekMenuList[i].foods.split(',').map(Number);
-
           }
-          console.log("after-->", this.weekMenuList);
           this.loading = false;
         });
         listFood(this.queryParams).then(response => {
