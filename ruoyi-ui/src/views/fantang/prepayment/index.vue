@@ -305,6 +305,7 @@
           this.prepaymentList = response.rows;
           this.total = response.total;
           this.loadAll();
+          this.loading = false;
         });
       },
       // 取消按钮
