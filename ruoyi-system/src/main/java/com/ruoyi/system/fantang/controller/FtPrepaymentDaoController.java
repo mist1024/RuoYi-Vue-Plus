@@ -10,6 +10,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
+import com.ruoyi.system.fantang.vo.FtPrepaymentVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,15 @@ import java.util.List;
 public class FtPrepaymentDaoController extends BaseController {
 
     private final IFtPrepaymentDaoService iFtPrepaymentDaoService;
+
+    // 查询所有待缴费列表
+    @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
+    @GetMapping("/listNoPrepay")
+    public TableDataInfo listNoPrepay(FtPrepaymentDao ftPrepaymentDao) {
+        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.listNoPrepay();
+        return getDataTable(list);
+    }
+
 
     /**
      * 查询收费管理列表

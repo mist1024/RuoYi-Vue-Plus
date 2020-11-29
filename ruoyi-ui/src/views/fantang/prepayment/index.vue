@@ -152,8 +152,12 @@
               @click="handleIconClick">
             </i>
             <template slot-scope="{ item }">
-              <div class="name">{{ item.value }}</div>
-              <span class="addr">{{ item.address }}</span>
+              <div class="name">{{ item.name }}</div>
+              <span class="addr">
+                {{ item.departName }}
+                <el-divider direction="vertical"></el-divider>
+                {{ item.bedId}}
+              </span>
             </template>
           </el-autocomplete>
         </el-form-item>
@@ -187,6 +191,7 @@
     exportPrepayment,
     getPrepayment,
     listPrepayment,
+    listNoPrepayment,
     updatePrepayment
   } from "@/api/fantang/prepayment";
 
@@ -195,7 +200,8 @@
     components: {},
     data() {
       return {
-        restaurants: [],
+        suggestionList:[],
+        NoPrepayments: [],
         state: '',
         // 遮罩层
         loading: true,
@@ -245,13 +251,16 @@
       this.getList();
     },
     mounted() {
-      this.restaurants = this.loadAll();
+      this.loadAll();
     },
 
     methods: {
       // 响应自动查询回显
       querySearch(queryString, cb) {
-        var restaurants = this.restaurants;
+        var restaurants = this.suggestionList;
+        console.log("restaurants-->", restaurants);
+        console.log("queryString", queryString)
+        console.log("cb-->", cb)
         var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
         // 调用 callback 返回建议列表的数据
         cb(results);
@@ -266,9 +275,18 @@
 
       // 填充所有待缴预付伙食费的病人清单
       loadAll() {
-        return [
-          { "value": "南拳妈妈龙虾盖浇饭", "address": "普陀区金沙江路1699号鑫乐惠美食广场A13" }
-        ];
+        listNoPrepayment().then(response => {
+          this.NoPrepayments = response.rows;
+          this.suggestionList = this.NoPrepayments.map(item => {
+            return {
+              "value": item.hospitalId,
+              "departName": item.departName,
+              "name": item.name,
+              "bedId": item.bedId,
+            }
+          });
+         return response.rows;
+        });
       },
 
       // 处理自动查询列表选择的事件
@@ -286,7 +304,7 @@
         listPrepayment(this.queryParams).then(response => {
           this.prepaymentList = response.rows;
           this.total = response.total;
-          this.loading = false;
+          this.loadAll();
         });
       },
       // 取消按钮

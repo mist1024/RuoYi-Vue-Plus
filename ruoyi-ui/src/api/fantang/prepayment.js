@@ -1,5 +1,18 @@
 import request from '@/utils/request'
 
+
+
+
+// 查询所有未缴预付费病人列表
+export function listNoPrepayment() {
+  return request({
+    url: '/fantang/prepayment/listNoPrepay',
+    method: 'get',
+  })
+}
+
+
+
 // 查询收费管理列表
 export function listPrepayment(query) {
   return request({
