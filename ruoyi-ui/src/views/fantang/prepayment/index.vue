@@ -26,15 +26,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="预付费金额" prop="prepaid">
-        <el-input
-          v-model="queryParams.prepaid"
-          placeholder="请输入预付费金额"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="预付费时间" prop="prepaidAt">
         <el-date-picker clearable size="small" style="width: 200px"
                         v-model="queryParams.prepaidAt"
@@ -57,7 +48,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:prepayment:add']"
-        >新增
+        >预付收款
         </el-button>
       </el-col>
       <el-col :span="1.5">
@@ -147,16 +138,34 @@
 
     <!-- 添加或修改收费管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="formAddPrepayment" :model="formAddPrepayment" :rules="rules" label-width="80px">
+        <el-form-item label="住院号" prop="hospitalId">
+          <el-autocomplete
+            popper-class="my-autocomplete"
+            v-model="state"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入住院号"
+            @select="handleSelect">
+            <i
+              class="el-icon-edit el-input__icon"
+              slot="suffix"
+              @click="handleIconClick">
+            </i>
+            <template slot-scope="{ item }">
+              <div class="name">{{ item.value }}</div>
+              <span class="addr">{{ item.address }}</span>
+            </template>
+          </el-autocomplete>
+        </el-form-item>
         <el-form-item label="病人id" prop="patientId">
-          <el-input v-model="form.patientId" placeholder="请输入病人id"/>
+          <el-input v-model="formAddPrepayment.patientId" placeholder="请输入病人id"/>
         </el-form-item>
         <el-form-item label="预付费金额" prop="prepaid">
-          <el-input v-model="form.prepaid" placeholder="请输入预付费金额"/>
+          <el-input v-model="formAddPrepayment.prepaid" placeholder="请输入预付费金额"/>
         </el-form-item>
         <el-form-item label="预付费时间" prop="prepaidAt">
           <el-date-picker clearable size="small" style="width: 200px"
-                          v-model="form.prepaidAt"
+                          v-model="formAddPrepayment.prepaidAt"
                           type="date"
                           value-format="yyyy-MM-dd"
                           placeholder="选择预付费时间">
@@ -172,177 +181,237 @@
 </template>
 
 <script>
-import {
-  addPrepayment,
-  delPrepayment,
-  exportPrepayment,
-  getPrepayment,
-  listPrepayment,
-  updatePrepayment
-} from "@/api/fantang/prepayment";
+  import {
+    addPrepayment,
+    delPrepayment,
+    exportPrepayment,
+    getPrepayment,
+    listPrepayment,
+    updatePrepayment
+  } from "@/api/fantang/prepayment";
 
-export default {
-  name: "Prepayment",
-  components: {},
-  data() {
-    return {
-      // 遮罩层
-      loading: true,
-      // 选中数组
-      ids: [],
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
-      // 显示搜索条件
-      showSearch: true,
-      // 总条数
-      total: 0,
-      // 收费管理表格数据
-      prepaymentList: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
-      // 查询参数
-      queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-        collectAt: null,
-        settlementAt: null,
-        settlementFlag: null,
-        prepaid: null,
-        prepaidAt: null
-      },
-      // 表单参数
-      form: {},
-      // 表单校验
-      rules: {
-        patientId: [
-          {required: true, message: "病人id不能为空", trigger: "blur"}
-        ],
-        prepaid: [
-          {required: true, message: "预付费金额不能为空", trigger: "blur"}
-        ],
-        prepaidAt: [
-          {required: true, message: "预付费时间不能为空", trigger: "blur"}
-        ]
-      }
-    };
-  },
-  created() {
-    this.getList();
-  },
-  methods: {
-    /** 查询收费管理列表 */
-    getList() {
-      this.loading = true;
-      listPrepayment(this.queryParams).then(response => {
-        this.prepaymentList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
-    },
-    // 取消按钮
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    // 表单重置
-    reset() {
-      this.form = {
-        prepaymentId: null,
-        patientId: null,
-        collectAt: null,
-        collectBy: null,
-        settlementAt: null,
-        settlementBy: null,
-        settlementId: null,
-        settlementFlag: null,
-        prepaid: null,
-        prepaidAt: null
+  export default {
+    name: "Prepayment",
+    components: {},
+    data() {
+      return {
+        restaurants: [],
+        state: '',
+        // 遮罩层
+        loading: true,
+        // 选中数组
+        ids: [],
+        // 非单个禁用
+        single: true,
+        // 非多个禁用
+        multiple: true,
+        // 显示搜索条件
+        showSearch: true,
+        // 总条数
+        total: 0,
+        // 收费管理表格数据
+        prepaymentList: [],
+        // 弹出层标题
+        title: "",
+        // 是否显示弹出层
+        open: false,
+        // 查询参数
+        queryParams: {
+          pageNum: 1,
+          pageSize: 10,
+          collectAt: null,
+          settlementAt: null,
+          settlementFlag: null,
+          prepaid: null,
+          prepaidAt: null
+        },
+        // 表单参数
+        formAddPrepayment: {},
+        // 表单校验
+        rules: {
+          patientId: [
+            {required: true, message: "病人id不能为空", trigger: "blur"}
+          ],
+          prepaid: [
+            {required: true, message: "预付费金额不能为空", trigger: "blur"}
+          ],
+          prepaidAt: [
+            {required: true, message: "预付费时间不能为空", trigger: "blur"}
+          ]
+        }
       };
-      this.resetForm("form");
     },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
+    created() {
       this.getList();
     },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
+    mounted() {
+      this.restaurants = this.loadAll();
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.prepaymentId)
-      this.single = selection.length !== 1
-      this.multiple = !selection.length
-    },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加收费管理";
-    },
-    /** 修改按钮操作 */
-    handleUpdate(row) {
-      this.reset();
-      const prepaymentId = row.prepaymentId || this.ids
-      getPrepayment(prepaymentId).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改收费管理";
-      });
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.prepaymentId != null) {
-            updatePrepayment(this.form).then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            addPrepayment(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
-          }
-        }
-      });
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const prepaymentIds = row.prepaymentId || this.ids;
-      this.$confirm('是否确认删除收费管理编号为"' + prepaymentIds + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return delPrepayment(prepaymentIds);
-      }).then(() => {
+
+    methods: {
+      // 响应自动查询回显
+      querySearch(queryString, cb) {
+        var restaurants = this.restaurants;
+        var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+        // 调用 callback 返回建议列表的数据
+        cb(results);
+      },
+
+      // 处理过滤器
+      createFilter(queryString) {
+        return (restaurant) => {
+          return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        };
+      },
+
+      // 填充所有待缴预付伙食费的病人清单
+      loadAll() {
+        return [
+          { "value": "南拳妈妈龙虾盖浇饭", "address": "普陀区金沙江路1699号鑫乐惠美食广场A13" }
+        ];
+      },
+
+      // 处理自动查询列表选择的事件
+      handleSelect(item) {
+        console.log(item);
+      },
+
+      // 处理点击查询图标的事件
+      handleIconClick(ev) {
+        console.log(ev);
+      },
+      /** 查询收费管理列表 */
+      getList() {
+        this.loading = true;
+        listPrepayment(this.queryParams).then(response => {
+          this.prepaymentList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        });
+      },
+      // 取消按钮
+      cancel() {
+        this.open = false;
+        this.reset();
+      },
+      // 表单重置
+      reset() {
+        this.formAddPrepayment = {
+          prepaymentId: null,
+          patientId: null,
+          collectAt: null,
+          collectBy: null,
+          settlementAt: null,
+          settlementBy: null,
+          settlementId: null,
+          settlementFlag: null,
+          prepaid: null,
+          prepaidAt: null
+        };
+        this.resetForm("form");
+      },
+      /** 搜索按钮操作 */
+      handleQuery() {
+        this.queryParams.pageNum = 1;
         this.getList();
-        this.msgSuccess("删除成功");
-      })
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有收费管理数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return exportPrepayment(queryParams);
-      }).then(response => {
-        this.download(response.msg);
-      })
+      },
+      /** 重置按钮操作 */
+      resetQuery() {
+        this.resetForm("queryForm");
+        this.handleQuery();
+      },
+      // 多选框选中数据
+      handleSelectionChange(selection) {
+        this.ids = selection.map(item => item.prepaymentId)
+        this.single = selection.length !== 1
+        this.multiple = !selection.length
+      },
+      /** 新增按钮操作 */
+      handleAdd() {
+        this.reset();
+        this.open = true;
+        this.title = "添加收费管理";
+      },
+      /** 修改按钮操作 */
+      handleUpdate(row) {
+        this.reset();
+        const prepaymentId = row.prepaymentId || this.ids
+        getPrepayment(prepaymentId).then(response => {
+          this.formAddPrepayment = response.data;
+          this.open = true;
+          this.title = "修改收费管理";
+        });
+      },
+      /** 提交按钮 */
+      submitForm() {
+        this.$refs["form"].validate(valid => {
+          if (valid) {
+            if (this.formAddPrepayment.prepaymentId != null) {
+              updatePrepayment(this.formAddPrepayment).then(response => {
+                this.msgSuccess("修改成功");
+                this.open = false;
+                this.getList();
+              });
+            } else {
+              addPrepayment(this.formAddPrepayment).then(response => {
+                this.msgSuccess("新增成功");
+                this.open = false;
+                this.getList();
+              });
+            }
+          }
+        });
+      },
+      /** 删除按钮操作 */
+      handleDelete(row) {
+        const prepaymentIds = row.prepaymentId || this.ids;
+        this.$confirm('是否确认删除收费管理编号为"' + prepaymentIds + '"的数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function () {
+          return delPrepayment(prepaymentIds);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        })
+      },
+      /** 导出按钮操作 */
+      handleExport() {
+        const queryParams = this.queryParams;
+        this.$confirm('是否确认导出所有收费管理数据项?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function () {
+          return exportPrepayment(queryParams);
+        }).then(response => {
+          this.download(response.msg);
+        })
+      }
+    }
+  };
+</script>
+
+<style lang="scss">
+  .my-autocomplete {
+    li {
+      line-height: normal;
+      padding: 7px;
+
+      .name {
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .addr {
+        font-size: 12px;
+        color: #b4b4b4;
+      }
+
+      .highlighted .addr {
+        color: #ddd;
+      }
     }
   }
-};
-</script>
+</style>
