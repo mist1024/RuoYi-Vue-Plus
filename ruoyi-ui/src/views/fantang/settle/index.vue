@@ -1,6 +1,24 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="住院号" prop="hospitalId">
+        <el-input
+          v-model="queryParams.hospitalId"
+          placeholder="请输入住院号"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="姓名" prop="name">
+        <el-input
+          v-model="queryParams.name"
+          placeholder="请输入姓名"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="结算日期" prop="settleAt">
         <el-date-picker clearable size="small" style="width: 200px"
                         v-model="queryParams.settleAt"
@@ -18,37 +36,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="应收" prop="payable">
-        <el-input
-          v-model="queryParams.payable"
-          placeholder="请输入应收"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="实收" prop="receipts">
-        <el-input
-          v-model="queryParams.receipts"
-          placeholder="请输入实收"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="结算类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择结算类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+      <el-form-item label="结算标志" prop="settlementFlag">
+        <el-select v-model="queryParams.settlementFlag" @change="selectSettlementFlag" placeholder="请选择">
+          <el-option
+            v-for="item in settlementFlagOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item label="退款总额" prop="refund">
-        <el-input
-          v-model="queryParams.refund"
-          placeholder="请输入退款总额"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -64,7 +60,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:settle:add']"
-        >新增
+        >伙食费收款
         </el-button>
       </el-col>
       <el-col :span="1.5">
@@ -75,7 +71,7 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:settle:edit']"
-        >修改
+        >出院结算
         </el-button>
       </el-col>
       <el-col :span="1.5">
@@ -105,6 +101,10 @@
     <el-table v-loading="loading" :data="settleList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="结算 id" align="center" prop="settleId" v-if="false"/>
+      <el-table-column label="住院号" align="center" prop="hospitalId"/>
+      <el-table-column label="姓名" align="center" prop="name"/>
+      <el-table-column label="科室" align="center" prop="departName"/>
+      <el-table-column label="床号" align="center" prop="bedId"/>
       <el-table-column label="结算日期" align="center" prop="settleAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.settleAt, '{y}-{m}-{d}') }}</span>
@@ -180,12 +180,26 @@
 
 <script>
 import {addSettle, delSettle, exportSettle, getSettle, listSettle, updateSettle} from "@/api/fantang/settle";
+import {listNoPay, listAll, listPayoff} from "../../../api/fantang/meals";
 
 export default {
   name: "Settle",
   components: {},
   data() {
     return {
+
+      // 结算类型字典
+      settlementFlagOptions: [{
+        value: null,
+        label: '全部数据'
+      }, {
+        value: 0,
+        label: '未结算'
+      }, {
+        value: 1,
+        label: '已结算'
+      }, ],
+
       // 遮罩层
       loading: true,
       // 选中数组
@@ -213,7 +227,10 @@ export default {
         payable: null,
         receipts: null,
         type: null,
-        refund: null
+        refund: null,
+        hospitalId: null,
+        name: null,
+        settlementFlag: 0,
       },
       // 表单参数
       form: {},
@@ -244,6 +261,31 @@ export default {
     this.getList();
   },
   methods: {
+
+    // 处理筛选结算标志
+    selectSettlementFlag(value) {
+      console.log("value", value)
+      if (value === null) {
+        this.loading = true;
+        listAll(this.queryParams).then(response => {
+          this.settleList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        });
+      } else if (value === 0) {
+        listNoPay(this.queryParams).then(response => {
+          this.settleList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        });
+      } else {
+        listPayoff(this.queryParams).then(response => {
+          this.settleList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        });
+      }
+    },
     /** 查询结算报列表 */
     getList() {
       this.loading = true;

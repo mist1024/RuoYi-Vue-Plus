@@ -10,6 +10,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
+import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,41 @@ import java.util.List;
 public class FtReportMealsDaoController extends BaseController {
 
     private final IFtReportMealsDaoService iFtReportMealsDaoService;
+
+    /**
+     * 查询所有报餐列表
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:meals:list')")
+    @GetMapping("/listAll")
+    public TableDataInfo listAll(FtReportMealVo ftReportMealsDao) {
+        startPage();
+        List<FtReportMealVo> list = iFtReportMealsDaoService.listAll();
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询所有未付费报餐列表
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:meals:list')")
+    @GetMapping("/listNoPay")
+    public TableDataInfo listNoPay(FtReportMealVo ftReportMealsDao) {
+        startPage();
+        List<FtReportMealVo> list = iFtReportMealsDaoService.listNoPay();
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询所有已付费报餐列表
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:meals:list')")
+    @GetMapping("/listPayoff")
+    public TableDataInfo listPayoff(FtReportMealVo ftReportMealsDao) {
+        startPage();
+        List<FtReportMealVo> list = iFtReportMealsDaoService.listPayoff();
+        return getDataTable(list);
+    }
+
+
 
     /**
      * 查询报餐管理列表

@@ -1,5 +1,32 @@
 import request from '@/utils/request'
 
+// 查询所有报餐管理列表
+export function listAll(query) {
+  return request({
+    url: '/fantang/meals/listAll',
+    method: 'get',
+    params: query
+  })
+}
+// 查询未结算报餐记录
+export function listNoPay(query) {
+  return request({
+    url: '/fantang/meals/listNoPay',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询已结算报餐记录
+export function listPayoff(query) {
+  return request({
+    url: '/fantang/meals/listPayoff',
+    method: 'get',
+    params: query
+  })
+}
+
+
 // 查询报餐管理列表
 export function listMeals(query) {
   return request({
