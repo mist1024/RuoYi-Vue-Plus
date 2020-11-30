@@ -163,7 +163,9 @@
           <el-input v-model="formAddPrepayment.name"  readonly/>
         </el-form-item>
         <el-form-item label="预付费金额" prop="prepaid">
-          <el-input v-model="formAddPrepayment.prepaid" placeholder="请输入预付费金额"/>
+          <el-input v-model="formAddPrepayment.prepaid"
+                    onKeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" type="number"
+                    placeholder="请输入预付费金额"/>
         </el-form-item>
         <el-form-item label="预付费时间" prop="prepaidAt">
           <el-date-picker clearable size="small" style="width: 200px"
@@ -364,7 +366,7 @@
           settlementBy: null,
           settlementId: null,
           settlementFlag: null,
-          prepaid: null,
+          prepaid: 500,
           prepaidAt: new Date()
         };
         this.resetForm("form");
