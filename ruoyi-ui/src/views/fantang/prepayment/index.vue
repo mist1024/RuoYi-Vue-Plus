@@ -135,8 +135,8 @@
     />
 
     <!-- 添加或修改收费管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="formAddPrepayment" :model="formAddPrepayment" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="formAddPrepayment" :model="formAddPrepayment" :rules="rules" label-width="120px">
         <el-form-item label="住院号" prop="hospitalId">
           <el-autocomplete
             popper-class="my-autocomplete"
@@ -159,8 +159,8 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item label="病人id" prop="patientId">
-          <el-input v-model="formAddPrepayment.patientId" placeholder="请输入病人id"/>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="formAddPrepayment.name"  readonly/>
         </el-form-item>
         <el-form-item label="预付费金额" prop="prepaid">
           <el-input v-model="formAddPrepayment.prepaid" placeholder="请输入预付费金额"/>
@@ -170,6 +170,7 @@
                           v-model="formAddPrepayment.prepaidAt"
                           type="date"
                           value-format="yyyy-MM-dd"
+                          readonly
                           placeholder="选择预付费时间">
           </el-date-picker>
         </el-form-item>
@@ -246,9 +247,6 @@
         formAddPrepayment: {},
         // 表单校验
         rules: {
-          patientId: [
-            {required: true, message: "病人id不能为空", trigger: "blur"}
-          ],
           prepaid: [
             {required: true, message: "预付费金额不能为空", trigger: "blur"}
           ],
@@ -332,6 +330,7 @@
 
       // 处理自动查询列表选择的事件
       handleSelect(item) {
+        this.formAddPrepayment.name = item.name;
         console.log(item);
       },
 
@@ -366,7 +365,7 @@
           settlementId: null,
           settlementFlag: null,
           prepaid: null,
-          prepaidAt: null
+          prepaidAt: new Date()
         };
         this.resetForm("form");
       },
@@ -389,6 +388,7 @@
       /** 新增按钮操作 */
       handleAdd() {
         this.reset();
+        this.formAddPrepayment.pre
         this.open = true;
         this.title = "添加收费管理";
       },
