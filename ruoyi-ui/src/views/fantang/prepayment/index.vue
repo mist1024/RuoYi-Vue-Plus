@@ -140,7 +140,7 @@
         <el-form-item label="住院号" prop="hospitalId">
           <el-autocomplete
             popper-class="my-autocomplete"
-            v-model="state"
+            v-model="formAddPrepayment.hospitalId"
             :fetch-suggestions="querySearch"
             placeholder="请输入住院号"
             @select="handleSelect">
@@ -178,7 +178,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button type="primary" @click="submitformAddPrepayment">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -322,6 +322,7 @@
               "departName": item.departName,
               "name": item.name,
               "bedId": item.bedId,
+              "patientId": item.patientId,
             }
           });
           this.loading = false;
@@ -333,7 +334,10 @@
       // 处理自动查询列表选择的事件
       handleSelect(item) {
         this.formAddPrepayment.name = item.name;
-        console.log(item);
+        this.formAddPrepayment.patientId = item.patientId;
+        this.formAddPrepayment.bedId = item.bedId;
+        this.formAddPrepayment.departName = item.departName;
+        this.formAddPrepayment["hospitalId"] = item.value ;
       },
 
       // 处理点击查询图标的事件
@@ -367,9 +371,11 @@
           settlementId: null,
           settlementFlag: null,
           prepaid: 500,
-          prepaidAt: new Date()
+          prepaidAt: new Date(),
+          hospitalId: null,
+          name: null,
         };
-        this.resetForm("form");
+        this.resetForm("formAddPrepayment");
       },
       /** 搜索按钮操作 */
       handleQuery() {
@@ -390,7 +396,6 @@
       /** 新增按钮操作 */
       handleAdd() {
         this.reset();
-        this.formAddPrepayment.pre
         this.open = true;
         this.title = "添加收费管理";
       },
@@ -405,22 +410,24 @@
         });
       },
       /** 提交按钮 */
-      submitForm() {
-        this.$refs["form"].validate(valid => {
+      submitformAddPrepayment() {
+        let hospitalId = this.formAddPrepayment.hospitalId;
+        this.$refs["formAddPrepayment"].validate(valid => {
           if (valid) {
-            if (this.formAddPrepayment.prepaymentId != null) {
-              updatePrepayment(this.formAddPrepayment).then(response => {
-                this.msgSuccess("修改成功");
-                this.open = false;
-                this.getList();
-              });
-            } else {
-              addPrepayment(this.formAddPrepayment).then(response => {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-              });
+            if (!this.NoPrepayments.find(function(x) {
+              return x.hospitalId === hospitalId;
+            })) {
+              this.msgError("未找到该住院号记录，请先添加！");
+              return ;
             }
+
+            this.formAddPrepayment.prepaidAt = null;
+            console.log("form -->", this.formAddPrepayment)
+            addPrepayment(this.formAddPrepayment).then(response => {
+              this.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
           }
         });
       },
