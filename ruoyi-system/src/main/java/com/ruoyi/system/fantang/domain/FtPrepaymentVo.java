@@ -26,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_prepayment")
-public class FtPrepaymentDao implements Serializable {
+public class FtPrepaymentVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

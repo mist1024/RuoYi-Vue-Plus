@@ -1,8 +1,7 @@
 package com.ruoyi.system.fantang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
-import com.ruoyi.system.fantang.vo.FtPrepaymentVo;
+import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 
 import java.util.List;
 
@@ -12,7 +11,11 @@ import java.util.List;
  * @author ft
  * @date 2020-11-19
  */
-public interface IFtPrepaymentDaoService extends IService<FtPrepaymentDao> {
+public interface IFtPrepaymentDaoService extends IService<FtPrepaymentVo> {
 
-    List<FtPrepaymentVo> listNoPrepay();
+    List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listNoPrepay();
+
+    List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listPrepay();
+
+    List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listAllPrepay();
 }

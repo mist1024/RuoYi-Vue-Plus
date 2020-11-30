@@ -8,9 +8,8 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
+import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
-import com.ruoyi.system.fantang.vo.FtPrepaymentVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +34,23 @@ public class FtPrepaymentDaoController extends BaseController {
     // 查询所有待缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listNoPrepay")
-    public TableDataInfo listNoPrepay(FtPrepaymentDao ftPrepaymentDao) {
-        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.listNoPrepay();
+    public TableDataInfo listNoPrepay() {
+        List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> list = iFtPrepaymentDaoService.listNoPrepay();
+        return getDataTable(list);
+    }
+
+    // 查询所有已缴费列表
+    @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
+    @GetMapping("/listPrepay")
+    public TableDataInfo listPrepay() {
+        List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> list = iFtPrepaymentDaoService.listPrepay();
+        return getDataTable(list);
+    }
+    // 查询所有已结算列表
+    @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
+    @GetMapping("/listAllPrepay")
+    public TableDataInfo listAllPrepay() {
+        List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> list = iFtPrepaymentDaoService.listAllPrepay();
         return getDataTable(list);
     }
 
@@ -46,25 +60,28 @@ public class FtPrepaymentDaoController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/list")
-    public TableDataInfo list(FtPrepaymentDao ftPrepaymentDao) {
+    public TableDataInfo list(FtPrepaymentVo ftPrepaymentDao) {
         startPage();
-        LambdaQueryWrapper<FtPrepaymentDao> lqw = Wrappers.lambdaQuery(ftPrepaymentDao);
+        LambdaQueryWrapper<FtPrepaymentVo> lqw = Wrappers.lambdaQuery(ftPrepaymentDao);
         if (ftPrepaymentDao.getCollectAt() != null) {
-            lqw.eq(FtPrepaymentDao::getCollectAt, ftPrepaymentDao.getCollectAt());
+            lqw.eq(FtPrepaymentVo::getCollectAt, ftPrepaymentDao.getCollectAt());
         }
         if (ftPrepaymentDao.getSettlementAt() != null) {
-            lqw.eq(FtPrepaymentDao::getSettlementAt, ftPrepaymentDao.getSettlementAt());
+            lqw.eq(FtPrepaymentVo::getSettlementAt, ftPrepaymentDao.getSettlementAt());
         }
         if (ftPrepaymentDao.getSettlementFlag() != null) {
-            lqw.eq(FtPrepaymentDao::getSettlementFlag, ftPrepaymentDao.getSettlementFlag());
+            lqw.eq(FtPrepaymentVo::getSettlementFlag, ftPrepaymentDao.getSettlementFlag());
         }
         if (ftPrepaymentDao.getPrepaid() != null) {
-            lqw.eq(FtPrepaymentDao::getPrepaid, ftPrepaymentDao.getPrepaid());
+            lqw.eq(FtPrepaymentVo::getPrepaid, ftPrepaymentDao.getPrepaid());
         }
         if (ftPrepaymentDao.getPrepaidAt() != null) {
-            lqw.eq(FtPrepaymentDao::getPrepaidAt, ftPrepaymentDao.getPrepaidAt());
+            lqw.eq(FtPrepaymentVo::getPrepaidAt, ftPrepaymentDao.getPrepaidAt());
         }
-        List<FtPrepaymentDao> list = iFtPrepaymentDaoService.list(lqw);
+        if (ftPrepaymentDao.getPrepaidAt() != null) {
+            lqw.eq(FtPrepaymentVo::getPrepaidAt, ftPrepaymentDao.getPrepaidAt());
+        }
+        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.list(lqw);
         return getDataTable(list);
     }
 
@@ -74,10 +91,10 @@ public class FtPrepaymentDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:export')")
     @Log(title = "收费管理", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(FtPrepaymentDao ftPrepaymentDao) {
-        LambdaQueryWrapper<FtPrepaymentDao> lqw = new LambdaQueryWrapper<FtPrepaymentDao>(ftPrepaymentDao);
-        List<FtPrepaymentDao> list = iFtPrepaymentDaoService.list(lqw);
-        ExcelUtil<FtPrepaymentDao> util = new ExcelUtil<FtPrepaymentDao>(FtPrepaymentDao.class);
+    public AjaxResult export(FtPrepaymentVo ftPrepaymentDao) {
+        LambdaQueryWrapper<FtPrepaymentVo> lqw = new LambdaQueryWrapper<FtPrepaymentVo>(ftPrepaymentDao);
+        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.list(lqw);
+        ExcelUtil<FtPrepaymentVo> util = new ExcelUtil<FtPrepaymentVo>(FtPrepaymentVo.class);
         return util.exportExcel(list, "prepayment");
     }
 
@@ -96,7 +113,7 @@ public class FtPrepaymentDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:add')")
     @Log(title = "收费管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody FtPrepaymentDao ftPrepaymentDao) {
+    public AjaxResult add(@RequestBody FtPrepaymentVo ftPrepaymentDao) {
         return toAjax(iFtPrepaymentDaoService.save(ftPrepaymentDao) ? 1 : 0);
     }
 
@@ -106,7 +123,7 @@ public class FtPrepaymentDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:edit')")
     @Log(title = "收费管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody FtPrepaymentDao ftPrepaymentDao) {
+    public AjaxResult edit(@RequestBody FtPrepaymentVo ftPrepaymentDao) {
         return toAjax(iFtPrepaymentDaoService.updateById(ftPrepaymentDao) ? 1 : 0);
     }
 
