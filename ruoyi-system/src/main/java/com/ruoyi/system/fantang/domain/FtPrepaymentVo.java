@@ -75,7 +75,7 @@ public class FtPrepaymentVo implements Serializable {
      * 结算标志
      */
     @Excel(name = "结算标志")
-    private Long settlementFlag;
+    private Integer settlementFlag;
 
     /**
      * 预付费金额

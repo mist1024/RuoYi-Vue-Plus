@@ -202,6 +202,7 @@
     components: {},
     data() {
       return {
+        userName: null,
         settlementFlagOptions: [{
           value: null,
           label: '未交费'
@@ -260,6 +261,7 @@
     },
     created() {
       this.getDefaultNoPrepayment();
+      this.getUser();
     },
     mounted() {
     },

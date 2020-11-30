@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -114,6 +115,8 @@ public class FtPrepaymentDaoController extends BaseController {
     @Log(title = "收费管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtPrepaymentVo ftPrepaymentDao) {
+        ftPrepaymentDao.setCollectAt(new Date());
+        ftPrepaymentDao.setSettlementFlag(0);
         return toAjax(iFtPrepaymentDaoService.save(ftPrepaymentDao) ? 1 : 0);
     }
 
