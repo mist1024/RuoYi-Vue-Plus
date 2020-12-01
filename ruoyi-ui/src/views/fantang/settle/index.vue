@@ -233,6 +233,7 @@
 <script>
 import {addSettle, delSettle, exportSettle, getSettle, listSettle, updateSettle} from "@/api/fantang/settle";
 import {listAll, listNoPay, listPayoff} from "@/api/fantang/meals";
+import {getUserProfile} from "../../../api/system/user";
 
 export default {
   name: "Settle",
