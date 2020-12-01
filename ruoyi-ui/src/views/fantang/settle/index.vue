@@ -239,6 +239,10 @@ export default {
   components: {},
   data() {
     return {
+      // 权限相关的参数
+      userName: null,
+      roleGroup: null,
+      postGroup: null,
       // 出院结算状态显示标志位
       flagAddPrepaymentShow: false,
       // 费用结算弹出层控制标志位
@@ -256,6 +260,7 @@ export default {
         netPeceipt: null,
         prepayment: null,
         settlementDate: null,
+        userName: null,
       },
 
       // 结算类型字典
@@ -329,6 +334,7 @@ export default {
   },
   created() {
     this.loading = true;
+    this.myGetUser();
     listNoPay(this.queryParams).then(response => {
       this.settleList = response.rows;
       this.total = response.total;
@@ -336,6 +342,14 @@ export default {
     });
   },
   methods: {
+    // 获取用户相关信息
+    myGetUser() {
+      getUserProfile().then(response => {
+        this.userName = response.data;
+        this.roleGroup = response.roleGroup;
+        this.postGroup = response.postGroup;
+      });
+    },
 
     // 日常伙食费结算操作按钮
     clickAddNewSettlement(row) {
@@ -349,6 +363,7 @@ export default {
       this.formAddNewSettlement.price = row.price;
       this.formAddNewSettlement.prepayment = row.prepayment;
       this.formAddNewSettlement.netPeceipt = null;
+      this.formAddNewSettlement.userName = this.userName;
     },
 
     // 出院伙食费结算按钮

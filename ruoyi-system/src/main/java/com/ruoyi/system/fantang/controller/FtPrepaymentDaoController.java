@@ -33,6 +33,13 @@ public class FtPrepaymentDaoController extends BaseController {
 
     private final IFtPrepaymentDaoService iFtPrepaymentDaoService;
 
+
+    @GetMapping("/getCountById/{patientId}")
+    public AjaxResult getCountById(@PathVariable("patientId") Long patiendId) {
+        return AjaxResult.success(iFtPrepaymentDaoService.getCountById(patiendId));
+    }
+
+
     // 查询所有待缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listNoPrepay")

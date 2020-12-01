@@ -196,13 +196,18 @@
     updatePrepayment
   } from "@/api/fantang/prepayment";
   import {listAllPrepay, listPrepay} from "../../../api/fantang/prepayment";
+  import {getUserProfile} from "../../../api/system/user";
 
   export default {
     name: "Prepayment",
     components: {},
     data() {
       return {
+        // 权限相关的参数
         userName: null,
+        roleGroup: null,
+        postGroup: null,
+
         settlementFlagOptions: [{
           value: null,
           label: '未交费'
@@ -261,12 +266,20 @@
     },
     created() {
       this.getDefaultNoPrepayment();
-      this.getUser();
+      this.myGetUser();
     },
     mounted() {
     },
 
     methods: {
+      // 获取用户相关信息
+      myGetUser() {
+        getUserProfile().then(response => {
+          this.userName = response.data;
+          this.roleGroup = response.roleGroup;
+          this.postGroup = response.postGroup;
+        });
+      },
       // 处理筛选结算标志
       selectSettlementFlag(value) {
         console.log("value", value)
@@ -376,6 +389,7 @@
           prepaidAt: new Date(),
           hospitalId: null,
           name: null,
+          userName:null,
         };
         this.resetForm("formAddPrepayment");
       },
@@ -414,6 +428,7 @@
       /** 提交按钮 */
       submitformAddPrepayment() {
         let hospitalId = this.formAddPrepayment.hospitalId;
+        this.formAddPrepayment.collectBy = this.userName;
         this.$refs["formAddPrepayment"].validate(valid => {
           if (valid) {
             if (!this.NoPrepayments.find(function(x) {
@@ -422,6 +437,7 @@
               this.msgError("未找到该住院号记录，请先添加！");
               return ;
             }
+
 
             this.formAddPrepayment.prepaidAt = null;
             console.log("form -->", this.formAddPrepayment)

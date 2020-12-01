@@ -23,7 +23,13 @@ export function listAllPrepay() {
   })
 }
 
-
+// 查询该用户是否已经收取预付伙食费
+export function getCountById(patientId) {
+  return request({
+    url: '/fantang/prepayment/getCountById/' + patientId,
+    method: 'get',
+  })
+}
 
 // 查询收费管理列表
 export function listPrepayment(query) {
