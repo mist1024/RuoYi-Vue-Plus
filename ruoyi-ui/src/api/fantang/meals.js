@@ -78,3 +78,12 @@ export function exportMeals(query) {
     params: query
   })
 }
+
+
+// 获取最后结算日期
+export function getLastSettlementDate(patientId) {
+  return request({
+    url: '/fantang/meals/getLastSettlementDate/' + patientId,
+    method: 'get',
+  })
+}
