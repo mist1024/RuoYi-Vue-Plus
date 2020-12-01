@@ -61,6 +61,7 @@ public class FtReportMealsDaoController extends BaseController {
     @GetMapping("/listPayoff")
     public TableDataInfo listPayoff(FtReportMealVo ftReportMealsDao) {
         startPage();
+
         List<FtReportMealVo> list = iFtReportMealsDaoService.listPayoff();
         return getDataTable(list);
     }

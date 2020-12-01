@@ -16,12 +16,12 @@ import java.util.List;
  */
 @Repository
 public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
-    @Select("select a.*, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id = c.depart_id")
+    @Select("select a.price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id = c.depart_id")
     public List<FtReportMealVo> listAll();
 
-    @Select("select a.*, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id = c.depart_id where a.settlement_flag = 0")
+    @Select("select sum(a.price) as price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id = c.depart_id where a.settlement_flag = 0 GROUP BY a.patient_id")
     public List<FtReportMealVo> listNoPay();
 
-    @Select("select a.*, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id = c.depart_id  where a.settlement_flag = 1")
+    @Select("select sum(a.price) as price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id = c.depart_id where a.settlement_flag = 1 GROUP BY a.patient_id")
     public List<FtReportMealVo> listPayoff();
 }

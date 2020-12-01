@@ -1,19 +1,11 @@
 package com.ruoyi.system.fantang.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 收费管理对象 ft_prepayment

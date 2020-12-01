@@ -110,14 +110,27 @@
           <span>{{ parseTime(scope.row.settleAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="记录清单" align="center" prop="list"/>
       <el-table-column label="结算总价" align="center" prop="price"/>
-      <el-table-column label="应收" align="center" prop="payable"/>
-      <el-table-column label="实收" align="center" prop="receipts"/>
       <el-table-column label="结算类型" align="center" prop="type"/>
       <el-table-column label="退款总额" align="center" prop="refund"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="clickAddNewSettlement(scope.row)"
+            v-hasPermi="['fantang:settle:AddNewSettlement']"
+          >收费
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="clickAddLeaveSettlement(scope.row)"
+            v-hasPermi="['fantang:settle:AddLeaveSettlement']"
+          >出院结算
+          </el-button>
           <el-button
             size="mini"
             type="text"
@@ -145,6 +158,45 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+<!--    日常收费弹出层对话框-->
+    <el-dialog title="伙食费结算窗口" :visible.sync="flagAddNewSettlementOpen" width="600px" append-to-body>
+      <el-form ref="form" :model="formAddNewSettlement" :rules="rules" label-width="160px">
+        <el-form-item label="住院号" prop="hospitalId">
+          <el-input v-model="formAddNewSettlement.hospitalId" readonly/>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="formAddNewSettlement.name" readonly/>
+        </el-form-item>
+        <el-form-item label="科室" prop="name">
+          <el-input v-model="formAddNewSettlement.departName" readonly/>
+        </el-form-item>
+        <el-form-item label="床号" prop="name">
+          <el-input v-model="formAddNewSettlement.bedId" readonly/>
+        </el-form-item>
+        <el-form-item label="上次结算日期" prop="name">
+          <el-input v-model="formAddNewSettlement.name" readonly/>
+        </el-form-item>
+        <el-form-item label="应收" prop="name">
+          <el-input v-model="formAddNewSettlement.price" readonly/>
+        </el-form-item>
+        <el-form-item label="用餐天数" prop="name">
+          <el-input v-model="formAddNewSettlement.name" readonly/>
+        </el-form-item>
+        <el-form-item label="已收预付伙食费" prop="name" v-if="flagAddPrepaymentShow">
+          <el-input v-model="formAddNewSettlement.prepayment" readonly/>
+        </el-form-item>
+        <el-form-item label="实收" prop="receipts">
+          <el-input v-model="form.receipts" placeholder="请输入实收"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+<!--    出院结算弹出层对话框-->
 
     <!-- 添加或修改结算报对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -187,6 +239,24 @@ export default {
   components: {},
   data() {
     return {
+      // 出院结算状态显示标志位
+      flagAddPrepaymentShow: false,
+      // 费用结算弹出层控制标志位
+      flagAddNewSettlementOpen: false,
+
+      // 费用结算弹出层数据
+      formAddNewSettlement: {
+        hospitalId: null,
+        patientId: null,
+        name: null,
+        departName: null,
+        bedId: null,
+        price: null,
+        receivable: null,
+        netPeceipt: null,
+        prepayment: null,
+        settlementDate: null,
+      },
 
       // 结算类型字典
       settlementFlagOptions: [{
@@ -258,9 +328,35 @@ export default {
     };
   },
   created() {
-    this.getList();
+    this.loading = true;
+    listNoPay(this.queryParams).then(response => {
+      this.settleList = response.rows;
+      this.total = response.total;
+      this.loading = false;
+    });
   },
   methods: {
+
+    // 日常伙食费结算操作按钮
+    clickAddNewSettlement(row) {
+      this.flagAddNewSettlementOpen = true;
+      this.flagAddPrepaymentShow = false;
+      this.formAddNewSettlement.hospitalId = row.hospitalId;
+      this.formAddNewSettlement.name = row.name;
+      this.formAddNewSettlement.departName = row.departName;
+      this.formAddNewSettlement.bedId = row.bedId;
+      this.formAddNewSettlement.patientId = row.patientId;
+      this.formAddNewSettlement.price = row.price;
+      this.formAddNewSettlement.prepayment = row.prepayment;
+      this.formAddNewSettlement.netPeceipt = null;
+    },
+
+    // 出院伙食费结算按钮
+    clickAddLeaveSettlement() {
+      this.flagAddNewSettlementOpen = true;
+      this.flagAddPrepaymentShow = true;
+
+    },
 
     // 处理筛选结算标志
     selectSettlementFlag(value) {
