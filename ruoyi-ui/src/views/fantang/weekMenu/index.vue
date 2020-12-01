@@ -36,8 +36,8 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="星期几" align="center" prop="weekday" width="80px"/>
-      <el-table-column label="类型" align="center" prop="dinnerType"  width="80px"/>
-      <el-table-column label="菜品列表" align="center" prop="foods"  width="500px">
+      <el-table-column label="类型" align="center" prop="dinnerType" width="80px"/>
+      <el-table-column label="菜品列表" align="center" prop="foods" width="500px">
         <template slot-scope="scope">
           <el-select v-model="scope.row.foods"
                      @change="changeFoods(scope.row)"
@@ -248,11 +248,18 @@
       },
       // 根据菜单选择的变化，计算总价
       changeFoods(row) {
+        console.log("row-->", row);
+        console.log("foodList-->", this.foodList)
         let ret = 0;
-        for(let i =0 ; i < row.foods.length; i++) {
-          ret += this.foodList[i].price;
+        for (let i = 0; i < row.foods.length; i++) {
+          let foodPrice = row.foods[i];
+          this.foodList.forEach(item => {
+            if (item.foodId === foodPrice) {
+              ret += item.price;
+            }
+          });
         }
-        this.weekMenuList[row.id -1 ].price = ret;
+        this.weekMenuList[row.id - 1].price = ret;
       },
 
       // 控制合并列
