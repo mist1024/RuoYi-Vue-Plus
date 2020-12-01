@@ -53,16 +53,16 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['fantang:settle:add']"
-        >伙食费收款
-        </el-button>
-      </el-col>
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="primary"-->
+      <!--          icon="el-icon-plus"-->
+      <!--          size="mini"-->
+      <!--          @click="handleAdd"-->
+      <!--          v-hasPermi="['fantang:settle:add']"-->
+      <!--        >伙食费收款-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -131,14 +131,14 @@
             v-hasPermi="['fantang:settle:AddLeaveSettlement']"
           >出院结算
           </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['fantang:settle:edit']"
-          >修改
-          </el-button>
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-edit"-->
+          <!--            @click="handleUpdate(scope.row)"-->
+          <!--            v-hasPermi="['fantang:settle:edit']"-->
+          <!--          >修改-->
+          <!--          </el-button>-->
           <el-button
             size="mini"
             type="text"
@@ -159,7 +159,7 @@
       @pagination="getList"
     />
 
-<!--    日常收费弹出层对话框-->
+    <!--    日常收费弹出层对话框-->
     <el-dialog title="伙食费结算窗口" :visible.sync="flagAddNewSettlementOpen" width="600px" append-to-body>
       <el-form ref="form" :model="formAddNewSettlement" :rules="rules" label-width="160px">
         <el-form-item label="住院号" prop="hospitalId">
@@ -196,7 +196,7 @@
       </div>
     </el-dialog>
 
-<!--    出院结算弹出层对话框-->
+    <!--    出院结算弹出层对话框-->
 
     <!-- 添加或修改结算报对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -232,7 +232,7 @@
 
 <script>
 import {addSettle, delSettle, exportSettle, getSettle, listSettle, updateSettle} from "@/api/fantang/settle";
-import {listNoPay, listAll, listPayoff} from "../../../api/fantang/meals";
+import {listAll, listNoPay, listPayoff} from "@/api/fantang/meals";
 
 export default {
   name: "Settle",
@@ -273,7 +273,7 @@ export default {
       }, {
         value: 1,
         label: '已结算'
-      }, ],
+      },],
 
       // 遮罩层
       loading: true,
