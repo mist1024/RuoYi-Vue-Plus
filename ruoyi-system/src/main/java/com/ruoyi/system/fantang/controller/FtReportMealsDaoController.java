@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -9,6 +10,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
+import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,8 +39,20 @@ public class FtReportMealsDaoController extends BaseController {
      * 查询指定用户上一次结算的日期，并通过这个日期计算未结算的天数
      */
     @GetMapping("/getLastSettlementDate/{patientId}")
-    public TableDataInfo getLastSettlementDate(@PathVariable("patiendId") Long patiendId) {
-        return null;
+    public AjaxResult getLastSettlementDate(@PathVariable("patiendId") Long patiendId) {
+
+        QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("patient_id", patiendId);
+        wrapper.orderByDesc("settlement_at");
+        wrapper.last("limit 1");
+        FtReportMealsDao ftReportMealsDao = iFtReportMealsDaoService.getOne(wrapper);
+        Date settlementAt = ftReportMealsDao.getSettlementAt();
+        int days = (int) (new Date().getTime() - settlementAt.getTime()) / (1000 * 3600 * 24);
+        ReportMealsDayEntity reportMealsDayEntity = new ReportMealsDayEntity();
+        reportMealsDayEntity.setCreateAt(settlementAt);
+        reportMealsDayEntity.setDays(days);
+
+        return AjaxResult.success(reportMealsDayEntity);
     }
 
 
@@ -74,7 +89,6 @@ public class FtReportMealsDaoController extends BaseController {
         List<FtReportMealVo> list = iFtReportMealsDaoService.listPayoff();
         return getDataTable(list);
     }
-
 
 
     /**
