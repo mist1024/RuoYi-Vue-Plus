@@ -33,6 +33,15 @@ public class FtReportMealsDaoController extends BaseController {
     private final IFtReportMealsDaoService iFtReportMealsDaoService;
 
     /**
+     * 查询指定用户上一次结算的日期，并通过这个日期计算未结算的天数
+     */
+    @GetMapping("/getLastSettlementDate/{patientId}")
+    public TableDataInfo getLastSettlementDate(@PathVariable("patiendId") Long patiendId) {
+        return null;
+    }
+
+
+    /**
      * 查询所有报餐列表
      */
     @PreAuthorize("@ss.hasPermi('fantang:meals:list')")
