@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -47,6 +48,7 @@ public class FtPrepaymentDaoController extends BaseController {
         List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> list = iFtPrepaymentDaoService.listPrepay();
         return getDataTable(list);
     }
+
     // 查询所有已结算列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listAllPrepay")
@@ -115,6 +117,14 @@ public class FtPrepaymentDaoController extends BaseController {
     @Log(title = "收费管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtPrepaymentVo ftPrepaymentDao) {
+
+        Long patientId = ftPrepaymentDao.getPatientId();
+        QueryWrapper<FtPrepaymentVo> wrapper = new QueryWrapper<>();
+        wrapper.eq("patient_id", patientId);
+        if (iFtPrepaymentDaoService.getOne(wrapper).getSettlementFlag() == 1) {
+            return AjaxResult.error("该病人已付费");
+        }
+
         ftPrepaymentDao.setCollectAt(new Date());
         ftPrepaymentDao.setSettlementFlag(0);
         return toAjax(iFtPrepaymentDaoService.save(ftPrepaymentDao) ? 1 : 0);
