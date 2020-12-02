@@ -57,6 +57,14 @@ export function getPrepayment(prepaymentId) {
   })
 }
 
+// 通过病人id查询收费管理详细
+export function getPrepaymentByPatientId(patientId) {
+  return request({
+    url: '/fantang/prepayment/getPrepaymentByPatientId/' + patientId,
+    method: 'get'
+  })
+}
+
 // 新增收费管理
 export function addPrepayment(data) {
   return request({

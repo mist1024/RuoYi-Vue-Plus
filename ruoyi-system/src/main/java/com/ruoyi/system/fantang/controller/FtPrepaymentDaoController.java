@@ -35,11 +35,28 @@ public class FtPrepaymentDaoController extends BaseController {
 
 
     @GetMapping("/getCountById/{patientId}")
-    public AjaxResult getCountById(@PathVariable("patientId") Long patiendId) {
-        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patiendId);
+    public AjaxResult getCountById(@PathVariable("patientId") Long patientId) {
+        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patientId);
+        if (dao == null)
+            return AjaxResult.error("无该记录");
         return AjaxResult.success("操作成功", dao);
     }
 
+    /**
+     * 通过病人id查询收费管理详细
+     * 作者：陈智兴
+     * 日期：2020年12月2日
+     * 功能： 前端查询预付款情况
+     * @param patientId
+     * @return
+     */
+    @GetMapping("/getPrepaymentByPatientId/{patientId}")
+    public AjaxResult getPrepaymentByPatientId(@PathVariable("patientId") Long patientId) {
+        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patientId);
+        if (dao == null)
+            return AjaxResult.error("无该记录");
+        return AjaxResult.success("操作成功", dao);
+    }
 
     // 查询所有待缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")

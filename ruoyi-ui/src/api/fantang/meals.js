@@ -87,3 +87,13 @@ export function getLastSettlementDate(patientId) {
     method: 'get',
   })
 }
+
+
+// 计算两个日期之间的结算数据
+export function countBillingBetween(query) {
+  return request({
+    url: '/fantang/meals/countBillingBetween',
+    method: 'get',
+    params: query
+  })
+}

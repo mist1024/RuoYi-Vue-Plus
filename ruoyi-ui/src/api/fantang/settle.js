@@ -1,5 +1,21 @@
 import request from '@/utils/request'
 
+/**
+ * 获取指定用户最后一次结算日期
+ * 作者： czx
+ * 日期：2020年12月2日
+ * 功能：向后台获取指定用户最后一次结算日期，显示在收费弹出层
+ * @param patientId
+ */
+export function getLastBillingDateByPatientId(patientId) {
+  return request({
+    url: '/fantang/settle/getLastBillingDateByPatientId/' + patientId,
+    method: 'get'
+  })
+}
+
+
+
 // 查询结算报列表
 export function listSettle(query) {
   return request({

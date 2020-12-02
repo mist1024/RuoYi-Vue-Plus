@@ -1,5 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,6 +12,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
+import com.ruoyi.system.fantang.domain.FtSettleDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
@@ -35,21 +38,22 @@ public class FtReportMealsDaoController extends BaseController {
 
     private final IFtReportMealsDaoService iFtReportMealsDaoService;
 
-    /**
+
+     /**
      * 查询指定用户上一次结算的日期，并通过这个日期计算未结算的天数
      */
     @GetMapping("/getLastSettlementDate/{patientId}")
-    public AjaxResult getLastSettlementDate(@PathVariable("patiendId") Long patiendId) {
+    public AjaxResult getLastSettlementDate(@PathVariable("patientId") Long patientId) {
 
         QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("patient_id", patiendId);
+        wrapper.eq("patient_id", patientId);
         wrapper.orderByDesc("settlement_at");
         wrapper.last("limit 1");
         FtReportMealsDao ftReportMealsDao = iFtReportMealsDaoService.getOne(wrapper);
         Date settlementAt = ftReportMealsDao.getSettlementAt();
-        int days = (int) (new Date().getTime() - settlementAt.getTime()) / (1000 * 3600 * 24);
+        long days = DateUtil.between(settlementAt, new Date(), DateUnit.DAY);
         ReportMealsDayEntity reportMealsDayEntity = new ReportMealsDayEntity();
-        reportMealsDayEntity.setCreateAt(settlementAt);
+        reportMealsDayEntity.setSettlementAt(settlementAt);
         reportMealsDayEntity.setDays(days);
 
         return AjaxResult.success(reportMealsDayEntity);
@@ -126,6 +130,17 @@ public class FtReportMealsDaoController extends BaseController {
         List<FtReportMealsDao> list = iFtReportMealsDaoService.list(lqw);
         ExcelUtil<FtReportMealsDao> util = new ExcelUtil<FtReportMealsDao>(FtReportMealsDao.class);
         return util.exportExcel(list, "meals");
+    }
+
+
+    /**
+     *  计算两个日期之间的未结算数据
+     * @param dao
+     * @return
+     */
+    @GetMapping("/countBillingBetween")
+    public AjaxResult countBillingBetween(ReportMealsDayEntity dao) {
+        iFtReportMealsDaoService.countBillingBetween(dao);
     }
 
     /**

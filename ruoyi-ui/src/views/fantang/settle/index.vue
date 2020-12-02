@@ -160,39 +160,65 @@
     />
 
     <!--    日常收费弹出层对话框-->
-    <el-dialog title="伙食费结算窗口" :visible.sync="flagAddNewSettlementOpen" width="600px" append-to-body>
+    <el-dialog title="伙食费结算窗口" :visible.sync="flagAddNewSettlementOpen" width="1000px" append-to-body>
       <el-form ref="form" :model="formAddNewSettlement" :rules="rules" label-width="160px">
         <el-form-item label="住院号" prop="hospitalId">
           <el-input v-model="formAddNewSettlement.hospitalId" readonly/>
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="formAddNewSettlement.name" readonly/>
-        </el-form-item>
-        <el-form-item label="科室" prop="name">
-          <el-input v-model="formAddNewSettlement.departName" readonly/>
-        </el-form-item>
-        <el-form-item label="床号" prop="name">
-          <el-input v-model="formAddNewSettlement.bedId" readonly/>
-        </el-form-item>
-        <el-form-item label="上次结算日期" prop="name">
-          <el-input v-model="formAddNewSettlement.name" readonly/>
-        </el-form-item>
-        <el-form-item label="应收" prop="name">
-          <el-input v-model="formAddNewSettlement.price" readonly/>
-        </el-form-item>
-        <el-form-item label="用餐天数" prop="name">
-          <el-input v-model="formAddNewSettlement.name" readonly/>
-        </el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="姓名" prop="name">
+              <el-input v-model="formAddNewSettlement.name" readonly/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="科室" prop="departName">
+              <el-input v-model="formAddNewSettlement.departName" readonly/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="床号" prop="bedId">
+              <el-input v-model="formAddNewSettlement.bedId" readonly/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="上次结算日期" prop="lastBillingDate">
+              <el-input v-model="formAddNewSettlement.lastBillingDate" readonly/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="未结算天数" prop="settlementDays">
+              <el-input v-model="formAddNewSettlement.settlementDays" readonly/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="应收" prop="name">
+              <el-input v-model="formAddNewSettlement.price" readonly/>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="已收预付伙食费" prop="name" v-if="flagAddPrepaymentShow">
           <el-input v-model="formAddNewSettlement.prepayment" readonly/>
         </el-form-item>
+        <el-form-item label="结算日期" prop="field106">
+          <el-date-picker
+            v-model="formAddNewSettlement.selectBillingDate"
+            align="right"
+            type="date"
+            placeholder="选择日期"
+            @change="changeBillingDate"
+            :picker-options="pickerOptions">
+          </el-date-picker>
+        </el-form-item>
         <el-form-item label="实收" prop="receipts">
-          <el-input v-model="form.receipts" placeholder="请输入实收"/>
+          <el-input v-model="formAddNewSettlement.netPeceipt" placeholder="请输入实收"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+        <el-button @click="clickFormAddNewSettlementCancel">取 消</el-button>
       </div>
     </el-dialog>
 
@@ -234,12 +260,40 @@
 import {addSettle, delSettle, exportSettle, getSettle, listSettle, updateSettle} from "@/api/fantang/settle";
 import {listAll, listNoPay, listPayoff} from "@/api/fantang/meals";
 import {getUserProfile} from "../../../api/system/user";
+import {getPrepaymentByPatientId} from "../../../api/fantang/prepayment";
+import {getLastSettlementDate} from "../../../api/fantang/meals";
+import { dateFormat } from 'vux'
 
 export default {
   name: "Settle",
   components: {},
   data() {
     return {
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+        shortcuts: [{
+          text: '今天',
+          onClick(picker) {
+            picker.$emit('pick', new Date());
+          }
+        }, {
+          text: '昨天',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: '一周前',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', date);
+          }
+        }]
+      },
       // 权限相关的参数
       userName: null,
       roleGroup: null,
@@ -256,12 +310,23 @@ export default {
         name: null,
         departName: null,
         bedId: null,
+
         price: null,
         receivable: null,
+        // 应收
         netPeceipt: null,
+        // 已收预付费
         prepayment: null,
-        settlementDate: null,
+        // 结算日期
+        settlementDays: null,
+        // 操作员
         userName: null,
+        // 计费周期
+        billingCycle: null,
+        // 上一次结算日期
+        lastBillingDate: null,
+        // 选择结算日期
+        selectBillingDate: null,
       },
 
       // 结算类型字典
@@ -343,6 +408,20 @@ export default {
     });
   },
   methods: {
+    // 变更结算日期计算
+    changeBillingDate(value) {
+      var dateSpan,  iDays;
+      let sDate1 = Date.parse(this.formAddNewSettlement.lastBillingDate);
+      let sDate2 = Date.parse(value);
+      dateSpan = sDate2 - sDate1;
+      if(dateSpan <=0){
+        this.msgError("你现在的结算日期小于上一次结算日期！！");
+      } else {
+        dateSpan = Math.abs(dateSpan);
+        iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+        this.formAddNewSettlement.settlementDays = iDays;
+      }
+    },
     // 获取用户相关信息
     myGetUser() {
       getUserProfile().then(response => {
@@ -354,17 +433,26 @@ export default {
 
     // 日常伙食费结算操作按钮
     clickAddNewSettlement(row) {
-      this.flagAddNewSettlementOpen = true;
-      this.flagAddPrepaymentShow = false;
-      this.formAddNewSettlement.hospitalId = row.hospitalId;
-      this.formAddNewSettlement.name = row.name;
-      this.formAddNewSettlement.departName = row.departName;
-      this.formAddNewSettlement.bedId = row.bedId;
-      this.formAddNewSettlement.patientId = row.patientId;
-      this.formAddNewSettlement.price = row.price;
-      this.formAddNewSettlement.prepayment = row.prepayment;
-      this.formAddNewSettlement.netPeceipt = null;
-      this.formAddNewSettlement.userName = this.userName;
+      getLastSettlementDate(row.patientId).then(response =>{
+        console.log("getLastBillingDateByPatientId-->", response);
+        this.formAddNewSettlement.lastBillingDate = response.data.settlementAt;
+        this.formAddNewSettlement.settlementDays = response.data.days;
+      });
+
+      getPrepaymentByPatientId(row.patientId).then(response => {
+        console.log("row-->", response);
+        this.flagAddNewSettlementOpen = true;
+        this.flagAddPrepaymentShow = false;
+        this.formAddNewSettlement.hospitalId = row.hospitalId;
+        this.formAddNewSettlement.name = row.name;
+        this.formAddNewSettlement.departName = row.departName;
+        this.formAddNewSettlement.bedId = row.bedId;
+        this.formAddNewSettlement.patientId = row.patientId;
+        this.formAddNewSettlement.price = row.price;
+        this.formAddNewSettlement.prepayment = response.data.prepaid;
+        this.formAddNewSettlement.netPeceipt = null;
+        this.formAddNewSettlement.userName = this.userName;
+      });
     },
 
     // 出院伙食费结算按钮
@@ -406,6 +494,12 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+
+    // 取消按钮
+    clickFormAddNewSettlementCancel() {
+      this.flagAddNewSettlementOpen = false;
+      this.reset();
     },
     // 取消按钮
     cancel() {

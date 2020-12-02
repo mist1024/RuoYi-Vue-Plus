@@ -33,7 +33,6 @@ public class FtSettleDaoController extends BaseController {
     private final IFtSettleDaoService iFtSettleDaoService;
 
 
-
     /**
      * 查询结算报列表
      */
