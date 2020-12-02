@@ -7,6 +7,7 @@ export function listNoPrepayment() {
     method: 'get',
   })
 }
+
 // 查询所有已缴预付费病人列表
 export function listPrepay() {
   return request({
@@ -23,7 +24,14 @@ export function listAllPrepay() {
   })
 }
 
-// 查询该用户是否已经收取预付伙食费
+/**
+ * 查询该用户是否已经收取预付伙食费
+ * 作者： 陈智兴
+ * 日期： 2020年12月2日
+ * 功能： 前端调用查询
+ * @param patientId
+ */
+//
 export function getCountById(patientId) {
   return request({
     url: '/fantang/prepayment/getCountById/' + patientId,
@@ -39,6 +47,7 @@ export function listPrepayment(query) {
     params: query
   })
 }
+
 
 // 查询收费管理详细
 export function getPrepayment(prepaymentId) {

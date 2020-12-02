@@ -36,7 +36,8 @@ public class FtPrepaymentDaoController extends BaseController {
 
     @GetMapping("/getCountById/{patientId}")
     public AjaxResult getCountById(@PathVariable("patientId") Long patiendId) {
-        return AjaxResult.success(iFtPrepaymentDaoService.getCountById(patiendId));
+        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patiendId);
+        return AjaxResult.success("操作成功", dao);
     }
 
 
@@ -128,9 +129,6 @@ public class FtPrepaymentDaoController extends BaseController {
         Long patientId = ftPrepaymentDao.getPatientId();
         QueryWrapper<FtPrepaymentVo> wrapper = new QueryWrapper<>();
         wrapper.eq("patient_id", patientId);
-        if (iFtPrepaymentDaoService.getOne(wrapper).getSettlementFlag() == 1) {
-            return AjaxResult.error("该病人已付费");
-        }
 
         ftPrepaymentDao.setCollectAt(new Date());
         ftPrepaymentDao.setSettlementFlag(0);

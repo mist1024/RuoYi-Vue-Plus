@@ -34,10 +34,10 @@ public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMappe
     }
 
     @Override
-    public int getCountById(Long patiendId) {
+    public FtPrepaymentVo getCountById(Long patiendId) {
         QueryWrapper<FtPrepaymentVo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("patiendId",patiendId);
-        return this.baseMapper.selectCount(queryWrapper);
+        queryWrapper.eq("patient_Id",patiendId);
+        return this.baseMapper.selectOne(queryWrapper);
 
     }
 }

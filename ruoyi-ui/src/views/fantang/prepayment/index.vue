@@ -195,7 +195,7 @@
     listNoPrepayment,
     updatePrepayment
   } from "@/api/fantang/prepayment";
-  import {listAllPrepay, listPrepay} from "../../../api/fantang/prepayment";
+  import {getCountById, listAllPrepay, listPrepay} from "../../../api/fantang/prepayment";
   import {getUserProfile} from "../../../api/system/user";
 
   export default {
@@ -204,7 +204,7 @@
     data() {
       return {
         // 权限相关的参数
-        userName: null,
+        user: null,
         roleGroup: null,
         postGroup: null,
 
@@ -275,7 +275,7 @@
       // 获取用户相关信息
       myGetUser() {
         getUserProfile().then(response => {
-          this.userName = response.data;
+          this.user = response.data;
           this.roleGroup = response.roleGroup;
           this.postGroup = response.postGroup;
         });
@@ -428,7 +428,7 @@
       /** 提交按钮 */
       submitformAddPrepayment() {
         let hospitalId = this.formAddPrepayment.hospitalId;
-        this.formAddPrepayment.collectBy = this.userName;
+        this.formAddPrepayment.collectBy = this.user.userName;
         this.$refs["formAddPrepayment"].validate(valid => {
           if (valid) {
             if (!this.NoPrepayments.find(function(x) {
@@ -437,6 +437,10 @@
               this.msgError("未找到该住院号记录，请先添加！");
               return ;
             }
+
+            getCountById(this.formAddPrepayment.patientId).then(response => {
+              console.log("getCountbyId", response);
+            });
 
 
             this.formAddPrepayment.prepaidAt = null;

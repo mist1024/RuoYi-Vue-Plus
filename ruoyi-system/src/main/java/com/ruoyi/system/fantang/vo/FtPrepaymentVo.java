@@ -66,7 +66,7 @@ public class FtPrepaymentVo implements Serializable {
     /**
      * 收款员
      */
-    private Long collectBy;
+    private String collectBy;
 
     /**
      * 结算时间

@@ -19,5 +19,5 @@ public interface IFtPrepaymentDaoService extends IService<FtPrepaymentVo> {
 
     List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listAllPrepay();
 
-    int getCountById(Long patiendId);
+    FtPrepaymentVo getCountById(Long patiendId);
 }
