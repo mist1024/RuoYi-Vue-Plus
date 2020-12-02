@@ -140,7 +140,7 @@ public class FtReportMealsDaoController extends BaseController {
      */
     @GetMapping("/countBillingBetween")
     public AjaxResult countBillingBetween(ReportMealsDayEntity dao) {
-        iFtReportMealsDaoService.countBillingBetween(dao);
+        return AjaxResult.success(iFtReportMealsDaoService.countBillingBetween(dao));
     }
 
     /**
