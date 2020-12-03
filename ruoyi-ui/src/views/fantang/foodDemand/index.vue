@@ -89,11 +89,11 @@
 <!--      <el-table-column label="科室" align="center" prop="departName"/>-->
       <el-table-column label="床号" align="center" prop="bedId" width="100px"/>
       <el-table-column label="正餐" align="center" prop="type" :formatter="typeFormat" width="100px"/>
-      <el-table-column label="正餐清单" align="center" prop="foods"/>
-      <el-table-column label="加菜" align="center" prop="vegetables" width="80px"/>
-      <el-table-column label="加肉" align="center" prop="meat"  width="80px"/>
-      <el-table-column label="加饭" align="center" prop="rice" width="80px"/>
-      <el-table-column label="加蛋" align="center" prop="egg" width="80px"/>
+      <el-table-column label="正餐清单" align="center" prop="foods" :formatter="formatFoods"/>
+      <el-table-column label="加菜" align="center" prop="vegetables" width="80px" :formatter="formatVegetables"/>
+      <el-table-column label="加肉" align="center" prop="meat"  width="80px" :formatter="formatMeat"/>
+      <el-table-column label="加饭" align="center" prop="rice" width="80px" :formatter="formatRice"/>
+      <el-table-column label="加蛋" align="center" prop="egg" width="80px" :formatter="formatEgg"/>
       <el-table-column label="营养配餐" align="center" prop="nutritionFood"  width="120px"/>
 <!--      <el-table-column label="更新日期" align="center" prop="updateAt" width="180">-->
 <!--        <template slot-scope="scope">-->
@@ -147,6 +147,7 @@ import {
   listFoodDemand,
   updateFoodDemand
 } from "@/api/fantang/foodDemand";
+import {listFood} from "../../../api/fantang/food";
 
 export default {
   name: "FoodDemand",
@@ -198,6 +199,7 @@ export default {
       }
     };
   },
+
   created() {
     this.getList();
     this.getDicts("ft_book_type").then(response => {
@@ -207,7 +209,47 @@ export default {
       this.updateFromOptions = response.data;
     });
   },
+
+  beforeCreate() {
+    listFood(this.queryParams).then(response => {
+      this.foodList = response.rows;
+      this.loading = false;
+    });
+  },
   methods: {
+    // 格式化菜单回显文字
+    formatFoods(row) {
+      const _this = this;
+      let arr = row.foods.split(",").map(Number);
+      let ret = arr.map(item =>{
+        let obj = _this.foodList.find((value => {
+          return value.foodId === item;
+        }));
+        return obj.name;
+      });
+      return ret.toString();
+    },
+    formatVegetables(row){
+      if (row.vegetables === null || row.vegetables === 0)
+        return "否";
+      return "是";
+    },
+    formatMeat(row) {
+      if (row.meat === null || row.meat === 0)
+        return "否";
+      return "是";
+    },
+
+    formatRice(row) {
+      if (row.rice === null || row.rice === 0)
+        return "否";
+      return "是";
+    },
+    formatEgg(row) {
+      if (row.egg === null || row.egg === 0)
+        return "否";
+      return "是";
+    },
     /** 查询病人报餐列表 */
     getList() {
       this.loading = true;
