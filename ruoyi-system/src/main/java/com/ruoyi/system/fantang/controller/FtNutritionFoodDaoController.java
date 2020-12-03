@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,7 +83,8 @@ public class FtNutritionFoodDaoController extends BaseController {
     @Log(title = "病患营养配餐", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtNutritionFoodDao ftNutritionFoodDao) {
-//        ftNutritionFoodDao.setFlag(1);
+        ftNutritionFoodDao.setFlag(true);
+        ftNutritionFoodDao.setCreateAt(new Date());
         return toAjax(iFtNutritionFoodDaoService.save(ftNutritionFoodDao) ? 1 : 0);
     }
 
