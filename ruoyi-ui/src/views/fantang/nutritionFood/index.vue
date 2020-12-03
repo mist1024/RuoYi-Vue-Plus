@@ -1,39 +1,5 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="营养餐名称" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入营养餐名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="价格" prop="price">
-        <el-input
-          v-model="queryParams.price"
-          placeholder="请输入价格"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="启用标志" prop="flag">
-        <el-input
-          v-model="queryParams.flag"
-          placeholder="请输入启用标志"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
@@ -45,28 +11,6 @@
         >新增
         </el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['fantang:nutritionFood:edit']"
-        >修改
-        </el-button>
-      </el-col>
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button-->
-      <!--          type="danger"-->
-      <!--          icon="el-icon-delete"-->
-      <!--          size="mini"-->
-      <!--          :disabled="multiple"-->
-      <!--          @click="handleDelete"-->
-      <!--          v-hasPermi="['fantang:nutritionFood:remove']"-->
-      <!--        >删除</el-button>-->
-      <!--      </el-col>-->
-      <!--      <el-col :span="1.5">-->
       <el-button
         type="warning"
         icon="el-icon-download"
@@ -75,17 +19,32 @@
         v-hasPermi="['fantang:nutritionFood:export']"
       >导出
       </el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="nutritionFoodList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center"/>
+    <el-table v-loading="loading" :data="nutritionFoodList" @selection-change="handleSelectionChange" fit border>
+      <!--      <el-table-column type="selection" width="55" align="center"/>-->
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-      <el-table-column label="营养餐名称" align="center" prop="name"/>
-      <el-table-column label="价格" align="center" prop="price"/>
-      <el-table-column label="启用标志" align="center" prop="flag"/>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="营养餐名称" align="center" prop="name" width="200px" fixed="left">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.name"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="价格" align="center" prop="price" fixed="left" width="250px">
+        <template slot-scope="scope">
+          <el-input-number v-model="scope.row.price" :min="0" :precision="2"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="启用标志" align="center" prop="flag" width="180px" fixed="left">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.flag"
+            active-text="启用"
+            inactive-text="禁用">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="left" width="100px">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -93,16 +52,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:nutritionFood:edit']"
-          >修改
+          >保存
           </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['fantang:nutritionFood:remove']"
-          >停用
-          </el-button>
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-delete"-->
+          <!--            @click="handleDelete(scope.row)"-->
+          <!--            v-hasPermi="['fantang:nutritionFood:remove']"-->
+          <!--          >停用-->
+          <!--          </el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -124,9 +83,6 @@
         <el-form-item label="价格" prop="price">
           <el-input v-model="form.price" placeholder="请输入价格"/>
         </el-form-item>
-        <el-form-item label="启用标志" prop="flag">
-          <el-input v-model="form.flag" placeholder="请输入启用标志"/>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -141,7 +97,6 @@ import {
   addNutritionFood,
   deactivate,
   exportNutritionFood,
-  getNutritionFood,
   listNutritionFood,
   updateNutritionFood
 } from "@/api/fantang/nutritionFood";
@@ -223,12 +178,7 @@ export default {
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
-    },
-    /** 重置按钮操作 */
+       /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
@@ -247,13 +197,18 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const id = row.id || this.ids
-      getNutritionFood(id).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改病患营养配餐";
-      });
+      console.log(row);
+      updateNutritionFood(row).then(response => {
+        this.msgSuccess("保存成功");
+        this.getList();
+      })
+      // this.reset();
+      // const id = row.id || this.ids
+      // getNutritionFood(id).then(response => {
+      //   this.form = response.data;
+      //   this.open = true;
+      //   this.title = "修改病患营养配餐";
+      // });
     },
     /** 提交按钮 */
     submitForm() {

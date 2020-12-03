@@ -82,7 +82,7 @@ public class FtNutritionFoodDaoController extends BaseController {
     @Log(title = "病患营养配餐", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtNutritionFoodDao ftNutritionFoodDao) {
-        ftNutritionFoodDao.setFlag(1);
+//        ftNutritionFoodDao.setFlag(1);
         return toAjax(iFtNutritionFoodDaoService.save(ftNutritionFoodDao) ? 1 : 0);
     }
 
@@ -102,7 +102,7 @@ public class FtNutritionFoodDaoController extends BaseController {
     @PutMapping("/deactivate/{id}")
     public AjaxResult deactivate(@PathVariable("id") Long id) {
         FtNutritionFoodDao ftNutritionFoodDao = iFtNutritionFoodDaoService.getById(id);
-        ftNutritionFoodDao.setFlag(0);
+        ftNutritionFoodDao.setFlag(false);
         iFtNutritionFoodDaoService.updateById(ftNutritionFoodDao);
         return AjaxResult.success("停用成功");
     }
