@@ -31,7 +31,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * 病人报餐Controller
  * 
  * @author ft
- * @date 2020-11-26
+ * @date 2020-12-03
  */
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
@@ -49,14 +49,8 @@ public class FtFoodDemandDaoController extends BaseController {
     {
         startPage();
         LambdaQueryWrapper<FtFoodDemandDao> lqw = Wrappers.lambdaQuery(ftFoodDemandDao);
-        if (ftFoodDemandDao.getType() != null){
-            lqw.eq(FtFoodDemandDao::getType ,ftFoodDemandDao.getType());
-        }
-        if (ftFoodDemandDao.getUpdateAt() != null){
-            lqw.eq(FtFoodDemandDao::getUpdateAt ,ftFoodDemandDao.getUpdateAt());
-        }
-        if (ftFoodDemandDao.getUpdateFrom() != null){
-            lqw.eq(FtFoodDemandDao::getUpdateFrom ,ftFoodDemandDao.getUpdateFrom());
+        if (ftFoodDemandDao.getFlag() != null){
+            lqw.eq(FtFoodDemandDao::getFlag ,ftFoodDemandDao.getFlag());
         }
         List<FtFoodDemandDao> list = iFtFoodDemandDaoService.list(lqw);
         return getDataTable(list);
