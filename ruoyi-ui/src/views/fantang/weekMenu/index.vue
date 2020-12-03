@@ -78,13 +78,13 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+<!--    <pagination-->
+<!--      v-show="total>0"-->
+<!--      :total="total"-->
+<!--      :page.sync="queryParams.pageNum"-->
+<!--      :limit.sync="queryParams.pageSize"-->
+<!--      @pagination="getList"-->
+<!--    />-->
 
     <!-- 添加或修改每周菜单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
@@ -214,7 +214,7 @@
         // 查询参数
         queryParams: {
           pageNum: 1,
-          pageSize: 9,
+          pageSize: 50,
           dinnerType: '',
           weekday: '',
           flag: null
