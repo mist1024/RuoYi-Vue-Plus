@@ -11,11 +11,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="type"    column="type"    />
         <result property="createAt"    column="create_at"    />
         <result property="createBy"    column="create_by"    />
-        <result property="price"    column="price"    />
-        <result property="term"    column="term"    />
         <result property="updateAt"    column="update_at"    />
+        <result property="vegetables"    column="vegetables"    />
         <result property="updateBy"    column="update_by"    />
+        <result property="meat"    column="meat"    />
         <result property="updateFrom"    column="update_from"    />
+        <result property="rice"    column="rice"    />
+        <result property="egg"    column="egg"    />
+        <result property="orderInfo"    column="order_info"    />
+        <result property="flag"    column="flag"    />
     </resultMap>
 
 

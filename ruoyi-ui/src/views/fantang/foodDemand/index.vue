@@ -1,33 +1,14 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用餐类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择用餐类型" clearable size="small">
-          <el-option
-            v-for="dict in typeOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="更新日期" prop="updateAt">
-        <el-date-picker clearable size="small" style="width: 200px"
-                        v-model="queryParams.updateAt"
-                        type="date"
-                        value-format="yyyy-MM-dd"
-                        placeholder="选择更新日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="更新来源" prop="updateFrom">
-        <el-select v-model="queryParams.updateFrom" placeholder="请选择更新来源" clearable size="small">
-          <el-option
-            v-for="dict in updateFromOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
-          />
-        </el-select>
+      <el-form-item label="启用状态" prop="flag">
+        <el-input
+          v-model="queryParams.flag"
+          placeholder="请输入启用状态"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
       </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -74,20 +55,24 @@
           v-hasPermi="['fantang:foodDemand:export']"
         >导出</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="foodDemandList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-      <el-table-column label="用餐类型" align="center" prop="type" :formatter="typeFormat" />
-      <el-table-column label="总价" align="center" prop="price" />
+      <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat" />
+      <el-table-column label="正餐清单" align="center" prop="foods" />
       <el-table-column label="更新日期" align="center" prop="updateAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新来源" align="center" prop="updateFrom" :formatter="updateFromFormat" />
+      <el-table-column label="加菜" align="center" prop="vegetables" />
+      <el-table-column label="加肉" align="center" prop="meat" />
+      <el-table-column label="加饭" align="center" prop="rice" />
+      <el-table-column label="加蛋" align="center" prop="egg" />
+      <el-table-column label="启用状态" align="center" prop="flag" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -119,16 +104,6 @@
     <!-- 添加或修改病人报餐对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用餐类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择用餐类型">
-            <el-option
-              v-for="dict in typeOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="parseInt(dict.dictValue)"
-            ></el-option>
-          </el-select>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -165,7 +140,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 用餐类型字典
+      // 正餐类型字典
       typeOptions: [],
       // 更新来源字典
       updateFromOptions: [],
@@ -173,16 +148,14 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        type: null,
-        updateAt: null,
-        updateFrom: null
+        flag: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         type: [
-          { required: true, message: "用餐类型不能为空", trigger: "change" }
+          { required: true, message: "正餐类型不能为空", trigger: "change" }
         ],
       }
     };
@@ -206,7 +179,7 @@ export default {
         this.loading = false;
       });
     },
-    // 用餐类型字典翻译
+    // 正餐类型字典翻译
     typeFormat(row, column) {
       return this.selectDictLabel(this.typeOptions, row.type);
     },
@@ -228,11 +201,15 @@ export default {
         type: null,
         createAt: null,
         createBy: null,
-        price: null,
-        term: null,
         updateAt: null,
+        vegetables: null,
         updateBy: null,
-        updateFrom: null
+        meat: null,
+        updateFrom: null,
+        rice: null,
+        egg: null,
+        orderInfo: null,
+        flag: null
       };
       this.resetForm("form");
     },
@@ -292,28 +269,28 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除病人报餐编号为"' + ids + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        return delFoodDemand(ids);
-      }).then(() => {
-        this.getList();
-        this.msgSuccess("删除成功");
-      })
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return delFoodDemand(ids);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有病人报餐数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        return exportFoodDemand(queryParams);
-      }).then(response => {
-        this.download(response.msg);
-      })
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function() {
+          return exportFoodDemand(queryParams);
+        }).then(response => {
+          this.download(response.msg);
+        })
     }
   }
 };

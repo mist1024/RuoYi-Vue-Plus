@@ -19,7 +19,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 病人报餐对象 ft_food_demand
  * 
  * @author ft
- * @date 2020-11-26
+ * @date 2020-12-03
  */
 @Data
 @ToString
@@ -39,11 +39,12 @@ private static final long serialVersionUID=1L;
     /** 病人id */
     private Long patientId;
 
-    /** 订单详情 */
+    /** 正餐清单 */
+    @Excel(name = "正餐清单")
     private String foods;
 
-    /** 用餐类型 */
-    @Excel(name = "用餐类型")
+    /** 正餐类型 */
+    @Excel(name = "正餐类型")
     private Long type;
 
     /** 创建时间 */
@@ -52,22 +53,37 @@ private static final long serialVersionUID=1L;
     /** 创建人 */
     private Long createBy;
 
-    /** 总价 */
-    @Excel(name = "总价")
-    private BigDecimal price;
-
-    /** 有效期 */
-    private Long term;
-
     /** 更新日期 */
     @Excel(name = "更新日期" , width = 30, dateFormat = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateAt;
 
+    /** 加菜 */
+    @Excel(name = "加菜")
+    private Integer vegetables;
+
     /** 更新操作人 id */
     private Long updateBy;
 
+    /** 加肉 */
+    @Excel(name = "加肉")
+    private Integer meat;
+
     /** 更新来源 */
-    @Excel(name = "更新来源")
     private Integer updateFrom;
+
+    /** 加饭 */
+    @Excel(name = "加饭")
+    private Integer rice;
+
+    /** 加蛋 */
+    @Excel(name = "加蛋")
+    private Integer egg;
+
+    /** 订单详情 */
+    private String orderInfo;
+
+    /** 启用状态 */
+    @Excel(name = "启用状态")
+    private Integer flag;
 }
