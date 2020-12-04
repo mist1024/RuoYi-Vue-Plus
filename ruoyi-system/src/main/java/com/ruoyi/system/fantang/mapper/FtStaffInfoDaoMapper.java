@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface FtStaffInfoDaoMapper extends BaseMapper<FtStaffInfoDao> {
 
-    @Select("")
+    @Select("SELECT a.*, b.depart_name from ft_staff_info a LEFT JOIN ft_depart b on a.depart_id = b.depart_id where staff_type = 1")
     List<FtStaffInfoDao> selectStaffInfoWithDepart();
 }
