@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" v-if="false">
       <el-form-item label="补贴类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择补贴类型" clearable size="small">
           <el-option
@@ -54,7 +54,7 @@
         >新增
         </el-button>
       </el-col>
-      <el-col :span="1.5">
+      <el-col :span="1.5" v-if="false">
         <el-button
           type="success"
           icon="el-icon-edit"
@@ -65,7 +65,7 @@
         >修改
         </el-button>
       </el-col>
-      <el-col :span="1.5">
+      <el-col :span="1.5" v-if="false">
         <el-button
           type="danger"
           icon="el-icon-delete"
@@ -76,7 +76,7 @@
         >删除
         </el-button>
       </el-col>
-      <el-col :span="1.5">
+      <el-col :span="1.5" v-if="false">
         <el-button
           type="warning"
           icon="el-icon-download"
@@ -86,11 +86,11 @@
         >导出
         </el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" v-if="false"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="subsidyList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center"/>
+    <el-table v-loading="loading" :data="subsidyList" @selection-change="handleSelectionChange" border>
+      <el-table-column type="selection" width="55" align="center" v-if="false"/>
       <el-table-column label="补贴 id" align="center" prop="subsidyId" v-if="false"/>
       <el-table-column label="补贴类型" align="center" prop="type" :formatter="typeFormat"/>
       <el-table-column label="金额" align="center" prop="price"/>
@@ -102,6 +102,14 @@
       <el-table-column label="启用标志" align="center" prop="flag" :formatter="formatFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-money"
+            @click="clickSubsidyGiveOut(scope.row)"
+            v-hasPermi="['fantang:subsidy:edit']"
+          >发放
+          </el-button>
           <el-button
             size="mini"
             type="text"
@@ -129,6 +137,18 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+
+    <!--    补贴发放弹出层-->
+    <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="500px" align="center">
+      <el-table :data="staffData">
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column property="departId" label="科室" width="200"></el-table-column>
+        <el-table-column property="name" label="姓名" width="150"></el-table-column>
+      </el-table>
+      <br>
+      <el-button type="primary">发放</el-button>
+    </el-dialog>
 
     <!-- 添加或修改补贴管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -166,12 +186,16 @@
 
 <script>
 import {addSubsidy, delSubsidy, exportSubsidy, getSubsidy, listSubsidy, updateSubsidy} from "@/api/fantang/subsidy";
+import {listStaffInfo} from "@/api/fantang/staffInfo";
 
 export default {
   name: "Subsidy",
   components: {},
   data() {
     return {
+      staffData: [],
+      // 发放弹出层
+      showPopupSubsidyGiveOut: false,
       // 遮罩层
       loading: true,
       // 选中数组
@@ -224,6 +248,15 @@ export default {
     });
   },
   methods: {
+
+    //  响应发放补贴按钮
+    clickSubsidyGiveOut(row) {
+      listStaffInfo().then(response => {
+        this.staffData = response.rows;
+        this.showPopupSubsidyGiveOut = true;
+      })
+
+    },
     // 控制补贴列表启用状态的回显
     formatFlag(row) {
       if (row.flag)

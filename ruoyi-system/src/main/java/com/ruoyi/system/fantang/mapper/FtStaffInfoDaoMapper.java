@@ -2,6 +2,9 @@ package com.ruoyi.system.fantang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 员工管理Mapper接口
@@ -11,4 +14,6 @@ import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
  */
 public interface FtStaffInfoDaoMapper extends BaseMapper<FtStaffInfoDao> {
 
+    @Select("")
+    List<FtStaffInfoDao> selectStaffInfoWithDepart();
 }

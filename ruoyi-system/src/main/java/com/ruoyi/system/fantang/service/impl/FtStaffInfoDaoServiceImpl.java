@@ -6,6 +6,8 @@ import com.ruoyi.system.fantang.mapper.FtStaffInfoDaoMapper;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 员工管理Service业务层处理
  *
@@ -15,4 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper, FtStaffInfoDao> implements IFtStaffInfoDaoService {
 
+    @Override
+    public List<FtStaffInfoDao> selectStaffInfoWithDepart() {
+
+        return this.baseMapper.selectStaffInfoWithDepart();
+    }
 }
