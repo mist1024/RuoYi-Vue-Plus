@@ -9,6 +9,13 @@ export function listStaffInfo(query) {
   })
 }
 
+export function staffListWithDepart() {
+  return request({
+    url: '/fantang/staffInfo/staffListWithDepart',
+    method: 'get',
+  })
+}
+
 // 查询护工管理列表
 export function careStaffList(query) {
   return request({

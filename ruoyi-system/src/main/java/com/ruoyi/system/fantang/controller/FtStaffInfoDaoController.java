@@ -59,8 +59,7 @@ public class FtStaffInfoDaoController extends BaseController {
 
     @GetMapping("/staffListWithDepart")
     public AjaxResult staffListWithDepart() {
-
-        return AjaxResult.success(null);
+        return AjaxResult.success(iFtStaffInfoDaoService.selectStaffInfoWithDepart());
     }
 
     /**

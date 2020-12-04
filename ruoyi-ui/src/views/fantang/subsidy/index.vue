@@ -143,7 +143,7 @@
     <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="500px" align="center">
       <el-table :data="staffData">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column property="departId" label="科室" width="200"></el-table-column>
+        <el-table-column property="departName" label="科室" width="200"></el-table-column>
         <el-table-column property="name" label="姓名" width="150"></el-table-column>
       </el-table>
       <br>
@@ -186,7 +186,7 @@
 
 <script>
 import {addSubsidy, delSubsidy, exportSubsidy, getSubsidy, listSubsidy, updateSubsidy} from "@/api/fantang/subsidy";
-import {listStaffInfo} from "@/api/fantang/staffInfo";
+import {staffListWithDepart} from "@/api/fantang/staffInfo";
 
 export default {
   name: "Subsidy",
@@ -251,8 +251,9 @@ export default {
 
     //  响应发放补贴按钮
     clickSubsidyGiveOut(row) {
-      listStaffInfo().then(response => {
-        this.staffData = response.rows;
+      staffListWithDepart().then(response => {
+        console.log(response);
+        this.staffData = response.data;
         this.showPopupSubsidyGiveOut = true;
       })
 
