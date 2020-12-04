@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FtStaffInfoVo {
     private String departName;
+    private Boolean giveOutFlag;
 }

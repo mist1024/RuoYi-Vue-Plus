@@ -140,14 +140,30 @@
 
 
     <!--    补贴发放弹出层-->
-    <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="500px" align="center">
+    <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="1000px" align="center">
       <el-table :data="staffData">
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column property="departName" label="科室" width="200"></el-table-column>
-        <el-table-column property="name" label="姓名" width="150"></el-table-column>
+        <el-table-column prop="departName" label="科室" width="200" align="center"
+                         :filters="[{ text: '家', value: '家' }, { text: '公司', value: '公司' }]"
+                         :filter-method="filterDepart">
+          <template slot-scope="scope">
+
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="姓名" width="150" align="center"></el-table-column>
+        <el-table-column prop="giveOutFlag" label="是否发放补贴" width="300" align="center">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.giveOutFlag"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              active-text="是"
+              inactive-text="否">
+            </el-switch>
+          </template>
+        </el-table-column>
       </el-table>
       <br>
-      <el-button type="primary">发放</el-button>
+      <el-button type="primary">发放补贴</el-button>
     </el-dialog>
 
     <!-- 添加或修改补贴管理对话框 -->
@@ -249,14 +265,13 @@ export default {
   },
   methods: {
 
+    filterDepart() {
+      return row.tag === value;
+    },
+
     //  响应发放补贴按钮
     clickSubsidyGiveOut(row) {
-      staffListWithDepart().then(response => {
-        console.log(response);
-        this.staffData = response.data;
-        this.showPopupSubsidyGiveOut = true;
-      })
-
+      this.showPopupSubsidyGiveOut = true;
     },
     // 控制补贴列表启用状态的回显
     formatFlag(row) {
@@ -274,6 +289,13 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+      staffListWithDepart().then(response => {
+        this.staffData = response.data;
+        for (let i = 0; i < this.staffData.length; i++) {
+          this.staffData[i].giveOutFlag = true;
+        }
+        console.log(this.staffData);
+      })
     },
     // 补贴类型字典翻译
     typeFormat(row, column) {
