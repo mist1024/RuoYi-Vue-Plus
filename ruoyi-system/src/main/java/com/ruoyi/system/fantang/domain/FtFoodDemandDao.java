@@ -74,7 +74,7 @@ public class FtFoodDemandDao implements Serializable {
      * 加菜
      */
     @Excel(name = "加菜")
-    private Integer vegetables;
+    private Boolean vegetables;
 
     /**
      * 更新操作人 id
@@ -85,7 +85,7 @@ public class FtFoodDemandDao implements Serializable {
      * 加肉
      */
     @Excel(name = "加肉")
-    private Integer meat;
+    private Boolean meat;
 
     /**
      * 更新来源
@@ -96,7 +96,7 @@ public class FtFoodDemandDao implements Serializable {
      * 加饭
      */
     @Excel(name = "加饭")
-    private Integer rice;
+    private Boolean rice;
 
     /**
      * 加蛋

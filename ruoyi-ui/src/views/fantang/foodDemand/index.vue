@@ -136,40 +136,42 @@
           <el-input v-model="form.type" :disabled="true"/>
         </el-form-item>
         <el-form-item label="正餐清单" prop="foods">
-          <el-input v-model="form.foods"/>
+          <el-select v-model="form.foods"
+                     multiple style="width: 380px">
+            <el-option
+              v-for="item in foodList"
+              :key="item.foodId"
+              :label="item.name"
+              :value="item.foodId">
+              <span style="float: left; width:40px">{{ item.name }}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span style="color: #8492a6; font-size: 13px">{{ item.price }} 元</span>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="加菜" prop="vegetables">
-          <el-select v-model="form.vegetables" placeholder="是否加菜">
-            <el-option
-              v-for="item in vegetablesOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <el-switch
+            v-model="form.vegetables"
+            active-text="是"
+            inactive-text="否">
+          </el-switch>
         </el-form-item>
         <el-form-item label="加肉" prop="meat">
-          <el-select v-model="form.meat" placeholder="是否加肉">
-            <el-option
-              v-for="item in vegetablesOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <el-switch
+            v-model="form.meat"
+            active-text="是"
+            inactive-text="否">
+          </el-switch>
         </el-form-item>
         <el-form-item label="加饭" prop="rice">
-          <el-select v-model="form.rice" placeholder="是否加饭">
-            <el-option
-              v-for="item in vegetablesOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <el-switch
+            v-model="form.rice"
+            active-text="是"
+            inactive-text="否">
+          </el-switch>
         </el-form-item>
         <el-form-item label="加蛋" prop="egg">
-          <el-input-number v-model="form.egg" :min="0"/>
+          <el-input-number v-model="form.egg" :min="0" :max="5"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -195,13 +197,6 @@ export default {
   components: {},
   data() {
     return {
-      vegetablesOptions: [{
-        value: 1,
-        label: '是'
-      }, {
-        value: 0,
-        label: '否'
-      }],
       flagOptions: [{
         value: 1,
         label: '启用'
@@ -275,23 +270,32 @@ export default {
         }));
         return obj.name;
       });
-      return ret.toString();
+      let str = ret.toString();
+      if (row.vegetables > 0)
+        str += ",加菜";
+      if (row.rice > 0)
+        str += ",加饭"
+      if (row.meat > 0)
+        str += ",加肉"
+      if (row.egg > 0)
+        str += ",加蛋" + row.egg;
+      return str;
     },
     formatVegetables(row) {
-      if (row.vegetables === null || row.vegetables === 0)
-        return "否";
-      return "是";
+      if (row.vegetables)
+        return "是";
+      return "否";
     },
     formatMeat(row) {
-      if (row.meat === null || row.meat === 0)
-        return "否";
-      return "是";
+      if (row.meat)
+        return "是";
+      return "否";
     },
 
     formatRice(row) {
-      if (row.rice === null || row.rice === 0)
-        return "否";
-      return "是";
+      if (row.rice)
+        return "是";
+      return "否";
     },
     formatEgg(row) {
       if (row.egg === null || row.egg === 0)
@@ -304,6 +308,7 @@ export default {
       listFoodDemand(this.queryParams).then(response => {
         this.foodDemandList = response.rows;
         this.total = response.total;
+
         this.loading = false;
       });
     },
@@ -369,6 +374,8 @@ export default {
       const id = row.id || this.ids
       getFoodDemand(id).then(response => {
         this.form = response.data;
+        this.form.foods = this.form.foods.split(",").map(Number);
+
         this.open = true;
         this.title = "修改病人报餐";
       });
@@ -378,6 +385,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
+            this.form.foods = this.form.foods.toString();
             updateFoodDemand(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
