@@ -259,10 +259,9 @@
 <script>
 import {addSettle, delSettle, exportSettle, getSettle, listSettle, updateSettle} from "@/api/fantang/settle";
 import {listAll, listNoPay, listPayoff} from "@/api/fantang/meals";
-import {getUserProfile} from "../../../api/system/user";
-import {getPrepaymentByPatientId} from "../../../api/fantang/prepayment";
-import {getLastSettlementDate} from "../../../api/fantang/meals";
-import { dateFormat } from 'vux'
+import {getUserProfile} from "@/api/system/user";
+import {getPrepaymentByPatientId} from "@/api/fantang/prepayment";
+import {getLastSettlementDate} from "@/api/fantang/meals";
 
 export default {
   name: "Settle",
@@ -410,11 +409,11 @@ export default {
   methods: {
     // 变更结算日期计算
     changeBillingDate(value) {
-      var dateSpan,  iDays;
+      var dateSpan, iDays;
       let sDate1 = Date.parse(this.formAddNewSettlement.lastBillingDate);
       let sDate2 = Date.parse(value);
       dateSpan = sDate2 - sDate1;
-      if(dateSpan <=0){
+      if (dateSpan <= 0) {
         this.msgError("你现在的结算日期小于上一次结算日期！！");
       } else {
         dateSpan = Math.abs(dateSpan);
@@ -433,7 +432,7 @@ export default {
 
     // 日常伙食费结算操作按钮
     clickAddNewSettlement(row) {
-      getLastSettlementDate(row.patientId).then(response =>{
+      getLastSettlementDate(row.patientId).then(response => {
         console.log("getLastBillingDateByPatientId-->", response);
         this.formAddNewSettlement.lastBillingDate = response.data.settlementAt;
         this.formAddNewSettlement.settlementDays = response.data.days;

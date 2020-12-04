@@ -21,13 +21,13 @@ import java.util.List;
 
 /**
  * 病人报餐Controller
- * 
+ *
  * @author ft
  * @date 2020-12-03
  */
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
-@RequestMapping("/fantang/foodDemand" )
+@RequestMapping("/fantang/foodDemand")
 public class FtFoodDemandDaoController extends BaseController {
 
     private final IFtFoodDemandDaoService iFtFoodDemandDaoService;
@@ -37,12 +37,11 @@ public class FtFoodDemandDaoController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('fantang:foodDemand:list')")
     @GetMapping("/list")
-    public TableDataInfo list(FtFoodDemandDao ftFoodDemandDao)
-    {
+    public TableDataInfo list(FtFoodDemandDao ftFoodDemandDao) {
         startPage();
         LambdaQueryWrapper<FtFoodDemandDao> lqw = Wrappers.lambdaQuery(ftFoodDemandDao);
-        if (ftFoodDemandDao.getFlag() != null){
-            lqw.eq(FtFoodDemandDao::getFlag ,ftFoodDemandDao.getFlag());
+        if (ftFoodDemandDao.getFlag() != null) {
+            lqw.eq(FtFoodDemandDao::getFlag, ftFoodDemandDao.getFlag());
         }
         List<FtFoodDemandDao> list = iFtFoodDemandDaoService.list(lqw);
         return getDataTable(list);
@@ -51,40 +50,41 @@ public class FtFoodDemandDaoController extends BaseController {
     /**
      * 导出病人报餐列表
      */
-    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:export')" )
-    @Log(title = "病人报餐" , businessType = BusinessType.EXPORT)
-    @GetMapping("/export" )
+    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:export')")
+    @Log(title = "病人报餐", businessType = BusinessType.EXPORT)
+    @GetMapping("/export")
     public AjaxResult export(FtFoodDemandDao ftFoodDemandDao) {
         LambdaQueryWrapper<FtFoodDemandDao> lqw = new LambdaQueryWrapper<FtFoodDemandDao>(ftFoodDemandDao);
         List<FtFoodDemandDao> list = iFtFoodDemandDaoService.list(lqw);
-        ExcelUtil<FtFoodDemandDao> util = new ExcelUtil<FtFoodDemandDao>(FtFoodDemandDao. class);
-        return util.exportExcel(list, "foodDemand" );
+        ExcelUtil<FtFoodDemandDao> util = new ExcelUtil<FtFoodDemandDao>(FtFoodDemandDao.class);
+        return util.exportExcel(list, "foodDemand");
     }
 
     /**
      * 获取病人报餐详细信息
      */
-    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:query')" )
-    @GetMapping(value = "/{id}" )
-    public AjaxResult getInfo(@PathVariable("id" ) Long id) {
+    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:query')")
+    @GetMapping(value = "/{id}")
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(iFtFoodDemandDaoService.getById(id));
     }
 
     /**
      * 新增病人报餐
      */
-    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:add')" )
-    @Log(title = "病人报餐" , businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:add')")
+    @Log(title = "病人报餐", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FtFoodDemandDao ftFoodDemandDao) {
+        ftFoodDemandDao.setFlag(true);
         return toAjax(iFtFoodDemandDaoService.save(ftFoodDemandDao) ? 1 : 0);
     }
 
     /**
      * 修改病人报餐
      */
-    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:edit')" )
-    @Log(title = "病人报餐" , businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:edit')")
+    @Log(title = "病人报餐", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody FtFoodDemandDao ftFoodDemandDao) {
         ftFoodDemandDao.setUpdateAt(new Date());
@@ -94,9 +94,9 @@ public class FtFoodDemandDaoController extends BaseController {
     /**
      * 删除病人报餐
      */
-    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:remove')" )
-    @Log(title = "病人报餐" , businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}" )
+    @PreAuthorize("@ss.hasPermi('fantang:foodDemand:remove')")
+    @Log(title = "病人报餐", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(iFtFoodDemandDaoService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
     }

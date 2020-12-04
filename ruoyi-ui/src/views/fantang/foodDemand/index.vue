@@ -84,23 +84,23 @@
     <el-table v-loading="loading" :data="foodDemandList" @selection-change="handleSelectionChange" border>
       <!--      <el-table-column type="selection" width="55" align="center"/>-->
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-<!--      <el-table-column label="住院号" align="center" prop="hospitalId"/>-->
+      <!--      <el-table-column label="住院号" align="center" prop="hospitalId"/>-->
       <el-table-column label="姓名" align="center" prop="name" width="100px"/>
-<!--      <el-table-column label="科室" align="center" prop="departName"/>-->
+      <!--      <el-table-column label="科室" align="center" prop="departName"/>-->
       <el-table-column label="床号" align="center" prop="bedId" width="100px"/>
       <el-table-column label="正餐" align="center" prop="type" :formatter="typeFormat" width="100px"/>
       <el-table-column label="正餐清单" align="center" prop="foods" :formatter="formatFoods"/>
       <el-table-column label="加菜" align="center" prop="vegetables" width="80px" :formatter="formatVegetables"/>
-      <el-table-column label="加肉" align="center" prop="meat"  width="80px" :formatter="formatMeat"/>
+      <el-table-column label="加肉" align="center" prop="meat" width="80px" :formatter="formatMeat"/>
       <el-table-column label="加饭" align="center" prop="rice" width="80px" :formatter="formatRice"/>
-      <el-table-column label="加蛋" align="center" prop="egg" width="80px" :formatter="formatEgg"/>
-      <el-table-column label="营养配餐" align="center" prop="nutritionFood"  width="120px"/>
-<!--      <el-table-column label="更新日期" align="center" prop="updateAt" width="180">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ parseTime(scope.row.updateAt, '{y}-{m}-{d}') }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column label="启用状态" align="center" prop="flag"  width="80px"/>
+      <el-table-column label="加蛋" align="center" prop="egg" width="80px" />
+      <el-table-column label="营养配餐" align="center" prop="nutritionFood" width="120px"/>
+      <!--      <el-table-column label="更新日期" align="center" prop="updateAt" width="180">-->
+      <!--        <template slot-scope="scope">-->
+      <!--          <span>{{ parseTime(scope.row.updateAt, '{y}-{m}-{d}') }}</span>-->
+      <!--        </template>-->
+      <!--      </el-table-column>-->
+      <el-table-column label="启用状态" align="center" prop="flag" width="80px"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -126,8 +126,50 @@
     <!-- 添加或修改病人报餐对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="姓名">
-          <el-input label="姓名"></el-input>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="form.name" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="床号" prop="bedId">
+          <el-input v-model="form.bedId" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="正餐" prop="type">
+          <el-input v-model="form.type" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="正餐清单" prop="foods">
+          <el-input v-model="form.foods"/>
+        </el-form-item>
+        <el-form-item label="加菜" prop="vegetables">
+          <el-select v-model="form.vegetables" placeholder="是否加菜">
+            <el-option
+              v-for="item in vegetablesOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="加肉" prop="meat">
+          <el-select v-model="form.meat" placeholder="是否加肉">
+            <el-option
+              v-for="item in vegetablesOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="加饭" prop="rice">
+          <el-select v-model="form.rice" placeholder="是否加饭">
+            <el-option
+              v-for="item in vegetablesOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="加蛋" prop="egg">
+          <el-input-number v-model="form.egg" :min="0"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -141,24 +183,30 @@
 <script>
 import {
   addFoodDemand,
-  delFoodDemand,
   exportFoodDemand,
   getFoodDemand,
   listFoodDemand,
   updateFoodDemand
 } from "@/api/fantang/foodDemand";
-import {listFood} from "../../../api/fantang/food";
+import {listFood} from "@/api/fantang/food";
 
 export default {
   name: "FoodDemand",
   components: {},
   data() {
     return {
+      vegetablesOptions: [{
+        value: 1,
+        label: '是'
+      }, {
+        value: 0,
+        label: '否'
+      }],
       flagOptions: [{
         value: 1,
         label: '启用'
       }, {
-        value: 2,
+        value: 0,
         label: '禁用'
       }],
       // 遮罩层
@@ -221,7 +269,7 @@ export default {
     formatFoods(row) {
       const _this = this;
       let arr = row.foods.split(",").map(Number);
-      let ret = arr.map(item =>{
+      let ret = arr.map(item => {
         let obj = _this.foodList.find((value => {
           return value.foodId === item;
         }));
@@ -229,7 +277,7 @@ export default {
       });
       return ret.toString();
     },
-    formatVegetables(row){
+    formatVegetables(row) {
       if (row.vegetables === null || row.vegetables === 0)
         return "否";
       return "是";
