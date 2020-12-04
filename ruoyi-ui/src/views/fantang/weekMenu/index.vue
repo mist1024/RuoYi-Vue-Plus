@@ -333,6 +333,7 @@
       /** 修改按钮操作 */
       handleUpdate(row) {
         row.foods = row.foods.toLocaleString();
+        console.log(row)
         updateWeekMenu(row).then(response => {
           this.msgSuccess("修改成功");
           row.foods = row.foods.split(',').map(Number);
