@@ -1,0 +1,13 @@
+package com.ruoyi.system.fantang.vo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class FtStaffInfoVo {
+    private String departName;
+    private Boolean giveOutFlag;
+}

@@ -57,6 +57,11 @@ public class FtStaffInfoDaoController extends BaseController {
         return getDataTable(list);
     }
 
+    @GetMapping("/staffListWithDepart")
+    public AjaxResult staffListWithDepart() {
+        return AjaxResult.success(iFtStaffInfoDaoService.selectStaffInfoWithDepart());
+    }
+
     /**
      * 查询护工管理列表
      */
