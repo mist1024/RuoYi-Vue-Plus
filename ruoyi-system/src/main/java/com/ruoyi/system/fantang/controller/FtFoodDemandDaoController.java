@@ -40,10 +40,8 @@ public class FtFoodDemandDaoController extends BaseController {
     public TableDataInfo list(FtFoodDemandDao ftFoodDemandDao) {
         startPage();
         LambdaQueryWrapper<FtFoodDemandDao> lqw = Wrappers.lambdaQuery(ftFoodDemandDao);
-        if (ftFoodDemandDao.getFlag() != null) {
-            lqw.eq(FtFoodDemandDao::getFlag, ftFoodDemandDao.getFlag());
-        }
-        List<FtFoodDemandDao> list = iFtFoodDemandDaoService.list(lqw);
+//        List<FtFoodDemandDao> list = iFtFoodDemandDaoService.list(lqw);
+        List<FtFoodDemandDao> list = iFtFoodDemandDaoService.listNewFormatter(ftFoodDemandDao);
         return getDataTable(list);
     }
 

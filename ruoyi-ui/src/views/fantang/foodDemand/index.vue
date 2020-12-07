@@ -65,7 +65,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:foodDemand:add']"
-        >自动生成
+        >导入新入院配置数据
         </el-button>
       </el-col>
       <el-col :span="1.5">

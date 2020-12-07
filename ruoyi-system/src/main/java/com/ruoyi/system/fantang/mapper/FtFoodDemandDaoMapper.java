@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import org.apache.ibatis.annotations.Insert;
@@ -20,4 +21,6 @@ public interface FtFoodDemandDaoMapper extends BaseMapper<FtFoodDemandDao> {
 
     @Select("select a.patient_id  from ft_patient a where a.patient_id not in (select patient_id from ft_food_demand c )")
     public List<Long> getNewPatientNotDemand();
+
+    List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao);
 }

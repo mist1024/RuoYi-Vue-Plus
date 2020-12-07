@@ -1,7 +1,10 @@
 package com.ruoyi.system.fantang.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * 病人报餐Service接口
@@ -14,4 +17,5 @@ public interface IFtFoodDemandDaoService extends IService<FtFoodDemandDao> {
 
     public Integer GenerateOrderForNewPatient() ;
 
+    List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao);
 }

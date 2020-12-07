@@ -22,5 +22,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="flag"    column="flag"    />
     </resultMap>
 
-
+    <select id="listNewFormatter" resultType="com.ruoyi.system.fantang.domain.FtFoodDemandDao">
+        select a.*, b.name, b.bed_id, c.depart_name, b.hospital_id  from ft_food_demand a LEFT JOIN ft_patient b LEFT JOIN ft_depart c  on b.depart_id = c.depart_id on a.patient_id = b.patient_id where b.off_flag = 0
+        <if test="name != null">and b.name = #{name}</if>
+        <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
+    </select>
 </mapper>
