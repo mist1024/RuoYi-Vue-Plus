@@ -199,7 +199,7 @@ export default {
   components: {},
   data() {
     return {
-      departOptions:[],
+      departOptions: [],
       foodList: [],
       flagOptions: [{
         value: 1,
@@ -398,6 +398,14 @@ export default {
         if (valid) {
           if (this.form.id != null) {
             this.form.foods = this.form.foods.toString();
+            if (this.form.type === '早餐')
+              this.form.type = 1;
+            else if (this.form.type === '午餐')
+              this.form.type = 2;
+            else if (this.form.type === '晚餐')
+              this.form.type = 3;
+            else
+              this.form.type = 4;
             updateFoodDemand(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
