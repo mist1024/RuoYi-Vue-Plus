@@ -197,6 +197,7 @@ export default {
   components: {},
   data() {
     return {
+      foodList:[],
       flagOptions: [{
         value: 1,
         label: '启用'
@@ -375,7 +376,7 @@ export default {
       getFoodDemand(id).then(response => {
         this.form = response.data;
         this.form.foods = this.form.foods.split(",").map(Number);
-
+        this.form.type = this.selectDictLabel(this.typeOptions, row.type);
         this.open = true;
         this.title = "修改病人报餐";
       });
