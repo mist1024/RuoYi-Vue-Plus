@@ -86,8 +86,8 @@
       <!--      <el-table-column type="selection" width="55" align="center"/>-->
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <!--      <el-table-column label="住院号" align="center" prop="hospitalId"/>-->
+      <el-table-column label="科室" align="center" prop="departName" width="100px"/>
       <el-table-column label="姓名" align="center" prop="name" width="100px"/>
-      <!--      <el-table-column label="科室" align="center" prop="departName"/>-->
       <el-table-column label="床号" align="center" prop="bedId" width="100px"/>
       <el-table-column label="正餐" align="center" prop="type" :formatter="typeFormat" width="100px"/>
       <el-table-column label="正餐清单" align="center" prop="foods" :formatter="formatFoods"/>
