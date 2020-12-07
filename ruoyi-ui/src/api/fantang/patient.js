@@ -9,6 +9,22 @@ export function listPatient(query) {
   })
 }
 
+// 根据 departId 查询病人列表
+export function selectPatientByDepartId(departId) {
+  return request({
+    url: '/fantang/patient/selectPatientByDepartId/' + departId,
+    method: 'get',
+  })
+}
+
+// 根据 patientId 查询病人床号
+export function getBedIdById(patientId) {
+  return request({
+    url: '/fantang/patient/getBedIdById/' + patientId,
+    method: 'get',
+  })
+}
+
 // 查询病人管理详细
 export function getPatient(patientId) {
   return request({
