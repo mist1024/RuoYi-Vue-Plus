@@ -64,7 +64,8 @@ public class FtFoodDemandDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:foodDemand:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
-        return AjaxResult.success(iFtFoodDemandDaoService.getById(id));
+        FtFoodDemandDao ftFoodDemandDao =  iFtFoodDemandDaoService.getByIdNewFormatter(id);
+        return AjaxResult.success(ftFoodDemandDao);
     }
 
     /**

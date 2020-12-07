@@ -23,4 +23,6 @@ public interface FtFoodDemandDaoMapper extends BaseMapper<FtFoodDemandDao> {
     public List<Long> getNewPatientNotDemand();
 
     List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao);
+
+    FtFoodDemandDao getByIdNewFormatter(Long id);
 }

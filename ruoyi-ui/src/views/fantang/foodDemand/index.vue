@@ -260,7 +260,6 @@ export default {
       this.updateFromOptions = response.data;
     });
     listDepart().then(response => {
-      console.log(response);
       this.departOptions = response.rows;
     })
   },

@@ -18,4 +18,6 @@ public interface IFtFoodDemandDaoService extends IService<FtFoodDemandDao> {
     public Integer GenerateOrderForNewPatient() ;
 
     List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao);
+
+    FtFoodDemandDao getByIdNewFormatter(Long id);
 }

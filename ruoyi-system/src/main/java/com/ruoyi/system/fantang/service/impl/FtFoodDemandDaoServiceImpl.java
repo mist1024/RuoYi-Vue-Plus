@@ -1,6 +1,5 @@
 package com.ruoyi.system.fantang.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.mapper.FtFoodDemandDaoMapper;
@@ -37,5 +36,10 @@ public class FtFoodDemandDaoServiceImpl extends ServiceImpl<FtFoodDemandDaoMappe
     @Override
     public List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao) {
         return this.baseMapper.listNewFormatter(ftFoodDemandDao);
+    }
+
+    @Override
+    public FtFoodDemandDao getByIdNewFormatter(Long id) {
+        return this.baseMapper.getByIdNewFormatter(id);
     }
 }
