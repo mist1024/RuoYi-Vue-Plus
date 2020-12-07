@@ -3,6 +3,8 @@ package com.ruoyi.system.fantang.mapper;
 import com.ruoyi.system.fantang.domain.FtCateringDao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * 配餐功能Mapper接口
  *
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface FtCateringDaoMapper extends BaseMapper<FtCateringDao> {
 
+    List<FtCateringDao> listNewFormatter(FtCateringDao ftCateringDao);
 }

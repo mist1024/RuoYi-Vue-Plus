@@ -184,8 +184,8 @@
       <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat" v-if="false"/>
       <el-table-column label="配餐号" align="center" prop="number"/>
       <el-table-column label="配餐频次" align="center" prop="frequency"/>
-      <el-table-column label="用法" align="center" prop="usage"/>
-      <el-table-column label="描述" align="center" prop="describe"/>
+      <el-table-column label="用法" align="center" prop="cateringUsage"/>
+      <el-table-column label="描述" align="center" prop="cateringDescribe"/>
       <el-table-column label="启用标示" align="center" prop="flag"/>
       <el-table-column label="创建时间" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
@@ -223,7 +223,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改配餐功能对话框 -->
+    <!-- 添加配餐功能对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="科室" prop="departId">
@@ -254,17 +254,24 @@
         <el-row :gutter="10">
           <el-col :span="12">
             <el-form-item label="配餐号" prop="number">
-              <el-input v-model="form.number" placeholder="请输入配餐号"/>
+              <el-select v-model="form.number" placeholder="请选择配餐号">
+                <el-option
+                  v-for="item in numberOptions"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="用法" prop="usage">
-              <el-select v-model="form.usage" placeholder="请选择用法">
+            <el-form-item label="用法" prop="cateringUsage">
+              <el-select v-model="form.cateringUsage" placeholder="请选择用法">
                 <el-option
-                  v-for="item in usageOptions"
+                  v-for="item in cateringUsageOptions"
                   :key="item.label"
                   :label="item.label"
-                  :value="item.label"
+                  :value="item.value"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -272,8 +279,8 @@
         </el-row>
         <el-row :gutter="10">
           <el-col :span="12">
-            <el-form-item label="正餐类型" prop="type">
-              <el-select v-model="form.type"
+            <el-form-item label="正餐类型" prop="types">
+              <el-select v-model="form.types"
                          multiple
                          @change="changeDinnerType"
                          placeholder="请选择正餐类型">
@@ -288,14 +295,106 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="配餐频次" prop="frequency">
-              <el-select v-model="form.frequency" placeholder="请选择频次">
+              <!--              <el-select v-model="form.frequency" placeholder="频次" :disabled="true">-->
+              <!--                <el-option-->
+              <!--                  v-for="item in frequencyOptions"-->
+              <!--                  :key="item.label"-->
+              <!--                  :label="item.label"-->
+              <!--                  :value="item.label"-->
+              <!--                ></el-option>-->
+              <!--              </el-select>-->
+              <el-input v-model="form.frequency" placeholder="频次" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 修改配餐功能对话框 -->
+    <el-dialog :title="title" :visible.sync="modifyItem" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="科室" prop="departId">
+          <el-select v-model="form.departId"
+                     placeholder="请选择科室"
+                     @change="changeDepart">
+            <el-option
+              v-for="item in departOptions"
+              :key="item.departName"
+              :label="item.departName"
+              :value="item.departId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="病人" prop="patientId">
+          <el-select v-model="form.patientId" placeholder="请选择病人" @change="changePatient">
+            <el-option
+              v-for="item in patientOptions"
+              :key="item.name"
+              :label="item.name"
+              :value="item.patientId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="床号" prop="bedId">
+          <el-input v-model="form.bedId" placeholder="床号" :disabled="true"/>
+        </el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="配餐号" prop="number">
+              <el-select v-model="form.number" placeholder="请选择配餐号">
                 <el-option
-                  v-for="item in frequencyOptions"
+                  v-for="item in numberOptions"
                   :key="item.label"
                   :label="item.label"
-                  :value="item.label"
+                  :value="item.value"
                 ></el-option>
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="用法" prop="cateringUsage">
+              <el-select v-model="form.cateringUsage" placeholder="请选择用法">
+                <el-option
+                  v-for="item in cateringUsageOptions"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="正餐类型" prop="types">
+              <el-select v-model="form.types"
+                         multiple
+                         @change="changeDinnerType"
+                         placeholder="请选择正餐类型">
+                <el-option
+                  v-for="dict in typeOptions"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="parseInt(dict.dictValue)"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="配餐频次" prop="frequency">
+              <!--              <el-select v-model="form.frequency" placeholder="频次" :disabled="true">-->
+              <!--                <el-option-->
+              <!--                  v-for="item in frequencyOptions"-->
+              <!--                  :key="item.label"-->
+              <!--                  :label="item.label"-->
+              <!--                  :value="item.label"-->
+              <!--                ></el-option>-->
+              <!--              </el-select>-->
+              <el-input v-model="form.frequency" placeholder="频次" :disabled="true"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -325,23 +424,19 @@ export default {
   components: {},
   data() {
     return {
-      // 频次列表
-      frequencyOptions:[{
-        value: 'qd',
-        label: 'qd'
+      // 配餐列表
+      numberOptions: [{
+        value: 1,
+        label: '配餐 1'
       }, {
-        value: 'bid',
-        label: 'bid'
+        value: 2,
+        label: '配餐 2'
       }, {
-        value: 'tid',
-        label: 'tid'
-      }, {
-        value: 'qn',
-        label: 'qn'
-      }
-      ],
+        value: 3,
+        label: '配餐 3'
+      }],
       // 用法列表
-      usageOptions: [{
+      cateringUsageOptions: [{
         value: 1,
         label: '鼻饲'
       }, {
@@ -378,6 +473,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 修改弹出层
+      modifyItem: false,
       // 正餐类型字典
       typeOptions: [],
       // 查询参数
@@ -438,6 +535,7 @@ export default {
       this.loading = true;
       listCatering(this.queryParams).then(response => {
         this.cateringList = response.rows;
+        console.log(response);
         this.total = response.total;
         this.loading = false;
       });
@@ -449,6 +547,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false;
+      this.modifyItem = false;
       this.reset();
     },
     // 表单重置
@@ -459,14 +558,14 @@ export default {
         type: null,
         number: null,
         frequency: null,
-        usage: null,
+        cateringUsage: null,
         isReplace: null,
         flag: null,
         updateAt: null,
         updateBy: null,
         createAt: null,
         createBy: null,
-        describe: null
+        cateringDescribe: null
       };
       this.resetForm("form");
     },
@@ -498,8 +597,8 @@ export default {
       const id = row.id || this.ids
       getCatering(id).then(response => {
         this.form = response.data;
-        this.open = true;
-        this.title = "修改配餐功能";
+        this.modifyItem = true;
+        this.title = "修改配餐";
       });
     },
     /** 提交按钮 */
@@ -513,6 +612,7 @@ export default {
               this.getList();
             });
           } else {
+            console.log(this.form);
             addCatering(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
