@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.fantang.mapper.FtFoodDemandDaoMapper">
-    
+
     <resultMap type="FtFoodDemandDao" id="FtFoodDemandDaoResult">
-        <result property="id"    column="id"    />
-        <result property="patientId"    column="patient_id"    />
-        <result property="foods"    column="foods"    />
-        <result property="type"    column="type"    />
-        <result property="createAt"    column="create_at"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="updateAt"    column="update_at"    />
-        <result property="vegetables"    column="vegetables"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="meat"    column="meat"    />
-        <result property="updateFrom"    column="update_from"    />
-        <result property="rice"    column="rice"    />
-        <result property="egg"    column="egg"    />
-        <result property="orderInfo"    column="order_info"    />
-        <result property="flag"    column="flag"    />
+        <result property="id" column="id"/>
+        <result property="patientId" column="patient_id"/>
+        <result property="foods" column="foods"/>
+        <result property="type" column="type"/>
+        <result property="createAt" column="create_at"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateAt" column="update_at"/>
+        <result property="vegetables" column="vegetables"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="meat" column="meat"/>
+        <result property="updateFrom" column="update_from"/>
+        <result property="rice" column="rice"/>
+        <result property="egg" column="egg"/>
+        <result property="orderInfo" column="order_info"/>
+        <result property="flag" column="flag"/>
     </resultMap>
 
     <select id="listNewFormatter" resultType="com.ruoyi.system.fantang.domain.FtFoodDemandDao">
-        select a.*, b.name, b.bed_id, c.depart_name, b.hospital_id  from ft_food_demand a LEFT JOIN ft_patient b LEFT JOIN ft_depart c  on b.depart_id = c.depart_id on a.patient_id = b.patient_id where b.off_flag = 0
-        <if test="name != null">and b.name = #{name}</if>
+        select a.*, b.name, b.bed_id, c.depart_name, b.hospital_id from ft_food_demand a LEFT JOIN ft_patient b LEFT
+        JOIN ft_depart c on b.depart_id = c.depart_id on a.patient_id = b.patient_id where b.off_flag = 0
+        <if test="name != null and name !=''">and b.name = #{name}</if>
+        <if test="bedId != null">and b.bed_id = #{bedId}</if>
+        <if test="departId != null">and b.depart_id = #{departId}</if>
         <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
+        <if test="flag != null">and a.flag = #{flag}</if>
     </select>
 </mapper>

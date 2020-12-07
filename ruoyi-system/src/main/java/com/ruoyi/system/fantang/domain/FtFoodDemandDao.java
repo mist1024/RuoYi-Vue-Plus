@@ -115,4 +115,6 @@ public class FtFoodDemandDao  extends BasePatient implements Serializable {
      */
     @Excel(name = "启用状态")
     private Boolean flag;
+
+    private Long departId;
 }

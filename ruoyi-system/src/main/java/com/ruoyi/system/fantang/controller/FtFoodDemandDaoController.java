@@ -39,7 +39,7 @@ public class FtFoodDemandDaoController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(FtFoodDemandDao ftFoodDemandDao) {
         startPage();
-        LambdaQueryWrapper<FtFoodDemandDao> lqw = Wrappers.lambdaQuery(ftFoodDemandDao);
+//        LambdaQueryWrapper<FtFoodDemandDao> lqw = Wrappers.lambdaQuery(ftFoodDemandDao);
 //        List<FtFoodDemandDao> list = iFtFoodDemandDaoService.list(lqw);
         List<FtFoodDemandDao> list = iFtFoodDemandDaoService.listNewFormatter(ftFoodDemandDao);
         return getDataTable(list);

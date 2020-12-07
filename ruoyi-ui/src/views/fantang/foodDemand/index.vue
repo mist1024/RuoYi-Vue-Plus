@@ -19,14 +19,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="科室" prop="departName">
-        <el-input
-          v-model="queryParams.departName"
-          placeholder="请输入科室"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="科室" prop="departId">
+        <el-select v-model="queryParams.departId" placeholder="请选择科室">
+          <el-option
+            v-for="item in departOptions"
+            :key="item.departName"
+            :label="item.departName"
+            :value="item.departId">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="住院号" prop="hospitalId">
         <el-input
@@ -93,7 +94,7 @@
       <el-table-column label="加菜" align="center" prop="vegetables" width="80px" :formatter="formatVegetables"/>
       <el-table-column label="加肉" align="center" prop="meat" width="80px" :formatter="formatMeat"/>
       <el-table-column label="加饭" align="center" prop="rice" width="80px" :formatter="formatRice"/>
-      <el-table-column label="加蛋" align="center" prop="egg" width="80px" />
+      <el-table-column label="加蛋" align="center" prop="egg" width="80px"/>
       <el-table-column label="营养配餐" align="center" prop="nutritionFood" width="120px"/>
       <!--      <el-table-column label="更新日期" align="center" prop="updateAt" width="180">-->
       <!--        <template slot-scope="scope">-->
@@ -191,13 +192,15 @@ import {
   updateFoodDemand
 } from "@/api/fantang/foodDemand";
 import {listFood} from "@/api/fantang/food";
+import {listDepart} from "@/api/fantang/depart";
 
 export default {
   name: "FoodDemand",
   components: {},
   data() {
     return {
-      foodList:[],
+      departOptions:[],
+      foodList: [],
       flagOptions: [{
         value: 1,
         label: '启用'
@@ -231,7 +234,11 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        flag: null
+        flag: null,
+        name: null,
+        bedId: null,
+        departName: null,
+        hospitalId: null,
       },
       // 表单参数
       form: {},
@@ -252,6 +259,10 @@ export default {
     this.getDicts("ft_update_from").then(response => {
       this.updateFromOptions = response.data;
     });
+    listDepart().then(response => {
+      console.log(response);
+      this.departOptions = response.rows;
+    })
   },
 
   beforeCreate() {
