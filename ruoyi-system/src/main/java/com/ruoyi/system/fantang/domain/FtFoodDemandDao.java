@@ -26,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_food_demand")
-public class FtFoodDemandDao  extends BasePatient implements Serializable {
+public class FtFoodDemandDao extends BasePatient implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -116,5 +116,4 @@ public class FtFoodDemandDao  extends BasePatient implements Serializable {
     @Excel(name = "启用状态")
     private Boolean flag;
 
-    private Long departId;
 }
