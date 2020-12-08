@@ -91,7 +91,7 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="员工 id" align="center" prop="staffId" v-if="false"/>
       <el-table-column label="姓名" align="center" prop="name"/>
-      <el-table-column label="性别" align="center" prop="sex"/>
+      <el-table-column label="性别" align="center" prop="sex" :formatter="formatSex"/>
       <el-table-column label="手机号码" align="center" prop="tel"/>
       <el-table-column label="岗位" align="center" prop="post"/>
       <el-table-column label="补贴余额" align="center" prop="balance"/>
@@ -293,6 +293,11 @@ export default {
         return '启用';
       else
         return '禁用';
+    },
+
+    //回显员工性别
+    formatSex(row) {
+      return this.selectDictLabel(this.sexOptions, row.sex);
     },
 
     /** 查询员工管理列表 */
