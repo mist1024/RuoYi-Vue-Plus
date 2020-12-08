@@ -261,9 +261,9 @@
               <el-select v-model="form.number" placeholder="请选择配餐号">
                 <el-option
                   v-for="item in numberOptions"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.value"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.id"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -542,14 +542,13 @@ export default {
 
     // 响应营养配餐用餐安排多选列表
     changeDinnerType(value) {
-      console.log(value)
       if (value.length === 1)
         this.form.frequency = 'qd';
       else if (value.length === 2)
         this.form.frequency = 'bid';
       else if (value.length === 3)
         this.form.frequency = 'tid';
-      else
+      else if (value.length === 4)
         this.form.frequency = 'qn';
     },
     // 响应科室信息切换
