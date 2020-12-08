@@ -194,15 +194,15 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="应收" prop="name">
+            <el-form-item label="应收" prop="price">
               <el-input v-model="formAddNewSettlement.price" readonly/>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="已收预付伙食费" prop="name" v-if="flagAddPrepaymentShow">
+        <el-form-item label="已收预付伙食费" prop="prepayment" v-if="flagAddPrepaymentShow">
           <el-input v-model="formAddNewSettlement.prepayment" readonly/>
         </el-form-item>
-        <el-form-item label="结算日期" prop="field106">
+        <el-form-item label="结算日期" prop="selectBillingDate">
           <el-date-picker
             v-model="formAddNewSettlement.selectBillingDate"
             align="right"
@@ -212,7 +212,7 @@
             :picker-options="pickerOptions">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="实收" prop="receipts">
+        <el-form-item label="实收" prop="netPeceipt">
           <el-input v-model="formAddNewSettlement.netPeceipt" placeholder="请输入实收"/>
         </el-form-item>
       </el-form>
@@ -492,6 +492,7 @@ export default {
         this.settleList = response.rows;
         this.total = response.total;
         this.loading = false;
+        console.log("list-------")
       });
     },
 

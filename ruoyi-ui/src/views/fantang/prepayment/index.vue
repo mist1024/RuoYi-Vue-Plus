@@ -29,7 +29,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="预付费时间" prop="prepaidAt">
+      <el-form-item label="预付费时间" prop="prepaidAt" label-width="50">
         <el-date-picker clearable size="small" style="width: 200px"
                         v-model="queryParams.prepaidAt"
                         type="date"
@@ -362,10 +362,11 @@
       /** 查询收费管理列表 */
       getList() {
         this.loading = true;
+        console.log("111------------------",this.queryParams)
         listPrepayment(this.queryParams).then(response => {
           this.prepaymentList = response.rows;
           this.total = response.total;
-          this.loadAll();
+          // this.loadAll();
           this.loading = false;
         });
       },
@@ -385,7 +386,7 @@
           settlementBy: null,
           settlementId: null,
           settlementFlag: null,
-          prepaid: 500,
+          prepaid: 700,
           prepaidAt: new Date(),
           hospitalId: null,
           name: null,

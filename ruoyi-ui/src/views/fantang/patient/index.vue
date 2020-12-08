@@ -209,6 +209,7 @@ export default {
     /** 查询病人管理列表 */
     getList() {
       this.loading = true;
+      console.log("111------------------",this.queryParams)
       listPatient(this.queryParams).then(response => {
         this.patientList = response.rows;
         this.total = response.total;
