@@ -175,13 +175,17 @@
     </el-row>
 
     <!--    数据列表栏-->
-    <el-table v-loading="loading" :data="cateringList" @selection-change="handleSelectionChange" broder>
+    <el-table v-loading="loading"
+              :data="cateringList"
+              border
+              :span-method="objectSpanMethod"
+              @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="科室" align="center" prop="departName"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="床号" align="center" prop="bedId"/>
-      <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat" v-if="false"/>
+      <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat"/>
       <el-table-column label="营养配餐" align="center" prop="foodName"/>
       <el-table-column label="配餐频次" align="center" prop="frequency"/>
       <el-table-column label="用法" align="center" prop="cateringUsage"/>
@@ -492,6 +496,50 @@ export default {
     })
   },
   methods: {
+
+    // 控制合并列
+    objectSpanMethod({row, column, rowIndex, columnIndex}) {
+      if (columnIndex === 1) {
+        if (rowIndex % 3 === 0) {
+          return {
+            rowspan: 3,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+      } else if (columnIndex === 2) {
+        if (rowIndex % 3 === 0) {
+          return {
+            rowspan: 3,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+
+      } else if (columnIndex === 3) {
+        if (rowIndex % 3 === 0) {
+          return {
+            rowspan: 3,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+
+      }
+    },
+
     // 响应营养配餐用餐安排多选列表
     changeDinnerType(value) {
       console.log(value)
