@@ -29,4 +29,7 @@ public class FtCateringVo {
 
     @TableField(exist = false)
     private String hospitalId;
+
+    @TableField(exist = false)
+    private String foodName;
 }

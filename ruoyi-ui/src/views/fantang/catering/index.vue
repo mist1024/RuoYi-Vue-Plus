@@ -182,7 +182,7 @@
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="床号" align="center" prop="bedId"/>
       <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat" v-if="false"/>
-      <el-table-column label="配餐号" align="center" prop="number"/>
+      <el-table-column label="营养配餐" align="center" prop="foodName"/>
       <el-table-column label="配餐频次" align="center" prop="frequency"/>
       <el-table-column label="用法" align="center" prop="cateringUsage"/>
       <el-table-column label="描述" align="center" prop="cateringDescribe"/>
