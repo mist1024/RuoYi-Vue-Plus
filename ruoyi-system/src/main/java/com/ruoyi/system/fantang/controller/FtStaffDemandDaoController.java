@@ -36,13 +36,6 @@ public class FtStaffDemandDaoController extends BaseController {
     private final IFtConfigDaoService iFtConfigDaoService;
 
 
-    /**
-     * 获取用餐时间
-     */
-    @GetMapping("/getDinnerTimeSetting")
-    public AjaxResult getDinnerTimeSetting() {
-        return AjaxResult.success(iFtConfigDaoService.getDinnerTimeSetting());
-    }
 
     /**
      * 查询员工报餐列表
