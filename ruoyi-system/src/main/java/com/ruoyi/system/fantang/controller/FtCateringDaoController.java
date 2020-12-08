@@ -9,8 +9,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtCateringDao;
 import com.ruoyi.system.fantang.service.IFtCateringDaoService;
-import com.ruoyi.system.fantang.service.IFtDepartDaoService;
-import com.ruoyi.system.fantang.service.IFtPatientDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,10 +31,6 @@ public class FtCateringDaoController extends BaseController {
 
     private final IFtCateringDaoService iFtCateringDaoService;
 
-    private final IFtDepartDaoService departDaoService;
-
-    private final IFtPatientDaoService patientDaoService;
-
     /**
      * 查询配餐功能列表
      */
@@ -44,21 +38,6 @@ public class FtCateringDaoController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(FtCateringDao ftCateringDao) {
         startPage();
-//        LambdaQueryWrapper<FtCateringDao> lqw = Wrappers.lambdaQuery(ftCateringDao);
-//        if (ftCateringDao.getFlag() != null) {
-//            lqw.eq(FtCateringDao::getFlag, ftCateringDao.getFlag());
-//        }
-//        List<FtCateringDao> list = iFtCateringDaoService.list(lqw);
-//        List<FtCateringDao> listWithDepart = iFtCateringDaoService.list(lqw);
-//        for (FtCateringDao cateringDao : list) {
-//            FtPatientDao Patient = patientDaoService.getById(cateringDao.getPatientId());
-//            Long departId = Patient.getDepartId();
-//            String departName = departDaoService.getById(departId).getDepartName();
-//            cateringDao.setDepartName(departName);
-//            cateringDao.setName(Patient.getName());
-//            cateringDao.setBedId(Patient.getBedId());
-//            listWithDepart.add(cateringDao);
-//        }
         List<FtCateringDao> list = iFtCateringDaoService.listNewFormatter(ftCateringDao);
         return getDataTable(list);
     }
@@ -82,7 +61,8 @@ public class FtCateringDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:catering:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
-        return AjaxResult.success(iFtCateringDaoService.getById(id));
+        FtCateringDao ftCateringDao = iFtCateringDaoService.getByIdNewFormatter(id);
+        return AjaxResult.success(ftCateringDao);
     }
 
     /**

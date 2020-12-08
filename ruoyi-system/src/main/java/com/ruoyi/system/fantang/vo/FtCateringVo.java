@@ -27,4 +27,6 @@ public class FtCateringVo {
     @TableField(exist = false)
     private String name;
 
+    @TableField(exist = false)
+    private String hospitalId;
 }

@@ -29,4 +29,13 @@
         <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
         <if test="flag != null">and a.flag = #{flag}</if>
     </select>
+
+    <select id="getByIdNewFormatter" resultType="com.ruoyi.system.fantang.domain.FtCateringDao">
+        select a.*, b.name, b.bed_id, b.patient_id,c.depart_name, b.hospital_id, c.depart_id
+        from ft_catering a
+                 LEFT JOIN ft_patient b
+                 LEFT JOIN ft_depart c on b.depart_id = c.depart_id on a.patient_id = b.patient_id
+        where b.off_flag = 0
+          and a.id = #{id}
+    </select>
 </mapper>

@@ -103,6 +103,4 @@ public class FtCateringDao extends FtCateringVo {
      */
     @Excel(name = "描述")
     private String cateringDescribe;
-
-    private String hospitalId;
 }

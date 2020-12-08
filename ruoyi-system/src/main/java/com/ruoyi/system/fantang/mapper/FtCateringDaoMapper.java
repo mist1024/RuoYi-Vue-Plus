@@ -14,4 +14,6 @@ import java.util.List;
 public interface FtCateringDaoMapper extends BaseMapper<FtCateringDao> {
 
     List<FtCateringDao> listNewFormatter(FtCateringDao ftCateringDao);
+
+    FtCateringDao getByIdNewFormatter(Long id);
 }

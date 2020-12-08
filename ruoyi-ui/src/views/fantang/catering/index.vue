@@ -320,7 +320,8 @@
         <el-form-item label="科室" prop="departId">
           <el-select v-model="form.departId"
                      placeholder="请选择科室"
-                     @change="changeDepart">
+                     @change="changeDepart"
+                     :disabled="true">
             <el-option
               v-for="item in departOptions"
               :key="item.departName"
@@ -330,14 +331,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="病人" prop="patientId">
-          <el-select v-model="form.patientId" placeholder="请选择病人" @change="changePatient">
-            <el-option
-              v-for="item in patientOptions"
-              :key="item.name"
-              :label="item.name"
-              :value="item.patientId"
-            ></el-option>
-          </el-select>
+          <el-input v-model="form.name" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="床号" prop="bedId">
           <el-input v-model="form.bedId" placeholder="床号" :disabled="true"/>
@@ -348,9 +342,9 @@
               <el-select v-model="form.number" placeholder="请选择配餐号">
                 <el-option
                   v-for="item in numberOptions"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.value"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.id"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -370,11 +364,10 @@
         </el-row>
         <el-row :gutter="10">
           <el-col :span="12">
-            <el-form-item label="正餐类型" prop="types">
-              <el-select v-model="form.types"
-                         multiple
-                         @change="changeDinnerType"
-                         placeholder="请选择正餐类型">
+            <el-form-item label="正餐类型" prop="type">
+              <el-select v-model="form.type"
+                         placeholder="请选择正餐类型"
+                         :disabled="true">
                 <el-option
                   v-for="dict in typeOptions"
                   :key="dict.dictValue"
@@ -418,6 +411,7 @@ import {
 } from "@/api/fantang/catering";
 import {listDepart} from "@/api/fantang/depart";
 import {getBedIdById, selectPatientByDepartId} from "@/api/fantang/patient";
+import {listNutritionFood} from "@/api/fantang/nutritionFood";
 
 export default {
   name: "Catering",
@@ -425,16 +419,7 @@ export default {
   data() {
     return {
       // 配餐列表
-      numberOptions: [{
-        value: 1,
-        label: '配餐 1'
-      }, {
-        value: 2,
-        label: '配餐 2'
-      }, {
-        value: 3,
-        label: '配餐 3'
-      }],
+      numberOptions: [],
       // 用法列表
       cateringUsageOptions: [{
         value: 1,
@@ -500,6 +485,10 @@ export default {
     });
     listDepart().then(response => {
       this.departOptions = response.rows;
+    })
+    listNutritionFood().then(response => {
+      console.log("yyc----",response)
+      this.numberOptions = response.rows;
     })
   },
   methods: {
@@ -597,6 +586,7 @@ export default {
       const id = row.id || this.ids
       getCatering(id).then(response => {
         this.form = response.data;
+        console.log(response.data);
         this.modifyItem = true;
         this.title = "修改配餐";
       });
@@ -608,7 +598,7 @@ export default {
           if (this.form.id != null) {
             updateCatering(this.form).then(response => {
               this.msgSuccess("修改成功");
-              this.open = false;
+              this.modifyItem = false;
               this.getList();
             });
           } else {

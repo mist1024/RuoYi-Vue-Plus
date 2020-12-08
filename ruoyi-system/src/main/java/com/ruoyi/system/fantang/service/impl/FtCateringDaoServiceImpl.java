@@ -21,4 +21,9 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
     public List<FtCateringDao> listNewFormatter(FtCateringDao ftCateringDao) {
         return this.baseMapper.listNewFormatter(ftCateringDao);
     }
+
+    @Override
+    public FtCateringDao getByIdNewFormatter(Long id) {
+        return this.baseMapper.getByIdNewFormatter(id);
+    }
 }
