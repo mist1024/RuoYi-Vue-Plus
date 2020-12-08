@@ -26,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_staff_info")
-public class FtStaffInfoDao extends FtStaffInfoVo {
+public class FtStaffInfoDao  {
 
     private static final long serialVersionUID = 1L;
 
