@@ -98,4 +98,12 @@ public class FtSettleDao implements Serializable {
 
     @TableField(exist = false)
     private BigDecimal netPeceipt;
+
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastBillingDate;
+
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date selectBillingDate;
 }

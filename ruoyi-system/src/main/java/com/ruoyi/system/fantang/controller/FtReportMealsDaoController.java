@@ -126,6 +126,14 @@ public class FtReportMealsDaoController extends BaseController {
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('fantang:meals:list')")
+    @GetMapping("/listMealsWithInSettle")
+    public TableDataInfo listMealsWithInSettle(FtReportMealsDao ftReportMealsDao) {
+        startPage();
+        List<FtReportMealsDao> list = iFtReportMealsDaoService.listMealsWithInSettle(ftReportMealsDao);
+        return getDataTable(list);
+    }
+
     /**
      * 导出报餐管理列表
      */

@@ -2,10 +2,10 @@ package com.ruoyi.system.fantang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
-import com.ruoyi.system.fantang.domain.FtSettleDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,4 +23,8 @@ public interface IFtReportMealsDaoService extends IService<FtReportMealsDao> {
     List<FtReportMealVo> listPayoff();
 
     Long countBillingBetween(ReportMealsDayEntity dao);
+
+    List<FtReportMealsDao> listMealsWithInSettle(FtReportMealsDao ftReportMealsDao);
+
+    Integer settleMeals(Long settlementId, Long patientId, String lastBillingDate, String selectBillingDate);
 }

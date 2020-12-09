@@ -11,4 +11,5 @@ import com.ruoyi.system.fantang.domain.FtSettleDao;
  */
 public interface IFtSettleDaoService extends IService<FtSettleDao> {
 
+    Integer updateList(Long settlementId, Long patientId, String lastBillingDate, String selectBillingDate);
 }

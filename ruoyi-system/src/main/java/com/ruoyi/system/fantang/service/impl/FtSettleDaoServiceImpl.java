@@ -15,4 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class FtSettleDaoServiceImpl extends ServiceImpl<FtSettleDaoMapper, FtSettleDao> implements IFtSettleDaoService {
 
+    @Override
+    public Integer updateList(Long settlementId, Long patientId, String lastBillingDate, String selectBillingDate) {
+        return this.baseMapper.updateList(settlementId, patientId, lastBillingDate, selectBillingDate);
+    }
 }
