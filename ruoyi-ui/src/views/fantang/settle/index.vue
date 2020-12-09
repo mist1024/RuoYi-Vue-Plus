@@ -184,13 +184,13 @@
         </el-row>
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item label="上次结算日期" prop="lastBillingDate">
-<!--              <el-input v-model="formAddNewSettlement.lastBillingDate" :disabled="true"/>-->
+            <el-form-item label="上次结算日期" prop="lastBillingDate" v-if="lastBillFlag">
+              <!--              <el-input v-model="formAddNewSettlement.lastBillingDate" :disabled="true"/>-->
               <el-date-picker
                 v-model="formAddNewSettlement.lastBillingDate"
                 align="right"
                 type="date"
-              :disabled="true">
+                :disabled="true">
               </el-date-picker>
             </el-form-item>
           </el-col>
@@ -264,10 +264,9 @@
 
 <script>
 import {addSettle, delSettle, exportSettle, getSettle, listSettle, updateSettle} from "@/api/fantang/settle";
-import {listAll, listNoPay, listPayoff} from "@/api/fantang/meals";
+import {getLastSettlementDate, listAll, listNoPay, listPayoff} from "@/api/fantang/meals";
 import {getUserProfile} from "@/api/system/user";
 import {getPrepaymentByPatientId} from "@/api/fantang/prepayment";
-import {getLastSettlementDate} from "@/api/fantang/meals";
 
 export default {
   name: "Settle",
@@ -299,6 +298,8 @@ export default {
           }
         }]
       },
+      //上次结算日期标志
+      lastBillFlag: true,
       // 权限相关的参数
       userName: null,
       roleGroup: null,
@@ -418,12 +419,15 @@ export default {
       var dateSpan, iDays;
       let sDate1 = Date.parse(this.formAddNewSettlement.lastBillingDate);
       let sDate2 = Date.parse(value);
+      console.log("sDate1---",sDate1,"sDate2---",sDate2)
       dateSpan = sDate2 - sDate1;
+      console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqq",dateSpan);
       if (dateSpan <= 0) {
         this.msgError("你现在的结算日期小于上一次结算日期！！");
       } else {
         dateSpan = Math.abs(dateSpan);
         iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+        console.log("ddddddddddddddddddddddddddddd",iDays);
         this.formAddNewSettlement.settlementDays = iDays;
       }
     },
@@ -440,7 +444,14 @@ export default {
     clickAddNewSettlement(row) {
       getLastSettlementDate(row.patientId).then(response => {
         console.log("getLastBillingDateByPatientId-->", response);
-        this.formAddNewSettlement.lastBillingDate = response.data.settlementAt;
+        if (response.data.settlementAt === null) {
+          this.lastBillFlag = false;
+          this.formAddNewSettlement.lastBillingDate = response.data.lastCreateDate;
+          this.msgInfo("该病人首次收费")
+        }else {
+          this.lastBillFlag = true;
+          this.formAddNewSettlement.lastBillingDate = response.data.settlementAt;
+        }
         this.formAddNewSettlement.settlementDays = response.data.days;
       });
 
