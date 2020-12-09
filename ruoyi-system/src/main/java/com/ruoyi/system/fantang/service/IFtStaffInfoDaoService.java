@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface IFtStaffInfoDaoService extends IService<FtStaffInfoDao> {
 
     List<FtStaffInfoDao> selectStaffInfoWithDepart();
 
+    AjaxResult login(String tel, String password);
 }

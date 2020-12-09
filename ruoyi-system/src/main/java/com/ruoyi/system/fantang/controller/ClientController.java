@@ -2,10 +2,14 @@ package com.ruoyi.system.fantang.controller;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
+import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
@@ -16,6 +20,9 @@ public class ClientController extends BaseController {
      */
     @Autowired
     private IFtConfigDaoService iFtConfigDaoService;
+
+    @Autowired
+    private IFtStaffInfoDaoService staffInfoDaoService;
 
     @GetMapping("/getDinnerTimeSetting")
     public AjaxResult getDinnerTimeSetting() {
@@ -52,12 +59,12 @@ public class ClientController extends BaseController {
         return AjaxResult.success("推送个人配置");
     }
 
-    @PostMapping("/login")
-    public AjaxResult login() {
-        return AjaxResult.success("登录成功");
+    @GetMapping("/login")
+    public AjaxResult login(String tel, String password) {
+        return staffInfoDaoService.login(tel, password);
     }
-    @PostMapping("/logout")
-    public AjaxResult logout() {
+    @PostMapping("/logout/{staffId}")
+    public AjaxResult logout(@PathVariable("staffId") Long staffId) {
         return AjaxResult.success("登录成功");
     }
 
