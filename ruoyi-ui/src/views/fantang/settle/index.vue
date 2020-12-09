@@ -163,44 +163,50 @@
     <el-dialog title="伙食费结算窗口" :visible.sync="flagAddNewSettlementOpen" width="1000px" append-to-body>
       <el-form ref="form" :model="formAddNewSettlement" :rules="rules" label-width="160px">
         <el-form-item label="住院号" prop="hospitalId">
-          <el-input v-model="formAddNewSettlement.hospitalId" readonly/>
+          <el-input v-model="formAddNewSettlement.hospitalId" :disabled="true"/>
         </el-form-item>
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item label="姓名" prop="name">
-              <el-input v-model="formAddNewSettlement.name" readonly/>
+              <el-input v-model="formAddNewSettlement.name" :disabled="true"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="科室" prop="departName">
-              <el-input v-model="formAddNewSettlement.departName" readonly/>
+              <el-input v-model="formAddNewSettlement.departName" :disabled="true"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="床号" prop="bedId">
-              <el-input v-model="formAddNewSettlement.bedId" readonly/>
+              <el-input v-model="formAddNewSettlement.bedId" :disabled="true"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="8">
             <el-form-item label="上次结算日期" prop="lastBillingDate">
-              <el-input v-model="formAddNewSettlement.lastBillingDate" readonly/>
+<!--              <el-input v-model="formAddNewSettlement.lastBillingDate" :disabled="true"/>-->
+              <el-date-picker
+                v-model="formAddNewSettlement.lastBillingDate"
+                align="right"
+                type="date"
+              :disabled="true">
+              </el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="未结算天数" prop="settlementDays">
-              <el-input v-model="formAddNewSettlement.settlementDays" readonly/>
+              <el-input v-model="formAddNewSettlement.settlementDays" :disabled="true"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="应收" prop="price">
-              <el-input v-model="formAddNewSettlement.price" readonly/>
+              <el-input v-model="formAddNewSettlement.price" :disabled="true"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="已收预付伙食费" prop="prepayment" v-if="flagAddPrepaymentShow">
-          <el-input v-model="formAddNewSettlement.prepayment" readonly/>
+          <el-input v-model="formAddNewSettlement.prepayment" :disabled="true"/>
         </el-form-item>
         <el-form-item label="结算日期" prop="selectBillingDate">
           <el-date-picker
