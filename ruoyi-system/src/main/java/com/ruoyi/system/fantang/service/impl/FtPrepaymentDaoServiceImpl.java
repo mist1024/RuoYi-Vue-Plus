@@ -2,9 +2,10 @@ package com.ruoyi.system.fantang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
+import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.mapper.FtPrepaymentDaoMapper;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
+import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,28 +17,29 @@ import java.util.List;
  * @date 2020-11-19
  */
 @Service
-public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMapper, FtPrepaymentVo> implements IFtPrepaymentDaoService {
+public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMapper, FtPrepaymentDao> implements IFtPrepaymentDaoService {
 
     @Override
-    public List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listNoPrepay() {
+    public List<FtPrepaymentVo> listNoPrepay() {
         return this.baseMapper.listNoPrepay();
     }
 
     @Override
-    public List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listPrepay() {
+    public List<FtPrepaymentVo> listPrepay() {
         return this.baseMapper.listPrepay();
     }
 
     @Override
-    public List<com.ruoyi.system.fantang.vo.FtPrepaymentVo> listAllPrepay() {
+    public List<FtPrepaymentVo> listAllPrepay() {
         return this.baseMapper.listAllPrepay();
     }
 
     @Override
     public FtPrepaymentVo getCountById(Long patiendId) {
-        QueryWrapper<FtPrepaymentVo> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<FtPrepaymentDao> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("patient_Id",patiendId);
-        return this.baseMapper.selectOne(queryWrapper);
+        FtPrepaymentDao prepaymentDao = this.baseMapper.selectOne(queryWrapper);
+        return (FtPrepaymentVo)prepaymentDao;
 
     }
 }

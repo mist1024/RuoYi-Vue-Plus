@@ -15,6 +15,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="settlementFlag"    column="settlement_flag"    />
         <result property="prepaid"    column="prepaid"    />
         <result property="prepaidAt"    column="prepaid_at"    />
+        <result property="name"    column="name"    />
+        <result property="bedId"    column="bed_Id"    />
+        <result property="departName"    column="depart_name"    />
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="departCode"    column="depart_code"    />
     </resultMap>
 
 
