@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -94,4 +95,7 @@ public class FtSettleDao implements Serializable {
      */
     @Excel(name = "退款总额")
     private BigDecimal refund;
+
+    @TableField(exist = false)
+    private BigDecimal netPeceipt;
 }

@@ -161,7 +161,7 @@
 
     <!--    日常收费弹出层对话框-->
     <el-dialog title="伙食费结算窗口" :visible.sync="flagAddNewSettlementOpen" width="1000px" append-to-body>
-      <el-form ref="form" :model="formAddNewSettlement" :rules="rules" label-width="160px">
+      <el-form ref="formAddNewSettlement" :model="formAddNewSettlement" :rules="rules" label-width="160px">
         <el-form-item label="住院号" prop="hospitalId">
           <el-input v-model="formAddNewSettlement.hospitalId" :disabled="true"/>
         </el-form-item>
@@ -229,29 +229,27 @@
     </el-dialog>
 
     <!--    出院结算弹出层对话框-->
-
-    <!-- 添加或修改结算报对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="leaveForm" :model="leaveForm" :rules="rules" label-width="80px">
         <el-form-item label="记录清单" prop="list">
-          <el-input v-model="form.list" placeholder="请输入记录清单"/>
+          <el-input v-model="leaveForm.list" placeholder="请输入记录清单"/>
         </el-form-item>
         <el-form-item label="结算总价" prop="price">
-          <el-input v-model="form.price" placeholder="请输入结算总价"/>
+          <el-input v-model="leaveForm.price" placeholder="请输入结算总价"/>
         </el-form-item>
         <el-form-item label="应收" prop="payable">
-          <el-input v-model="form.payable" placeholder="请输入应收"/>
+          <el-input v-model="leaveForm.payable" placeholder="请输入应收"/>
         </el-form-item>
         <el-form-item label="实收" prop="receipts">
-          <el-input v-model="form.receipts" placeholder="请输入实收"/>
+          <el-input v-model="leaveForm.receipts" placeholder="请输入实收"/>
         </el-form-item>
         <el-form-item label="结算类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择结算类型">
+          <el-select v-model="leaveForm.type" placeholder="请选择结算类型">
             <el-option label="请选择字典生成" value=""/>
           </el-select>
         </el-form-item>
         <el-form-item label="退款总额" prop="refund">
-          <el-input v-model="form.refund" placeholder="请输入退款总额"/>
+          <el-input v-model="leaveForm.refund" placeholder="请输入退款总额"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -381,6 +379,7 @@ export default {
       },
       // 表单参数
       form: {},
+      leaveForm: {},
       // 表单校验
       rules: {
         list: [
@@ -419,15 +418,15 @@ export default {
       var dateSpan, iDays;
       let sDate1 = Date.parse(this.formAddNewSettlement.lastBillingDate);
       let sDate2 = Date.parse(value);
-      console.log("sDate1---",sDate1,"sDate2---",sDate2)
+      console.log("sDate1---", sDate1, "sDate2---", sDate2)
       dateSpan = sDate2 - sDate1;
-      console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqq",dateSpan);
+      console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqq", dateSpan);
       if (dateSpan <= 0) {
         this.msgError("你现在的结算日期小于上一次结算日期！！");
       } else {
         dateSpan = Math.abs(dateSpan);
         iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
-        console.log("ddddddddddddddddddddddddddddd",iDays);
+        console.log("ddddddddddddddddddddddddddddd", iDays);
         this.formAddNewSettlement.settlementDays = iDays;
       }
     },
@@ -448,7 +447,7 @@ export default {
           this.lastBillFlag = false;
           this.formAddNewSettlement.lastBillingDate = response.data.lastCreateDate;
           this.msgInfo("该病人首次收费")
-        }else {
+        } else {
           this.lastBillFlag = true;
           this.formAddNewSettlement.lastBillingDate = response.data.settlementAt;
         }
@@ -574,7 +573,7 @@ export default {
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate(valid => {
+      this.$refs["formAddNewSettlement"].validate(valid => {
         if (valid) {
           if (this.form.settleId != null) {
             updateSettle(this.form).then(response => {
@@ -583,10 +582,15 @@ export default {
               this.getList();
             });
           } else {
-            addSettle(this.form).then(response => {
+            console.log(this.formAddNewSettlement);
+            addSettle(this.formAddNewSettlement).then(response => {
               this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
+              this.flagAddNewSettlementOpen = false;
+              listNoPay(this.queryParams).then(response => {
+                this.settleList = response.rows;
+                this.total = response.total;
+                this.loading = false;
+              });
             });
           }
         }
