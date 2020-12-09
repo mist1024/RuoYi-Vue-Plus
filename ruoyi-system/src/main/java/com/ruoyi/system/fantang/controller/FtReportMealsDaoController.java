@@ -12,7 +12,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
-import com.ruoyi.system.fantang.domain.FtSettleDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
@@ -39,7 +38,7 @@ public class FtReportMealsDaoController extends BaseController {
     private final IFtReportMealsDaoService iFtReportMealsDaoService;
 
 
-     /**
+    /**
      * 查询指定用户上一次结算的日期，并通过这个日期计算未结算的天数
      */
     @GetMapping("/getLastSettlementDate/{patientId}")
@@ -50,9 +49,17 @@ public class FtReportMealsDaoController extends BaseController {
         wrapper.orderByDesc("settlement_at");
         wrapper.last("limit 1");
         FtReportMealsDao ftReportMealsDao = iFtReportMealsDaoService.getOne(wrapper);
+        Date createAt = ftReportMealsDao.getCreateAt();
         Date settlementAt = ftReportMealsDao.getSettlementAt();
-        long days = DateUtil.between(settlementAt, new Date(), DateUnit.DAY);
         ReportMealsDayEntity reportMealsDayEntity = new ReportMealsDayEntity();
+        if (settlementAt == null) {
+            long betweenDays = DateUtil.between(createAt, new Date(), DateUnit.DAY);
+            reportMealsDayEntity.setDays(betweenDays);
+            reportMealsDayEntity.setLastCreateDate(createAt);
+            return AjaxResult.success(reportMealsDayEntity);
+        }
+        long days = DateUtil.between(settlementAt, new Date(), DateUnit.DAY);
+
         reportMealsDayEntity.setSettlementAt(settlementAt);
         reportMealsDayEntity.setDays(days);
 
@@ -134,7 +141,8 @@ public class FtReportMealsDaoController extends BaseController {
 
 
     /**
-     *  计算两个日期之间的未结算数据
+     * 计算两个日期之间的未结算数据
+     *
      * @param dao
      * @return
      */
