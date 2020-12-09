@@ -131,7 +131,7 @@
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
-      @pagination="getList"
+      @pagination="getDefaultNoPrepayment"
     />
 
     <!-- 添加或修改收费管理对话框 -->
@@ -328,9 +328,8 @@
       // 填充所有待缴预付伙食费的病人清单
       getDefaultNoPrepayment() {
         this.loading = true;
-        listNoPrepayment().then(response => {
+        listNoPrepayment(this.queryParams).then(response => {
           this.NoPrepayments = response.rows;
-          this.prepaymentList = response.rows;
           this.suggestionList = this.NoPrepayments.map(item => {
             return {
               "value": item.hospitalId,
@@ -341,7 +340,6 @@
             }
           });
           this.loading = false;
-          console.log("this.prepaymentList",this.prepaymentList);
           return response.rows;
         });
       },
@@ -359,17 +357,7 @@
       handleIconClick(ev) {
         console.log(ev);
       },
-      /** 查询收费管理列表 */
-      getList() {
-        this.loading = true;
-        console.log("111------------------",this.queryParams)
-        listPrepayment(this.queryParams).then(response => {
-          this.prepaymentList = response.rows;
-          this.total = response.total;
-          // this.loadAll();
-          this.loading = false;
-        });
-      },
+
       // 取消按钮
       cancel() {
         this.open = false;

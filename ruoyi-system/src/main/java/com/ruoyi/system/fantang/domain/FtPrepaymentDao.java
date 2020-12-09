@@ -1,4 +1,4 @@
-package com.ruoyi.system.fantang.vo;
+package com.ruoyi.system.fantang.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -26,24 +26,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_prepayment")
-public class FtPrepaymentVo implements Serializable {
+public class FtPrepaymentDao implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * select a.patient_id , a.name,  a.hospital_id, b.depart_name, b.depart_code from ft_patient a
-     * LEFT JOIN ft_depart b on a.depart_id = b.depart_id
-     * where a.patient_id not in (select patient_id from ft_prepayment )
-     */
-    private String name;
-
-    private String bedId;
-
-    private String departName;
-
-    private String hospitalId;
-
-    private String departCode;
 
     /**
      * 预付费id

@@ -25,68 +25,20 @@ import java.util.Date;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("ft_prepayment")
-public class FtPrepaymentVo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
+public class FtPrepaymentVo extends FtPrepaymentDao {
 
     /**
-     * 预付费id
+     * select a.patient_id , a.name,  a.hospital_id, b.depart_name, b.depart_code from ft_patient a
+     * LEFT JOIN ft_depart b on a.depart_id = b.depart_id
+     * where a.patient_id not in (select patient_id from ft_prepayment )
      */
-    @TableId(value = "prepayment_id")
-    private Long prepaymentId;
+    private String name;
 
-    /**
-     * 病人id
-     */
-    private Long patientId;
+    private String bedId;
 
-    /**
-     * 收款时间
-     */
-    @Excel(name = "收款时间", width = 30, dateFormat = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date collectAt;
+    private String departName;
 
-    /**
-     * 收款员
-     */
-    private String collectBy;
+    private String hospitalId;
 
-    /**
-     * 结算时间
-     */
-    @Excel(name = "结算时间", width = 30, dateFormat = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date settlementAt;
-
-    /**
-     * 结算员
-     */
-    private Long settlementBy;
-
-    /**
-     * 结算报表id
-     */
-    private Long settlementId;
-
-    /**
-     * 结算标志
-     */
-    @Excel(name = "结算标志")
-    private Integer settlementFlag;
-
-    /**
-     * 预付费金额
-     */
-    @Excel(name = "预付费金额")
-    private BigDecimal prepaid;
-
-    /**
-     * 预付费时间
-     */
-    @Excel(name = "预付费时间", width = 30, dateFormat = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date prepaidAt;
+    private String departCode;
 }
