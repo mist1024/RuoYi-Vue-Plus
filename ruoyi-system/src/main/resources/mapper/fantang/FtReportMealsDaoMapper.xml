@@ -17,5 +17,18 @@
         <result property="settlementBy" column="settlement_by"/>
     </resultMap>
 
+    <select id="listMealsWithInSettle" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+        select sum(a.price) as price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code
+        from ft_report_meals a
+        LEFT JOIN ft_patient b on a.patient_id = b.patient_id
+        LEFT JOIN ft_depart c on b.depart_id = c.depart_id
+        <where>
+            <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
+            <if test="departId != null">and b.depart_id = #{departId}</if>
+            <if test="name != null and name !=''">and b.name = #{name}</if>
+            <if test="settlementFlag != null">and a.settlement_flag = #{settlementFlag}</if>
+        </where>
+        GROUP BY a.patient_id
+    </select>
 
 </mapper>

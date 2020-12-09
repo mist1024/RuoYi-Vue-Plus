@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -82,4 +83,20 @@ public class FtReportMealsDao implements Serializable {
     private Date settlementAt;
 
     private String settlementBy;
+
+    @TableField(exist = false)
+    private String hospitalId;
+
+    @TableField(exist = false)
+    private String departId;
+
+    @TableField(exist = false)
+    private String departName;
+
+    @TableField(exist = false)
+    private String bedId;
+
+
+    @TableField(exist = false)
+    private String name;
 }

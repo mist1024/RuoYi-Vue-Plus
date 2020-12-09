@@ -10,12 +10,14 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtSettleDao;
+import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import com.ruoyi.system.fantang.service.IFtSettleDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.List;
 public class FtSettleDaoController extends BaseController {
 
     private final IFtSettleDaoService iFtSettleDaoService;
+
+    private final IFtReportMealsDaoService iFtReportMealsDaoService;
 
 
     /**
@@ -95,7 +99,17 @@ public class FtSettleDaoController extends BaseController {
     public AjaxResult add(@RequestBody FtSettleDao ftSettleDao) {
         ftSettleDao.setSettleAt(new Date());
         ftSettleDao.setReceipts(ftSettleDao.getNetPeceipt());
-        return toAjax(iFtSettleDaoService.save(ftSettleDao) ? 1 : 0);
+
+        Long patientId = ftSettleDao.getPatientId();
+        Date lastBillingDate = ftSettleDao.getLastBillingDate();
+        Date selectBillingDate = ftSettleDao.getSelectBillingDate();
+        iFtSettleDaoService.save(ftSettleDao);
+        Long settlementId = ftSettleDao.getSettleId();
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        iFtReportMealsDaoService.settleMeals(settlementId, patientId, ft.format(lastBillingDate), ft.format(selectBillingDate));
+        iFtSettleDaoService.updateList(settlementId, patientId, ft.format(lastBillingDate), ft.format(selectBillingDate));
+
+        return AjaxResult.success("结算成功");
     }
 
     /**
