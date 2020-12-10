@@ -3,6 +3,7 @@ package com.ruoyi.system.fantang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.mapper.FtStaffInfoDaoMapper;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
@@ -33,6 +34,9 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
         FtStaffInfoDao dao = this.baseMapper.selectOne(queryWrapper);
         if (dao == null)
             return AjaxResult.error(-1, "查无记录");
+        dao.setLoginFlag(true);
+        dao.setToken(IdUtils.fastUUID());
+        this.baseMapper.insert(dao);
         return AjaxResult.success(dao);
     }
 }
