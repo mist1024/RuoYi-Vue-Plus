@@ -17,4 +17,6 @@ public interface IFtStaffInfoDaoService extends IService<FtStaffInfoDao> {
     List<FtStaffInfoDao> selectStaffInfoWithDepart();
 
     AjaxResult login(String tel, String password);
+
+    AjaxResult logout(Long staffId);
 }

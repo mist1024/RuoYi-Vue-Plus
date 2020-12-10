@@ -39,4 +39,16 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
         this.baseMapper.insert(dao);
         return AjaxResult.success(dao);
     }
+
+    @Override
+    public AjaxResult logout(Long staffId) {
+        FtStaffInfoDao dao = new FtStaffInfoDao();
+        dao.setStaffId(staffId);
+        dao.setLoginFlag(false);
+        dao.setToken("");
+        int ret = this.baseMapper.updateById(dao);
+        if (ret ==0 )
+            return AjaxResult.error("更新退出状态失败");
+        return AjaxResult.success(dao);
+    }
 }
