@@ -123,4 +123,10 @@ public class FtStaffInfoDao  {
      * 手机号码
      */
     private String tel;
+
+    private String token;
+
+    private Boolean loginFlag;
+
+    private Long expiredFlag;
 }
