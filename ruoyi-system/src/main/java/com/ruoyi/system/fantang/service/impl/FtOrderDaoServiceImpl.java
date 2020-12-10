@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.mapper.FtOrderDaoMapper;
 import com.ruoyi.system.fantang.service.IFtOrderDaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,4 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrderDao> implements IFtOrderDaoService {
 
+    public void GenerateStaffTomorrowOrder() {
+        this.baseMapper.GenerateStaffTomorrowOrder();
+
+    }
 }
