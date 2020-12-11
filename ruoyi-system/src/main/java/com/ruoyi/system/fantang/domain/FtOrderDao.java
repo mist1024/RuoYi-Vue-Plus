@@ -46,7 +46,7 @@ public class FtOrderDao implements Serializable {
     /**
      * 员工 id
      */
-    private Long workerId;
+    private Long staffId;
 
     /**
      * 清单

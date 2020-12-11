@@ -42,8 +42,8 @@ public class ClientController extends BaseController {
     }
 
     @GetMapping("/getOrderOfToday/{staffId}")
-    public AjaxResult getOrderOfToday(@PathVariable("staffId") Integer staffId) {
-        return AjaxResult.success("调用成功");
+    public AjaxResult getOrderOfToday(@PathVariable("staffId") Long staffId) {
+        return AjaxResult.success(orderDaoService.getOrderOfToday(staffId));
     }
 
     @GetMapping("/getWeekMenu")
@@ -95,8 +95,7 @@ public class ClientController extends BaseController {
 
     @PostMapping("/logout/{staffId}")
     public AjaxResult logout(@PathVariable("staffId") Long staffId) {
-        staffInfoDaoService.logout(staffId);
-        return AjaxResult.success("登录成功");
+        return AjaxResult.success(staffInfoDaoService.logout(staffId));
     }
 
     @GetMapping("/getWorkday")

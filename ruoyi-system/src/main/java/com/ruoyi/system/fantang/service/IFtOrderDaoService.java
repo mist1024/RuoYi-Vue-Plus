@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 
 /**
@@ -11,4 +12,5 @@ import com.ruoyi.system.fantang.domain.FtOrderDao;
  */
 public interface IFtOrderDaoService extends IService<FtOrderDao> {
 
+    AjaxResult getOrderOfToday(Long staffId);
 }
