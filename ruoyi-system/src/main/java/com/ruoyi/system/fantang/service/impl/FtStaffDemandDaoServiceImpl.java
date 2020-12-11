@@ -18,7 +18,7 @@ import com.ruoyi.system.fantang.service.IFtStaffDemandDaoService;
 public class FtStaffDemandDaoServiceImpl extends ServiceImpl<FtStaffDemandDaoMapper, FtStaffDemandDao> implements IFtStaffDemandDaoService {
 
     @Override
-    public AjaxResult getConfiguration(Integer staffId) {
+    public AjaxResult getConfiguration(Long staffId) {
         QueryWrapper<FtStaffDemandDao> wrapper = new QueryWrapper<>();
         wrapper.eq("staff_id", staffId);
         FtStaffDemandDao dao = this.baseMapper.selectOne(wrapper);

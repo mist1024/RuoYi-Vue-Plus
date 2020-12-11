@@ -36,7 +36,7 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
             return AjaxResult.error(-1, "查无记录");
         dao.setLoginFlag(true);
         dao.setToken(IdUtils.fastUUID());
-        this.baseMapper.insert(dao);
+        this.baseMapper.updateById(dao);
         return AjaxResult.success(dao);
     }
 
@@ -47,7 +47,7 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
         dao.setLoginFlag(false);
         dao.setToken("");
         int ret = this.baseMapper.updateById(dao);
-        if (ret ==0 )
+        if (ret == 0)
             return AjaxResult.error("更新退出状态失败");
         return AjaxResult.success(dao);
     }

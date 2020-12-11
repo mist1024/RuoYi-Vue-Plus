@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IFtStaffDemandDaoService extends IService<FtStaffDemandDao> {
 
-    AjaxResult getConfiguration(Integer staffId);
+    AjaxResult getConfiguration(Long staffId);
 
     AjaxResult setDemandMode(Long id, Boolean demandModeFlag);
 }

@@ -1,16 +1,19 @@
 package com.ruoyi.system.fantang.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
+import com.ruoyi.system.fantang.service.IFtOrderDaoService;
 import com.ruoyi.system.fantang.service.IFtStaffDemandDaoService;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,9 @@ public class ClientController extends BaseController {
     @Autowired
     private IFtStaffDemandDaoService staffDemandDaoService;
 
+    @Autowired
+    private IFtOrderDaoService orderDaoService;
+
     @GetMapping("/getDinnerTimeSetting")
     public AjaxResult getDinnerTimeSetting() {
         return AjaxResult.success(iFtConfigDaoService.getDinnerTimeSetting());
@@ -41,7 +47,7 @@ public class ClientController extends BaseController {
     }
 
     @GetMapping("/getWeekMenu")
-    public AjaxResult getWeekMenu(){
+    public AjaxResult getWeekMenu() {
         return AjaxResult.success("调用每周菜谱成功");
     }
 
@@ -50,16 +56,29 @@ public class ClientController extends BaseController {
         return AjaxResult.success("调用有效订单成功");
     }
 
+    /**
+     * 推送订单信息
+     *
+     * @param params
+     * @return
+     */
     @PostMapping("/PostOrder")
-    public AjaxResult postOrder() {
+    public AjaxResult postOrder(JSONArray params) {
+//        for(int i : params.size()) {
+//
+//        }
+//        Long staffId = params.getLong("staffId");
+//        Integer type = params.getInteger("type");
+//        Date demandDate = params.getDate("demandDate");
+//        orderDaoService.postOrder();
+
         return AjaxResult.success("调用提交订单成功");
     }
 
     // 获取配置信息
     @GetMapping("/getConfiguration/{staffId}")
-    public AjaxResult getConfiguration(@PathVariable("staffId") Integer staffId) {
-        staffDemandDaoService.getConfiguration(staffId);
-        return AjaxResult.success("调用个人配置");
+    public AjaxResult getConfiguration(@PathVariable("staffId") Long staffId) {
+        return AjaxResult.success(staffDemandDaoService.getConfiguration(staffId));
     }
 
     // 获取配置信息
@@ -73,6 +92,7 @@ public class ClientController extends BaseController {
     public AjaxResult login(String tel, String password) {
         return staffInfoDaoService.login(tel, password);
     }
+
     @PostMapping("/logout/{staffId}")
     public AjaxResult logout(@PathVariable("staffId") Long staffId) {
         staffInfoDaoService.logout(staffId);
@@ -93,18 +113,22 @@ public class ClientController extends BaseController {
     public AjaxResult getOtherProduct() {
         return null;
     }
+
     @PostMapping("/postProductOrder")
     public AjaxResult postProductOrder() {
         return null;
     }
+
     @PostMapping("/postCurrentOrder")
     public AjaxResult postCurrentOrder() {
         return null;
     }
+
     @PostMapping("/postStopOrder")
     public AjaxResult postStopOrder() {
         return null;
     }
+
     @PostMapping("/postRestoreOrder")
     public AjaxResult postRestoreOrder() {
         return null;

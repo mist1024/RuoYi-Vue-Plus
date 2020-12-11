@@ -128,5 +128,5 @@ public class FtStaffInfoDao  {
 
     private Boolean loginFlag;
 
-    private Long expiredFlag;
+    private String expired;
 }
