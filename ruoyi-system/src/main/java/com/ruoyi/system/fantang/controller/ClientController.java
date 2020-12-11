@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
 import com.ruoyi.system.fantang.service.IFtOrderDaoService;
 import com.ruoyi.system.fantang.service.IFtStaffDemandDaoService;
@@ -13,9 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
@@ -58,8 +54,12 @@ public class ClientController extends BaseController {
 
     /**
      * 推送订单信息
-     *
-     * @param params
+     * 日期：2020年12月11日
+     * 作者：陈智兴
+     * @param JSONArray
+     * staffId: 员工id
+     * type：订餐类型
+     * demandDate： 订餐用餐日期
      * @return
      */
     @PostMapping("/PostOrder")
@@ -87,7 +87,17 @@ public class ClientController extends BaseController {
 
         return AjaxResult.success("推送个人配置");
     }
-
+    /**
+     * 设置订餐模式
+     * 日期：2020年12月10日
+     * 作者： 陈智兴
+     * 修改：首次创建
+     * @param {
+     *     tel: 手机号码;
+     *     password： 密码
+     * }
+     * @return 返回员工信息
+     */
     @GetMapping("/login")
     public AjaxResult login(String tel, String password) {
         return staffInfoDaoService.login(tel, password);
@@ -133,6 +143,17 @@ public class ClientController extends BaseController {
         return null;
     }
 
+    /**
+     * 设置订餐模式
+     * 日期：2020年12月11日
+     * 作者： 陈智兴
+     * 修改：首次创建
+     * @param {
+     *     config_id: id;
+     *     demandMode: true:自动模式；false:手动模式
+     * }
+     * @return
+     */
     @PostMapping("/setDemandMode")
     public AjaxResult setDemandMode(@RequestBody JSONObject params) {
         Long id = params.getLong("id");
