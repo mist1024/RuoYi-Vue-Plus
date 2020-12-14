@@ -1,11 +1,23 @@
+## 重点注意事项
+
+若依文档对事务注解的描述 [关于事务](https://doc.ruoyi.vip/ruoyi/document/htsc.html#%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86)  以下对多数据源事务做补充:
+* 同一个事务下是无法切换数据源的
+* 禁止 父方法使用 @Transactional 创建事务 子方法使用 @DataSource 切换数据源
+* 正确用法: 子方法单独创建事务 或 父方法使用 @Transactional(propagation = Propagation.REQUIRES_NEW) 为所有子方法创建新事务
+
+关于如何使用Tomcat
+* 查看ruoyi-framework模块的pom.xml文件,根据注释更改依赖
+* 查看ruoyi-admin模块中的application.yml文件,根据注释更改配置
+
 ## 修改RuoYi功能
 
 * ORM框架 使用 Mybatis-Plus 简化CRUD
 * Bean简化 使用 Lombok 简化 get set toString 等等
 * 容器改动 Tomcat 改为 并发性能更好的 undertow
 * 代码生成模板 改为适配 Mybatis-Plus 的代码
+* 项目修改为 maven多环境配置
 * 重磅更新 升级MybatisPlus 3.4.1 重写配置文件详细注释 更新所有插件
-* 同步升级 3.2.1 修复重大bug 阻止任意文件下载漏洞
+* 同步升级 3.3
 
 ## 平台简介
 
@@ -16,9 +28,6 @@
 * 高效率开发，使用代码生成器可以一键生成前后端代码。
 * 提供了一个Oracle版本[RuoYi-Vue-Oracle](https://github.com/yangzongzhuan/RuoYi-Vue-Oracle)，保持同步更新。
 * 不分离版本，请移步[RuoYi](https://gitee.com/y_project/RuoYi)，微服务版本，请移步[RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud)
-* 感谢[Vue-Element-Admin](https://github.com/PanJiaChen/vue-element-admin)，[eladmin-web](https://gitee.com/elunez/eladmin-web?_from=gitee_search)。
-* 阿里云折扣场：[点我进入](http://aly.ruoyi.vip)，腾讯云秒杀场：[点我进入](http://txy.ruoyi.vip)&nbsp;&nbsp;
-* 阿里云优惠券：[点我领取](https://www.aliyun.com/minisite/goods?userCode=brki8iof&share_source=copy_link)，腾讯云优惠券：[点我领取](https://cloud.tencent.com/redirect.php?redirect=1025&cps_key=198c8df2ed259157187173bc7f4f32fd&from=console)&nbsp;&nbsp;
 
 ## 内置功能
 
