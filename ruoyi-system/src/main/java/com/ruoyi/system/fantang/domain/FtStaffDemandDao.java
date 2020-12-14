@@ -38,7 +38,7 @@ private static final long serialVersionUID=1L;
 
     /** 员工 id */
     @Excel(name = "员工 id")
-    private Long staffId;
+    private Integer staffId;
 
     /** 正餐清单 */
     @Excel(name = "正餐清单")
@@ -74,7 +74,7 @@ private static final long serialVersionUID=1L;
 
     /** 报餐模式 */
     @Excel(name = "报餐模式")
-    private Integer demandMode;
+    private Boolean demandMode;
 
     /** 停用标志 */
     @Excel(name = "停用标志")
