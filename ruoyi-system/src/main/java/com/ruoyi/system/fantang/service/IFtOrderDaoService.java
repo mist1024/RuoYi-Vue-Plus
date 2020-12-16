@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 
+import java.util.Date;
+
 /**
  * 订单管理Service接口
  *
@@ -13,4 +15,6 @@ import com.ruoyi.system.fantang.domain.FtOrderDao;
 public interface IFtOrderDaoService extends IService<FtOrderDao> {
 
     AjaxResult getOrderOfToday(Long staffId);
+
+    Integer insertOrder(Long staffId, Integer orderType, Date demandDate);
 }

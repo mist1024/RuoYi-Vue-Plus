@@ -34,4 +34,13 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         wrapper.between("order_date", DateUtil.beginOfDay(new Date()), DateUtil.endOfDay(new Date()));
         return AjaxResult.success(this.baseMapper.selectList(wrapper));
     }
+
+    @Override
+    public Integer insertOrder(Long staffId, Integer orderType, Date demandDate) {
+        FtOrderDao dao = new FtOrderDao();
+        dao.setStaffId(staffId);
+        dao.setOrderType(orderType);
+        dao.setOrderDate(demandDate);
+        return this.baseMapper.insert(dao);
+    }
 }

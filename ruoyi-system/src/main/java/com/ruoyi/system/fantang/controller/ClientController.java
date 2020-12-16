@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
@@ -32,11 +34,26 @@ public class ClientController extends BaseController {
     @Autowired
     private IFtOrderDaoService orderDaoService;
 
+    /**
+     * 获取用餐时间信息
+     * 日期：2020年12月11日
+     * 作者：陈智兴
+     * type：订餐类型
+     *
+     * @return
+     */
     @GetMapping("/getDinnerTimeSetting")
     public AjaxResult getDinnerTimeSetting() {
         return AjaxResult.success(iFtConfigDaoService.getDinnerTimeSetting());
     }
 
+    /**
+     * 获取员工当天订单信息
+     * 日期：2020年12月11日
+     * 作者：陈智兴
+     *
+     * @return
+     */
     @GetMapping("/getOrderOfToday/{staffId}")
     public AjaxResult getOrderOfToday(@PathVariable("staffId") Long staffId) {
         return AjaxResult.success(orderDaoService.getOrderOfToday(staffId));
@@ -56,21 +73,15 @@ public class ClientController extends BaseController {
      * 推送订单信息
      * 日期：2020年12月11日
      * 作者：陈智兴
-     * @param JSONArray
-     * staffId: 员工id
-     * type：订餐类型
-     * demandDate： 订餐用餐日期
+     *
+     * @param JSONObject staffId: 员工id
+     *                   orderType：订餐类型
+     *                   demandDate： 订餐用餐日期
      * @return
      */
     @PostMapping("/PostOrder")
-    public AjaxResult postOrder(JSONArray params) {
-//        for(int i : params.size()) {
-//
-//        }
-//        Long staffId = params.getLong("staffId");
-//        Integer type = params.getInteger("type");
-//        Date demandDate = params.getDate("demandDate");
-//        orderDaoService.postOrder();
+    public AjaxResult postOrder(@RequestBody JSONObject params) {
+            orderDaoService.insertOrder(params.getLong("staffId"), params.getInteger("orderType"), params.getDate("demandDate"));
 
         return AjaxResult.success("调用提交订单成功");
     }
@@ -81,21 +92,22 @@ public class ClientController extends BaseController {
         return AjaxResult.success(staffDemandDaoService.getConfiguration(staffId));
     }
 
-    // 获取配置信息
+    // 推送配置信息
     @PostMapping("/postConfiguration/{staffId}")
     public AjaxResult postConfiguration(@PathVariable("staffId") Long staffId) {
 
         return AjaxResult.success("推送个人配置");
     }
+
     /**
      * 设置订餐模式
      * 日期：2020年12月10日
      * 作者： 陈智兴
      * 修改：首次创建
-     * @param {
-     *     tel: 手机号码;
-     *     password： 密码
-     * }
+     *
+     * @param { tel: 手机号码;
+     *          password： 密码
+     *          }
      * @return 返回员工信息
      */
     @GetMapping("/login")
@@ -133,8 +145,18 @@ public class ClientController extends BaseController {
         return null;
     }
 
+    /**
+     * 推送停餐信息
+     * 日期：2020年12月11日
+     * 作者：陈智兴
+     *
+     * @param staffId: 员工id
+     *                 type：订餐类型
+     *                 demandDate： 订餐用餐日期
+     * @return
+     */
     @PostMapping("/postStopOrder")
-    public AjaxResult postStopOrder() {
+    public AjaxResult postStopOrder(@RequestBody JSONObject params) {
         return null;
     }
 
@@ -148,10 +170,10 @@ public class ClientController extends BaseController {
      * 日期：2020年12月11日
      * 作者： 陈智兴
      * 修改：首次创建
-     * @param {
-     *     config_id: id;
-     *     demandMode: true:自动模式；false:手动模式
-     * }
+     *
+     * @param { config_id: id;
+     *          demandMode: true:自动模式；false:手动模式
+     *          }
      * @return
      */
     @PostMapping("/setDemandMode")
