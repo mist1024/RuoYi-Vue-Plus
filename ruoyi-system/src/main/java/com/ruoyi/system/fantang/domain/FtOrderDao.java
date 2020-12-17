@@ -41,7 +41,7 @@ public class FtOrderDao implements Serializable {
      * 订单类型
      */
     @Excel(name = "订单类型")
-    private String orderType;
+    private Integer orderType;
 
     /**
      * 员工 id
@@ -134,4 +134,7 @@ public class FtOrderDao implements Serializable {
      * 核销设备 id
      */
     private Long deviceId;
+
+    // 订用餐日期
+    private Date orderDate;
 }
