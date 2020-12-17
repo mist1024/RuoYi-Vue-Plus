@@ -73,6 +73,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!-- 酒庄-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>hope-winery</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

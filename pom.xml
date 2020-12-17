@@ -14,6 +14,7 @@
     
     <properties>
         <ruoyi.version>3.3.0</ruoyi.version>
+        <winery.version>1.0.0</winery.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -218,6 +219,14 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+
+            <!-- 葡萄酒庄-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>hope-winery</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -228,6 +237,7 @@
         <module>ruoyi-quartz</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
+        <module>hope-winery</module>
     </modules>
     <packaging>pom</packaging>
 
