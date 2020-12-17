@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -42,6 +43,9 @@ public class FtOrderDao implements Serializable {
      */
     @Excel(name = "订单类型")
     private Integer orderType;
+
+    @TableField(exist = false)
+    private String orderTypeString;
 
     /**
      * 员工 id

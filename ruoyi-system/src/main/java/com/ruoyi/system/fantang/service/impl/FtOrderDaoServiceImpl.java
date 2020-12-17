@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 订单管理Service业务层处理
@@ -32,7 +33,11 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
         wrapper.eq("staff_id", staffId);
         wrapper.between("order_date", DateUtil.beginOfDay(new Date()), DateUtil.endOfDay(new Date()));
-        return AjaxResult.success(this.baseMapper.selectList(wrapper));
+        List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
+        for (FtOrderDao dao : daos) {
+            dao.setOrderTypeString(dao.getOrderType().toString());
+        }
+        return AjaxResult.success(daos);
     }
 
     @Override
