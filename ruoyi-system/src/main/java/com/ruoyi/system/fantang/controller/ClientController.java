@@ -66,7 +66,7 @@ public class ClientController extends BaseController {
 
     @GetMapping("/getAvailableOrder/{staffId}")
     public AjaxResult getAvailableOrder(@PathVariable("staffId") Integer staffId) {
-        return AjaxResult.success("调用有效订单成功");
+        return AjaxResult.success(orderDaoService.getAvailableOrder(staffId));
     }
 
     /**

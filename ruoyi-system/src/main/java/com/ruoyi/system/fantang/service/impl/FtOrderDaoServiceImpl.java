@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -34,9 +35,6 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         wrapper.eq("staff_id", staffId);
         wrapper.between("order_date", DateUtil.beginOfDay(new Date()), DateUtil.endOfDay(new Date()));
         List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
-        for (FtOrderDao dao : daos) {
-            dao.setOrderTypeString(dao.getOrderType().toString());
-        }
         return AjaxResult.success(daos);
     }
 
@@ -47,5 +45,13 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         dao.setOrderType(orderType);
         dao.setOrderDate(demandDate);
         return this.baseMapper.insert(dao);
+    }
+
+    @Override
+    public AjaxResult getAvailableOrder(Integer staffId) {
+        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id", staffId);
+        List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
+        return AjaxResult.success(daos);
     }
 }
