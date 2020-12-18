@@ -1,7 +1,13 @@
 <template>
   <div :class="classObj" class="app-wrapper" :style="{'--current-color': theme}">
+    <div style="height: 70px; display: flex;align-items: center;" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg }" >
+
+      <img :src="logo" style="width: 60px;height: 60px; margin-left: 20px;" />
+      <span style="font-size: 28px; color: #fff;">贺兰山酒庄管理系统</span>
+
+    </div>
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
-    <sidebar class="sidebar-container" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg }" />
+    <sidebar class="sidebar-container" :style="{ backgroundColor: sideTheme === 'theme-dark' ? variables.menuBg : variables.menuLightBg }" style="margin-top: 70px;" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
@@ -16,23 +22,32 @@
 </template>
 
 <script>
+import logoImg from '@/assets/logo/logo.png'
 import RightPanel from '@/components/RightPanel'
 import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
 import variables from '@/assets/styles/variables.scss'
+import Header from "@/components/Header";
+
 
 export default {
   name: 'Layout',
   components: {
+    Header,
     AppMain,
     Navbar,
     RightPanel,
     Settings,
     Sidebar,
-    TagsView
+    TagsView,
   },
   mixins: [ResizeMixin],
+  data() {
+    return {
+      logo: logoImg
+    }
+  },
   computed: {
     ...mapState({
       theme: state => state.settings.theme,
