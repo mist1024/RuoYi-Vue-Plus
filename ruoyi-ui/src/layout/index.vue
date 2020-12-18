@@ -28,13 +28,11 @@ import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
 import variables from '@/assets/styles/variables.scss'
-import Header from "@/components/Header";
 
 
 export default {
   name: 'Layout',
   components: {
-    Header,
     AppMain,
     Navbar,
     RightPanel,
