@@ -29,7 +29,7 @@
       <!--          @keyup.enter.native="handleQuery"-->
       <!--        />-->
       <!--      </el-form-item>-->
-      <el-form-item label="联系人" prop="personName" >
+      <el-form-item label="联系人" prop="personName">
         <el-input
           v-model="queryParams.personName"
           placeholder="请输入联系人姓名"
@@ -307,17 +307,17 @@
       <el-table-column label="酒庄名称" align="center" prop="wineryName"/>
       <el-table-column label="联系人姓名" align="center" prop="personName"/>
 
-      <el-table-column label="酒庄地址" align="center" prop="region" :formatter="addressFormat"  width="180"/>
+      <el-table-column label="酒庄地址" align="center" prop="region" :formatter="addressFormat" width="180"/>
       <!--      <el-table-column label="创建者openid" align="center" prop="openid" />-->
       <el-table-column label="联系邮箱" align="center" prop="email" width="180"/>
 
       <el-table-column label="手机号码" align="center" prop="mobile" width="120"/>
 
-      <el-table-column label="建立时间" align="center" prop="buildTime"  width="120"/>
+      <el-table-column label="建立时间" align="center" prop="buildTime" width="120"/>
 
       <el-table-column label="总面积" align="center" prop="wineryArea"/>
       <el-table-column label="建筑面积" align="center" prop="buildArea"/>
-      <el-table-column label="酒庄现状" align="center" prop="wineryStatus" :formatter="wineryStatusFormat"  width="120"/>
+      <el-table-column label="酒庄现状" align="center" prop="wineryStatus" :formatter="wineryStatusFormat" width="120"/>
       <el-table-column label="面积" align="center" prop="plantArea"/>
       <el-table-column label="产量" align="center" prop="plantWeight"/>
       <el-table-column label="土壤类型" align="center" prop="soilType" :formatter="soilTypeFormat"/>
@@ -366,124 +366,17 @@
     />
 
     <!-- 添加或修改酒庄厂家登记记录对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="状态">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in statusOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="创建者openid" prop="openid">
-          <el-input v-model="form.openid" placeholder="请输入创建者openid"/>
-        </el-form-item>
-        <el-form-item label="联系邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入联系邮箱"/>
-        </el-form-item>
-        <el-form-item label="联系人姓名" prop="personName">
-          <el-input v-model="form.personName" placeholder="请输入联系人姓名"/>
-        </el-form-item>
-        <el-form-item label="手机号码" prop="mobile">
-          <el-input v-model="form.mobile" placeholder="请输入手机号码"/>
-        </el-form-item>
-        <el-form-item label="酒庄名称" prop="wineryName">
-          <el-input v-model="form.wineryName" placeholder="请输入酒庄名称"/>
-        </el-form-item>
-        <el-form-item label="建立时间" prop="buildTime">
-          <el-input v-model="form.buildTime" placeholder="请输入建立时间"/>
-        </el-form-item>
-        <el-form-item label="酒庄地址" prop="region">
-          <el-input v-model="form.region" placeholder="请输入酒庄地址"/>
-        </el-form-item>
-        <el-form-item label="酒庄地址" prop="address">
-          <el-input v-model="form.address" placeholder="请输入酒庄地址"/>
-        </el-form-item>
-        <el-form-item label="总面积" prop="wineryArea">
-          <el-input v-model="form.wineryArea" placeholder="请输入总面积"/>
-        </el-form-item>
-        <el-form-item label="建筑面积" prop="buildArea">
-          <el-input v-model="form.buildArea" placeholder="请输入建筑面积"/>
-        </el-form-item>
-        <el-form-item label="酒庄现状">
-          <el-radio-group v-model="form.wineryStatus">
-            <el-radio
-              v-for="dict in wineryStatusOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="面积" prop="plantArea">
-          <el-input v-model="form.plantArea" placeholder="请输入面积"/>
-        </el-form-item>
-        <el-form-item label="产量" prop="plantWeight">
-          <el-input v-model="form.plantWeight" placeholder="请输入产量"/>
-        </el-form-item>
-        <el-form-item label="土壤类型" prop="soilType">
-          <el-select v-model="form.soilType" placeholder="请选择土壤类型">
-            <el-option
-              v-for="dict in soilTypeOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictValue"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="红葡萄品种" prop="redVariety">
-          <el-input v-model="form.redVariety" placeholder="请输入红葡萄品种"/>
-        </el-form-item>
-        <el-form-item label="白葡萄品种" prop="whiteVariety">
-          <el-input v-model="form.whiteVariety" placeholder="请输入白葡萄品种"/>
-        </el-form-item>
-        <el-form-item label="灌溉方式" prop="irrigationType">
-          <el-select v-model="form.irrigationType" placeholder="请选择灌溉方式">
-            <el-option
-              v-for="dict in irrigationTypeOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictValue"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="发酵工艺" prop="fermentationProcess">
-          <el-input v-model="form.fermentationProcess" placeholder="请输入发酵工艺"/>
-        </el-form-item>
-        <el-form-item label="热化容器" prop="container">
-          <el-input v-model="form.container" placeholder="请输入热化容器"/>
-        </el-form-item>
-        <el-form-item label="澄清方式" prop="clarificationMethod">
-          <el-input v-model="form.clarificationMethod" placeholder="请输入澄清方式"/>
-        </el-form-item>
-        <el-form-item label="年产量" prop="annualOutput">
-          <el-input v-model="form.annualOutput" placeholder="请输入年产量"/>
-        </el-form-item>
-        <el-form-item label="库存" prop="stock">
-          <el-input v-model="form.stock" placeholder="请输入库存"/>
-        </el-form-item>
-        <el-form-item label="酒桶数量" prop="bucketCount">
-          <el-input v-model="form.bucketCount" placeholder="请输入酒桶数量"/>
-        </el-form-item>
-        <el-form-item label="主要产品定价" prop="mainPrice">
-          <el-input v-model="form.mainPrice" type="textarea" placeholder="请输入内容"/>
-        </el-form-item>
-        <el-form-item label="销售方式" prop="salesMode">
-          <el-input v-model="form.salesMode" placeholder="请输入销售方式"/>
-        </el-form-item>
-        <el-form-item label="获奖种类" prop="awards">
-          <el-input v-model="form.awards" type="textarea" placeholder="请输入内容"/>
-        </el-form-item>
-        <el-form-item label="获奖信息" prop="awardInformation">
-          <el-input v-model="form.awardInformation" placeholder="请输入获奖信息"/>
-        </el-form-item>
-        <el-form-item label="征集口号" prop="slogan">
-          <el-input v-model="form.slogan" placeholder="请输入征集口号"/>
-        </el-form-item>
+        <winery-company-record-form ref="recordForm"
+                                    :form="form"
+                                    :wineryStatusOptions="wineryStatusOptions"
+                                    :soilTypeOptions="soilTypeOptions"
+                                    :irrigationTypeOptions="irrigationTypeOptions"
+                                    :statusOptions="statusOptions"/>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
@@ -501,10 +394,11 @@ import {
   updateWinery_company_record,
   exportWinery_company_record
 } from "@/api/winery/winery_company_record";
+import WineryCompanyRecordForm from "@/views/winery/winery_company_record/WineryCompanyRecordForm";
 
 export default {
   name: "Winery_company_record",
-  components: {},
+  components: {WineryCompanyRecordForm},
   data() {
     return {
       // 遮罩层
@@ -690,17 +584,20 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+
       this.reset();
       const id = row.id || this.ids
       getWinery_company_record(id).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改酒庄厂家登记记录";
+
       });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
+
         if (valid) {
           if (this.form.id != null) {
             updateWinery_company_record(this.form).then(response => {
