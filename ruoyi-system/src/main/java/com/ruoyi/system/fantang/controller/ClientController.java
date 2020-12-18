@@ -64,7 +64,7 @@ public class ClientController extends BaseController {
      * 日期：2020年12月11日
      * 作者：陈智兴
      *
-     * @return
+     * return
      */
     @GetMapping("/getOrderOfDay")
     public AjaxResult getOrderOfDate(@RequestParam("staffId") Long staffId, @RequestParam("orderDate") Date orderDate) {
@@ -87,10 +87,10 @@ public class ClientController extends BaseController {
      * 日期：2020年12月11日
      * 作者：陈智兴
      *
-     * @param JSONObject staffId: 员工id
+     * param JSONObject staffId: 员工id
      *                   orderType：订餐类型
      *                   demandDate： 订餐用餐日期
-     * @return
+     * return
      */
     @PostMapping("/PostOrder")
     public AjaxResult postOrder(@RequestBody JSONObject params) {
@@ -163,10 +163,10 @@ public class ClientController extends BaseController {
      * 日期：2020年12月11日
      * 作者：陈智兴
      *
-     * @param staffId: 员工id
+     * param staffId: 员工id
      *                 type：订餐类型
      *                 demandDate： 订餐用餐日期
-     * @return
+     * return
      */
     @PostMapping("/postStopOrder")
     public AjaxResult postStopOrder(@RequestBody JSONObject params) {
