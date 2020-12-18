@@ -59,6 +59,19 @@ public class ClientController extends BaseController {
         return AjaxResult.success(orderDaoService.getOrderOfToday(staffId));
     }
 
+    /**
+     * 获取员工某一天的订单信息
+     * 日期：2020年12月11日
+     * 作者：陈智兴
+     *
+     * @return
+     */
+    @GetMapping("/getOrderOfDay")
+    public AjaxResult getOrderOfDate(@RequestParam("staffId") Long staffId, @RequestParam("orderDate") Date orderDate) {
+        return AjaxResult.success(orderDaoService.getOrderOfDay(staffId, orderDate));
+    }
+
+
     @GetMapping("/getWeekMenu")
     public AjaxResult getWeekMenu() {
         return AjaxResult.success("调用每周菜谱成功");

@@ -54,4 +54,13 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
         return AjaxResult.success(daos);
     }
+
+    @Override
+    public AjaxResult getOrderOfDay(Long staffId, Date orderDate) {
+        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id", staffId);
+        wrapper.between("order_date", DateUtil.beginOfDay(orderDate), DateUtil.endOfDay(orderDate));
+        List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
+        return AjaxResult.success(daos);
+    }
 }
