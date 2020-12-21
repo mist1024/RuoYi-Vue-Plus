@@ -6,6 +6,8 @@ import com.ruoyi.system.fantang.mapper.FtStaffSubsidyDaoMapper;
 import com.ruoyi.system.fantang.service.IFtStaffSubsidyDaoService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 补贴流水查看Service业务层处理
  *
@@ -15,4 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class FtStaffSubsidyDaoServiceImpl extends ServiceImpl<FtStaffSubsidyDaoMapper, FtStaffSubsidyDao> implements IFtStaffSubsidyDaoService {
 
+    @Override
+    public Integer insertBatchStaffSubsidy(List<FtStaffSubsidyDao> ftStaffSubsidyDaoList) {
+        return this.baseMapper.insertBatchStaffSubsidy(ftStaffSubsidyDaoList);
+    }
 }

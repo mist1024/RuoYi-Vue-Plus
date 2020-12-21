@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface IFtStaffInfoDaoService extends IService<FtStaffInfoDao> {
 
-    List<FtStaffInfoDao> selectStaffInfoWithDepart();
+    List<FtStaffInfoDao> selectStaffInfoWithDepart(FtStaffInfoDao ftStaffInfoDao);
 
     AjaxResult login(String tel, String password);
 

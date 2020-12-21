@@ -9,14 +9,19 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
+import com.ruoyi.system.fantang.domain.FtSubsidyDao;
 import com.ruoyi.system.fantang.service.IFtStaffSubsidyDaoService;
+import com.ruoyi.system.fantang.vo.FtStaffSubsidyVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -106,5 +111,34 @@ public class FtStaffSubsidyDaoController extends BaseController {
     @DeleteMapping("/{subsidyIds}")
     public AjaxResult remove(@PathVariable Long[] subsidyIds) {
         return toAjax(iFtStaffSubsidyDaoService.removeByIds(Arrays.asList(subsidyIds)) ? 1 : 0);
+    }
+
+    /**
+     * 发放员工补贴
+     */
+    @PostMapping("/submitGiveOutSubsidy")
+    public AjaxResult submitGiveOutSubsidy(@RequestBody FtStaffSubsidyVo ftStaffSubsidyVo) {
+
+        FtSubsidyDao subsidy = ftStaffSubsidyVo.getSubsidy();
+        List<FtStaffInfoDao> staffData = ftStaffSubsidyVo.getStaffData();
+        Date giveOutDate = ftStaffSubsidyVo.getGiveOutDate();
+
+        List<FtStaffSubsidyDao> ftStaffSubsidyDaoList = new ArrayList<>();
+
+        for (FtStaffInfoDao staffDatum : staffData) {
+            if (staffDatum.getGiveOutFlag()){
+                FtStaffSubsidyDao ftStaffSubsidyDao = new FtStaffSubsidyDao();
+                ftStaffSubsidyDao.setStaffId(staffDatum.getStaffId());
+                ftStaffSubsidyDao.setSubsidyType(subsidy.getType());
+                ftStaffSubsidyDao.setIncomeType("1");
+                ftStaffSubsidyDao.setPrice(subsidy.getPrice());
+                ftStaffSubsidyDao.setConsumAt(giveOutDate);
+                ftStaffSubsidyDaoList.add(ftStaffSubsidyDao);
+            }
+        }
+
+        iFtStaffSubsidyDaoService.insertBatchStaffSubsidy(ftStaffSubsidyDaoList);
+
+        return AjaxResult.success("发放成功");
     }
 }

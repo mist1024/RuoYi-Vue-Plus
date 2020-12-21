@@ -1,10 +1,10 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.system.fantang.vo.FtStaffInfoVo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_staff_info")
-public class FtStaffInfoDao  {
+public class FtStaffInfoDao {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,6 +41,11 @@ public class FtStaffInfoDao  {
      * 科室 id
      */
     private Long departId;
+
+    /**
+     * 科室名
+     */
+    private String departName;
 
     /**
      * 姓名
@@ -129,4 +134,7 @@ public class FtStaffInfoDao  {
     private Boolean loginFlag;
 
     private String expired;
+
+    @TableField(exist = false)
+    private Boolean giveOutFlag = true;
 }

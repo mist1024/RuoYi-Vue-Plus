@@ -2,6 +2,9 @@ package com.ruoyi.system.fantang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
+import org.apache.ibatis.annotations.Insert;
+
+import java.util.List;
 
 /**
  * 补贴流水查看Mapper接口
@@ -11,4 +14,5 @@ import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
  */
 public interface FtStaffSubsidyDaoMapper extends BaseMapper<FtStaffSubsidyDao> {
 
+    Integer insertBatchStaffSubsidy(List<FtStaffSubsidyDao> ftStaffSubsidyDaoList);
 }

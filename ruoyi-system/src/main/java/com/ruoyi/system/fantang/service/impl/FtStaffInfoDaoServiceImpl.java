@@ -21,9 +21,9 @@ import java.util.List;
 public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper, FtStaffInfoDao> implements IFtStaffInfoDaoService {
 
     @Override
-    public List<FtStaffInfoDao> selectStaffInfoWithDepart() {
+    public List<FtStaffInfoDao> selectStaffInfoWithDepart(FtStaffInfoDao ftStaffInfoDao) {
 
-        return this.baseMapper.selectStaffInfoWithDepart();
+        return this.baseMapper.selectStaffInfoWithDepart(ftStaffInfoDao);
     }
 
     @Override

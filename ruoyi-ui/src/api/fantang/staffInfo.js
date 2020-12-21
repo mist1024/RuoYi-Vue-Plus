@@ -9,10 +9,11 @@ export function listStaffInfo(query) {
   })
 }
 
-export function staffListWithDepart() {
+export function staffListWithDepart(query) {
   return request({
     url: '/fantang/staffInfo/staffListWithDepart',
     method: 'get',
+    params : query
   })
 }
 
