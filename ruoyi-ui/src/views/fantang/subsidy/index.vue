@@ -156,14 +156,14 @@
       </el-form>
       <div class="block">
         <span>发放日期 </span>
-<!--        <el-date-picker-->
-<!--          v-model="giveOutDate"-->
-<!--          value-format="yyyy-MM-dd"-->
-<!--          type="daterange"-->
-<!--          range-separator="至"-->
-<!--          start-placeholder="开始日期"-->
-<!--          end-placeholder="结束日期">-->
-<!--        </el-date-picker>-->
+        <!--        <el-date-picker-->
+        <!--          v-model="giveOutDate"-->
+        <!--          value-format="yyyy-MM-dd"-->
+        <!--          type="daterange"-->
+        <!--          range-separator="至"-->
+        <!--          start-placeholder="开始日期"-->
+        <!--          end-placeholder="结束日期">-->
+        <!--        </el-date-picker>-->
         <el-date-picker
           v-model="giveOutDate"
           value-format="yyyy-MM-dd"
@@ -367,22 +367,19 @@ export default {
     },
 
     submitGiveOut() {
-      // console.log("date", this.giveOutDate)
-      // console.log("list", this.staffData)
-      // console.log("row",this.form)
+      if (new Date() < this.giveOutDate) {
+        let giveOutSubmitData = {
+          giveOutDate: this.giveOutDate,
+          staffData: this.staffData,
+          subsidy: this.form
+        }
 
-
-
-      let giveOutSubmitData = {
-        giveOutDate: this.giveOutDate,
-        staffData: this.staffData,
-        subsidy: this.form
-      }
-      console.log(giveOutSubmitData)
-
-      submitGiveOutSubsidy(giveOutSubmitData).then(res => {
+        submitGiveOutSubsidy(giveOutSubmitData).then(res => {
           this.msgSuccess("发放成功")
-      })
+        })
+      }else {
+          this.msgError("发放日期必须大于当前日期")
+      }
 
     },
 
