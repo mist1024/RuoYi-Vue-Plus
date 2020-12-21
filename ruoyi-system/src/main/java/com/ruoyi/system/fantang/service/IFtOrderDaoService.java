@@ -25,4 +25,8 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
     AjaxResult stopOrder(Long staffId, Integer orderType, Date demandDate);
 
     AjaxResult cancelOrder(Long orderId);
+
+    AjaxResult getAvailableStopOrder(Long staffId);
+
+    AjaxResult cancelStopOrder(Long orderId);
 }

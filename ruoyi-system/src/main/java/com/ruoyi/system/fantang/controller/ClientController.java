@@ -82,6 +82,21 @@ public class ClientController extends BaseController {
         return AjaxResult.success(orderDaoService.getAvailableOrder(staffId));
     }
 
+
+    /**
+     * 获取员工停餐信息
+     * 日期：2020年12月21日
+     * 作者：陈智兴
+     *
+     * param JSONObject staffId: 员工id
+     * return
+     */
+    @GetMapping("/getAvailableStopOrder")
+    public AjaxResult getAvailableStopOrder(@RequestBody JSONObject params) {
+        return AjaxResult.success(orderDaoService.getAvailableStopOrder(params.getLong("staffId")));
+    }
+
+
     /**
      * 推送订单信息
      * 日期：2020年12月11日
@@ -125,6 +140,21 @@ public class ClientController extends BaseController {
     @PostMapping("/postCancelOrder")
     public AjaxResult postCancelOrder(@RequestBody JSONObject params) {
         return orderDaoService.cancelOrder(params.getLong("orderId"));
+    }
+
+    /**
+     * 推送取消停餐信息
+     * 日期：2020年12月21日
+     * 作者：陈智兴
+     *
+     * param staffId: 员工id
+     *                 type：订餐类型
+     *                 demandDate： 订餐用餐日期
+     * return -1: 已报停餐信息， 1： 停餐成功
+     */
+    @PostMapping("/postCancelStopOrder")
+    public AjaxResult postCancelStopOrder(@RequestBody JSONObject params) {
+        return AjaxResult.success(orderDaoService.cancelStopOrder(params.getLong("orderId")));
     }
 
     // 获取配置信息

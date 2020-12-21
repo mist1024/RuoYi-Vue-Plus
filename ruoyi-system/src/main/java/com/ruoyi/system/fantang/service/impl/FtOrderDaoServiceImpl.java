@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtStaffStopMealsDao;
 import com.ruoyi.system.fantang.mapper.FtOrderDaoMapper;
+import com.ruoyi.system.fantang.mapper.FtStaffStopMealsDaoMapper;
 import com.ruoyi.system.fantang.service.IFtOrderDaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -20,6 +23,9 @@ import java.util.List;
  */
 @Service
 public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrderDao> implements IFtOrderDaoService {
+
+    @Autowired
+    FtStaffStopMealsDaoMapper staffStopMealsDaoMapper;
 
     public void GenerateStaffTomorrowOrder() {
         this.baseMapper.GenerateStaffTomorrowOrder();
@@ -72,7 +78,12 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
 
     @Override
     public AjaxResult stopOrder(Long staffId, Integer orderType, Date demandDate) {
-        return null;
+        FtStaffStopMealsDao dao = new FtStaffStopMealsDao();
+        dao.setStaffId(staffId);
+        dao.setType(orderType);
+        dao.setDemandDate(demandDate);
+        dao.setCreateAt(new Date());
+        return AjaxResult.success(staffStopMealsDaoMapper.insert(dao));
     }
 
     @Override
@@ -80,5 +91,17 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         FtOrderDao dao = new FtOrderDao();
         dao.setOrderId(orderId);
         return AjaxResult.success(this.baseMapper.deleteById(dao));
+    }
+
+    @Override
+    public AjaxResult getAvailableStopOrder(Long staffId) {
+        QueryWrapper<FtStaffStopMealsDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id", staffId);
+        return AjaxResult.success(staffStopMealsDaoMapper.selectList(wrapper));
+    }
+
+    @Override
+    public AjaxResult cancelStopOrder(Long orderId) {
+        return AjaxResult.success(staffStopMealsDaoMapper.deleteById(orderId));
     }
 }
