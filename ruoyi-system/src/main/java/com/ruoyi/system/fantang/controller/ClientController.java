@@ -179,9 +179,9 @@ public class ClientController extends BaseController {
         return staffInfoDaoService.login(tel, password);
     }
 
-    @PostMapping("/logout/{staffId}")
-    public AjaxResult logout(@PathVariable("staffId") Long staffId) {
-        return AjaxResult.success(staffInfoDaoService.logout(staffId));
+    @PostMapping("/logout")
+    public AjaxResult logout(@RequestBody JSONObject params) {
+        return AjaxResult.success(staffInfoDaoService.logout(params.getLong("staffId")));
     }
 
     @GetMapping("/getWorkday")
