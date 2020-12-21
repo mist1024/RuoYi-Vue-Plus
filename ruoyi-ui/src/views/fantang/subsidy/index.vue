@@ -141,14 +141,39 @@
 
     <!--    补贴发放弹出层-->
     <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="1000px" align="center">
+      <el-form :model="giveOutQueryParams" ref="giveOutQueryForm" :inline="true" v-show="showSearch" label-width="68px">
+        <el-form-item label="科室" prop="departId">
+          <el-select v-model="giveOutQueryParams.departId" placeholder="请选择科室" @change="handleGiveOutQueryChange"
+                     clearable>
+            <el-option
+              v-for="item in departOptions"
+              :key="item.departName"
+              :label="item.departName"
+              :value="item.departId">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div class="block">
+        <span>发放日期 </span>
+<!--        <el-date-picker-->
+<!--          v-model="giveOutDate"-->
+<!--          value-format="yyyy-MM-dd"-->
+<!--          type="daterange"-->
+<!--          range-separator="至"-->
+<!--          start-placeholder="开始日期"-->
+<!--          end-placeholder="结束日期">-->
+<!--        </el-date-picker>-->
+        <el-date-picker
+          v-model="giveOutDate"
+          value-format="yyyy-MM-dd"
+          type="date"
+          placeholder="请选择发放日期">
+        </el-date-picker>
+      </div>
+      <br>
       <el-table :data="staffData">
-        <el-table-column prop="departName" label="科室" width="200" align="center"
-                         :filters="[{ text: '家', value: '家' }, { text: '公司', value: '公司' }]"
-                         :filter-method="filterDepart">
-          <template slot-scope="scope">
-
-          </template>
-        </el-table-column>
+        <el-table-column prop="departName" label="科室" width="150" align="center"></el-table-column>
         <el-table-column prop="name" label="姓名" width="150" align="center"></el-table-column>
         <el-table-column prop="giveOutFlag" label="是否发放补贴" width="300" align="center">
           <template slot-scope="scope">
@@ -163,7 +188,7 @@
         </el-table-column>
       </el-table>
       <br>
-      <el-button type="primary">发放补贴</el-button>
+      <el-button type="primary" @click="submitGiveOut">发放补贴</el-button>
     </el-dialog>
 
     <!-- 添加或修改补贴管理对话框 -->
@@ -203,12 +228,16 @@
 <script>
 import {addSubsidy, delSubsidy, exportSubsidy, getSubsidy, listSubsidy, updateSubsidy} from "@/api/fantang/subsidy";
 import {staffListWithDepart} from "@/api/fantang/staffInfo";
+import {listDepart} from "@/api/fantang/depart";
+import {submitGiveOutSubsidy} from "@/api/fantang/staffSubsidy";
 
 export default {
   name: "Subsidy",
   components: {},
   data() {
     return {
+      giveOutDate: null,
+      departOptions: [],
       staffData: [],
       // 发放弹出层
       showPopupSubsidyGiveOut: false,
@@ -241,6 +270,10 @@ export default {
         createAt: null,
         createBy: null
       },
+      // 收费弹出层查询参数
+      giveOutQueryParams: {
+        departId: null,
+      },
       // 表单参数
       form: {},
       // 表单校验
@@ -272,6 +305,10 @@ export default {
     //  响应发放补贴按钮
     clickSubsidyGiveOut(row) {
       this.showPopupSubsidyGiveOut = true;
+      const subsidyId = row.subsidyId
+      getSubsidy(subsidyId).then(response => {
+        this.form = response.data;
+      })
     },
     // 控制补贴列表启用状态的回显
     formatFlag(row) {
@@ -295,6 +332,9 @@ export default {
           this.staffData[i].giveOutFlag = true;
         }
         console.log(this.staffData);
+      })
+      listDepart().then(response => {
+        this.departOptions = response.rows;
       })
     },
     // 补贴类型字典翻译
@@ -324,6 +364,37 @@ export default {
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
+    },
+
+    submitGiveOut() {
+      // console.log("date", this.giveOutDate)
+      // console.log("list", this.staffData)
+      // console.log("row",this.form)
+
+
+
+      let giveOutSubmitData = {
+        giveOutDate: this.giveOutDate,
+        staffData: this.staffData,
+        subsidy: this.form
+      }
+      console.log(giveOutSubmitData)
+
+      submitGiveOutSubsidy(giveOutSubmitData).then(res => {
+          this.msgSuccess("发放成功")
+      })
+
+    },
+
+    handleGiveOutQueryChange() {
+      // console.log("change")
+      staffListWithDepart(this.giveOutQueryParams).then(response => {
+        this.staffData = response.data;
+        for (let i = 0; i < this.staffData.length; i++) {
+          this.staffData[i].giveOutFlag = true;
+        }
+        console.log(this.staffData);
+      })
     },
     /** 重置按钮操作 */
     resetQuery() {

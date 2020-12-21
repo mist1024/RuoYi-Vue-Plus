@@ -3,6 +3,8 @@ package com.ruoyi.system.fantang.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
 
+import java.util.List;
+
 /**
  * 补贴流水查看Service接口
  *
@@ -11,4 +13,5 @@ import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
  */
 public interface IFtStaffSubsidyDaoService extends IService<FtStaffSubsidyDao> {
 
+    Integer insertBatchStaffSubsidy(List<FtStaffSubsidyDao> ftStaffSubsidyDaoList);
 }

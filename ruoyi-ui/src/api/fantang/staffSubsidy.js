@@ -35,6 +35,15 @@ export function updateStaffSubsidy(data) {
   })
 }
 
+// 发放员工补贴
+export function submitGiveOutSubsidy(data) {
+  return request({
+    url: '/fantang/staffSubsidy/submitGiveOutSubsidy',
+    method: 'post',
+    data: data
+  })
+}
+
 // 删除补贴流水查看
 export function delStaffSubsidy(subsidyId) {
   return request({
