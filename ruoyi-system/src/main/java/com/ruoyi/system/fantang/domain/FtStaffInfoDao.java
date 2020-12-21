@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -133,4 +134,7 @@ public class FtStaffInfoDao {
     private Boolean loginFlag;
 
     private String expired;
+
+    @TableField(exist = false)
+    private Boolean giveOutFlag = true;
 }

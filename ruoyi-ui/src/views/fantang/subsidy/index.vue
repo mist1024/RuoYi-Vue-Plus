@@ -142,35 +142,40 @@
     <!--    补贴发放弹出层-->
     <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="1000px" align="center">
       <el-form :model="giveOutQueryParams" ref="giveOutQueryForm" :inline="true" v-show="showSearch" label-width="68px">
-        <el-form-item label="科室" prop="departId">
-          <el-select v-model="giveOutQueryParams.departId" placeholder="请选择科室" @change="handleGiveOutQueryChange"
-                     clearable>
-            <el-option
-              v-for="item in departOptions"
-              :key="item.departName"
-              :label="item.departName"
-              :value="item.departId">
-            </el-option>
-          </el-select>
-        </el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="4"></el-col>
+          <el-col :span="8">
+            <el-form-item label="科室" prop="departId">
+              <el-select v-model="giveOutQueryParams.departId" placeholder="请选择科室" @change="handleGiveOutQueryChange"
+                         clearable>
+                <el-option
+                  v-for="item in departOptions"
+                  :key="item.departName"
+                  :label="item.departName"
+                  :value="item.departId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+              <span>发放日期 </span>
+              <!--        <el-date-picker-->
+              <!--          v-model="giveOutDate"-->
+              <!--          value-format="yyyy-MM-dd"-->
+              <!--          type="daterange"-->
+              <!--          range-separator="至"-->
+              <!--          start-placeholder="开始日期"-->
+              <!--          end-placeholder="结束日期">-->
+              <!--        </el-date-picker>-->
+              <el-date-picker
+                v-model="giveOutDate"
+                value-format="yyyy-MM-dd"
+                type="date"
+                placeholder="请选择发放日期">
+              </el-date-picker>
+          </el-col>
+        </el-row>
       </el-form>
-      <div class="block">
-        <span>发放日期 </span>
-        <!--        <el-date-picker-->
-        <!--          v-model="giveOutDate"-->
-        <!--          value-format="yyyy-MM-dd"-->
-        <!--          type="daterange"-->
-        <!--          range-separator="至"-->
-        <!--          start-placeholder="开始日期"-->
-        <!--          end-placeholder="结束日期">-->
-        <!--        </el-date-picker>-->
-        <el-date-picker
-          v-model="giveOutDate"
-          value-format="yyyy-MM-dd"
-          type="date"
-          placeholder="请选择发放日期">
-        </el-date-picker>
-      </div>
       <br>
       <el-table :data="staffData">
         <el-table-column prop="departName" label="科室" width="150" align="center"></el-table-column>
@@ -290,6 +295,8 @@ export default {
       }
     };
   },
+
+
   created() {
     this.getList();
     this.getDicts("ft_subsidy").then(response => {
@@ -304,6 +311,7 @@ export default {
 
     //  响应发放补贴按钮
     clickSubsidyGiveOut(row) {
+      this.getAllStaffList();
       this.showPopupSubsidyGiveOut = true;
       const subsidyId = row.subsidyId
       getSubsidy(subsidyId).then(response => {
@@ -326,16 +334,20 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+
+    getAllStaffList() {
       staffListWithDepart().then(response => {
         this.staffData = response.data;
-        for (let i = 0; i < this.staffData.length; i++) {
-          this.staffData[i].giveOutFlag = true;
-        }
-        console.log(this.staffData);
+        // for (let i = 0; i < this.staffData.length; i++) {
+        //   this.staffData[i].giveOutFlag = true;
+        // }
+        console.log('staffData-->', this.staffData);
       })
       listDepart().then(response => {
         this.departOptions = response.rows;
       })
+
     },
     // 补贴类型字典翻译
     typeFormat(row, column) {

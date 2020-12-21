@@ -125,20 +125,20 @@ public class FtStaffSubsidyDaoController extends BaseController {
 
         List<FtStaffSubsidyDao> ftStaffSubsidyDaoList = new ArrayList<>();
 
-
         for (FtStaffInfoDao staffDatum : staffData) {
-            FtStaffSubsidyDao ftStaffSubsidyDao = new FtStaffSubsidyDao();
-            ftStaffSubsidyDao.setStaffId(staffDatum.getStaffId());
-            ftStaffSubsidyDao.setSubsidyType(subsidy.getType());
-            ftStaffSubsidyDao.setIncomeType("1");
-            ftStaffSubsidyDao.setPrice(subsidy.getPrice());
-            ftStaffSubsidyDao.setConsumAt(giveOutDate);
-            ftStaffSubsidyDaoList.add(ftStaffSubsidyDao);
+            if (staffDatum.getGiveOutFlag()){
+                FtStaffSubsidyDao ftStaffSubsidyDao = new FtStaffSubsidyDao();
+                ftStaffSubsidyDao.setStaffId(staffDatum.getStaffId());
+                ftStaffSubsidyDao.setSubsidyType(subsidy.getType());
+                ftStaffSubsidyDao.setIncomeType("1");
+                ftStaffSubsidyDao.setPrice(subsidy.getPrice());
+                ftStaffSubsidyDao.setConsumAt(giveOutDate);
+                ftStaffSubsidyDaoList.add(ftStaffSubsidyDao);
+            }
         }
-
 
         iFtStaffSubsidyDaoService.insertBatchStaffSubsidy(ftStaffSubsidyDaoList);
 
-        return null;
+        return AjaxResult.success("发放成功");
     }
 }
