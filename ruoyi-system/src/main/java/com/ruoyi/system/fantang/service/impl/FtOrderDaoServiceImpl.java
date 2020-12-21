@@ -1,14 +1,12 @@
 package com.ruoyi.system.fantang.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.mapper.FtOrderDaoMapper;
 import com.ruoyi.system.fantang.service.IFtOrderDaoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -44,7 +42,15 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         dao.setStaffId(staffId);
         dao.setOrderType(orderType);
         dao.setOrderDate(demandDate);
-        return this.baseMapper.insert(dao);
+        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id", staffId);
+        wrapper.eq("order_type", orderType);
+        wrapper.between("order_date", DateUtil.beginOfDay(demandDate), DateUtil.endOfDay(demandDate));
+        Integer count = this.baseMapper.selectCount(wrapper);
+        if (count > 0)
+            return -1;
+        else
+            return this.baseMapper.insert(dao);
     }
 
     @Override
@@ -62,5 +68,17 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         wrapper.between("order_date", DateUtil.beginOfDay(orderDate), DateUtil.endOfDay(orderDate));
         List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
         return AjaxResult.success(daos);
+    }
+
+    @Override
+    public AjaxResult stopOrder(Long staffId, Integer orderType, Date demandDate) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult cancelOrder(Long orderId) {
+        FtOrderDao dao = new FtOrderDao();
+        dao.setOrderId(orderId);
+        return AjaxResult.success(this.baseMapper.deleteById(dao));
     }
 }

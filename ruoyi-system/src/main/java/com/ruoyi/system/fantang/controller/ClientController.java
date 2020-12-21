@@ -94,9 +94,37 @@ public class ClientController extends BaseController {
      */
     @PostMapping("/PostOrder")
     public AjaxResult postOrder(@RequestBody JSONObject params) {
-            orderDaoService.insertOrder(params.getLong("staffId"), params.getInteger("orderType"), params.getDate("demandDate"));
+            return AjaxResult.success(orderDaoService.insertOrder(params.getLong("staffId"), params.getInteger("orderType"), params.getDate("demandDate")));
+    }
 
-        return AjaxResult.success("调用提交订单成功");
+    /**
+     * 推送停餐信息
+     * 日期：2020年12月21日
+     * 作者：陈智兴
+     *
+     * param staffId: 员工id
+     *                 type：订餐类型
+     *                 demandDate： 订餐用餐日期
+     * return -1: 已报停餐信息， 1： 停餐成功
+     */
+    @PostMapping("/postStopOrder")
+    public AjaxResult postStopOrder(@RequestBody JSONObject params) {
+        return AjaxResult.success(orderDaoService.stopOrder(params.getLong("staffId"), params.getInteger("orderType"), params.getDate("demandDate")));
+    }
+
+    /**
+     * 员工取消订餐信息
+     * 日期：2020年12月21日
+     * 作者：陈智兴
+     *
+     * param staffId: 员工id
+     *                 type：订餐类型
+     *                 demandDate： 订餐用餐日期
+     * return -1: 已报停餐信息， 1： 停餐成功
+     */
+    @PostMapping("/postCancelOrder")
+    public AjaxResult postCancelOrder(@RequestBody JSONObject params) {
+        return orderDaoService.cancelOrder(params.getLong("orderId"));
     }
 
     // 获取配置信息
@@ -148,21 +176,6 @@ public class ClientController extends BaseController {
 
     @PostMapping("/postCurrentOrder")
     public AjaxResult postCurrentOrder() {
-        return null;
-    }
-
-    /**
-     * 推送停餐信息
-     * 日期：2020年12月11日
-     * 作者：陈智兴
-     *
-     * param staffId: 员工id
-     *                 type：订餐类型
-     *                 demandDate： 订餐用餐日期
-     * return
-     */
-    @PostMapping("/postStopOrder")
-    public AjaxResult postStopOrder(@RequestBody JSONObject params) {
         return null;
     }
 
