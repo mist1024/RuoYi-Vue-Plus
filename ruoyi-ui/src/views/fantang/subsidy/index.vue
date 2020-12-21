@@ -399,9 +399,9 @@ export default {
       // console.log("change")
       staffListWithDepart(this.giveOutQueryParams).then(response => {
         this.staffData = response.data;
-        for (let i = 0; i < this.staffData.length; i++) {
-          this.staffData[i].giveOutFlag = true;
-        }
+        // for (let i = 0; i < this.staffData.length; i++) {
+        //   this.staffData[i].giveOutFlag = true;
+        // }
         console.log(this.staffData);
       })
     },
