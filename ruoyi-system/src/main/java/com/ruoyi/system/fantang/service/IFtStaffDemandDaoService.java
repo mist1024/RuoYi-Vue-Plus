@@ -14,5 +14,5 @@ public interface IFtStaffDemandDaoService extends IService<FtStaffDemandDao> {
 
     AjaxResult getConfiguration(Long staffId);
 
-    AjaxResult setDemandMode(Long id, Boolean demandModeFlag);
+    AjaxResult setDemandMode(Long id, Integer type, Boolean demandModeFlag);
 }

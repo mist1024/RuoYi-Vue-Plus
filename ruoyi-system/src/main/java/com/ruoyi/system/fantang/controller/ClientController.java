@@ -105,23 +105,16 @@ public class ClientController extends BaseController {
         return AjaxResult.success(staffDemandDaoService.getConfiguration(staffId));
     }
 
-    // 推送配置信息
-    @PostMapping("/postConfiguration/{staffId}")
-    public AjaxResult postConfiguration(@PathVariable("staffId") Long staffId) {
-
-        return AjaxResult.success("推送个人配置");
-    }
-
     /**
-     * 设置订餐模式
+     * 员工登录
      * 日期：2020年12月10日
      * 作者： 陈智兴
      * 修改：首次创建
      *
-     * @param { tel: 手机号码;
+     * param { tel: 手机号码;
      *          password： 密码
      *          }
-     * @return 返回员工信息
+     * return 返回员工信息
      */
     @GetMapping("/login")
     public AjaxResult login(String tel, String password) {
@@ -192,7 +185,8 @@ public class ClientController extends BaseController {
     @PostMapping("/setDemandMode")
     public AjaxResult setDemandMode(@RequestBody JSONObject params) {
         Long id = params.getLong("id");
+        Integer type = params.getInteger("type");
         Boolean demandMode = params.getBoolean("demandModeFlag");
-        return staffDemandDaoService.setDemandMode(id, demandMode);
+        return staffDemandDaoService.setDemandMode(id, type, demandMode);
     }
 }
