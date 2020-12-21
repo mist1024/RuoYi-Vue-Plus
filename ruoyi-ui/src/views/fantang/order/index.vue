@@ -2,8 +2,14 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="订单类型" prop="orderType">
-        <el-select v-model="queryParams.orderType" placeholder="请选择订单类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+        <el-select v-model="queryParams.orderType" placeholder="请选择订单类型" clearable
+                   size="small">
+          <el-option
+            v-for="item in orderTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="总价" prop="totalPrice">
@@ -127,7 +133,7 @@
     <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="订单 id" align="center" prop="orderId" v-if="false"/>
-      <el-table-column label="订单类型" align="center" prop="orderType"/>
+      <el-table-column label="订单类型" align="center" prop="orderType" :formatter="orderTypeFormat"/>
       <el-table-column label="清单" align="center" prop="orderList"/>
       <el-table-column label="总价" align="center" prop="totalPrice"/>
       <el-table-column label="折扣" align="center" prop="discount"/>
@@ -229,6 +235,7 @@ export default {
   components: {},
   data() {
     return {
+      orderTypeOptions: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -294,6 +301,9 @@ export default {
   },
   created() {
     this.getList();
+    this.getDicts("ft_book_type").then(response => {
+      this.orderTypeOptions = response.data;
+    });
   },
   methods: {
     /** 查询订单管理列表 */
@@ -333,6 +343,10 @@ export default {
         deviceId: null
       };
       this.resetForm("form");
+    },
+    /** 订单类型回显**/
+    orderTypeFormat(row, column) {
+      return this.selectDictLabel(this.orderTypeOptions, row.orderType);
     },
     /** 搜索按钮操作 */
     handleQuery() {
