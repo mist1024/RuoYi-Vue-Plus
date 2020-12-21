@@ -40,7 +40,7 @@ public class FtOrderDaoController extends BaseController {
     public TableDataInfo list(FtOrderDao ftOrderDao) {
         startPage();
         LambdaQueryWrapper<FtOrderDao> lqw = Wrappers.lambdaQuery(ftOrderDao);
-        if (StringUtils.isNotBlank(ftOrderDao.getOrderType().toString())) {
+        if (ftOrderDao.getOrderType() != null) {
             lqw.eq(FtOrderDao::getOrderType, ftOrderDao.getOrderType());
         }
         if (ftOrderDao.getTotalPrice() != null) {
