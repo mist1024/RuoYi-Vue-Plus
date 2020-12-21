@@ -7,6 +7,8 @@ import com.ruoyi.system.fantang.mapper.FtConfigDaoMapper;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,34 +26,15 @@ public class FtConfigDaoServiceImpl extends ServiceImpl<FtConfigDaoMapper, FtCon
         Map<String, String> map = new HashMap<>();
 
         QueryWrapper<FtConfigDao> breakfastStartWrapper = new QueryWrapper<>();
-        breakfastStartWrapper.eq("config_key", "breakfast_start");
-        String breakfastStart = this.baseMapper.selectOne(breakfastStartWrapper).getConfigValue();
-        map.put("breakfastStart", breakfastStart);
-
-        QueryWrapper<FtConfigDao> breakfastEndWrapper = new QueryWrapper<>();
-        breakfastEndWrapper.eq("config_key", "breakfast_end");
-        String breakfastEnd = this.baseMapper.selectOne(breakfastStartWrapper).getConfigValue();
-        map.put("breakfastEnd", breakfastEnd);
-
-        QueryWrapper<FtConfigDao> lunchStartWrapper = new QueryWrapper<>();
-        lunchStartWrapper.eq("config_key", "lunch_start");
-        String lunchStart = this.baseMapper.selectOne(lunchStartWrapper).getConfigValue();
-        map.put("lunchStart", lunchStart);
-
-        QueryWrapper<FtConfigDao> lunchEndWrapper = new QueryWrapper<>();
-        lunchEndWrapper.eq("config_key", "lunch_end");
-        String lunchEnd = this.baseMapper.selectOne(lunchEndWrapper).getConfigValue();
-        map.put("lunchEnd", lunchEnd);
-
-        QueryWrapper<FtConfigDao> dinnerStartWrapper = new QueryWrapper<>();
-        dinnerStartWrapper.eq("config_key", "dinner_start");
-        String dinnerStart = this.baseMapper.selectOne(dinnerStartWrapper).getConfigValue();
-        map.put("dinnerStart", dinnerStart);
-
-        QueryWrapper<FtConfigDao> dinnerEndWrapper = new QueryWrapper<>();
-        dinnerEndWrapper.eq("config_key", "dinner_end");
-        String dinnerEnd = this.baseMapper.selectOne(dinnerEndWrapper).getConfigValue();
-        map.put("dinnerEnd", dinnerEnd);
+        breakfastStartWrapper.eq("config_key", "dinner_string");
+        String dinnerString = this.baseMapper.selectOne(breakfastStartWrapper).getConfigValue();
+        String[] split = dinnerString.split(",");
+        map.put("breakfastStart", split[0]);
+        map.put("breakfastEnd", split[1]);
+        map.put("lunchStart", split[2]);
+        map.put("lunchEnd", split[3]);
+        map.put("dinnerStart", split[4]);
+        map.put("dinnerEnd", split[5]);
 
         return map;
     }
