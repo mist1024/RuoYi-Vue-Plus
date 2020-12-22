@@ -3,12 +3,22 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="补贴类型" prop="subsidyType">
         <el-select v-model="queryParams.subsidyType" placeholder="请选择补贴类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+          <el-option
+            v-for="item in subsidyTypeOptions"
+            :key="item.dictValue"
+            :label="item.dictLabel"
+            :value="item.dictValue">
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="收支类型" prop="incomeType">
         <el-select v-model="queryParams.incomeType" placeholder="请选择收支类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+          <el-option
+            v-for="item in incomeTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="金额" prop="price">
@@ -83,8 +93,8 @@
     <el-table v-loading="loading" :data="staffSubsidyList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="补贴流水 id" align="center" prop="subsidyId" v-if="false"/>
-      <el-table-column label="补贴类型" align="center" prop="subsidyType"/>
-      <el-table-column label="收支类型" align="center" prop="incomeType"/>
+      <el-table-column label="补贴类型" align="center" prop="subsidyType" :formatter="subsidyTypeFormat"/>
+      <el-table-column label="收支类型" align="center" prop="incomeType" :formatter="incomeTypeFormat"/>
       <el-table-column label="金额" align="center" prop="price"/>
       <el-table-column label="消费日期" align="center" prop="consumAt" width="180">
         <template slot-scope="scope">
@@ -161,6 +171,14 @@ export default {
   components: {},
   data() {
     return {
+      subsidyTypeOptions: [],
+      incomeTypeOptions: [{
+        value: 1,
+        label: '发放'
+      }, {
+        value: 2,
+        label: '消费'
+      }],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -206,6 +224,9 @@ export default {
   },
   created() {
     this.getList();
+    this.getDicts("ft_subsidy").then(response => {
+      this.subsidyTypeOptions = response.data;
+    });
   },
   methods: {
     /** 查询补贴流水查看列表 */
@@ -286,6 +307,18 @@ export default {
           }
         }
       });
+    },
+    // 补贴类型回显
+    subsidyTypeFormat(row, column) {
+      return this.selectDictLabel(this.subsidyTypeOptions, row.subsidyType);
+    },
+    // 收支类型回显
+    incomeTypeFormat(row) {
+      if (row.incomeType === '1' || row.incomeType === 1) {
+        return "发放";
+      } else if (row.incomeType === '2' || row.incomeType === 2) {
+        return "消费";
+      }
     },
     /** 删除按钮操作 */
     handleDelete(row) {
