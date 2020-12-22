@@ -390,7 +390,7 @@ export default {
           this.msgSuccess("发放成功")
         })
       }else {
-          this.msgError("发放日期必须大于当前日期")
+          this.msgError("发放日期不可小于当前日期")
       }
 
     },
