@@ -45,6 +45,7 @@ public class FtStaffInfoDao {
     /**
      * 科室名
      */
+    @TableField(exist = false)
     private String departName;
 
     /**
