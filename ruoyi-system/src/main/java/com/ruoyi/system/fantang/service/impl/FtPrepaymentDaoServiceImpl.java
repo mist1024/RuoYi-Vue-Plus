@@ -3,9 +3,9 @@ package com.ruoyi.system.fantang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
+import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import com.ruoyi.system.fantang.mapper.FtPrepaymentDaoMapper;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
-import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,9 +37,16 @@ public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMappe
     @Override
     public FtPrepaymentVo getCountById(Long patiendId) {
         QueryWrapper<FtPrepaymentDao> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("patient_Id",patiendId);
+        queryWrapper.eq("patient_Id", patiendId);
         FtPrepaymentDao prepaymentDao = this.baseMapper.selectOne(queryWrapper);
-        return (FtPrepaymentVo)prepaymentDao;
+        return (FtPrepaymentVo) prepaymentDao;
 
+    }
+
+    @Override
+    public FtPrepaymentDao getByPatientId(Long patientId) {
+        QueryWrapper<FtPrepaymentDao> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("patient_Id", patientId);
+        return this.baseMapper.selectOne(queryWrapper);
     }
 }

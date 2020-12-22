@@ -21,4 +21,6 @@ public interface IFtPrepaymentDaoService extends IService<FtPrepaymentDao> {
     List<FtPrepaymentVo> listAllPrepay();
 
     FtPrepaymentVo getCountById(Long patiendId);
+
+    FtPrepaymentDao getByPatientId(Long patientId);
 }

@@ -10,8 +10,8 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
-import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
+import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,15 +48,21 @@ public class FtPrepaymentDaoController extends BaseController {
      * 作者：陈智兴
      * 日期：2020年12月2日
      * 功能： 前端查询预付款情况
+     *
      * @param patientId
      * @return
      */
     @GetMapping("/getPrepaymentByPatientId/{patientId}")
     public AjaxResult getPrepaymentByPatientId(@PathVariable("patientId") Long patientId) {
-        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patientId);
-        if (dao == null)
+//        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patientId);
+//        if (dao == null)
+//            return AjaxResult.error("无该记录");
+//        return AjaxResult.success("操作成功", dao);
+        FtPrepaymentDao ftPrepaymentDao = iFtPrepaymentDaoService.getByPatientId(patientId);
+        if (ftPrepaymentDao == null){
             return AjaxResult.error("无该记录");
-        return AjaxResult.success("操作成功", dao);
+        }
+        return AjaxResult.success("操作成功", ftPrepaymentDao);
     }
 
     // 查询所有待缴费列表
