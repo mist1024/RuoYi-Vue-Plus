@@ -116,4 +116,13 @@ public class FtFoodDemandDao extends BasePatient implements Serializable {
     @Excel(name = "启用状态")
     private Boolean flag;
 
+    /**
+     * 营养餐 id
+     **/
+    private Long nutritionFoodId;
+
+    /**
+     * 营养餐标志
+     **/
+    private Integer nutritionFoodFlag;
 }

@@ -36,7 +36,16 @@ export function getSettle(settleId) {
 // 新增结算报
 export function addSettle(data) {
   return request({
-    url: '/fantang/settle',
+    url: '/fantang/settle/addSettle',
+    method: 'post',
+    data: data
+  })
+}
+
+// 显示正餐记录
+export function showMealsWithSelect(data) {
+  return request({
+    url: '/fantang/settle/showMealsWithSelect',
     method: 'post',
     data: data
   })

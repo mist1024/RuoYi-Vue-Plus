@@ -3,11 +3,11 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="住院号" prop="hospitalId">
         <el-input
-            v-model="queryParams.hospitalId"
-            placeholder="请输入住院号"
-            clearable
-            size="small"
-            @keyup.enter.native="handleQuery"
+          v-model="queryParams.hospitalId"
+          placeholder="请输入住院号"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
 
@@ -17,21 +17,21 @@
                    size="small"
                    @keyup.enter.native="handleQuery">
           <el-option
-              v-for="item in departOptions"
-              :key="item.departName"
-              :label="item.departName"
-              :value="item.departId">
+            v-for="item in departOptions"
+            :key="item.departName"
+            :label="item.departName"
+            :value="item.departId">
           </el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="姓名" prop="name">
         <el-input
-            v-model="queryParams.name"
-            placeholder="请输入姓名"
-            clearable
-            size="small"
-            @keyup.enter.native="handleQuery"
+          v-model="queryParams.name"
+          placeholder="请输入姓名"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="结算标志" prop="settlementFlag">
@@ -40,10 +40,10 @@
                    size="small"
                    @keyup.enter.native="handleQuery">
           <el-option
-              v-for="item in settlementFlagOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+            v-for="item in settlementFlagOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -66,33 +66,33 @@
       <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
-            type="success"
-            icon="el-icon-edit"
-            size="mini"
-            :disabled="single"
-            @click="handleUpdate"
-            v-hasPermi="['fantang:settle:edit']"
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['fantang:settle:edit']"
         >出院结算
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="mini"
-            :disabled="multiple"
-            @click="handleDelete"
-            v-hasPermi="['fantang:settle:remove']"
+          type="danger"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['fantang:settle:remove']"
         >删除
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-            type="warning"
-            icon="el-icon-download"
-            size="mini"
-            @click="handleExport"
-            v-hasPermi="['fantang:settle:export']"
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['fantang:settle:export']"
         >导出
         </el-button>
       </el-col>
@@ -117,19 +117,19 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="clickAddNewSettlement(scope.row)"
-              v-hasPermi="['fantang:settle:AddNewSettlement']"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="clickAddNewSettlement(scope.row)"
+            v-hasPermi="['fantang:settle:AddNewSettlement']"
           >收费
           </el-button>
           <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="clickAddLeaveSettlement(scope.row)"
-              v-hasPermi="['fantang:settle:AddLeaveSettlement']"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="clickAddLeaveSettlement(scope.row)"
+            v-hasPermi="['fantang:settle:AddLeaveSettlement']"
           >出院结算
           </el-button>
           <!--          <el-button-->
@@ -141,11 +141,11 @@
           <!--          >修改-->
           <!--          </el-button>-->
           <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['fantang:settle:remove']"
+            size="mini"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['fantang:settle:remove']"
           >删除
           </el-button>
         </template>
@@ -153,11 +153,11 @@
     </el-table>
 
     <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getList"
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
     />
 
     <!--    日常收费弹出层对话框-->
@@ -185,14 +185,15 @@
         </el-row>
         <el-row :gutter="10">
           <el-col :span="8">
-            <el-form-item label="上次结算日期" prop="lastBillingDate" v-if="lastBillFlag">
+            <!--            <el-form-item label="上次结算日期" prop="lastBillingDate" v-if="lastBillFlag">-->
+            <el-form-item label="上次结算/用餐日期" prop="lastBillingDate">
               <!--              <el-input v-model="formAddNewSettlement.lastBillingDate" :disabled="true"/>-->
               <el-date-picker
-                  v-model="formAddNewSettlement.lastBillingDate"
-                  align="right"
-                  type="date"
-                  value-format="yyyy-MM-dd"
-                  :disabled="true">
+                v-model="formAddNewSettlement.lastBillingDate"
+                align="right"
+                type="date"
+                value-format="yyyy-MM-dd"
+                :disabled="true">
               </el-date-picker>
             </el-form-item>
           </el-col>
@@ -202,23 +203,24 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="应收" prop="price">
+            <el-form-item label="结算总价" prop="price">
               <el-input v-model="formAddNewSettlement.price" :disabled="true"/>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="已收预付伙食费" prop="prepayment" v-if="flagAddPrepaymentShow">
+        <!--        <el-form-item label="已收预付伙食费" prop="prepayment" v-if="flagAddPrepaymentShow">-->
+        <el-form-item label="已收预付伙食费" prop="prepayment">
           <el-input v-model="formAddNewSettlement.prepayment" :disabled="true"/>
         </el-form-item>
         <el-form-item label="结算日期" prop="selectBillingDate">
           <el-date-picker
-              v-model="formAddNewSettlement.selectBillingDate"
-              align="right"
-              type="date"
-              placeholder="选择日期"
-              value-format="yyyy-MM-dd mm:hh:ss"
-              @change="changeBillingDate"
-              :picker-options="pickerOptions">
+            v-model="formAddNewSettlement.selectBillingDate"
+            align="right"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            @change="changeBillingDate"
+            :picker-options="pickerOptions">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="实收" prop="netPeceipt">
@@ -229,6 +231,32 @@
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="clickFormAddNewSettlementCancel">取 消</el-button>
       </div>
+
+      <el-row>
+        报餐明细
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="4">
+          正餐总价：{{ dinnerTotalPrice }}
+        </el-col>
+        <el-col :span="4">
+          营养餐总价：{{ nutritionTotalPrice }}
+        </el-col>
+      </el-row>
+      <el-row>
+        报餐总价：{{ sumTotalPrice }}
+      </el-row>
+      <el-table v-loading="loading" :data="mealsList">
+        <el-table-column label="报餐日期" align="center" prop="createAt" width="180">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="正餐价格" align="center" prop="price"/>
+        <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
+        <el-table-column label="报餐总价" align="center" prop="totalPrice"/>
+      </el-table>
+
     </el-dialog>
 
     <!--    出院结算弹出层对话框-->
@@ -264,7 +292,7 @@
 </template>
 
 <script>
-import {addSettle, delSettle, exportSettle, getSettle, updateSettle} from "@/api/fantang/settle";
+import {addSettle, delSettle, exportSettle, getSettle, showMealsWithSelect} from "@/api/fantang/settle";
 import {getLastSettlementDate, listAll, listMealsWithInSettle, listNoPay, listPayoff} from "@/api/fantang/meals";
 import {getUserProfile} from "@/api/system/user";
 import {getPrepaymentByPatientId} from "@/api/fantang/prepayment";
@@ -275,6 +303,10 @@ export default {
   components: {},
   data() {
     return {
+      sumTotalPrice: 0,
+      dinnerTotalPrice: 0,
+      nutritionTotalPrice: 0,
+      mealsList: [],
       departOptions: [],
       pickerOptions: {
         disabledDate(time) {
@@ -432,6 +464,13 @@ export default {
         iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
         this.formAddNewSettlement.settlementDays = iDays;
       }
+
+      showMealsWithSelect(this.formAddNewSettlement).then(response => {
+        this.mealsList = response.data.reportMealsList;
+        this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
+        this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
+        this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
+      })
     },
     // 获取用户相关信息
     myGetUser() {
@@ -575,25 +614,25 @@ export default {
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["formAddNewSettlement"].validate(valid => {
-        if (valid) {
-          if (this.form.settleId != null) {
-            updateSettle(this.form).then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            console.log(this.formAddNewSettlement);
-            this.formAddNewSettlement.opera = this.userName;
-            addSettle(this.formAddNewSettlement).then(response => {
-              this.msgSuccess("结算成功");
-              this.flagAddNewSettlementOpen = false;
-              this.getList();
-            });
-          }
-        }
+      // this.$refs["formAddNewSettlement"].validate(valid => {
+      //   if (valid) {
+      //     if (this.form.settleId != null) {
+      //       updateSettle(this.form).then(response => {
+      //         this.msgSuccess("修改成功");
+      //         this.open = false;
+      //         this.getList();
+      //       });
+      //     } else {
+      console.log(this.formAddNewSettlement);
+      this.formAddNewSettlement.opera = this.userName;
+      addSettle(this.formAddNewSettlement).then(response => {
+        this.msgSuccess("结算成功");
+        this.flagAddNewSettlementOpen = false;
+        this.getList();
       });
+      //     }
+      //   }
+      // });
     },
     /** 删除按钮操作 */
     handleDelete(row) {

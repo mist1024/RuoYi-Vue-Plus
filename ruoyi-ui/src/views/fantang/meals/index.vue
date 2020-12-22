@@ -145,10 +145,13 @@
         <el-form-item label="订单列表" prop="foods">
           <el-input v-model="form.foods" placeholder="请输入订单列表"/>
         </el-form-item>
-        <el-form-item label="总价" prop="price">
+        <el-form-item label="正餐总价" prop="price">
           <el-input v-model="form.price" placeholder="请输入总价"/>
         </el-form-item>
       </el-form>
+      <el-form-item>
+
+      </el-form-item>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>

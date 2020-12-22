@@ -20,6 +20,8 @@
         <result property="egg" column="egg"/>
         <result property="orderInfo" column="order_info"/>
         <result property="flag" column="flag"/>
+        <result property="nutritionFoodId" column="nutrition_food_id"/>
+        <result property="nutritionFoodFlag" column="nutrition_food_flag"/>
     </resultMap>
 
     <select id="listNewFormatter" resultType="com.ruoyi.system.fantang.domain.FtFoodDemandDao">

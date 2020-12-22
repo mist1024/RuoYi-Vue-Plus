@@ -3,6 +3,7 @@ package com.ruoyi.system.fantang.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
+import com.ruoyi.system.fantang.entity.ReportMealsPriceEntity;
 import com.ruoyi.system.fantang.mapper.FtReportMealVoMapper;
 import com.ruoyi.system.fantang.mapper.FtReportMealsDaoMapper;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
@@ -10,6 +11,7 @@ import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -62,5 +64,10 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     @Override
     public Integer settleMeals(Long settlementId, Long patientId, String lastBillingDate, String selectBillingDate) {
         return this.baseMapper.settleMeals(settlementId, patientId, lastBillingDate, selectBillingDate);
+    }
+
+    @Override
+    public ReportMealsPriceEntity sumTotalPrice(Long patientId, Date lastBillingDate, Date selectBillingDate) {
+        return this.baseMapper.sumTotalPrice(patientId, lastBillingDate, selectBillingDate);
     }
 }

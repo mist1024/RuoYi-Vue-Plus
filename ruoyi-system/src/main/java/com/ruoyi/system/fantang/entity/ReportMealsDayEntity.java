@@ -15,11 +15,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class ReportMealsDayEntity extends FtReportMealsDao {
     // 用户自定义结算日期
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date selectBillingDate;
     // 自上一次结算累计未结算天数
     private Long days;
     // 上次缴费日期
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date lastCreateDate;
 }

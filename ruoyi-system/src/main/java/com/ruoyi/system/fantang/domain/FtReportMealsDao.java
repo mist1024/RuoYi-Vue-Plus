@@ -69,7 +69,7 @@ public class FtReportMealsDao implements Serializable {
     private String foods;
 
     /**
-     * 总价
+     * 正餐总价
      */
     @Excel(name = "总价")
     private BigDecimal price;
@@ -96,7 +96,31 @@ public class FtReportMealsDao implements Serializable {
     @TableField(exist = false)
     private String bedId;
 
-
     @TableField(exist = false)
     private String name;
+
+    /**
+     * 营养餐 id
+     */
+    private Long nutritionFoodId;
+
+    /**
+     * 营养配餐标志
+     */
+    private Integer nutritionFoodFlag;
+
+    /**
+     * 是否替代正餐
+     */
+    private Boolean isReplaceFood;
+
+    /**
+     * 营养配餐价格
+     */
+    private BigDecimal nutritionFoodPrice;
+
+    /**
+     * 当前报餐总价
+     */
+    private BigDecimal totalPrice;
 }
