@@ -54,4 +54,13 @@ public class SettleEntity {
     // 操作员
     private String userName;
 
+    // 正餐总价
+    private BigDecimal dinnerTotalPrice;
+
+    // 营养餐总价
+    private BigDecimal nutritionTotalPrice;
+
+    // 正餐和营养餐总价
+    private BigDecimal sumTotalPrice;
+
 }

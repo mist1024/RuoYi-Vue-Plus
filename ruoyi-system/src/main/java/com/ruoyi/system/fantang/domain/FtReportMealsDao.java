@@ -77,7 +77,9 @@ public class FtReportMealsDao implements Serializable {
     /**
      * 结算标志
      */
-    private Long settlementFlag;
+    private Integer settlementFlag;
+
+    private Long settlementId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date settlementAt;

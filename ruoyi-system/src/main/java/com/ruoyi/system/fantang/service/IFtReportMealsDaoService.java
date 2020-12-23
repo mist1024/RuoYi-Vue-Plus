@@ -32,3 +32,4 @@ public interface IFtReportMealsDaoService extends IService<FtReportMealsDao> {
 
     ReportMealsPriceEntity sumTotalPrice(Long patientId, Date lastBillingDate, Date selectBillingDate);
 }
+

@@ -13,6 +13,7 @@
         <result property="foods" column="foods"/>
         <result property="price" column="price"/>
         <result property="settlementFlag" column="settlement_flag"/>
+        <result property="settlementId" column="settlement_id"/>
         <result property="settlementAt" column="settlement_at"/>
         <result property="settlementBy" column="settlement_by"/>
         <result property="nutritionFoodId" column="nutrition_food_id"/>

@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -10,11 +11,13 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.domain.FtSettleDao;
 import com.ruoyi.system.fantang.entity.ReportMealsPriceEntity;
 import com.ruoyi.system.fantang.entity.SettleEntity;
-import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
+import com.ruoyi.system.fantang.service.IFtInvoiceDaoService;
+import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import com.ruoyi.system.fantang.service.IFtSettleDaoService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +44,9 @@ public class FtSettleDaoController extends BaseController {
 
     private final IFtReportMealsDaoService iFtReportMealsDaoService;
 
-    private final IFtFoodDemandDaoService iFtFoodDemandDaoService;
+    private final IFtPrepaymentDaoService iFtPrepaymentDaoService;
+
+    private final IFtInvoiceDaoService iFtInvoiceDaoService;
 
 
     /**
@@ -50,8 +55,13 @@ public class FtSettleDaoController extends BaseController {
     @PostMapping("/showMealsWithSelect")
     public AjaxResult showMealsWithSelect(@RequestBody SettleEntity settlement) {
 
+        // 病人 id
         Long patientId = settlement.getPatientId();
+
+        // 上次结算 / 用餐日期
         Date lastBillingDate = settlement.getLastBillingDate();
+
+        // 用户选择结算日期
         Date selectBillingDate = settlement.getSelectBillingDate();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -66,8 +76,8 @@ public class FtSettleDaoController extends BaseController {
         ReportMealsPriceEntity reportMealsPrice = iFtReportMealsDaoService.sumTotalPrice(patientId, lastBillingDate, selectBillingDate);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("reportMealsList",reportMealsList);
-        data.put("reportMealsPrice",reportMealsPrice);
+        data.put("reportMealsList", reportMealsList);
+        data.put("reportMealsPrice", reportMealsPrice);
 
         return AjaxResult.success(data);
     }
@@ -77,33 +87,61 @@ public class FtSettleDaoController extends BaseController {
      */
     @PostMapping("/addSettle")
     public AjaxResult addSettle(@RequestBody SettleEntity settlement) {
-        System.out.println(settlement);
 
+        // 病人 id
         Long patientId = settlement.getPatientId();
+
+        // 上次结算 / 用餐日期
         Date lastBillingDate = settlement.getLastBillingDate();
+
+        // 用户选择结算日期
         Date selectBillingDate = settlement.getSelectBillingDate();
 
-//        List<FtReportMealsDao> reportMealsDaoList =  iFtReportMealsDaoService.listByPatientIdAndDate(patientId,);
+        // 应收
+        BigDecimal sumTotalPrice = settlement.getSumTotalPrice();
 
-        // 根据病人 id ，上次结算日期，选择日期查询病人非营养餐记录
-        QueryWrapper<FtReportMealsDao> reportMealsWrapper = new QueryWrapper<>();
+        // 实收
+        BigDecimal netPeceipt = settlement.getNetPeceipt();
+
+        // 操作用户
+        String userName = settlement.getUserName();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        // 根据病人 id 查询预付费记录
+        QueryWrapper<FtPrepaymentDao> prepaymentWrapper = new QueryWrapper<>();
+        prepaymentWrapper.eq("patient_id", patientId);
+        FtPrepaymentDao prepaymentDao = iFtPrepaymentDaoService.getOne(prepaymentWrapper);
+
+        // 预付费扣费
+        BigDecimal prepaid = prepaymentDao.getPrepaid();
+        BigDecimal balance = prepaid.subtract(netPeceipt);
+        prepaymentDao.setPrepaid(balance);
+        iFtPrepaymentDaoService.updateById(prepaymentDao);
+
+        // 添加结算记录
+        FtSettleDao ftSettleDao = new FtSettleDao();
+        ftSettleDao.setReceipts(netPeceipt);
+        ftSettleDao.setPatientId(patientId);
+        Date nowDate = new Date();
+        ftSettleDao.setSettleAt(nowDate);
+        ftSettleDao.setOpera(userName);
+        ftSettleDao.setPayable(sumTotalPrice);
+        ftSettleDao.setReceipts(netPeceipt);
+        iFtSettleDaoService.save(ftSettleDao);
+
+        // 修改报餐信息
+        UpdateWrapper<FtReportMealsDao> reportMealsWrapper = new UpdateWrapper<>();
         reportMealsWrapper.eq("patient_id", patientId);
-        reportMealsWrapper.eq("nutrition_food_flag", 0);
-        reportMealsWrapper.between("create_at", lastBillingDate, selectBillingDate);
-        List<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.list(reportMealsWrapper);
+        reportMealsWrapper.between("create_at", sdf.format(lastBillingDate), sdf.format(selectBillingDate));
+        FtReportMealsDao reportMealsDao = new FtReportMealsDao();
+        reportMealsDao.setSettlementFlag(1);
+        reportMealsDao.setSettlementAt(nowDate);
+        reportMealsDao.setSettlementBy(userName);
+        reportMealsDao.setSettlementId(ftSettleDao.getSettleId());
+        iFtReportMealsDaoService.update(reportMealsDao, reportMealsWrapper);
 
-        // 统计非营养餐总价
-//        BigDecimal totalPrice = iFtReportMealsDaoService.sumTotalPrice(patientId, lastBillingDate, selectBillingDate);
-
-
-        // 根据病人 id ，上次结算日期，选择日期查询病人养餐记录
-        QueryWrapper<FtReportMealsDao> withNutritionWrapper = new QueryWrapper<>();
-        withNutritionWrapper.eq("patient_id", patientId);
-        withNutritionWrapper.eq("nutrition_food_flag", 1);
-        withNutritionWrapper.between("create_at", lastBillingDate, selectBillingDate);
-        List<FtReportMealsDao> withNutritionList = iFtReportMealsDaoService.list(reportMealsWrapper);
-
-        return null;
+        return AjaxResult.success("已收费");
     }
 
     /**

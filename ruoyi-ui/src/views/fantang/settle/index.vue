@@ -346,6 +346,9 @@ export default {
 
       // 费用结算弹出层数据
       formAddNewSettlement: {
+        dinnerTotalPrice: 0,
+        nutritionTotalPrice: 0,
+        sumTotalPrice: 0,
         hospitalId: null,
         patientId: null,
         name: null,
@@ -465,14 +468,14 @@ export default {
         this.formAddNewSettlement.settlementDays = iDays;
       }
 
-      if (this.formAddNewSettlement.selectBillingDate!=null){
+      if (this.formAddNewSettlement.selectBillingDate != null) {
         showMealsWithSelect(this.formAddNewSettlement).then(response => {
           this.mealsList = response.data.reportMealsList;
           this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
           this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
           this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
         })
-      }else {
+      } else {
         this.mealsList = null;
         this.dinnerTotalPrice = 0;
         this.nutritionTotalPrice = 0;
@@ -632,11 +635,19 @@ export default {
       //     } else {
       console.log(this.formAddNewSettlement);
       this.formAddNewSettlement.opera = this.userName;
-      addSettle(this.formAddNewSettlement).then(response => {
-        this.msgSuccess("结算成功");
-        this.flagAddNewSettlementOpen = false;
-        this.getList();
-      });
+      this.formAddNewSettlement.dinnerTotalPrice = this.dinnerTotalPrice;
+      this.formAddNewSettlement.nutritionTotalPrice = this.nutritionTotalPrice;
+      this.formAddNewSettlement.sumTotalPrice = this.sumTotalPrice
+      console.log(this.formAddNewSettlement);
+      if (this.formAddNewSettlement.prepayment >= this.formAddNewSettlement.netPeceipt) {
+        addSettle(this.formAddNewSettlement).then(response => {
+          this.msgSuccess("已收费");
+          this.flagAddNewSettlementOpen = false;
+          this.getList();
+        });
+      }else {
+          this.msgError("预付费余额不足");
+      }
       //     }
       //   }
       // });
