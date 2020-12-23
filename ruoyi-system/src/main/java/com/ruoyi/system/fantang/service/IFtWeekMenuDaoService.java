@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.service;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtWeekMenuDao;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -11,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IFtWeekMenuDaoService extends IService<FtWeekMenuDao> {
 
+    AjaxResult getTodayMenu(String weekDay);
 }

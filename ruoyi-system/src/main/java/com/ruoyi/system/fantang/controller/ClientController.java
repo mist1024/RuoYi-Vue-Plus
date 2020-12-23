@@ -4,14 +4,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.fantang.service.IFtConfigDaoService;
-import com.ruoyi.system.fantang.service.IFtOrderDaoService;
-import com.ruoyi.system.fantang.service.IFtStaffDemandDaoService;
-import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
+import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -33,6 +31,9 @@ public class ClientController extends BaseController {
 
     @Autowired
     private IFtOrderDaoService orderDaoService;
+
+    @Autowired
+    private IFtWeekMenuDaoService weekMenuDaoService;
 
     /**
      * 获取用餐时间信息
@@ -231,5 +232,21 @@ public class ClientController extends BaseController {
         Integer type = params.getInteger("type");
         Boolean demandMode = params.getBoolean("demandModeFlag");
         return staffDemandDaoService.setDemandMode(id, type, demandMode);
+    }
+
+    /**
+     * 获取当天菜谱
+     * param  today
+     * return
+     */
+    @GetMapping("/getTodayMenu")
+    public AjaxResult getTodayMenu() {
+        String[] weekDays = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        if (w < 0)
+            w = 0;
+        return weekMenuDaoService.getTodayMenu(weekDays[w]);
     }
 }

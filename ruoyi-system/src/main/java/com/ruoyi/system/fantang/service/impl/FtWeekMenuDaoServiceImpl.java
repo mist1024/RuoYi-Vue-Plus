@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.service.impl;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.mapper.FtWeekMenuDaoMapper;
@@ -15,4 +16,8 @@ import com.ruoyi.system.fantang.service.IFtWeekMenuDaoService;
 @Service
 public class FtWeekMenuDaoServiceImpl extends ServiceImpl<FtWeekMenuDaoMapper, FtWeekMenuDao> implements IFtWeekMenuDaoService {
 
+    @Override
+    public AjaxResult getTodayMenu(String weekDay) {
+        return this.baseMapper.getTodayMenu(weekDay);
+    }
 }
