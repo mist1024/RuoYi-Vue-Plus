@@ -240,10 +240,10 @@ public class ClientController extends BaseController {
      * return
      */
     @GetMapping("/getTodayMenu")
-    public AjaxResult getTodayMenu() {
+    public AjaxResult getTodayMenu(@RequestBody JSONObject params) {
         String[] weekDays = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
+        cal.setTime(params.getDate("date"));
         int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
         if (w < 0)
             w = 0;
