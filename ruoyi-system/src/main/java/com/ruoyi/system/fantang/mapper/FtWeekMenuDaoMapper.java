@@ -13,6 +13,8 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface FtWeekMenuDaoMapper extends BaseMapper<FtWeekMenuDao> {
 
+    // 非聚合方式转换参考
+    // SELECT a.weekday, a.dinner_type,  CONCAT(b.name ) name FROM ft_week_menu a LEFT JOIN ft_food b ON FIND_IN_SET(b.food_id,a.foods) WHERE a.weekday = '周一'
     @Select("SELECT a.weekday, a.dinner_type,  GROUP_CONCAT(b.name ) name FROM ft_week_menu a LEFT JOIN ft_food b ON FIND_IN_SET(b.food_id,a.foods) WHERE a.weekday = #{weekDay} GROUP BY a.dinner_type")
     AjaxResult getTodayMenu(String weekDay);
 }

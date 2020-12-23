@@ -97,6 +97,7 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     public AjaxResult getAvailableStopOrder(Long staffId) {
         QueryWrapper<FtStaffStopMealsDao> wrapper = new QueryWrapper<>();
         wrapper.eq("staff_id", staffId);
+        wrapper.ge("demand_date", new Date());
         return AjaxResult.success(staffStopMealsDaoMapper.selectList(wrapper));
     }
 
