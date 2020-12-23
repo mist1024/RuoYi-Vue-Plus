@@ -186,7 +186,7 @@
         <el-row :gutter="10">
           <el-col :span="8">
             <!--            <el-form-item label="上次结算日期" prop="lastBillingDate" v-if="lastBillFlag">-->
-            <el-form-item label="上次结算/用餐日期" prop="lastBillingDate">
+            <el-form-item label="上次结算 / 用餐日期" prop="lastBillingDate">
               <!--              <el-input v-model="formAddNewSettlement.lastBillingDate" :disabled="true"/>-->
               <el-date-picker
                 v-model="formAddNewSettlement.lastBillingDate"
@@ -457,7 +457,7 @@ export default {
 
       dateSpan = sDate2 - sDate1;
       if (dateSpan < 0) {
-        this.msgError("你现在的结算日期小于上一次结算日期！！");
+        this.msgError("你现在的结算日期小于上一次上次结算 / 用餐日期");
       } else {
 
         dateSpan = Math.abs(dateSpan);
@@ -465,12 +465,19 @@ export default {
         this.formAddNewSettlement.settlementDays = iDays;
       }
 
-      showMealsWithSelect(this.formAddNewSettlement).then(response => {
-        this.mealsList = response.data.reportMealsList;
-        this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
-        this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
-        this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
-      })
+      if (this.formAddNewSettlement.selectBillingDate!=null){
+        showMealsWithSelect(this.formAddNewSettlement).then(response => {
+          this.mealsList = response.data.reportMealsList;
+          this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
+          this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
+          this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
+        })
+      }else {
+        this.mealsList = null;
+        this.dinnerTotalPrice = 0;
+        this.nutritionTotalPrice = 0;
+        this.sumTotalPrice = 0;
+      }
     },
     // 获取用户相关信息
     myGetUser() {
