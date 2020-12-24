@@ -1,15 +1,21 @@
 package com.ruoyi.winery.controller;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Arrays;
 
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,6 +52,7 @@ public class WineryCompanyRecordController extends BaseController {
     @PreAuthorize("@ss.hasPermi('winery:winery_company_record:list')")
     @GetMapping("/list")
     public TableDataInfo list(WineryCompanyRecord wineryCompanyRecord) {
+
         startPage();
         LambdaQueryWrapper<WineryCompanyRecord> lqw = Wrappers.lambdaQuery(wineryCompanyRecord);
         if (StringUtils.isNotBlank(wineryCompanyRecord.getStatus())) {

@@ -46,9 +46,9 @@
           placeholder="选择创建时间">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="租户id" prop="tenantId">
+      <el-form-item label="租户id" prop="deptId">
         <el-input
-          v-model="queryParams.tenantId"
+          v-model="queryParams.deptId"
           placeholder="请输入租户id"
           clearable
           size="small"
@@ -115,7 +115,7 @@
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="租户id" align="center" prop="tenantId" />
+      <el-table-column label="租户id" align="center" prop="deptId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -165,8 +165,8 @@
         <el-form-item label="unionid" prop="unionId">
           <el-input v-model="form.unionId" placeholder="请输入unionid" :disabled="true" />
         </el-form-item>
-        <el-form-item label="租户id" prop="tenantId">
-          <el-input v-model="form.tenantId" placeholder="请输入租户id" />
+        <el-form-item label="租户id" prop="deptId">
+          <el-input v-model="form.deptId" placeholder="请输入租户id" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -215,7 +215,7 @@ export default {
         nickName: undefined,
         unionId: undefined,
         createTime: undefined,
-        tenantId: undefined
+        deptId: undefined
       },
       // 表单参数
       form: {},
@@ -259,7 +259,7 @@ export default {
         unionId: undefined,
         createTime: undefined,
         updateTime: undefined,
-        tenantId: undefined
+        deptId: undefined
       };
       this.resetForm("form");
     },

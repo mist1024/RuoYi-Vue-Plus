@@ -64,8 +64,8 @@ public class WineryMauserController extends BaseController {
         if (wineryMauser.getCreateTime() != null){
             lqw.eq(WineryMauser::getCreateTime ,wineryMauser.getCreateTime());
         }
-        if (StringUtils.isNotBlank(wineryMauser.getTenantId())){
-            lqw.eq(WineryMauser::getTenantId ,wineryMauser.getTenantId());
+        if (StringUtils.isNotBlank(wineryMauser.getDeptId())){
+            lqw.eq(WineryMauser::getDeptId ,wineryMauser.getDeptId());
         }
         List<WineryMauser> list = iWineryMauserService.list(lqw);
         return getDataTable(list);
@@ -122,4 +122,5 @@ public class WineryMauserController extends BaseController {
     public AjaxResult remove(@PathVariable String[] openIds) {
         return toAjax(iWineryMauserService.removeByIds(Arrays.asList(openIds)) ? 1 : 0);
     }
+
 }

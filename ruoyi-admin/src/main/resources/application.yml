@@ -190,3 +190,18 @@ xss:
   excludes: /system/notice/*
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+#微信小程序支付配置
+wxmini:
+  appId: wx76ec015fc31a1946 #微信公众号或者小程序等的appid 必填
+  mchId: 1486984962
+  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
+  notifyUrl: http://41.mxl530.top:8087/zhongyihis/wxnotify
+  subAppId: #服务商模式下的子商户公众账号ID
+  subMchId: #服务商模式下的子商户号
+  tradeType: JSAPI  #交易类型
+  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+  secret: 94ee42c0899a6ceccf353e1e729c50d4 #微信小程序的Secret
+  token: xiao4r #微信小程序消息服务器配置的token
+  aesKey: jNXajd2sQSMYQNg3rcdMF9HraUJxXF0iswgdMxVik9W #微信小程序消息服务器配置的EncodingAESKey
+  msgDataFormat: JSON

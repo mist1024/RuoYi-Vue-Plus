@@ -131,11 +131,11 @@ private static final long serialVersionUID=1L;
 
     /** 年产量 */
     @Excel(name = "年产量")
-    private Long annualOutput;
+    private Float annualOutput;
 
     /** 库存 */
     @Excel(name = "库存")
-    private Long stock;
+    private Float stock;
 
     /** 酒桶数量 */
     @Excel(name = "酒桶数量")

@@ -3,8 +3,12 @@ package com.ruoyi.common.core.controller;
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
 import java.util.List;
+
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import com.github.pagehelper.PageHelper;
@@ -90,5 +94,21 @@ public class BaseController
     public String redirect(String url)
     {
         return StringUtils.format("redirect:{}", url);
+    }
+
+
+    /**
+     * 获取部门Id
+     * @param token
+     * @return
+     */
+    public String getDeptId(UsernamePasswordAuthenticationToken token) {
+        JSONObject json = (JSONObject) JSONUtil.parse(token.getPrincipal());
+
+        String deptId = json.getJSONObject("user")
+                .getJSONObject("dept")
+                .getStr("deptId");
+
+        return deptId;
     }
 }

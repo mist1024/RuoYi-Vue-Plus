@@ -63,5 +63,5 @@ private static final long serialVersionUID=1L;
 
     /** 租户id */
     @Excel(name = "租户id")
-    private String tenantId;
+    private String deptId;
 }
