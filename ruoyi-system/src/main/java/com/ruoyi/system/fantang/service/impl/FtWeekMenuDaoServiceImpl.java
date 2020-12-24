@@ -17,7 +17,7 @@ import com.ruoyi.system.fantang.service.IFtWeekMenuDaoService;
 public class FtWeekMenuDaoServiceImpl extends ServiceImpl<FtWeekMenuDaoMapper, FtWeekMenuDao> implements IFtWeekMenuDaoService {
 
     @Override
-    public AjaxResult getTodayMenu(String weekDay) {
-        return this.baseMapper.getTodayMenu(weekDay);
+    public AjaxResult getMenuOfDay(String weekDay) {
+        return AjaxResult.success(this.baseMapper.getTodayMenu(weekDay));
     }
 }

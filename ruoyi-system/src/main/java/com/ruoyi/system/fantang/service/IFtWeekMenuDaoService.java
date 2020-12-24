@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IFtWeekMenuDaoService extends IService<FtWeekMenuDao> {
 
-    AjaxResult getTodayMenu(String weekDay);
+    AjaxResult getMenuOfDay(String weekDay);
 }
