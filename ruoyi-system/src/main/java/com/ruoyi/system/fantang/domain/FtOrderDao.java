@@ -141,4 +141,7 @@ public class FtOrderDao implements Serializable {
 
     // 订用餐日期
     private Date orderDate;
+
+    @TableField(exist = false)
+    private Integer countOrder;
 }

@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.service.*;
@@ -92,7 +93,7 @@ public class ClientController extends BaseController {
      * param JSONObject staffId: 员工id
      * return
      */
-    @GetMapping("/getAvailableStopOrder")
+    @PostMapping("/getAvailableStopOrder")
     public AjaxResult getAvailableStopOrder(@RequestBody JSONObject params) {
         return AjaxResult.success(orderDaoService.getAvailableStopOrder(params.getLong("staffId")));
     }
@@ -216,6 +217,16 @@ public class ClientController extends BaseController {
     }
 
     /**
+     * 初始化员工订餐配置文件，并返回初始化后的记录给前端
+     * params: staffId
+     * return
+     */
+    @PostMapping("/initDemandMode")
+    public AjaxResult initDemandMode(@RequestBody JSONObject params) {
+        return staffDemandDaoService.initDemandMode(params.getLong("staffId"));
+    }
+
+    /**
      * 设置订餐模式
      * 日期：2020年12月11日
      * 作者： 陈智兴
@@ -235,18 +246,23 @@ public class ClientController extends BaseController {
     }
 
     /**
-     * 获取当天菜谱
+     * 返回某天的菜单
      * param  today
      * return
      */
-    @GetMapping("/getTodayMenu")
-    public AjaxResult getTodayMenu(@RequestBody JSONObject params) {
+    @PostMapping("/getMenuOfDay")
+    public AjaxResult getMenuOfDay(@RequestBody JSONObject params) {
         String[] weekDays = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
         Calendar cal = Calendar.getInstance();
         cal.setTime(params.getDate("date"));
         int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
         if (w < 0)
             w = 0;
-        return weekMenuDaoService.getTodayMenu(weekDays[w]);
+        return weekMenuDaoService.getMenuOfDay(weekDays[w]);
+    }
+
+    @GetMapping("/StatisGetOrderOfDate")
+    public AjaxResult statisGetOrderOfDate(@RequestParam Date date) {
+        return orderDaoService.statisGetOrderOfDate(date);
     }
 }

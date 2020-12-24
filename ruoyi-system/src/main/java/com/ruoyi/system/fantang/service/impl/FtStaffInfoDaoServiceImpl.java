@@ -28,16 +28,22 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
 
     @Override
     public AjaxResult login(String tel, String password) {
-        QueryWrapper<FtStaffInfoDao> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("tel", tel);
-        queryWrapper.eq("password", password);
-        FtStaffInfoDao dao = this.baseMapper.selectOne(queryWrapper);
-        if (dao == null)
-            return AjaxResult.error(-1, "查无记录");
-        dao.setLoginFlag(true);
-        dao.setToken(IdUtils.fastUUID());
-        this.baseMapper.updateById(dao);
-        return AjaxResult.success(dao);
+        // 查询是否有该员工
+        QueryWrapper<FtStaffInfoDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("tel", tel);
+        FtStaffInfoDao dao = this.baseMapper.selectOne(wrapper);
+        if (dao == null) {
+            return AjaxResult.error(-2, "无该员工信息");
+        } else {
+            wrapper.eq("password", password);
+            dao = this.baseMapper.selectOne(wrapper);
+            if (dao == null)
+                return AjaxResult.error(-1, "密码错误");
+            dao.setLoginFlag(true);
+            dao.setToken(IdUtils.fastUUID());
+            this.baseMapper.updateById(dao);
+            return AjaxResult.success(dao);
+        }
     }
 
     @Override
