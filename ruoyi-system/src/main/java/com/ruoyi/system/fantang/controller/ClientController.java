@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.service.*;
@@ -214,6 +215,13 @@ public class ClientController extends BaseController {
     public AjaxResult postRestoreOrder() {
         return null;
     }
+
+    @PostMapping("/initDemandMode")
+    public AjaxResult initDemandMode(@RequestBody JSONObject params) {
+        return staffDemandDaoService.initDemandMode(params.getLong("staffId"));
+    }
+
+
 
     /**
      * 设置订餐模式
