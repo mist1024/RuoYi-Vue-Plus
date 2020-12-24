@@ -44,6 +44,14 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
 
     @Override
     public Integer insertOrder(Long staffId, Integer orderType, Date demandDate) {
+        // 先删除停餐记录，再添加订餐记录
+        QueryWrapper<FtStaffStopMealsDao> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("staff_id", staffId);
+        queryWrapper.eq("type", orderType);
+        queryWrapper.between("demand_date", DateUtil.beginOfDay(demandDate), DateUtil.endOfDay(demandDate));
+        staffStopMealsDaoMapper.delete(queryWrapper);
+
+        // 查找是否已经订餐
         FtOrderDao dao = new FtOrderDao();
         dao.setStaffId(staffId);
         dao.setOrderType(orderType);
@@ -79,6 +87,14 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
 
     @Override
     public AjaxResult stopOrder(Long staffId, Integer orderType, Date demandDate) {
+        // 先删除当天的订餐记录，再添加停餐记录
+        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id",  staffId);
+        wrapper.eq("order_type", orderType);
+        wrapper.between("order_date", DateUtil.beginOfDay(demandDate), DateUtil.endOfDay(demandDate));
+        this.baseMapper.delete(wrapper);
+
+        // 添加停餐记录
         FtStaffStopMealsDao dao = new FtStaffStopMealsDao();
         dao.setStaffId(staffId);
         dao.setType(orderType);
