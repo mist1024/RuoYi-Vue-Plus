@@ -93,7 +93,7 @@ public class ClientController extends BaseController {
      * param JSONObject staffId: 员工id
      * return
      */
-    @GetMapping("/getAvailableStopOrder")
+    @PostMapping("/getAvailableStopOrder")
     public AjaxResult getAvailableStopOrder(@RequestBody JSONObject params) {
         return AjaxResult.success(orderDaoService.getAvailableStopOrder(params.getLong("staffId")));
     }
