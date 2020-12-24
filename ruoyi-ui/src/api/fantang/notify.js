@@ -17,10 +17,26 @@ export function getNotify(id) {
   })
 }
 
+// 查询是否有新消息
+export function isHaveNewMsg() {
+  return request({
+    url: '/fantang/notify/isHaveNewMsg',
+    method: 'get'
+  })
+}
+
 // 新增系统信息
 export function addNotify(data) {
   return request({
     url: '/fantang/notify',
+    method: 'post',
+    data: data
+  })
+}
+
+export function solveConflict(data) {
+  return request({
+    url: '/fantang/notify/solveConflict',
     method: 'post',
     data: data
   })

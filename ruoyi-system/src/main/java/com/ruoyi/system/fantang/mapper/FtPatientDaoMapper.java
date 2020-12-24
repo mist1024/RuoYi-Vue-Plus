@@ -40,6 +40,9 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     public int updateDepartIDToNewPatient();
 
 
-    @Select("select a.hospital_id, a.name, a.depart_name, a.bed_id, b.depart_id, c.hospital_id as old_hospital_id, c.name as old_name, a.depart_name as old_depart_name, c.bed_id as old_bed_id, c.depart_id as old_depart_id from ft_sync a LEFT JOIN  ft_depart b on a.depart_name = b.depart_name LEFT JOIN ft_patient c on a.hospital_id = c.hospital_id where b.depart_id = c.depart_id and a.bed_id = c.bed_id and a.name != c.name")
+    @Select("select a.hospital_id, a.name, a.depart_name, a.bed_id, b.depart_id, c.hospital_id as old_hospital_id, c.name as old_name, a.depart_name as old_depart_name, c.bed_id as old_bed_id, c.depart_id as old_depart_id, c.patient_id as patient_id from ft_sync a LEFT JOIN  ft_depart b on a.depart_name = b.depart_name LEFT JOIN ft_patient c on a.hospital_id = c.hospital_id where b.depart_id = c.depart_id and a.bed_id = c.bed_id and a.name != c.name")
     List<ftSyncConflictVo> syncConflictOnlyHospitalEqual();
+
+    @Select("select a.hospital_id, a.name, a.depart_name, a.bed_id, b.depart_id, c.hospital_id as old_hospital_id, c.name as old_name, a.depart_name as old_depart_name, c.bed_id as old_bed_id, c.depart_id as old_depart_id, c.patient_id as patient_id from ft_sync a LEFT JOIN  ft_depart b on a.depart_name = b.depart_name LEFT JOIN ft_patient c on a.hospital_id = c.hospital_id where b.depart_id = c.depart_id and a.bed_id = c.bed_id and a.name = c.name and c.hospital_id!=a.hospital_id")
+    List<ftSyncConflictVo> syncConflictOtherAllEqual();
 }

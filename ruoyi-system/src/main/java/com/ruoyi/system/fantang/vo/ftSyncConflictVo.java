@@ -19,7 +19,7 @@ import java.io.Serializable;
  */
 @Data
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Accessors(chain = true)
 public class ftSyncConflictVo extends FtSyncPatientDao implements Serializable {
@@ -49,4 +49,7 @@ private static final long serialVersionUID=1L;
 
     @TableField("old_depart_id")
     private String oldDepartId;
+
+    @TableField("patient_id")
+    private Long patientId;
 }
