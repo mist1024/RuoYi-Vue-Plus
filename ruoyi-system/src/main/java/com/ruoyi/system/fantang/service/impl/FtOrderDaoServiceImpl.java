@@ -63,7 +63,7 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     public AjaxResult getAvailableOrder(Integer staffId) {
         QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
         wrapper.eq("staff_id", staffId);
-        wrapper.ge("order_date", new Date());
+        wrapper.ge("order_date", DateUtil.beginOfDay(new Date()));
         List<FtOrderDao> daos = this.baseMapper.selectList(wrapper);
         return AjaxResult.success(daos);
     }
