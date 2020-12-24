@@ -75,7 +75,6 @@ public class MiniController {
     }
 
 
-    @Log(title = "提交酒庄厂家记录", businessType = BusinessType.INSERT)
     @PostMapping("/postForm")
     AjaxResult postForm(@RequestBody JSONObject json) {
 
@@ -92,7 +91,6 @@ public class MiniController {
 
     }
 
-    @Log(title = "获取酒庄厂家记录", businessType = BusinessType.OTHER)
     @GetMapping("/getForm")
     AjaxResult getForm(@RequestParam String openid) {
 
