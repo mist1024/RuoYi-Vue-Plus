@@ -106,4 +106,9 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     public AjaxResult cancelStopOrder(Long orderId) {
         return AjaxResult.success(staffStopMealsDaoMapper.deleteById(orderId));
     }
+
+    @Override
+    public AjaxResult statisGetOrderOfDate(Date date) {
+        return AjaxResult.success(this.baseMapper.statisGetOrderOfDate(DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString()));
+    }
 }

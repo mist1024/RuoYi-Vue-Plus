@@ -260,4 +260,9 @@ public class ClientController extends BaseController {
             w = 0;
         return weekMenuDaoService.getMenuOfDay(weekDays[w]);
     }
+
+    @GetMapping("/StatisGetOrderOfDate")
+    public AjaxResult statisGetOrderOfDate(@RequestParam Date date) {
+        return orderDaoService.statisGetOrderOfDate(date);
+    }
 }
