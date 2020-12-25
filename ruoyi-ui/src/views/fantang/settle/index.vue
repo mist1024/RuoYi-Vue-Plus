@@ -204,7 +204,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="结算总价" prop="price">
-              <el-input v-model="formAddNewSettlement.price" :disabled="true"/>
+              <el-input v-model="this.sumTotalPrice" :disabled="true"/>
             </el-form-item>
           </el-col>
         </el-row>

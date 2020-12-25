@@ -46,6 +46,7 @@ public class FtReportMealsDaoController extends BaseController {
 
         QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
         wrapper.eq("patient_id", patientId);
+        wrapper.eq("settlement_flag", 1);
         wrapper.orderByDesc("settlement_at");
         wrapper.last("limit 1");
         FtReportMealsDao ftReportMealsDao = iFtReportMealsDaoService.getOne(wrapper);

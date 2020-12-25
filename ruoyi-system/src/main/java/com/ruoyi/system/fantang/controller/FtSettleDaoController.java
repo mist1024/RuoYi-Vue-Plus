@@ -114,10 +114,10 @@ public class FtSettleDaoController extends BaseController {
         FtPrepaymentDao prepaymentDao = iFtPrepaymentDaoService.getOne(prepaymentWrapper);
 
         // 预付费扣费
-        BigDecimal prepaid = prepaymentDao.getPrepaid();
-        BigDecimal balance = prepaid.subtract(netPeceipt);
-        prepaymentDao.setPrepaid(balance);
-        iFtPrepaymentDaoService.updateById(prepaymentDao);
+//        BigDecimal prepaid = prepaymentDao.getPrepaid();
+//        BigDecimal balance = prepaid.subtract(netPeceipt);
+//        prepaymentDao.setPrepaid(balance);
+//        iFtPrepaymentDaoService.updateById(prepaymentDao);
 
         // 添加结算记录
         FtSettleDao ftSettleDao = new FtSettleDao();
