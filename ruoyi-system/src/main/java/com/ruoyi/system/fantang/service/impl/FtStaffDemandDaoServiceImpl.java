@@ -33,12 +33,10 @@ public class FtStaffDemandDaoServiceImpl extends ServiceImpl<FtStaffDemandDaoMap
 
     @Override
     public AjaxResult setDemandMode(Long id, Integer type, Boolean demandMode) {
-        FtStaffDemandDao dao = new FtStaffDemandDao();
-        dao.setId(id);
+        FtStaffDemandDao dao = this.baseMapper.selectById(id);
         dao.setDemandMode(demandMode);
-        QueryWrapper<FtStaffDemandDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("type", type);
-        int ret = this.baseMapper.update(dao, wrapper);
+
+        int ret = this.baseMapper.updateById(dao);
         if (ret == 0)
             return AjaxResult.error("更新订餐状态失败");
         return AjaxResult.success();
