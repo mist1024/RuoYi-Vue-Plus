@@ -28,7 +28,9 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     FtStaffStopMealsDaoMapper staffStopMealsDaoMapper;
 
     public void GenerateStaffTomorrowOrder() {
-        this.baseMapper.GenerateStaffTomorrowOrder();
+        int week = DateUtil.thisDayOfWeek();
+        if (week < 6)
+            this.baseMapper.GenerateStaffTomorrowOrder();
 
     }
 
