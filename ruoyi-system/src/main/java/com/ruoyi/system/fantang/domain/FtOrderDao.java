@@ -144,4 +144,7 @@ public class FtOrderDao implements Serializable {
 
     @TableField(exist = false)
     private Integer countOrder;
+
+    @TableField(exist = false)
+    private String departName;
 }
