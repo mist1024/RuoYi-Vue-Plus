@@ -39,6 +39,9 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     @Update("update ft_patient a inner join ft_sync b on a.hospital_id = b.hospital_id and a.sync_flag = 2 set a.depart_id = (select depart_id from ft_depart c where b.depart_name = c.depart_name )")
     public int updateDepartIDToNewPatient();
 
+    @Update("update ft_patient a inner join ft_sync b on a.hospital_id = b.hospital_id and a.sync_flag = 2 set a.depart_id = (select depart_id from ft_depart c where b.depart_name = c.depart_name )")
+    public int updateDepartIDToPatient();
+
 
     @Select("select a.hospital_id, a.name, a.depart_name, a.bed_id, b.depart_id, c.hospital_id as old_hospital_id, c.name as old_name, a.depart_name as old_depart_name, c.bed_id as old_bed_id, c.depart_id as old_depart_id, c.patient_id as patient_id from ft_sync a LEFT JOIN  ft_depart b on a.depart_name = b.depart_name LEFT JOIN ft_patient c on a.hospital_id = c.hospital_id where b.depart_id = c.depart_id and a.bed_id = c.bed_id and a.name != c.name")
     List<ftSyncConflictVo> syncConflictOnlyHospitalEqual();

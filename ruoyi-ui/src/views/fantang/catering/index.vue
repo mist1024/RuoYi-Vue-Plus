@@ -185,9 +185,9 @@
       <el-table-column label="科室" align="center" prop="departName"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="床号" align="center" prop="bedId"/>
+      <el-table-column label="配餐频次" align="center" prop="frequency"/>
       <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat"/>
       <el-table-column label="营养配餐" align="center" prop="foodName"/>
-      <el-table-column label="配餐频次" align="center" prop="frequency"/>
       <el-table-column label="用法" align="center" prop="cateringUsage"/>
       <el-table-column label="描述" align="center" prop="cateringDescribe"/>
       <el-table-column label="启用标示" align="center" prop="flag"/>
@@ -491,7 +491,7 @@ export default {
       this.departOptions = response.rows;
     })
     listNutritionFood().then(response => {
-      console.log("yyc----",response)
+      console.log("yyc----", response)
       this.numberOptions = response.rows;
     })
   },

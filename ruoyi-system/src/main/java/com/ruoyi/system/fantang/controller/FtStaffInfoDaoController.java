@@ -136,7 +136,7 @@ public class FtStaffInfoDaoController extends BaseController {
         }
 
         // 判断密码是否为空
-        if (ftStaffInfoDao.getPassword() == null) {
+        if (ftStaffInfoDao.getPassword() == null || ftStaffInfoDao.getPassword().equals("")) {
             ftStaffInfoDao.setPassword("123456");
         }
 

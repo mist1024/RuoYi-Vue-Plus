@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtSettlementDaoMapper">
+    
+    <resultMap type="FtSettlementDao" id="FtSettlementDaoResult">
+        <result property="settleId"    column="settle_id"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="settleAt"    column="settle_at"    />
+        <result property="opera"    column="opera"    />
+        <result property="list"    column="list"    />
+        <result property="price"    column="price"    />
+        <result property="payable"    column="payable"    />
+        <result property="receipts"    column="receipts"    />
+        <result property="type"    column="type"    />
+        <result property="flag"    column="flag"    />
+        <result property="refund"    column="refund"    />
+    </resultMap>
+
+
+</mapper>
