@@ -45,25 +45,22 @@ public class SyncPatientServiceImpl implements ISyncPatientService {
     @Transactional
     @Override
     public Integer insertToLocalSync(List<FtRemotePatientDao> remotePatientDaoList) {
-        System.out.println("开始同步................");
+        System.out.println("开始同步..................");
         StringBuilder syncMessage = new StringBuilder();
         syncMessage.append("同步信息:");
         // 清空本地中间表数据，准备接收同步数据
-        syncPatientDaoMapper.clearAll();
+        syncPatientDaoMapper.delete(null);
 
         // 遍历数据源，逐条插入本地中间表
         for (FtRemotePatientDao dao : remotePatientDaoList) {
             syncPatientDaoMapper.insert(dao);
         }
-        // 为记录填入对应的科室id
-        patientDaoMapper.updateDepartIDToNewPatient();
-
-        System.out.println("完成遍历数据源，逐条插入本地中间表..");
+        // 为新记录填入对应的科室id
+        patientDaoMapper.updateDepartIDToPatient();
 
         // 初始化本地病患表准备同步，将标志位置“0”
         int ret = patientDaoMapper.initForSync();
         syncMessage.append(String.format("本地初始化记录：%d 条", ret));
-        System.out.println("完成 初始化本地病患表准备同步，将标志位置“0”..");
 
         // 自动同步：住院号相同，姓名，科室，床号相同
         // 同步逻辑1：更新住院号、科室、床号、姓名全部相同的记录，并标注flag=1

@@ -21,7 +21,7 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     @Update("update ft_patient set sync_flag = 0 where off_flag = 0")
     public int initForSync();
 
-    @Update("update ft_patient a, ft_sync b set a.name= b.name, a.bed_id = b.bed_id,  a.sync_flag = 1 where a.hospital_id = b.hospital_id and a.name = b.name and a.bed_id = b.bed_id and a.depart_name = b.depart_name")
+    @Update("update ft_patient a, ft_sync b set a.name= b.name, a.bed_id = b.bed_id,  a.sync_flag = 1 where a.hospital_id = b.hospital_id and a.name = b.name and a.bed_id = b.bed_id and a.depart_id = b.depart_id")
     public int syncEqual();
 
     @Update("update ft_patient a, ft_sync b set a.name= b.name, a.bed_id = b.bed_id,  a.sync_flag = 1 where a.hospital_id = b.hospital_id and a.name = b.name")
@@ -39,7 +39,7 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     @Update("update ft_patient a inner join ft_sync b on a.hospital_id = b.hospital_id and a.sync_flag = 2 set a.depart_id = (select depart_id from ft_depart c where b.depart_name = c.depart_name )")
     public int updateDepartIDToNewPatient();
 
-    @Update("update ft_patient a inner join ft_sync b on a.hospital_id = b.hospital_id and a.sync_flag = 2 set a.depart_id = (select depart_id from ft_depart c where b.depart_name = c.depart_name )")
+    @Update("update ft_sync, ft_depart set ft_sync.depart_id =  ft_depart.depart_id  where ft_sync.depart_name = ft_depart.depart_name")
     public int updateDepartIDToPatient();
 
 
