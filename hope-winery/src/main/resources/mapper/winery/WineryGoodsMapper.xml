@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.winery.mapper.WineryGoodsMapper">
+    
+    <resultMap type="WineryGoods" id="WineryGoodsResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="goodsAlias"    column="goods_alias"    />
+        <result property="goodsType"    column="goods_type"    />
+        <result property="goodsSpec"    column="goods_spec"    />
+        <result property="goodDesc"    column="good_desc"    />
+        <result property="goodFaceImg"    column="good_face_img"    />
+        <result property="goodImg"    column="good_img"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+
+</mapper>

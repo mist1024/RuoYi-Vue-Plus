@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.winery.mapper.WineryWineSpecDetailMapper">
+    
+    <resultMap type="WineryWineSpecDetail" id="WineryWineSpecDetailResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="brand"    column="brand"    />
+        <result property="capacity"    column="capacity"    />
+        <result property="year"    column="year"    />
+        <result property="alcohol"    column="alcohol"    />
+        <result property="remark"    column="remark"    />
+        <result property="wineType"    column="wine_type"    />
+        <result property="wineLevel"    column="wine_level"    />
+        <result property="grape"    column="grape"    />
+        <result property="sugarContent"    column="sugar_content"    />
+        <result property="packingType"    column="packing_type"    />
+        <result property="decanteDuration"    column="decante_duration"    />
+        <result property="count"    column="count"    />
+        <result property="aroma"    column="aroma"    />
+    </resultMap>
+
+
+</mapper>
