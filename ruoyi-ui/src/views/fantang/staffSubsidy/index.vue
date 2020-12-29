@@ -1,18 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="补贴类型" prop="subsidyType">
-        <el-select v-model="queryParams.subsidyType" placeholder="请选择补贴类型" clearable size="small">
-          <el-option
-            v-for="item in subsidyTypeOptions"
-            :key="item.dictValue"
-            :label="item.dictLabel"
-            :value="item.dictValue">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="收支类型" prop="incomeType">
-        <el-select v-model="queryParams.incomeType" placeholder="请选择收支类型" clearable size="small">
+      <el-form-item label="筛选类型" prop="incomeType">
+        <el-select v-model="queryParams.incomeType" placeholder="筛选类型" clearable size="small">
           <el-option
             v-for="item in incomeTypeOptions"
             :key="item.value"
@@ -21,21 +11,12 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="金额" prop="price">
-        <el-input
-          v-model="queryParams.price"
-          placeholder="请输入金额"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="消费日期" prop="consumAt">
+      <el-form-item label="日期" prop="consumAt">
         <el-date-picker clearable size="small" style="width: 200px"
                         v-model="queryParams.consumAt"
                         type="date"
                         value-format="yyyy-MM-dd"
-                        placeholder="选择消费日期">
+                        placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -45,38 +26,38 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['fantang:staffSubsidy:add']"
-        >新增
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['fantang:staffSubsidy:edit']"
-        >修改
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['fantang:staffSubsidy:remove']"
-        >删除
-        </el-button>
-      </el-col>
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="primary"-->
+      <!--          icon="el-icon-plus"-->
+      <!--          size="mini"-->
+      <!--          @click="handleAdd"-->
+      <!--          v-hasPermi="['fantang:staffSubsidy:add']"-->
+      <!--        >新增-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="success"-->
+      <!--          icon="el-icon-edit"-->
+      <!--          size="mini"-->
+      <!--          :disabled="single"-->
+      <!--          @click="handleUpdate"-->
+      <!--          v-hasPermi="['fantang:staffSubsidy:edit']"-->
+      <!--        >修改-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="danger"-->
+      <!--          icon="el-icon-delete"-->
+      <!--          size="mini"-->
+      <!--          :disabled="multiple"-->
+      <!--          @click="handleDelete"-->
+      <!--          v-hasPermi="['fantang:staffSubsidy:remove']"-->
+      <!--        >删除-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -174,10 +155,13 @@ export default {
       subsidyTypeOptions: [],
       incomeTypeOptions: [{
         value: 1,
-        label: '发放'
+        label: '发放情况'
       }, {
         value: 2,
-        label: '消费'
+        label: '消费情况'
+      }, {
+        value: 3,
+        label: '冲减情况'
       }],
       // 遮罩层
       loading: true,
