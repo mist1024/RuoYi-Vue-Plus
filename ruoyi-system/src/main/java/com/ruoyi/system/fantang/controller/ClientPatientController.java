@@ -28,6 +28,6 @@ public class ClientPatientController extends BaseController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String createAt = sdf.format(new Date());
 
-        return AjaxResult.success(iFtPatientDaoService.getReportMealsToday("2020-12-29", patientId));
+        return AjaxResult.success(iFtPatientDaoService.getReportMealsToday(createAt, patientId));
     }
 }

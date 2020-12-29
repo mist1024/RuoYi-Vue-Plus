@@ -21,6 +21,11 @@ RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
 WHERE a.patient_id  = #{patientId} and c.create_at = #{createAt}
     </select>
     <resultMap id="patientReportMealsList" type="com.ruoyi.system.fantang.vo.FtPatientVo">
+        <result property="patientId" column="patient_id"></result>
+        <result property="name" column="name"></result>
+        <result property="departName" column="depart_name"></result>
+        <result property="bedId" column="bed_id"></result>
+        <result property="hospitalId" column="hospital_id"></result>
         <collection property="reportMealsList" ofType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
             <result property="id" column="id"></result>
             <result property="createAt" column="create_at"></result>

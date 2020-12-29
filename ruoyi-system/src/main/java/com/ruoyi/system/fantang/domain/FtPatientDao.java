@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,6 +43,9 @@ private static final long serialVersionUID=1L;
 
     /** 所属部门id */
     private Long departId;
+
+    @TableField(exist = false)
+    private String departName;
 
     /** 床号 */
     @Excel(name = "床号")
