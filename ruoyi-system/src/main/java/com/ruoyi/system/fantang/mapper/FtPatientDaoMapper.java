@@ -1,9 +1,11 @@
 package com.ruoyi.system.fantang.mapper;
 
-import com.ruoyi.system.fantang.domain.FtPatientDao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.system.fantang.domain.FtPatientDao;
+import com.ruoyi.system.fantang.vo.FtPatientVo;
 import com.ruoyi.system.fantang.vo.ftSyncConflictVo;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
@@ -48,4 +50,6 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
 
     @Select("select a.hospital_id, a.name, a.depart_name, a.bed_id, b.depart_id, c.hospital_id as old_hospital_id, c.name as old_name, a.depart_name as old_depart_name, c.bed_id as old_bed_id, c.depart_id as old_depart_id, c.patient_id as patient_id from ft_sync a LEFT JOIN  ft_depart b on a.depart_name = b.depart_name LEFT JOIN ft_patient c on a.hospital_id = c.hospital_id where b.depart_id = c.depart_id and a.bed_id = c.bed_id and a.name = c.name and c.hospital_id!=a.hospital_id")
     List<ftSyncConflictVo> syncConflictOtherAllEqual();
+
+    FtPatientVo getReportMealsToday(@Param("createAt") String createAt, @Param("patientId") Long patientId);
 }

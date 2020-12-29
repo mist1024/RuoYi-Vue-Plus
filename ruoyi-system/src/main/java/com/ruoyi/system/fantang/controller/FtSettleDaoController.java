@@ -108,17 +108,6 @@ public class FtSettleDaoController extends BaseController {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // 根据病人 id 查询预付费记录
-        QueryWrapper<FtPrepaymentDao> prepaymentWrapper = new QueryWrapper<>();
-        prepaymentWrapper.eq("patient_id", patientId);
-        FtPrepaymentDao prepaymentDao = iFtPrepaymentDaoService.getOne(prepaymentWrapper);
-
-        // 预付费扣费
-//        BigDecimal prepaid = prepaymentDao.getPrepaid();
-//        BigDecimal balance = prepaid.subtract(netPeceipt);
-//        prepaymentDao.setPrepaid(balance);
-//        iFtPrepaymentDaoService.updateById(prepaymentDao);
-
         // 添加结算记录
         FtSettleDao ftSettleDao = new FtSettleDao();
         ftSettleDao.setReceipts(netPeceipt);
@@ -128,6 +117,34 @@ public class FtSettleDaoController extends BaseController {
         ftSettleDao.setOpera(userName);
         ftSettleDao.setPayable(sumTotalPrice);
         ftSettleDao.setReceipts(netPeceipt);
+
+        //支付方式
+        switch (settlement.getPayType()) {
+            case 1:
+                ftSettleDao.setType("现金");
+                break;
+
+            case 2:
+                // 根据病人 id 查询预付费记录
+                QueryWrapper<FtPrepaymentDao> prepaymentWrapper = new QueryWrapper<>();
+                prepaymentWrapper.eq("patient_id", patientId);
+                FtPrepaymentDao prepaymentDao = iFtPrepaymentDaoService.getOne(prepaymentWrapper);
+
+                // 预付费扣费
+                BigDecimal prepaid = prepaymentDao.getPrepaid();
+                BigDecimal balance = prepaid.subtract(netPeceipt);
+                prepaymentDao.setPrepaid(balance);
+                iFtPrepaymentDaoService.updateById(prepaymentDao);
+
+                ftSettleDao.setType("预付款");
+                break;
+                
+            case 3:
+                ftSettleDao.setType("在线支付");
+                break;
+        }
+        
+
         iFtSettleDaoService.save(ftSettleDao);
 
         // 修改报餐信息

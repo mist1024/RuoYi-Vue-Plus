@@ -212,17 +212,34 @@
         <el-form-item label="已收预付伙食费" prop="prepayment">
           <el-input v-model="formAddNewSettlement.prepayment" :disabled="true"/>
         </el-form-item>
-        <el-form-item label="结算日期" prop="selectBillingDate">
-          <el-date-picker
-            v-model="formAddNewSettlement.selectBillingDate"
-            align="right"
-            type="date"
-            placeholder="选择日期"
-            value-format="yyyy-MM-dd"
-            @change="changeBillingDate"
-            :picker-options="pickerOptions">
-          </el-date-picker>
-        </el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="结算日期" prop="selectBillingDate">
+              <el-date-picker
+                v-model="formAddNewSettlement.selectBillingDate"
+                align="right"
+                type="date"
+                placeholder="选择日期"
+                value-format="yyyy-MM-dd"
+                @change="changeBillingDate"
+                :picker-options="pickerOptions">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="支付方式" prop="payType">
+              <el-select v-model="formAddNewSettlement.payType" placeholder="请选择支付方式">
+                <el-option
+                  v-for="item in payTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="实收" prop="netPeceipt">
           <el-input v-model="formAddNewSettlement.netPeceipt" placeholder="请输入实收"/>
         </el-form-item>
@@ -303,6 +320,16 @@ export default {
   components: {},
   data() {
     return {
+      payTypeOptions: [{
+        value: 1,
+        label: '现金'
+      }, {
+        value: 2,
+        label: '预付款'
+      }, {
+        value: 3,
+        label: '在线支付'
+      }],
       sumTotalPrice: 0,
       dinnerTotalPrice: 0,
       nutritionTotalPrice: 0,
@@ -354,7 +381,6 @@ export default {
         name: null,
         departName: null,
         bedId: null,
-
         price: null,
         receivable: null,
         // 应收
@@ -372,6 +398,7 @@ export default {
         // 选择结算日期
         selectBillingDate: null,
         opera: null,
+        payType: null,
       },
 
       // 结算类型字典
@@ -438,7 +465,16 @@ export default {
         ],
         refund: [
           {required: true, message: "退款总额不能为空", trigger: "blur"}
-        ]
+        ],
+        selectBillingDate: [{
+          required: true, message: "结算日期不能为空", trigger: "blur"
+        }],
+        payType: [{
+          required: true, message: "支付方式不能为空", trigger: "blur"
+        }],
+        netPeceipt: [{
+          required: true, message: "实收不能为空", trigger: "blur"
+        }]
       }
     };
   },
@@ -456,7 +492,7 @@ export default {
       var dateSpan, iDays;
       let sDate1 = Date.parse(this.formAddNewSettlement.lastBillingDate);
       let sDate2 = Date.parse(value);
-      console.log("selectBillingDate", this.formAddNewSettlement.selectBillingDate)
+      // console.log("selectBillingDate", this.formAddNewSettlement.selectBillingDate)
 
       dateSpan = sDate2 - sDate1;
       if (dateSpan < 0) {
@@ -488,14 +524,14 @@ export default {
         this.userName = response.data.userName;
         this.roleGroup = response.roleGroup;
         this.postGroup = response.postGroup;
-        console.log(this.userName);
+        // console.log(this.userName);
       });
     },
 
     // 日常伙食费结算操作按钮
     clickAddNewSettlement(row) {
       getLastSettlementDate(row.patientId).then(response => {
-        console.log("getLastBillingDateByPatientId-->", response);
+        // console.log("getLastBillingDateByPatientId-->", response);
         if (response.data.settlementAt === null) {
           this.lastBillFlag = false;
           this.formAddNewSettlement.lastBillingDate = response.data.lastCreateDate;
@@ -508,7 +544,7 @@ export default {
       });
 
       getPrepaymentByPatientId(row.patientId).then(response => {
-        console.log("row-->", response);
+        // console.log("row-->", response);
         this.flagAddNewSettlementOpen = true;
         this.flagAddPrepaymentShow = false;
         this.formAddNewSettlement.hospitalId = row.hospitalId;
@@ -532,7 +568,7 @@ export default {
 
     // 处理筛选结算标志
     selectSettlementFlag(value) {
-      console.log("value", value)
+      // console.log("value", value)
       if (value === null) {
         this.loading = true;
         listAll(this.queryParams).then(response => {
@@ -624,8 +660,8 @@ export default {
     },
     /** 提交按钮 */
     submitForm() {
-      // this.$refs["formAddNewSettlement"].validate(valid => {
-      //   if (valid) {
+      this.$refs["formAddNewSettlement"].validate(valid => {
+        if (valid) {
       //     if (this.form.settleId != null) {
       //       updateSettle(this.form).then(response => {
       //         this.msgSuccess("修改成功");
@@ -633,7 +669,6 @@ export default {
       //         this.getList();
       //       });
       //     } else {
-      console.log(this.formAddNewSettlement);
       this.formAddNewSettlement.opera = this.userName;
       this.formAddNewSettlement.dinnerTotalPrice = this.dinnerTotalPrice;
       this.formAddNewSettlement.nutritionTotalPrice = this.nutritionTotalPrice;
@@ -645,12 +680,12 @@ export default {
           this.flagAddNewSettlementOpen = false;
           this.getList();
         });
-      }else {
-          this.msgError("预付费余额不足");
+      } else {
+        this.msgError("预付费余额不足");
       }
       //     }
-      //   }
-      // });
+        }
+      });
     },
     /** 删除按钮操作 */
     handleDelete(row) {

@@ -63,4 +63,7 @@ public class SettleEntity {
     // 正餐和营养餐总价
     private BigDecimal sumTotalPrice;
 
+    // 付款方式
+    private Integer payType;
+
 }
