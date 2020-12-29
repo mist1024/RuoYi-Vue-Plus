@@ -1,10 +1,13 @@
 package com.ruoyi.system.fantang.service.impl;
 
+import com.ruoyi.system.fantang.vo.FtPatientVo;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.mapper.FtPatientDaoMapper;
 import com.ruoyi.system.fantang.domain.FtPatientDao;
 import com.ruoyi.system.fantang.service.IFtPatientDaoService;
+
+import java.util.List;
 
 /**
  * 病人管理Service业务层处理
@@ -15,4 +18,8 @@ import com.ruoyi.system.fantang.service.IFtPatientDaoService;
 @Service
 public class FtPatientDaoServiceImpl extends ServiceImpl<FtPatientDaoMapper, FtPatientDao> implements IFtPatientDaoService {
 
+    @Override
+    public FtPatientVo getReportMealsToday(String createAt, Long patientId) {
+        return this.baseMapper.getReportMealsToday(createAt, patientId);
+    }
 }
