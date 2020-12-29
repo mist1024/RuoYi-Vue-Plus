@@ -624,7 +624,14 @@ export default {
         flag: null,
         refund: null
       };
+      this.formAddNewSettlement = {
+        selectBillingDate:null,
+        payType:null,
+        netPeceipt:null,
+      };
+
       this.resetForm("form");
+      this.resetForm("formAddNewSettlement");
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -662,28 +669,38 @@ export default {
     submitForm() {
       this.$refs["formAddNewSettlement"].validate(valid => {
         if (valid) {
-      //     if (this.form.settleId != null) {
-      //       updateSettle(this.form).then(response => {
-      //         this.msgSuccess("修改成功");
-      //         this.open = false;
-      //         this.getList();
-      //       });
-      //     } else {
-      this.formAddNewSettlement.opera = this.userName;
-      this.formAddNewSettlement.dinnerTotalPrice = this.dinnerTotalPrice;
-      this.formAddNewSettlement.nutritionTotalPrice = this.nutritionTotalPrice;
-      this.formAddNewSettlement.sumTotalPrice = this.sumTotalPrice
-      console.log(this.formAddNewSettlement);
-      if (this.formAddNewSettlement.prepayment >= this.formAddNewSettlement.netPeceipt) {
-        addSettle(this.formAddNewSettlement).then(response => {
-          this.msgSuccess("已收费");
-          this.flagAddNewSettlementOpen = false;
-          this.getList();
-        });
-      } else {
-        this.msgError("预付费余额不足");
-      }
-      //     }
+          //     if (this.form.settleId != null) {
+          //       updateSettle(this.form).then(response => {
+          //         this.msgSuccess("修改成功");
+          //         this.open = false;
+          //         this.getList();
+          //       });
+          //     } else {
+          this.formAddNewSettlement.opera = this.userName;
+          this.formAddNewSettlement.dinnerTotalPrice = this.dinnerTotalPrice;
+          this.formAddNewSettlement.nutritionTotalPrice = this.nutritionTotalPrice;
+          this.formAddNewSettlement.sumTotalPrice = this.sumTotalPrice
+          console.log(this.formAddNewSettlement);
+          // if (this.formAddNewSettlement.prepayment >= this.formAddNewSettlement.netPeceipt) {
+          //   addSettle(this.formAddNewSettlement).then(response => {
+          //     this.msgSuccess("已收费");
+          //     this.flagAddNewSettlementOpen = false;
+          //     this.getList();
+          //   });
+          // } else {
+          //   this.msgError("预付费余额不足");
+          // }
+          if (this.formAddNewSettlement.payType === 2 && this.formAddNewSettlement.prepayment < this.formAddNewSettlement.netPeceipt) {
+            this.msgError("预付费余额不足");
+          } else {
+            addSettle(this.formAddNewSettlement).then(response => {
+              this.msgSuccess("已收费");
+              this.flagAddNewSettlementOpen = false;
+              this.getList();
+            });
+          }
+
+          //     }
         }
       });
     },
