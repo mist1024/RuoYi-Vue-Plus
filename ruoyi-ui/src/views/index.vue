@@ -202,7 +202,7 @@ export default {
       this.syncConflictList = response.rows;
       this.loading = false;
     });
-    this.timer = setInterval(this.getNewMsg, 5000);
+    this.timer = setInterval(this.getNewMsg, 1000 * 60 * 5);
   },
   beforeDestroy() {
     clearInterval(this.timer);
