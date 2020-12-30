@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,5 +23,10 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
             "    LEFT JOIN ft_staff_info b on a.staff_id = b.staff_id\n" +
             "    LEFT JOIN ft_depart c on b.depart_id = c.depart_id where a.order_date BETWEEN #{start} and #{end}\n" +
             "    GROUP BY a.order_type, c.depart_name")
-    List<FtOrderDao> statisGetOrderOfDate(@Param("start")String start,@Param("end") String end);
+    List<FtOrderDao> statisGetOrderOfDate(@Param("start") String start, @Param("end") String end);
+
+
+    List<FtOrderDao> listDetailedByDate(@Param("orderType") Integer orderType, @Param("start") String start, @Param("end") String end);
+
+    List<FtOrderDao> listAllDetailedByDate(String start, String end);
 }

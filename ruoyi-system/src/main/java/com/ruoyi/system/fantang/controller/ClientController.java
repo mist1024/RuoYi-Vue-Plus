@@ -1,10 +1,9 @@
 package com.ruoyi.system.fantang.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -35,6 +35,9 @@ public class ClientController extends BaseController {
 
     @Autowired
     private IFtWeekMenuDaoService weekMenuDaoService;
+
+    @Autowired
+    private IFtReportMealsDaoService reportMealsDaoService;
 
     /**
      * 获取用餐时间信息
@@ -65,7 +68,7 @@ public class ClientController extends BaseController {
      * 获取员工某一天的订单信息
      * 日期：2020年12月11日
      * 作者：陈智兴
-     *
+     * <p>
      * return
      */
     @GetMapping("/getOrderOfDay")
@@ -89,7 +92,7 @@ public class ClientController extends BaseController {
      * 获取员工停餐信息
      * 日期：2020年12月21日
      * 作者：陈智兴
-     *
+     * <p>
      * param JSONObject staffId: 员工id
      * return
      */
@@ -103,25 +106,25 @@ public class ClientController extends BaseController {
      * 推送订单信息
      * 日期：2020年12月11日
      * 作者：陈智兴
-     *
+     * <p>
      * param JSONObject staffId: 员工id
-     *                   orderType：订餐类型
-     *                   demandDate： 订餐用餐日期
+     * orderType：订餐类型
+     * demandDate： 订餐用餐日期
      * return
      */
     @PostMapping("/PostOrder")
     public AjaxResult postOrder(@RequestBody JSONObject params) {
-            return AjaxResult.success(orderDaoService.insertOrder(params.getLong("staffId"), params.getInteger("orderType"), params.getDate("demandDate")));
+        return AjaxResult.success(orderDaoService.insertOrder(params.getLong("staffId"), params.getInteger("orderType"), params.getDate("demandDate")));
     }
 
     /**
      * 推送停餐信息
      * 日期：2020年12月21日
      * 作者：陈智兴
-     *
+     * <p>
      * param staffId: 员工id
-     *                 type：订餐类型
-     *                 demandDate： 订餐用餐日期
+     * type：订餐类型
+     * demandDate： 订餐用餐日期
      * return -1: 已报停餐信息， 1： 停餐成功
      */
     @PostMapping("/postStopOrder")
@@ -133,10 +136,10 @@ public class ClientController extends BaseController {
      * 员工取消订餐信息
      * 日期：2020年12月21日
      * 作者：陈智兴
-     *
+     * <p>
      * param staffId: 员工id
-     *                 type：订餐类型
-     *                 demandDate： 订餐用餐日期
+     * type：订餐类型
+     * demandDate： 订餐用餐日期
      * return -1: 已报停餐信息， 1： 停餐成功
      */
     @PostMapping("/postCancelOrder")
@@ -148,10 +151,10 @@ public class ClientController extends BaseController {
      * 推送取消停餐信息
      * 日期：2020年12月21日
      * 作者：陈智兴
-     *
+     * <p>
      * param staffId: 员工id
-     *                 type：订餐类型
-     *                 demandDate： 订餐用餐日期
+     * type：订餐类型
+     * demandDate： 订餐用餐日期
      * return -1: 已报停餐信息， 1： 停餐成功
      */
     @PostMapping("/postCancelStopOrder")
@@ -170,10 +173,10 @@ public class ClientController extends BaseController {
      * 日期：2020年12月10日
      * 作者： 陈智兴
      * 修改：首次创建
-     *
+     * <p>
      * param { tel: 手机号码;
-     *          password： 密码
-     *          }
+     * password： 密码
+     * }
      * return 返回员工信息
      */
     @GetMapping("/login")
@@ -252,7 +255,7 @@ public class ClientController extends BaseController {
      */
     @PostMapping("/getMenuOfDay")
     public AjaxResult getMenuOfDay(@RequestBody JSONObject params) {
-        String[] weekDays = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
+        String[] weekDays = {"周日", "周一", "周二", "周三", "周四", "周五", "周六"};
         Calendar cal = Calendar.getInstance();
         cal.setTime(params.getDate("date"));
         int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
@@ -264,5 +267,37 @@ public class ClientController extends BaseController {
     @GetMapping("/StatisGetOrderOfDate")
     public AjaxResult statisGetOrderOfDate(@RequestParam Date date) {
         return orderDaoService.statisGetOrderOfDate(date);
+    }
+
+    /**
+     * 获取指定日期的订单明细
+     * 类型，日期
+     * 类型 = 0 ，所有
+     * type = 1，2，3：早，午，晚
+     */
+    @PostMapping("/getOrderDetailedByDate")
+    public AjaxResult getOrderDetailedByDate(@RequestBody JSONObject params) {
+
+        String createAt = params.getString("createAt");
+        Integer orderType = params.getInteger("orderType");
+        String start = createAt + " 00:00:00";
+        String end = createAt + " 23:59:59";
+
+//        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+//        if (orderType != 0) {
+//            wrapper.eq("order_type", orderType);
+//        }
+//        wrapper.between("create_at", start, end);
+//        orderDaoService.list(wrapper);
+
+        List<FtOrderDao> orderList;
+
+        if (orderType != 0) {
+            orderList   = orderDaoService.listDetailedByDate(orderType, start, end);
+        }else {
+           orderList =  orderDaoService.listAllDetailedByDate(start, end);
+        }
+
+        return AjaxResult.success(orderList);
     }
 }

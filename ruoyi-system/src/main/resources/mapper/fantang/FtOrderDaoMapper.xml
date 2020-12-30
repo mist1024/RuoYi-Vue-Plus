@@ -1,29 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.fantang.mapper.FtOrderDaoMapper">
-    
+
     <resultMap type="FtOrderDao" id="FtOrderDaoResult">
-        <result property="orderId"    column="order_id"    />
-        <result property="orderType"    column="order_type"    />
-        <result property="workerId"    column="worker_id"    />
-        <result property="orderList"    column="order_list"    />
-        <result property="totalPrice"    column="total_price"    />
-        <result property="discount"    column="discount"    />
-        <result property="receipts"    column="receipts"    />
-        <result property="createAt"    column="create_at"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="orderSrc"    column="order_src"    />
-        <result property="currentPrice"    column="current_price"    />
-        <result property="payType"    column="pay_type"    />
-        <result property="payFlag"    column="pay_flag"    />
-        <result property="expiredFlag"    column="expired_flag"    />
-        <result property="writeOffFlag"    column="write_off_flag"    />
-        <result property="writeOffAt"    column="write_off_at"    />
-        <result property="isExpired"    column="is_expired"    />
-        <result property="deviceId"    column="device_id"    />
+        <result property="orderId" column="order_id"/>
+        <result property="orderType" column="order_type"/>
+        <result property="workerId" column="worker_id"/>
+        <result property="orderList" column="order_list"/>
+        <result property="totalPrice" column="total_price"/>
+        <result property="discount" column="discount"/>
+        <result property="receipts" column="receipts"/>
+        <result property="createAt" column="create_at"/>
+        <result property="createBy" column="create_by"/>
+        <result property="orderSrc" column="order_src"/>
+        <result property="currentPrice" column="current_price"/>
+        <result property="payType" column="pay_type"/>
+        <result property="payFlag" column="pay_flag"/>
+        <result property="expiredFlag" column="expired_flag"/>
+        <result property="writeOffFlag" column="write_off_flag"/>
+        <result property="writeOffAt" column="write_off_at"/>
+        <result property="isExpired" column="is_expired"/>
+        <result property="deviceId" column="device_id"/>
     </resultMap>
+
+    <select id="listDetailedByDate" resultType="com.ruoyi.system.fantang.domain.FtOrderDao">
+        SELECT a.*,
+               b.staff_id,
+               b.`name`,
+               b.depart_id,
+               c.depart_name
+        FROM ft_order a
+                 LEFT JOIN ft_staff_info b ON a.staff_id = b.staff_id
+                 LEFT JOIN ft_depart c ON b.depart_id = c.depart_id
+        WHERE a.order_type = #{orderType}
+          AND a.create_at BETWEEN #{start}
+            AND #{end}
+    </select>
+
+    <select id="listAllDetailedByDate" resultType="com.ruoyi.system.fantang.domain.FtOrderDao">
+        SELECT a.*,
+               b.staff_id,
+               b.`name`,
+               b.depart_id,
+               c.depart_name
+        FROM ft_order a
+                 LEFT JOIN ft_staff_info b ON a.staff_id = b.staff_id
+                 LEFT JOIN ft_depart c ON b.depart_id = c.depart_id
+            AND a.create_at BETWEEN #{start}
+            AND #{end}
+    </select>
 
 
 </mapper>

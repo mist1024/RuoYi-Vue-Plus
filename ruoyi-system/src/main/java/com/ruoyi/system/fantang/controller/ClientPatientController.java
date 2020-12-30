@@ -2,20 +2,23 @@ package com.ruoyi.system.fantang.controller;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtFoodDao;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
+import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
-import com.ruoyi.system.fantang.service.IFtDepartDaoService;
-import com.ruoyi.system.fantang.service.IFtPatientDaoService;
-import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
+import com.ruoyi.system.fantang.service.*;
 import com.ruoyi.system.fantang.vo.FtDepartVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 
 @RestController
@@ -30,6 +33,18 @@ public class ClientPatientController extends BaseController {
 
     @Autowired
     private IFtDepartDaoService iFtDepartDaoService;
+
+    @Autowired
+    private IFtReportMealsDaoService iFtReportMealsDaoService;
+
+    @Autowired
+    private IFtFoodDemandDaoService iFtFoodDemandDaoService;
+
+    @Autowired
+    private IFtNutritionFoodDaoService iFftNutritionFoodDaoService;
+
+    @Autowired
+    private IFtFoodDaoService iftFoodDaoService;
 
     /**
      * 根据病人获取今日报餐信息
@@ -92,10 +107,10 @@ public class ClientPatientController extends BaseController {
     /**
      * 更改默认报餐部门
      */
-    @PostMapping("/updateDepart")
-    public AjaxResult updateDepart(@RequestBody Map<String, Object> data) {
-        Long staffId = Long.parseLong(data.get("staffId").toString());
-        String departId = data.get("departId").toString();
+    @PutMapping("/updateDepart")
+    public AjaxResult updateDepart(@RequestBody JSONObject params) {
+        Long staffId = params.getLong("staffId");
+        String departId = params.getString("departId");
 
         UpdateWrapper<FtStaffInfoDao> wrapper = new UpdateWrapper<>();
         wrapper.eq("staff_id", staffId);
@@ -103,5 +118,48 @@ public class ClientPatientController extends BaseController {
         staffInfoDao.setDeptList(departId);
 
         return AjaxResult.success(iFtStaffInfoDaoService.update(staffInfoDao, wrapper));
+    }
+
+    /**
+     * 批量更新报餐记录
+     */
+    @PutMapping("/batchUpdateReportMeals")
+    public AjaxResult batchUpdateReportMeals(@RequestBody List<FtReportMealsDao> reportMealsDaoList) {
+        return AjaxResult.success(iFtReportMealsDaoService.updateBatchById(reportMealsDaoList));
+    }
+
+    /**
+     * 更新指定病患的报餐记录
+     */
+    @PutMapping("/updateReportMeals")
+    public AjaxResult updateReportMeals(@RequestBody FtReportMealsDao ftReportMealsDao) {
+        return AjaxResult.success(iFtReportMealsDaoService.updateById(ftReportMealsDao));
+    }
+
+    /**
+     * 更新指定病患默认报餐数据
+     */
+    @PutMapping("/updateFoodDemand")
+    public AjaxResult updateFoodDemand(@RequestBody FtFoodDemandDao ftFoodDemandDao) {
+        return AjaxResult.success(iFtFoodDemandDaoService.updateById(ftFoodDemandDao));
+    }
+
+    /**
+     * 获取营养配餐配置信息
+     */
+    @GetMapping("getNutritionFood")
+    public AjaxResult getNutritionFood() {
+        return AjaxResult.success(iFftNutritionFoodDaoService.list());
+    }
+
+    /**
+     * 获取菜品价格
+     */
+    @GetMapping("/getFoodPrice/{foodId}")
+    public AjaxResult getFoodPrice(@PathVariable("foodId") Long foodId) {
+        QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("type", 1);
+        wrapper.eq("food_id", foodId);
+        return AjaxResult.success(iftFoodDaoService.getOne(wrapper).getPrice());
     }
 }

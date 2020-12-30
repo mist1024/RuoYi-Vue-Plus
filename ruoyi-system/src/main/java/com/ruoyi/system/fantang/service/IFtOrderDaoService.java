@@ -5,6 +5,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 订单管理Service接口
@@ -31,4 +32,8 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
     AjaxResult cancelStopOrder(Long orderId);
 
     AjaxResult statisGetOrderOfDate(Date date);
+
+    List<FtOrderDao> listDetailedByDate(Integer orderType, String start, String end);
+
+    List<FtOrderDao> listAllDetailedByDate(String start, String end);
 }

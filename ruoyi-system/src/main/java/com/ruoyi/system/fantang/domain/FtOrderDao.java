@@ -53,6 +53,12 @@ public class FtOrderDao implements Serializable {
     private Long staffId;
 
     /**
+     * 员工姓名
+     */
+    @TableField(exist = false)
+    private String name;
+
+    /**
      * 清单
      */
     @Excel(name = "清单")
@@ -147,4 +153,7 @@ public class FtOrderDao implements Serializable {
 
     @TableField(exist = false)
     private String departName;
+
+    @TableField(exist = false)
+    private Long departId;
 }
