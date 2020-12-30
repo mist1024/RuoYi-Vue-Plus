@@ -1,8 +1,6 @@
 package com.ruoyi.system.fantang.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.system.fantang.domain.FtPatientDao;
+import com.ruoyi.system.fantang.domain.FtDepartDao;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,8 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FtPatientVo extends FtPatientDao {
+public class FtDepartVo extends FtDepartDao {
 
     List<FtReportMealsDao> reportMealsList;
-
 }

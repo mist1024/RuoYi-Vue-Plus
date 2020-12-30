@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtPatientDao;
+import com.ruoyi.system.fantang.vo.FtDepartVo;
 import com.ruoyi.system.fantang.vo.FtPatientVo;
 import com.ruoyi.system.fantang.vo.ftSyncConflictVo;
 import org.apache.ibatis.annotations.Insert;
@@ -52,4 +53,6 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     List<ftSyncConflictVo> syncConflictOtherAllEqual();
 
     List<FtPatientVo> getReportMealsToday(@Param("createAt") String createAt, @Param("patientId") Long patientId);
+
+    FtDepartVo getReportMealsByDepart(@Param("departId") Long departId, @Param("createAt") String createAt);
 }

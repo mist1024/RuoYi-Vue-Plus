@@ -36,4 +36,36 @@ WHERE a.patient_id  = #{patientId} and c.create_at = #{createAt}
     </resultMap>
 
 
+    <select id="getReportMealsByDepart" resultMap="departReportMealsList">
+        SELECT
+            a.depart_id,
+            a.depart_name,
+            a.depart_code,
+            c.create_at,
+            c.foods,
+            c.id,
+            c.nutrition_food_id,
+            c.type
+        FROM
+            ft_depart a
+                LEFT JOIN ft_patient b ON a.depart_id = b.depart_id
+                LEFT JOIN ft_report_meals c ON c.patient_id = b.patient_id
+        WHERE
+            a.depart_id = #{departId}
+          AND c.create_at = #{createAt}
+    </select>
+    <resultMap id="departReportMealsList" type="com.ruoyi.system.fantang.vo.FtDepartVo">
+        <result property="departId" column="depart_id"></result>
+        <result property="departName" column="depart_name"></result>
+        <result property="departCode" column="depart_code"></result>
+        <collection property="reportMealsList" ofType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+            <result property="id" column="id"></result>
+            <result property="createAt" column="create_at"></result>
+            <result property="type" column="type"></result>
+            <result property="foods" column="foods"></result>
+            <result property="nutritionFoodId" column="nutrition_food_id"></result>
+        </collection>
+    </resultMap>
+
+
 </mapper>
