@@ -4,7 +4,9 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.IFtPatientDaoService;
+import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import com.ruoyi.system.fantang.vo.FtDepartVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,9 @@ public class ClientPatientController extends BaseController {
 
     @Autowired
     private IFtPatientDaoService iFtPatientDaoService;
+
+    @Autowired
+    private IFtStaffInfoDaoService iFtStaffInfoDaoService;
 
     @GetMapping("/getReportMealsToday/{patientId}")
     public AjaxResult getReportMealsToday(@PathVariable("patientId") Long patientId) {
@@ -50,5 +55,13 @@ public class ClientPatientController extends BaseController {
         FtDepartVo ftDepartVo = iFtPatientDaoService.getReportMealsByDepart(departId, formatDate);
 
         return AjaxResult.success(ftDepartVo);
+    }
+
+    @GetMapping("/getDepartInfo/{staffId}")
+    public AjaxResult getDepartInfo(@PathVariable("staffId") Long staffId) {
+
+        FtStaffInfoDao departInfo = iFtStaffInfoDaoService.getDepartInfo(staffId);
+
+        return AjaxResult.success(departInfo);
     }
 }

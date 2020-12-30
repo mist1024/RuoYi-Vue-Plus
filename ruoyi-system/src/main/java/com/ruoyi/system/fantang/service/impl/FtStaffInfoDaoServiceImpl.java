@@ -57,4 +57,9 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
             return AjaxResult.error("更新退出状态失败");
         return AjaxResult.success(dao);
     }
+
+    @Override
+    public FtStaffInfoDao getDepartInfo(Long staffId) {
+        return this.baseMapper.getDepartInfo(staffId);
+    }
 }

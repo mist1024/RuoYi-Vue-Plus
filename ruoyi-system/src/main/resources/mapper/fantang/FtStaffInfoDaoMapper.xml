@@ -26,8 +26,22 @@
 
     <select id="selectStaffInfoWithDepart" parameterType="FtStaffInfoDao"
             resultType="FtStaffInfoDao">
-        SELECT a.*, b.depart_name from ft_staff_info a LEFT JOIN ft_depart b on a.depart_id = b.depart_id where staff_type = 1 and a.flag = 1
+        SELECT a.*, b.depart_name from ft_staff_info a LEFT JOIN ft_depart b on a.depart_id = b.depart_id where
+        staff_type = 1 and a.flag = 1
         <if test="departId != null">and b.depart_id = #{departId}</if>
+    </select>
+
+    <select id="getDepartInfo" resultType="FtStaffInfoDao">
+        SELECT a.staff_id,
+               a.`name`,
+               a.corp_name,
+               a.picture_url,
+               b.depart_id,
+               b.depart_name,
+               b.depart_code
+        FROM ft_staff_info a
+                 LEFT JOIN ft_depart b ON a.dept_list = b.depart_id
+        WHERE a.staff_id = #{staffId}
     </select>
 
 </mapper>

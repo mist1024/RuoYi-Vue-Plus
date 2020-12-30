@@ -49,6 +49,12 @@ public class FtStaffInfoDao {
     private String departName;
 
     /**
+     * 科室编号
+     */
+    @TableField(exist = false)
+    private String departCode;
+
+    /**
      * 姓名
      */
     @Excel(name = "姓名")
