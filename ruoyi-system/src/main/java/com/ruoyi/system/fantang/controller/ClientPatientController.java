@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
+import com.ruoyi.system.fantang.service.IFtDepartDaoService;
 import com.ruoyi.system.fantang.service.IFtPatientDaoService;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import com.ruoyi.system.fantang.vo.FtDepartVo;
@@ -27,6 +28,9 @@ public class ClientPatientController extends BaseController {
 
     @Autowired
     private IFtStaffInfoDaoService iFtStaffInfoDaoService;
+
+    @Autowired
+    private IFtDepartDaoService iFtDepartDaoService;
 
     /**
      * 根据病人获取今日报餐信息
@@ -75,5 +79,14 @@ public class ClientPatientController extends BaseController {
         FtStaffInfoDao departInfo = iFtStaffInfoDaoService.getDepartInfo(staffId);
 
         return AjaxResult.success(departInfo);
+    }
+
+    /**
+     * 获取部门列表
+     */
+    @GetMapping("/getAllDepart")
+    public AjaxResult getAllDepart(){
+
+        return AjaxResult.success(iFtDepartDaoService.list());
     }
 }
