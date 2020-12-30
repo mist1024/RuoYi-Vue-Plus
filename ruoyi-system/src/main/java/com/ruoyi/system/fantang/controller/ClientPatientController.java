@@ -28,6 +28,9 @@ public class ClientPatientController extends BaseController {
     @Autowired
     private IFtStaffInfoDaoService iFtStaffInfoDaoService;
 
+    /**
+     * 根据病人获取今日报餐信息
+     */
     @GetMapping("/getReportMealsToday/{patientId}")
     public AjaxResult getReportMealsToday(@PathVariable("patientId") Long patientId) {
 
@@ -37,6 +40,9 @@ public class ClientPatientController extends BaseController {
         return AjaxResult.success(iFtPatientDaoService.getReportMealsToday(createAt, patientId));
     }
 
+    /**
+     * 根据病人获取次日报餐信息
+     */
     @GetMapping("/getReportMealsTomorrow/{patientId}")
     public AjaxResult getReportMealsTomorrow(@PathVariable("patientId") Long patientId) {
 
@@ -46,6 +52,9 @@ public class ClientPatientController extends BaseController {
         return AjaxResult.success(iFtPatientDaoService.getReportMealsToday(formatDate, patientId));
     }
 
+    /**
+     * 根据科室获取次日报餐信息
+     */
     @GetMapping("/getReportMealsByDepart/{departId}")
     public AjaxResult getReportMealsByDepart(@PathVariable("departId") Long departId) {
 
@@ -57,6 +66,9 @@ public class ClientPatientController extends BaseController {
         return AjaxResult.success(ftDepartVo);
     }
 
+    /**
+     * 获取护工默认部门信息
+     */
     @GetMapping("/getDepartInfo/{staffId}")
     public AjaxResult getDepartInfo(@PathVariable("staffId") Long staffId) {
 
