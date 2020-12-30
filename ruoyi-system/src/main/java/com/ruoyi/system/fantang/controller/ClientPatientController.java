@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.controller;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
@@ -10,13 +11,11 @@ import com.ruoyi.system.fantang.service.IFtPatientDaoService;
 import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import com.ruoyi.system.fantang.vo.FtDepartVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 
 @RestController
@@ -85,8 +84,24 @@ public class ClientPatientController extends BaseController {
      * 获取部门列表
      */
     @GetMapping("/getAllDepart")
-    public AjaxResult getAllDepart(){
+    public AjaxResult getAllDepart() {
 
         return AjaxResult.success(iFtDepartDaoService.list());
+    }
+
+    /**
+     * 更改默认报餐部门
+     */
+    @PostMapping("/updateDepart")
+    public AjaxResult updateDepart(@RequestBody Map<String, Object> data) {
+        Long staffId = Long.parseLong(data.get("staffId").toString());
+        String departId = data.get("departId").toString();
+
+        UpdateWrapper<FtStaffInfoDao> wrapper = new UpdateWrapper<>();
+        wrapper.eq("staff_id", staffId);
+        FtStaffInfoDao staffInfoDao = new FtStaffInfoDao();
+        staffInfoDao.setDeptList(departId);
+
+        return AjaxResult.success(iFtStaffInfoDaoService.update(staffInfoDao, wrapper));
     }
 }
