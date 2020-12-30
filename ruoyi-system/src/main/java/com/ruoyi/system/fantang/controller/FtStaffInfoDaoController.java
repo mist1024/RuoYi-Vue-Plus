@@ -167,6 +167,8 @@ public class FtStaffInfoDaoController extends BaseController {
     @PutMapping("/nursing")
     public AjaxResult nursingEdit(@RequestBody JSONObject param) {
         FtStaffInfoDao dao = new FtStaffInfoDao();
+        dao.setPassword(param.getString("password"));
+        dao.setTel(param.getString("tel"));
         dao.setStaffId(param.getLong("staffId"));
         dao.setCorpName(param.getString("corpName"));
         dao.setCreateAt(new DateTime());

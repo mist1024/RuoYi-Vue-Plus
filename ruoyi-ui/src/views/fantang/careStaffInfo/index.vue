@@ -141,11 +141,14 @@
         <el-form-item label="所属公司" prop="corpName">
           <el-input v-model="form.corpName" placeholder="请输入所属公司"/>
         </el-form-item>
-        <el-form-item label="照片">
-          <uploadImage v-model="form.pictureUrl"/>
+        <el-form-item label="手机号码" prop="tel">
+          <el-input v-model="form.tel" placeholder="请输入手机号码"/>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="form.password" placeholder="请输入密码"/>
         </el-form-item>
         <el-form-item label="报餐科室" prop="deptList">
-          <el-select v-model="form.deptList" multiple placeholder="请选择报餐科室">
+          <el-select v-model="form.deptList" placeholder="请选择报餐科室">
             <el-option
               v-for="item in deptListOptions"
               :key="item.departName"
@@ -153,6 +156,9 @@
               :value="item.departId">
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="照片">
+          <uploadImage v-model="form.pictureUrl"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -224,6 +230,9 @@ export default {
         sex: [
           {required: true, message: "性别不能为空", trigger: "blur"}
         ],
+        tel: [
+          {required: true, message: "手机号码不能为空", trigger: "blur"}
+        ],
         deptList: [
           {required: true, message: "报餐科室不能为空", trigger: "blur"}
         ],
@@ -246,7 +255,7 @@ export default {
         this.loading = false;
       });
       listDepart(this.queryParams).then(response => {
-        // console.log("depart", response);
+        console.log("depart", response);
         this.deptListOptions = response.rows;
       })
     },
@@ -272,7 +281,8 @@ export default {
         corpName: null,
         pictureUrl: null,
         deptList: null,
-        qrCode: null
+        qrCode: null,
+        tel:null,
       };
       this.resetForm("form");
     },
@@ -304,7 +314,7 @@ export default {
       const staffId = row.staffId || this.ids;
       getNursingInfo(staffId).then(response => {
         this.form = response.data;
-        this.form.deptList = response.data.deptList.split(',').map(Number);
+        // this.form.deptList = response.data.deptList.split(',').map(Number);
         // this.form.deptList =['2','3'].map(Number);
         this.open = true;
         this.title = "修改护工管理";
@@ -317,6 +327,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.staffId != null) {
+            console.log(this.form);
             updateNursingInfo(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
