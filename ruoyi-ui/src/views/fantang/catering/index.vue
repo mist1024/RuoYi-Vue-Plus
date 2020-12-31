@@ -224,6 +224,7 @@
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      :page-sizes="[12, 24]"
       @pagination="getList"
     />
 
@@ -307,7 +308,7 @@
               <!--                  :value="item.label"-->
               <!--                ></el-option>-->
               <!--              </el-select>-->
-              <el-input v-model="form.frequency" placeholder="频次" :disabled="true"/>
+              <el-input v-model="form.frequency" placeholder="频次"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -469,7 +470,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 12,
         flag: null,
         hospitalId: null,
         name: null,
@@ -500,9 +501,9 @@ export default {
     // 控制合并列
     objectSpanMethod({row, column, rowIndex, columnIndex}) {
       if (columnIndex === 1) {
-        if (rowIndex % 3 === 0) {
+        if (rowIndex % 4 === 0) {
           return {
-            rowspan: 3,
+            rowspan: 4,
             colspan: 1
           };
         } else {
@@ -512,9 +513,9 @@ export default {
           };
         }
       } else if (columnIndex === 2) {
-        if (rowIndex % 3 === 0) {
+        if (rowIndex % 4 === 0) {
           return {
-            rowspan: 3,
+            rowspan: 4,
             colspan: 1
           };
         } else {
@@ -525,9 +526,9 @@ export default {
         }
 
       } else if (columnIndex === 3) {
-        if (rowIndex % 3 === 0) {
+        if (rowIndex % 4 === 0) {
           return {
-            rowspan: 3,
+            rowspan: 4,
             colspan: 1
           };
         } else {
@@ -536,7 +537,18 @@ export default {
             colspan: 0
           };
         }
-
+      }else if (columnIndex === 4) {
+        if (rowIndex % 4 === 0) {
+          return {
+            rowspan: 4,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
       }
     },
 
