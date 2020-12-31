@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="最大补贴金额">
-        <el-input v-model="formInline.price" placeholder="请输入最大补贴金额"></el-input>
+        <el-input v-model="formInline.configValue" placeholder="请输入最大补贴金额"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -15,6 +15,8 @@
             <el-time-picker
               is-range
               v-model="dinnerForm.breakfast"
+              value-format="HH:mm"
+              @change="changeBreakfast"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -29,6 +31,8 @@
             <el-time-picker
               is-range
               v-model="dinnerForm.lunch"
+              value-format="HH:mm"
+              @change="changeLunch"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -43,6 +47,8 @@
             <el-time-picker
               is-range
               v-model="dinnerForm.dinner"
+              value-format="HH:mm"
+              @change="changeDinner"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -67,6 +73,7 @@ import {
   exportFantangConfig,
   getFantangConfig,
   listFantangConfig,
+  updateDinnerTime,
   updateFantangConfig
 } from "@/api/fantang/fantangConfig";
 
@@ -75,13 +82,16 @@ export default {
   components: {},
   data() {
     return {
+      timeArr: [],
       formInline: {
-        price: null,
+        configValue: null,
+        id: null,
       },
       dinnerForm: {
-        breakfast: null,
-        lunch: null,
-        dinner: null,
+        breakfast: [],
+        lunch: [],
+        dinner: [],
+        id: 7,
       },
     };
   },
@@ -89,13 +99,39 @@ export default {
     this.getList();
   },
   methods: {
+    changeBreakfast(e) {
+      if (e != null) {
+        this.timeArr[0] = e[0];
+        this.timeArr[1] = e[1];
+      }
+    },
+    changeLunch(e) {
+      if (e != null) {
+        this.timeArr[2] = e[0];
+        this.timeArr[3] = e[1];
+      }
+    },
+    changeDinner(e) {
+      if (e != null) {
+        this.timeArr[4] = e[0];
+        this.timeArr[5] = e[1];
+      }
+    },
     /** 查询饭堂参数列表 */
     getList() {
       this.loading = true;
-      listFantangConfig(this.queryParams).then(response => {
-        this.fantangConfigList = response.rows;
-        this.total = response.total;
-        this.loading = false;
+      listFantangConfig().then(response => {
+        this.formInline.configValue = response.rows[7].configValue
+        this.formInline.id = response.rows[7].id
+        console.log("数据库获取--------", response.rows[6].configValue.split(','))
+
+        this.timeArr = response.rows[6].configValue.split(',')
+        this.dinnerForm.breakfast[0] = new Date(2016, 9, 1, this.timeArr[0].split(':')[0], this.timeArr[0].split(':')[1])
+        this.dinnerForm.breakfast[1] = new Date(2016, 9, 1, this.timeArr[1].split(':')[0], this.timeArr[1].split(':')[1])
+        this.dinnerForm.lunch[0] = new Date(2016, 9, 1, this.timeArr[2].split(':')[0], this.timeArr[2].split(':')[1])
+        this.dinnerForm.lunch[1] = new Date(2016, 9, 1, this.timeArr[3].split(':')[0], this.timeArr[3].split(':')[1])
+        this.dinnerForm.dinner[0] = new Date(2016, 9, 1, this.timeArr[4].split(':')[0], this.timeArr[4].split(':')[1])
+        this.dinnerForm.dinner[1] = new Date(2016, 9, 1, this.timeArr[5].split(':')[0], this.timeArr[5].split(':')[1])
       });
     },
     // 取消按钮
@@ -148,14 +184,20 @@ export default {
     },
 
     // 用餐时间提交
-    submitDinnerForm(){
+    submitDinnerForm() {
       console.log(this.dinnerForm)
-
+      updateDinnerTime(this.dinnerForm).then(response => {
+        this.msgSuccess("修改成功")
+      })
     },
 
     // 补贴金额
-    onSubmit(){
+    onSubmit() {
       console.log(this.formInline)
+      if (this.formInline.configValue != null || this.formInline.configValue !== '')
+        updateFantangConfig(this.formInline).then(response => {
+          this.msgSuccess("修改成功")
+        })
     },
 
     /** 提交按钮 */
