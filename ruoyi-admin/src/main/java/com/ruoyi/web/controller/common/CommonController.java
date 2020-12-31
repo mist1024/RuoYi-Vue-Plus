@@ -67,7 +67,7 @@ public class CommonController {
      * 通用上传请求
      */
     @PostMapping("/common/upload")
-    public AjaxResult uploadFile(MultipartFile file) throws Exception {
+    public AjaxResult uploadFile(String type, MultipartFile file) throws Exception {
         try {
 
             // 上传文件路径
@@ -75,9 +75,13 @@ public class CommonController {
             // 上传并返回新文件名称
 //            String fileName = FileUploadUtils.upload(filePath, file);
 
+            if (StringUtils.isEmpty(type)) {
+                type = "defalut";
+            }
 
-            String fileName = cosUtils.upload(file);
-            String url = serverConfig.getUrl()  + "/common/file?fileName=" + fileName;
+
+            String fileName = cosUtils.upload(type, file);
+            String url = serverConfig.getUrl() + "/common/file?fileName=" + fileName;
             AjaxResult ajax = AjaxResult.success();
             ajax.put("fileName", fileName);
             ajax.put("url", url);

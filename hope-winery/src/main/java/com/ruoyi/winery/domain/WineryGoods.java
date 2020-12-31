@@ -33,8 +33,8 @@ private static final long serialVersionUID=1L;
 
 
     /** 商品ID */
-    @TableId(value = "id")
-    private Long id;
+    @TableId(value = "id",type = IdType.ASSIGN_UUID)
+    private String id;
 
     /** 部门ID */
     @Excel(name = "部门ID")

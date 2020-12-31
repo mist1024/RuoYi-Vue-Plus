@@ -19,24 +19,17 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+
+
       <el-form-item label="商品类型" prop="goodsType">
         <el-select v-model="queryParams.goodsType" placeholder="请选择商品类型" clearable size="small">
           <el-option label="请选择字典生成" value=""/>
         </el-select>
       </el-form-item>
-      <el-form-item label="商品说明" prop="goodsDesc">
+      <el-form-item label="备注" prop="remark">
         <el-input
-          v-model="queryParams.goodsDesc"
-          placeholder="请输入商品说明"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="商品封面" prop="goodsFaceImg">
-        <el-input
-          v-model="queryParams.goodsFaceImg"
-          placeholder="请输入商品封面"
+          v-model="queryParams.remark"
+          placeholder="请输入商品简称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -100,10 +93,14 @@
       <el-table-column label="商品名称" align="center" prop="goodsName"/>
       <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
       <el-table-column label="商品类型" align="center" prop="goodsType"/>
-      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>
+<!--      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>-->
       <el-table-column label="商品说明" align="center" prop="goodsDesc"/>
-      <el-table-column label="商品封面" align="center" prop="goodsFaceImg"/>
-      <el-table-column label="商品图片" align="center" prop="goodsImg"/>
+      <el-table-column label="商品封面" align="center" prop="goodsFaceImg">
+        <template slot-scope="scope">
+          <el-image :src="scope.row.goodsFaceImg|getImageForKey" style="width: 60px; height: 60px" />
+        </template>
+      </el-table-column>
+<!--      <el-table-column label="商品图片" align="center" prop="goodsImg"/>-->
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -190,8 +187,11 @@ import {
 import UploadImage from '@/components/UploadImage/index'
 import UploadImageMultiple from '@/components/UploadImageMultiple/index'
 
+import CommonMixin from "@/mixin/common";
+
 export default {
   name: "Winery_goods",
+  mixins:[CommonMixin],
   components: {
     UploadImage,
     UploadImageMultiple,

@@ -7,6 +7,7 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.transfer.Download;
+import com.ruoyi.common.config.CosProperties;
 import com.ruoyi.common.utils.uuid.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,13 +38,13 @@ public class CosUtils {
     @Autowired
     ClientConfig clientConfig;
 
+    @Autowired
+    private CosProperties properties;
 
     // 指定要上传到的存储桶
-
-    final String bucketName = "winery-1257413599";
     String SPECIAL_CHARACTERS = "[`~! @#$%^&*()+=|{}':;',//[//]<>/?~！@#￥%……&*（）_——+|{}【】‘；：”“’。，、？]";
 
-    public String upload(MultipartFile file) {
+    public String upload(String type, MultipartFile file) {
 
 
         // 指定要上传到 COS 上对象键
@@ -55,7 +56,7 @@ public class CosUtils {
         metadata.setContentLength(file.getSize());
         file.getContentType();
         try {
-            PutObjectResult putObjectResult = cosClient.putObject(bucketName, key, file.getInputStream(), metadata);
+            PutObjectResult putObjectResult = cosClient.putObject(properties.getBucketName(), type + "/" + key, file.getInputStream(), metadata);
             file.getInputStream().close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,14 +64,14 @@ public class CosUtils {
 
             cosClient.shutdown();
         }
-        return key;
+        return type + "/" + key;
 
     }
 
     public void getFile(String fileName, HttpServletResponse response) {
 
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
-        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, fileName);
+        GetObjectRequest getObjectRequest = new GetObjectRequest(properties.getBucketName(), fileName);
         // 限流使用的单位是bit/s, 这里设置下载带宽限制为 10MB/s
         getObjectRequest.setTrafficLimit(80 * 1024 * 1024);
 
@@ -102,7 +103,6 @@ public class CosUtils {
         // 关闭输入流
         cosClient.shutdown();
     }
-
 
 
 }

@@ -36,7 +36,7 @@ private static final long serialVersionUID=1L;
 
 
     /** id */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.ASSIGN_UUID)
     private String id;
 
     /** 状态 */

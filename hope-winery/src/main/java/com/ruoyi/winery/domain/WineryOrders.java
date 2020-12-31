@@ -37,8 +37,8 @@ public class WineryOrders implements Serializable {
     /**
      * 订单ID
      */
-    @TableId(value = "id")
-    private Long id;
+    @TableId(value = "id",type = IdType.ASSIGN_UUID)
+    private String id;
 
     /**
      * 部门ID

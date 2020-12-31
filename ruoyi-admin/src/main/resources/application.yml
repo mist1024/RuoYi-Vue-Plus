@@ -206,3 +206,11 @@ wxmini:
   token: xiao4r #微信小程序消息服务器配置的token
   aesKey: jNXajd2sQSMYQNg3rcdMF9HraUJxXF0iswgdMxVik9W #微信小程序消息服务器配置的EncodingAESKey
   msgDataFormat: JSON
+
+# cos存储配置
+tencent-cos:
+  bucketName: winery-1257413599
+  bucketUrl: https://winery-1257413599.cos.ap-beijing.myqcloud.com/
+  secretId: AKIDovztW8x0DpQnunSw2uXUDhw3IH0fQC75
+  secretKey: rCH8tOfjX5XjegYBXfkZWc2E75nJq9Dx
+  region: ap-beijing
