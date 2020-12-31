@@ -21,6 +21,10 @@
         <result property="isReplaceFood" column="is_replace_food"/>
         <result property="nutritionFoodPrice" column="nutrition_food_price"/>
         <result property="totalPrice" column="total_price"/>
+        <result property="vegetables" column="vegetables"/>
+        <result property="meat" column="meat"/>
+        <result property="rice" column="rice"/>
+        <result property="egg" column="egg"/>
     </resultMap>
 
     <select id="listMealsWithInSettle" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">

@@ -125,4 +125,12 @@ public class FtReportMealsDao implements Serializable {
      * 当前报餐总价
      */
     private BigDecimal totalPrice;
+    
+    private Boolean vegetables;
+    
+    private Boolean meat;
+    
+    private Boolean rice;
+    
+    private Integer egg;
 }

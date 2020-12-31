@@ -28,7 +28,11 @@
                c.nutrition_food_flag,
                c.is_replace_food,
                c.nutrition_food_price,
-               c.total_price
+               c.total_price,
+               c.vegetables,
+               c.meat,
+               c.rice,
+               c.egg
         from ft_patient a
                  LEFT JOIN ft_depart b on a.depart_id = b.depart_id
                  RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
@@ -51,6 +55,10 @@
             <result property="isReplaceFood" column="is_replace_food"></result>
             <result property="nutritionFoodPrice" column="nutrition_food_price"></result>
             <result property="totalPrice" column="total_price"></result>
+            <result property="vegetables" column="vegetables"></result>
+            <result property="meat" column="meat"></result>
+            <result property="rice" column="rice"></result>
+            <result property="egg" column="egg"></result>
         </collection>
     </resultMap>
 
@@ -69,7 +77,11 @@
                c.nutrition_food_flag,
                c.is_replace_food,
                c.nutrition_food_price,
-               c.total_price
+               c.total_price,
+               c.vegetables,
+               c.meat,
+               c.rice,
+               c.egg
         from ft_patient a
                  LEFT JOIN ft_depart b on a.depart_id = b.depart_id
                  RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
