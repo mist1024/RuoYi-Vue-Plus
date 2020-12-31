@@ -26,7 +26,7 @@ public class FtPatientDaoServiceImpl extends ServiceImpl<FtPatientDaoMapper, FtP
     }
 
     @Override
-    public FtDepartVo getReportMealsByDepart(Long departId, String createAt) {
+    public List<FtPatientVo> getReportMealsByDepart(Long departId, String createAt) {
         return this.baseMapper.getReportMealsByDepart(departId,createAt);
     }
 }

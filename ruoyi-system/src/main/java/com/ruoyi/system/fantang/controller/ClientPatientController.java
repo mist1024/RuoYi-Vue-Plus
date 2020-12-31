@@ -13,6 +13,7 @@ import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.service.*;
 import com.ruoyi.system.fantang.vo.FtDepartVo;
+import com.ruoyi.system.fantang.vo.FtPatientVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,9 +80,9 @@ public class ClientPatientController extends BaseController {
         DateTime tomorrow = DateUtil.tomorrow();
         String formatDate = DateUtil.formatDate(tomorrow);
 
-        FtDepartVo ftDepartVo = iFtPatientDaoService.getReportMealsByDepart(departId, formatDate);
+        List<FtPatientVo> patientVos = iFtPatientDaoService.getReportMealsByDepart(departId, formatDate);
 
-        return AjaxResult.success(ftDepartVo);
+        return AjaxResult.success(patientVos);
     }
 
     /**

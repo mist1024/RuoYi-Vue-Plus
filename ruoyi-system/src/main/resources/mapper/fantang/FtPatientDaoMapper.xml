@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.fantang.mapper.FtPatientDaoMapper">
 
     <resultMap type="FtPatientDao" id="FtPatientDaoResult">
-        <result property="patientId"    column="patient_id"    />
-        <result property="name"    column="name"    />
-        <result property="departId"    column="depart_id"    />
-        <result property="bedId"    column="bed_id"    />
-        <result property="hospitalId"    column="hospital_id"    />
-        <result property="syncFlag"    column="sync_flag"    />
-        <result property="offFlag"    column="off_flag"    />
-        <result property="createAt"    column="create_at"    />
+        <result property="patientId" column="patient_id"/>
+        <result property="name" column="name"/>
+        <result property="departId" column="depart_id"/>
+        <result property="bedId" column="bed_id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="syncFlag" column="sync_flag"/>
+        <result property="offFlag" column="off_flag"/>
+        <result property="createAt" column="create_at"/>
     </resultMap>
     <select id="getReportMealsToday" resultMap="patientReportMealsList">
-SELECT a.patient_id, a.`name`, b.depart_name, a.bed_id, a.hospital_id, c.create_at, c.foods, c.id, c.nutrition_food_id, c.type from ft_patient a
-LEFT JOIN ft_depart b on a.depart_id = b.depart_id
-RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
-WHERE a.patient_id  = #{patientId} and c.create_at = #{createAt}
+        SELECT a.patient_id,
+               a.`name`,
+               b.depart_name,
+               a.bed_id,
+               a.hospital_id,
+               c.create_at,
+               c.foods,
+               c.id,
+               c.nutrition_food_id,
+               c.type
+        from ft_patient a
+                 LEFT JOIN ft_depart b on a.depart_id = b.depart_id
+                 RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
+        WHERE a.patient_id = #{patientId}
+          and c.create_at = #{createAt}
     </select>
     <resultMap id="patientReportMealsList" type="com.ruoyi.system.fantang.vo.FtPatientVo">
         <result property="patientId" column="patient_id"></result>
@@ -36,42 +47,23 @@ WHERE a.patient_id  = #{patientId} and c.create_at = #{createAt}
     </resultMap>
 
 
-    <select id="getReportMealsByDepart" resultMap="departReportMealsList">
-        SELECT
-            a.depart_id,
-            a.depart_name,
-            a.depart_code,
-            c.create_at,
-            c.foods,
-            c.id,
-            c.nutrition_food_id,
-            c.type,
-            b.patient_id,
-            b.name,
-            b.bed_id
-        FROM
-            ft_depart a
-                LEFT JOIN ft_patient b ON a.depart_id = b.depart_id
-                LEFT JOIN ft_report_meals c ON c.patient_id = b.patient_id
-        WHERE
-            a.depart_id = #{departId}
-          AND c.create_at = #{createAt}
+    <select id="getReportMealsByDepart" resultMap="patientReportMealsList">
+        SELECT a.patient_id,
+               a.`name`,
+               b.depart_name,
+               a.bed_id,
+               a.hospital_id,
+               c.create_at,
+               c.foods,
+               c.id,
+               c.nutrition_food_id,
+               c.type
+        from ft_patient a
+                 LEFT JOIN ft_depart b on a.depart_id = b.depart_id
+                 RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
+        WHERE b.depart_id = #{departId}
+          and c.create_at = #{createAt}
     </select>
-    <resultMap id="departReportMealsList" type="com.ruoyi.system.fantang.vo.FtDepartVo">
-        <result property="departId" column="depart_id"></result>
-        <result property="departName" column="depart_name"></result>
-        <result property="departCode" column="depart_code"></result>
-        <result property="patientId" column="patient_id"></result>
-        <result property="name" column="name"></result>
-        <result property="bedId" column="bed_id"></result>
-        <collection property="reportMealsList" ofType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
-            <result property="id" column="id"></result>
-            <result property="createAt" column="create_at"></result>
-            <result property="type" column="type"></result>
-            <result property="foods" column="foods"></result>
-            <result property="nutritionFoodId" column="nutrition_food_id"></result>
-        </collection>
-    </resultMap>
 
 
 </mapper>
