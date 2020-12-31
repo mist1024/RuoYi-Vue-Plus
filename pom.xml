@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.1.18.RELEASE</version>
+                <version>2.2.12.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -224,6 +224,13 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- demo模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-demo</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -234,6 +241,7 @@
         <module>ruoyi-quartz</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
+        <module>ruoyi-demo</module>
     </modules>
     <packaging>pom</packaging>
 
