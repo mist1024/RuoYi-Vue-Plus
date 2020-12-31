@@ -13,8 +13,8 @@
       :headers="headers"
       style="display: inline-block; vertical-align: top"
     >
-      <img v-if="value" :src="value" class="avatar" />
-      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      <img v-if="value" :src="value|image" class="avatar" />
+      <i v-else class="el-icon-plus avatar-uploader-icon" />
     </el-upload>
   </div>
 </template>
@@ -38,9 +38,14 @@ export default {
       default: "",
     },
   },
+  filters: {
+    image(value) {
+      return process.env.VUE_APP_BASE_API + "/common/file?fileName=" + value
+    }
+  },
   methods: {
     handleUploadSuccess(res) {
-      this.$emit("input", res.url);
+      this.$emit("input", res.fileName);
       this.loading.close();
     },
     handleBeforeUpload() {
@@ -58,7 +63,6 @@ export default {
       this.loading.close();
     },
     handleRemove(file, fileList) {
-      console.log(file, fileList);
       this.$emit("input", '');
     },
   },
