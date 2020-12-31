@@ -153,13 +153,12 @@ public class ClientPatientController extends BaseController {
     }
 
     /**
-     * 获取菜品价格
+     * 获取菜品清单
      */
-    @GetMapping("/getFoodPrice/{foodId}")
-    public AjaxResult getFoodPrice(@PathVariable("foodId") Long foodId) {
+    @GetMapping("/getFoodPrice")
+    public AjaxResult getFoodPrice() {
         QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
         wrapper.eq("type", 1);
-        wrapper.eq("food_id", foodId);
-        return AjaxResult.success(iftFoodDaoService.getOne(wrapper).getPrice());
+        return AjaxResult.success(iftFoodDaoService.list(wrapper));
     }
 }
