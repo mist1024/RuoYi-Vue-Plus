@@ -33,6 +33,8 @@
             <version>${wx-java.version}</version>
         </dependency>
 
+
+
     </dependencies>
 
 </project>

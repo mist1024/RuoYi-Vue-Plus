@@ -136,6 +136,14 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
+        <!-- 对象存储 -->
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>${cos-java.version}</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

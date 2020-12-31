@@ -64,14 +64,14 @@ public class WineryGoodsController extends BaseController {
         if (StringUtils.isNotBlank(wineryGoods.getGoodsSpec())){
             lqw.eq(WineryGoods::getGoodsSpec ,wineryGoods.getGoodsSpec());
         }
-        if (StringUtils.isNotBlank(wineryGoods.getGoodDesc())){
-            lqw.eq(WineryGoods::getGoodDesc ,wineryGoods.getGoodDesc());
+        if (StringUtils.isNotBlank(wineryGoods.getGoodsDesc())){
+            lqw.eq(WineryGoods::getGoodsDesc ,wineryGoods.getGoodsDesc());
         }
-        if (StringUtils.isNotBlank(wineryGoods.getGoodFaceImg())){
-            lqw.eq(WineryGoods::getGoodFaceImg ,wineryGoods.getGoodFaceImg());
+        if (StringUtils.isNotBlank(wineryGoods.getGoodsFaceImg())){
+            lqw.eq(WineryGoods::getGoodsFaceImg ,wineryGoods.getGoodsFaceImg());
         }
-        if (StringUtils.isNotBlank(wineryGoods.getGoodImg())){
-            lqw.eq(WineryGoods::getGoodImg ,wineryGoods.getGoodImg());
+        if (StringUtils.isNotBlank(wineryGoods.getGoodsImg())){
+            lqw.eq(WineryGoods::getGoodsImg ,wineryGoods.getGoodsImg());
         }
         List<WineryGoods> list = iWineryGoodsService.list(lqw);
         return getDataTable(list);

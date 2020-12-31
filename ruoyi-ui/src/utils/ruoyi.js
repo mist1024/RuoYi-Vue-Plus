@@ -98,7 +98,8 @@ export function selectDictLabels(datas, value, separator) {
 
 // 通用下载方法
 export function download(fileName) {
-	window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;
+	// window.location.href = baseURL + "/common/download?fileName=" + encodeURI(fileName) + "&delete=" + true;
+	window.location.href = baseURL + "/common/file?fileName=" + encodeURI(fileName)
 }
 
 // 字符串格式化(%s )

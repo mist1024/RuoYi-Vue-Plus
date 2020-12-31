@@ -2,10 +2,12 @@
   <div class="component-upload-image">
     <el-upload
       :action="uploadImgUrl"
+      accept="image/*"
       list-type="picture-card"
       :on-success="handleUploadSuccess"
       :before-upload="handleBeforeUpload"
       :on-error="handleUploadError"
+      :on-remove="handleRemove"
       name="file"
       :show-file-list="false"
       :headers="headers"
@@ -54,6 +56,10 @@ export default {
         message: "上传失败",
       });
       this.loading.close();
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+      this.$emit("input", '');
     },
   },
   watch: {},

@@ -1,6 +1,9 @@
 package com.ruoyi.web.controller.system;
 
 import java.io.IOException;
+
+import com.ruoyi.common.utils.file.CosUtils;
+import com.ruoyi.framework.config.ServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +40,13 @@ public class SysProfileController extends BaseController
 
     @Autowired
     private TokenService tokenService;
+
+
+    @Autowired
+    private CosUtils cosUtils;
+
+    @Autowired
+    private ServerConfig serverConfig;
 
     /**
      * 个人信息
@@ -111,7 +121,11 @@ public class SysProfileController extends BaseController
         if (!file.isEmpty())
         {
             LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
-            String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
+
+            String fileName = cosUtils.upload(file);
+            String avatar = "/common/file?fileName=" + fileName;
+
+//            String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
             if (userService.updateUserAvatar(loginUser.getUsername(), avatar))
             {
                 AjaxResult ajax = AjaxResult.success();

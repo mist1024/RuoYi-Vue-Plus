@@ -58,15 +58,15 @@ private static final long serialVersionUID=1L;
 
     /** 商品说明 */
     @Excel(name = "商品说明")
-    private String goodDesc;
+    private String goodsDesc;
 
     /** 商品封面 */
     @Excel(name = "商品封面")
-    private String goodFaceImg;
+    private String goodsFaceImg;
 
     /** 商品图片 */
     @Excel(name = "商品图片")
-    private String goodImg;
+    private String goodsImg;
 
     /** 创建者 */
     private String createBy;

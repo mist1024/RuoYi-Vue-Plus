@@ -21,21 +21,21 @@
       </el-form-item>
       <el-form-item label="商品类型" prop="goodsType">
         <el-select v-model="queryParams.goodsType" placeholder="请选择商品类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option label="请选择字典生成" value=""/>
         </el-select>
       </el-form-item>
-      <el-form-item label="商品说明" prop="goodDesc">
+      <el-form-item label="商品说明" prop="goodsDesc">
         <el-input
-          v-model="queryParams.goodDesc"
+          v-model="queryParams.goodsDesc"
           placeholder="请输入商品说明"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="商品封面" prop="goodFaceImg">
+      <el-form-item label="商品封面" prop="goodsFaceImg">
         <el-input
-          v-model="queryParams.goodFaceImg"
+          v-model="queryParams.goodsFaceImg"
           placeholder="请输入商品封面"
           clearable
           size="small"
@@ -56,7 +56,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['winery:winery_goods:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -66,7 +67,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['winery:winery_goods:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -76,7 +78,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['winery:winery_goods:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -85,22 +88,23 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['winery:winery_goods:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="winery_goodsList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="商品ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="商品名称" align="center" prop="goodsName" />
-      <el-table-column label="商品简称" align="center" prop="goodsAlias" />
-      <el-table-column label="商品类型" align="center" prop="goodsType" />
-      <el-table-column label="关联规格" align="center" prop="goodsSpec" />
-      <el-table-column label="商品说明" align="center" prop="goodDesc" />
-      <el-table-column label="商品封面" align="center" prop="goodFaceImg" />
-      <el-table-column label="商品图片" align="center" prop="goodImg" />
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="商品名称" align="center" prop="goodsName"/>
+      <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
+      <el-table-column label="商品类型" align="center" prop="goodsType"/>
+      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>
+      <el-table-column label="商品说明" align="center" prop="goodsDesc"/>
+      <el-table-column label="商品封面" align="center" prop="goodsFaceImg"/>
+      <el-table-column label="商品图片" align="center" prop="goodsImg"/>
+      <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -109,14 +113,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['winery:winery_goods:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['winery:winery_goods:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -134,30 +140,34 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 
         <el-form-item label="商品名称" prop="goodsName">
-          <el-input v-model="form.goodsName" placeholder="请输入商品名称" />
+          <el-input v-model="form.goodsName" placeholder="请输入商品名称"/>
         </el-form-item>
         <el-form-item label="商品简称" prop="goodsAlias">
-          <el-input v-model="form.goodsAlias" placeholder="请输入商品简称" />
+          <el-input v-model="form.goodsAlias" placeholder="请输入商品简称"/>
         </el-form-item>
         <el-form-item label="商品类型" prop="goodsType">
           <el-select v-model="form.goodsType" placeholder="请选择商品类型">
-            <el-option label="请选择字典生成" value="" />
+            <el-option label="请选择字典生成" value=""/>
           </el-select>
         </el-form-item>
         <el-form-item label="关联规格" prop="goodsSpec">
-          <el-input v-model="form.goodsSpec" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.goodsSpec" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
-        <el-form-item label="商品说明" prop="goodDesc">
-          <el-input v-model="form.goodDesc" placeholder="请输入商品说明" />
+        <el-form-item label="商品说明" prop="goodsDesc">
+          <el-input v-model="form.goodsDesc" placeholder="请输入商品说明"/>
         </el-form-item>
-        <el-form-item label="商品封面" prop="goodFaceImg">
-          <el-input v-model="form.goodFaceImg" placeholder="请输入商品封面" />
+        <el-form-item label="商品封面" prop="goodsFaceImg">
+
+
+          <upload-image :value="form.goodsFaceImg" @input="inputGoodsFaceImg"/>
+          <!--          <el-input v-model="form.goodsFaceImg" placeholder="请输入商品封面" />-->
         </el-form-item>
-        <el-form-item label="商品图片" prop="goodImg">
-          <el-input v-model="form.goodImg" placeholder="请输入商品图片" />
+        <el-form-item label="商品图片" prop="goodsImg">
+          <upload-image-multiple :value="form.goodsImg" @input="inputGoodsImg"/>
+<!--          <el-input v-model="form.goodsImg" placeholder="请输入商品图片"/>-->
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -169,12 +179,24 @@
 </template>
 
 <script>
-import { listWinery_goods, getWinery_goods, delWinery_goods, addWinery_goods, updateWinery_goods, exportWinery_goods } from "@/api/winery/winery_goods";
+import {
+  listWinery_goods,
+  getWinery_goods,
+  delWinery_goods,
+  addWinery_goods,
+  updateWinery_goods,
+  exportWinery_goods
+} from "@/api/winery/winery_goods";
+import UploadImage from '@/components/UploadImage/index'
+import UploadImageMultiple from '@/components/UploadImageMultiple/index'
 
 export default {
   name: "Winery_goods",
   components: {
+    UploadImage,
+    UploadImageMultiple,
   },
+  computed: {},
   data() {
     return {
       // 遮罩层
@@ -203,21 +225,27 @@ export default {
         goodsAlias: undefined,
         goodsType: undefined,
         goodsSpec: undefined,
-        goodDesc: undefined,
-        goodFaceImg: undefined,
-        goodImg: undefined,
+        goodsDesc: undefined,
+        goodsFaceImg: undefined,
+        goodsImg: undefined,
       },
       // 表单参数
       form: {},
       // 表单校验
-      rules: {
-      }
+      rules: {}
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    inputGoodsFaceImg(fileName) {
+      this.form.goodsFaceImg = fileName
+    },
+
+    inputGoodsImg(fileName) {
+      this.form.goodsImg = fileName
+    },
     /** 查询商品信息列表 */
     getList() {
       this.loading = true;
@@ -240,9 +268,9 @@ export default {
         goodsAlias: undefined,
         goodsType: undefined,
         goodsSpec: undefined,
-        goodDesc: undefined,
-        goodFaceImg: undefined,
-        goodImg: undefined,
+        goodsDesc: undefined,
+        goodsFaceImg: undefined,
+        goodsImg: undefined,
         createBy: undefined,
         createTime: undefined,
         updateBy: undefined,
@@ -264,7 +292,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -307,28 +335,28 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除商品信息编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delWinery_goods(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delWinery_goods(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有商品信息数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportWinery_goods(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return exportWinery_goods(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     }
   }
 };

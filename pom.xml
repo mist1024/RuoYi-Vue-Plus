@@ -35,6 +35,7 @@
         <mybatis-plus.version>3.4.1</mybatis-plus.version>
         <hutool.version>5.4.0</hutool.version>
         <wx-java.version>4.0.0</wx-java.version>
+        <cos-java.version>5.6.34</cos-java.version>
     </properties>
 	
     <!-- 依赖声明 -->
