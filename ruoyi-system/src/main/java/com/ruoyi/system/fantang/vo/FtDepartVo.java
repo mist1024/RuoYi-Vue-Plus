@@ -15,5 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class FtDepartVo extends FtDepartDao {
 
+
     List<FtReportMealsDao> reportMealsList;
 }

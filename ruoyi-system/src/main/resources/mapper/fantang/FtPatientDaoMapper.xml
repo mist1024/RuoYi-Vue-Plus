@@ -45,7 +45,10 @@ WHERE a.patient_id  = #{patientId} and c.create_at = #{createAt}
             c.foods,
             c.id,
             c.nutrition_food_id,
-            c.type
+            c.type,
+            b.patient_id,
+            b.name,
+            b.bed_id
         FROM
             ft_depart a
                 LEFT JOIN ft_patient b ON a.depart_id = b.depart_id
@@ -58,6 +61,9 @@ WHERE a.patient_id  = #{patientId} and c.create_at = #{createAt}
         <result property="departId" column="depart_id"></result>
         <result property="departName" column="depart_name"></result>
         <result property="departCode" column="depart_code"></result>
+        <result property="patientId" column="patient_id"></result>
+        <result property="name" column="name"></result>
+        <result property="bedId" column="bed_id"></result>
         <collection property="reportMealsList" ofType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
             <result property="id" column="id"></result>
             <result property="createAt" column="create_at"></result>
