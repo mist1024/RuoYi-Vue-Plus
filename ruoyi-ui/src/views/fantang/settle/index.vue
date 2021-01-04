@@ -325,7 +325,7 @@ export default {
         label: '现金'
       }, {
         value: 2,
-        label: '预付款'
+        label: '预付款冲减'
       }, {
         value: 3,
         label: '在线支付'

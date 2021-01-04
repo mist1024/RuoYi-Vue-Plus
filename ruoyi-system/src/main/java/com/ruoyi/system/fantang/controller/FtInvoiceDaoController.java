@@ -35,7 +35,7 @@ import java.util.List;
 public class FtInvoiceDaoController extends BaseController {
 
     private final IFtInvoiceDaoService iFtInvoiceDaoService;
-    
+
     private final IFtReturnDaoService iFtReturnDaoService;
 
     /**
@@ -46,6 +46,11 @@ public class FtInvoiceDaoController extends BaseController {
     public TableDataInfo list(FtInvoiceDao ftInvoiceDao) {
         startPage();
         LambdaQueryWrapper<FtInvoiceDao> lqw = Wrappers.lambdaQuery(ftInvoiceDao);
+
+        if (ftInvoiceDao.getInvoiceType() != null) {
+            lqw.eq(FtInvoiceDao::getInvoiceType, ftInvoiceDao.getInvoiceType());
+        }
+
         List<FtInvoiceDao> list = iFtInvoiceDaoService.list(lqw);
         return getDataTable(list);
     }
@@ -132,12 +137,12 @@ public class FtInvoiceDaoController extends BaseController {
         invoiceDao.setTaxId(taxId);
         invoiceDao.setInvoiceType(invoiceType);
         iFtInvoiceDaoService.save(invoiceDao);
-
-        if (invoiceType == 2) {
-            FtReturnDao ftReturnDao = new FtReturnDao();
-            ftReturnDao.setInvoiceId(invoiceDao.getId());
-            iFtReturnDaoService.save(ftReturnDao);
-        }
+//
+//        if (invoiceType == 2) {
+//            FtReturnDao ftReturnDao = new FtReturnDao();
+//            ftReturnDao.setInvoiceId(invoiceDao.getId());
+//            iFtReturnDaoService.save(ftReturnDao);
+//        }
 
         return AjaxResult.success("已开票");
     }

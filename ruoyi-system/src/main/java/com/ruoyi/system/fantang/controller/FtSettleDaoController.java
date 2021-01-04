@@ -136,7 +136,7 @@ public class FtSettleDaoController extends BaseController {
                 prepaymentDao.setPrepaid(balance);
                 iFtPrepaymentDaoService.updateById(prepaymentDao);
 
-                ftSettleDao.setType("预付款");
+                ftSettleDao.setType("预付款冲减");
                 break;
                 
             case 3:
