@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -125,4 +126,10 @@ public class FtFoodDemandDao extends BasePatient implements Serializable {
      * 营养餐标志
      **/
     private Integer nutritionFoodFlag;
+
+    /**
+     * 营养餐名
+     */
+    @TableField(exist = false)
+    private String nutritionFood;
 }

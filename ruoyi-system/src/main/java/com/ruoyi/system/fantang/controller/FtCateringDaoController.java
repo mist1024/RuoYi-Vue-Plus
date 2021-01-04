@@ -97,6 +97,7 @@ public class FtCateringDaoController extends BaseController {
                 foodDemandDao.setType(type);
                 foodDemandDao.setNutritionFoodId(ftCateringDao.getNumber());
                 foodDemandDao.setCreateAt(new Date());
+                foodDemandDao.setNutritionFoodFlag(0);
                 iFtFoodDemandDaoService.save(foodDemandDao);
             } else {
                 QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
@@ -105,6 +106,7 @@ public class FtCateringDaoController extends BaseController {
                 FtFoodDemandDao foodDemandDao = iFtFoodDemandDaoService.getOne(wrapper);
                 foodDemandDao.setNutritionFoodId(ftCateringDao.getNumber());
                 foodDemandDao.setUpdateAt(new Date());
+                foodDemandDao.setNutritionFoodFlag(0);
                 iFtFoodDemandDaoService.updateById(foodDemandDao);
             }
         }
