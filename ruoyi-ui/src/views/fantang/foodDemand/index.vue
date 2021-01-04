@@ -274,23 +274,25 @@ export default {
     // 格式化菜单回显文字
     formatFoods(row) {
       const _this = this;
-      let arr = row.foods.split(",").map(Number);
-      let ret = arr.map(item => {
-        let obj = _this.foodList.find((value => {
-          return value.foodId === item;
-        }));
-        return obj.name;
-      });
-      let str = ret.toString();
-      if (row.vegetables > 0)
-        str += ",加菜";
-      if (row.rice > 0)
-        str += ",加饭"
-      if (row.meat > 0)
-        str += ",加肉"
-      if (row.egg > 0)
-        str += ",加蛋" + row.egg;
-      return str;
+      if (row.foods!=null){
+        let arr = row.foods.split(",").map(Number);
+        let ret = arr.map(item => {
+          let obj = _this.foodList.find((value => {
+            return value.foodId === item;
+          }));
+          return obj.name;
+        });
+        let str = ret.toString();
+        if (row.vegetables > 0)
+          str += ",加菜";
+        if (row.rice > 0)
+          str += ",加饭"
+        if (row.meat > 0)
+          str += ",加肉"
+        if (row.egg > 0)
+          str += ",加蛋" + row.egg;
+        return str;
+      }
     },
     formatVegetables(row) {
       if (row.vegetables)
@@ -319,8 +321,8 @@ export default {
       listFoodDemand(this.queryParams).then(response => {
         this.foodDemandList = response.rows;
         this.total = response.total;
-
         this.loading = false;
+        console.log(response.rows)
       });
     },
     // 正餐类型字典翻译
@@ -385,7 +387,9 @@ export default {
       const id = row.id || this.ids
       getFoodDemand(id).then(response => {
         this.form = response.data;
-        this.form.foods = this.form.foods.split(",").map(Number);
+        if (this.form.foods!=null){
+          this.form.foods = this.form.foods.split(",").map(Number);
+        }
         this.form.type = this.selectDictLabel(this.typeOptions, row.type);
         this.open = true;
         this.title = "修改病人报餐";

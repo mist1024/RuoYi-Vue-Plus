@@ -52,7 +52,7 @@ public class FtFoodDemandDao extends BasePatient implements Serializable {
      * 正餐类型
      */
     @Excel(name = "正餐类型")
-    private Long type;
+    private Integer type;
 
     /**
      * 创建时间

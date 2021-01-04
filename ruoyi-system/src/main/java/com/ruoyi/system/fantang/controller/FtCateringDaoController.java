@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -8,7 +9,9 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtCateringDao;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.service.IFtCateringDaoService;
+import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +33,8 @@ import java.util.List;
 public class FtCateringDaoController extends BaseController {
 
     private final IFtCateringDaoService iFtCateringDaoService;
+
+    private final IFtFoodDemandDaoService iFtFoodDemandDaoService;
 
     /**
      * 查询配餐功能列表
@@ -74,8 +79,9 @@ public class FtCateringDaoController extends BaseController {
     public AjaxResult add(@RequestBody FtCateringDao ftCateringDao) {
         List<Integer> types = ftCateringDao.getTypes();
         for (Integer type : types) {
+            Long patientId = ftCateringDao.getPatientId();
             FtCateringDao ftCatering = new FtCateringDao();
-            ftCatering.setPatientId(ftCateringDao.getPatientId());
+            ftCatering.setPatientId(patientId);
             ftCatering.setNumber(ftCateringDao.getNumber());
             ftCatering.setFrequency(ftCateringDao.getFrequency());
             ftCatering.setCateringUsage(ftCateringDao.getCateringUsage());
@@ -83,6 +89,26 @@ public class FtCateringDaoController extends BaseController {
             ftCatering.setCreateAt(new Date());
             ftCatering.setType(type);
             iFtCateringDaoService.save(ftCatering);
+
+            // 如果属于加餐，新增一条病患配餐记录，否则修改
+            if (type == 4) {
+                FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
+                foodDemandDao.setPatientId(patientId);
+                foodDemandDao.setType(type);
+                foodDemandDao.setNutritionFoodId(ftCateringDao.getNumber());
+                foodDemandDao.setNutritionFoodFlag(1);
+                foodDemandDao.setCreateAt(new Date());
+                iFtFoodDemandDaoService.save(foodDemandDao);
+            } else {
+                QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
+                wrapper.eq("patient_id", patientId);
+                wrapper.eq("type", type);
+                FtFoodDemandDao foodDemandDao = iFtFoodDemandDaoService.getOne(wrapper);
+                foodDemandDao.setNutritionFoodId(ftCateringDao.getNumber());
+                foodDemandDao.setNutritionFoodFlag(1);
+                foodDemandDao.setUpdateAt(new Date());
+                iFtFoodDemandDaoService.updateById(foodDemandDao);
+            }
         }
 
         return AjaxResult.success("新增成功");
@@ -95,6 +121,20 @@ public class FtCateringDaoController extends BaseController {
     @Log(title = "配餐功能", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody FtCateringDao ftCateringDao) {
+
+        Long patientId = ftCateringDao.getPatientId();
+        Integer type = ftCateringDao.getType();
+        Long number = ftCateringDao.getNumber();
+
+        QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("patient_id", patientId);
+        wrapper.eq("type", type);
+        FtFoodDemandDao foodDemandDao = iFtFoodDemandDaoService.getOne(wrapper);
+        foodDemandDao.setNutritionFoodId(number);
+        foodDemandDao.setNutritionFoodFlag(1);
+        foodDemandDao.setUpdateAt(new Date());
+        iFtFoodDemandDaoService.updateById(foodDemandDao);
+
         return toAjax(iFtCateringDaoService.updateById(ftCateringDao) ? 1 : 0);
     }
 
