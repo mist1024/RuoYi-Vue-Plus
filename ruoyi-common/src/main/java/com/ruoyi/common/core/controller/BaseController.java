@@ -102,12 +102,12 @@ public class BaseController
      * @param token
      * @return
      */
-    public String getDeptId(UsernamePasswordAuthenticationToken token) {
+    public Long getDeptId(UsernamePasswordAuthenticationToken token) {
         JSONObject json = (JSONObject) JSONUtil.parse(token.getPrincipal());
 
-        String deptId = json.getJSONObject("user")
+        Long deptId = json.getJSONObject("user")
                 .getJSONObject("dept")
-                .getStr("deptId");
+                .getLong("deptId");
 
         return deptId;
     }

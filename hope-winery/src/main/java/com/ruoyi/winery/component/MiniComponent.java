@@ -83,6 +83,7 @@ public class MiniComponent {
         WxMaPhoneNumberInfo mobile = wxMaService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
 
         user.setMobile(mobile.getPhoneNumber());
+
         wineryMauserService.saveOrUpdate(user);
 
         return mobile.getPhoneNumber();

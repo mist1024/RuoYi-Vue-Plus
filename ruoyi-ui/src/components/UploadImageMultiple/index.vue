@@ -68,8 +68,6 @@ export default {
 
       let result = temp.join(',')
 
-      console.log(result)
-
       this.$emit("input", result);
       this.loading.close();
     },
