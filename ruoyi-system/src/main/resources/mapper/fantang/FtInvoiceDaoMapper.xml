@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.fantang.mapper.FtInvoiceDaoMapper">
-    
+
     <resultMap type="FtInvoiceDao" id="FtInvoiceDaoResult">
-        <result property="id"    column="id"    />
-        <result property="invoiceUnit"    column="invoice_unit"    />
-        <result property="invoiceId"    column="invoice_id"    />
-        <result property="createAt"    column="create_at"    />
-        <result property="drawer"    column="drawer"    />
-        <result property="collectionType"    column="collection_type"    />
-        <result property="payable"    column="payable"    />
-        <result property="receipts"    column="receipts"    />
-        <result property="voucherList"    column="voucher_list"    />
+        <result property="id" column="id"/>
+        <result property="invoiceUnit" column="invoice_unit"/>
+        <result property="invoiceId" column="invoice_id"/>
+        <result property="createAt" column="create_at"/>
+        <result property="drawer" column="drawer"/>
+        <result property="collectionType" column="collection_type"/>
+        <result property="payable" column="payable"/>
+        <result property="receipts" column="receipts"/>
+        <result property="voucherList" column="voucher_list"/>
+        <result property="invoiceNum" column="invoice_num"/>
+        <result property="invoiceName" column="invoice_name"/>
+        <result property="taxId" column="tax_id"/>
+        <result property="invoiceType" column="invoice_type"/>
     </resultMap>
 
 

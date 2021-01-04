@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.fantang.mapper.FtSettlementDaoMapper">
-    
+
     <resultMap type="FtSettlementDao" id="FtSettlementDaoResult">
-        <result property="settleId"    column="settle_id"    />
-        <result property="patientId"    column="patient_id"    />
-        <result property="settleAt"    column="settle_at"    />
-        <result property="opera"    column="opera"    />
-        <result property="list"    column="list"    />
-        <result property="price"    column="price"    />
-        <result property="payable"    column="payable"    />
-        <result property="receipts"    column="receipts"    />
-        <result property="type"    column="type"    />
-        <result property="flag"    column="flag"    />
-        <result property="refund"    column="refund"    />
+        <result property="settleId" column="settle_id"/>
+        <result property="patientId" column="patient_id"/>
+        <result property="settleAt" column="settle_at"/>
+        <result property="opera" column="opera"/>
+        <result property="list" column="list"/>
+        <result property="price" column="price"/>
+        <result property="payable" column="payable"/>
+        <result property="receipts" column="receipts"/>
+        <result property="type" column="type"/>
+        <result property="flag" column="flag"/>
+        <result property="refund" column="refund"/>
     </resultMap>
 
+    <select id="listWithPatient" resultType="com.ruoyi.system.fantang.domain.FtSettlementDao">
+        SELECT a.*,
+        b.`name`
+        FROM ft_settle a
+        LEFT JOIN ft_patient b ON b.patient_id = a.patient_id
+        <where>
+            <if test="settleAt != null and settleAt !=''">and a.settle_at = #{settleAt}</if>
+            <if test="type != null and type !=''">and a.type = #{type}</if>
+        </where>
+
+    </select>
 
 </mapper>

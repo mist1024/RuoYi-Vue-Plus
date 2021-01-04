@@ -49,7 +49,7 @@ private static final long serialVersionUID=1L;
     private String drawer;
 
     /** 收款方式 */
-    private Integer collectionType;
+    private String collectionType;
 
     /** 应收 */
     private BigDecimal payable;
@@ -59,4 +59,24 @@ private static final long serialVersionUID=1L;
 
     /** 凭证列表 */
     private String voucherList;
+
+    /**
+     * 发票号
+     */
+    private String invoiceNum;
+
+    /**
+     * 发票名
+     */
+    private String invoiceName;
+
+    /**
+     * 税号
+     */
+    private String taxId;
+
+    /**
+     * 开票类型
+     */
+    private Integer invoiceType;
 }
