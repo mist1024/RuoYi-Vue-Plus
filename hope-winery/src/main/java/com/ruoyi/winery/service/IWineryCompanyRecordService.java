@@ -1,6 +1,6 @@
 package com.ruoyi.winery.service;
 
-import com.ruoyi.winery.domain.WineryCompanyRecord;
+import com.ruoyi.winery.domain.winery.WineryCompanyRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

@@ -3,7 +3,7 @@ package com.ruoyi.winery.service.impl;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.winery.mapper.WineryGoodsSpecMapper;
-import com.ruoyi.winery.domain.WineryGoodsSpec;
+import com.ruoyi.winery.domain.winery.WineryGoodsSpec;
 import com.ruoyi.winery.service.IWineryGoodsSpecService;
 
 /**

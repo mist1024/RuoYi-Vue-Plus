@@ -5,9 +5,8 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.winery.domain.WineryMauser;
+import com.ruoyi.winery.domain.winery.WineryMauser;
 import com.ruoyi.winery.service.IWineryMauserService;
 
 import lombok.extern.slf4j.Slf4j;

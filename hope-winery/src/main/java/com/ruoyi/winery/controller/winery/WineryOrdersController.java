@@ -1,4 +1,4 @@
-package com.ruoyi.winery.controller;
+package com.ruoyi.winery.controller.winery;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -22,7 +22,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.winery.domain.WineryOrders;
+import com.ruoyi.winery.domain.winery.WineryOrders;
 import com.ruoyi.winery.service.IWineryOrdersService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;

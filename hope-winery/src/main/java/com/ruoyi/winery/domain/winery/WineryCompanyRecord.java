@@ -1,4 +1,4 @@
-package com.ruoyi.winery.domain;
+package com.ruoyi.winery.domain.winery;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.winery.enums.IrrigationTypeEnum;

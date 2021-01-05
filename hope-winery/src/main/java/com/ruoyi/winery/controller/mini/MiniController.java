@@ -8,7 +8,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.winery.component.MiniComponent;
-import com.ruoyi.winery.domain.WineryCompanyRecord;
+import com.ruoyi.winery.domain.winery.WineryCompanyRecord;
 import com.ruoyi.winery.enums.IrrigationTypeEnum;
 import com.ruoyi.winery.enums.SoilTypeEnum;
 import com.ruoyi.winery.enums.WineryStatusEnum;

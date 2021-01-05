@@ -1,6 +1,6 @@
 package com.ruoyi.winery.mapper;
 
-import com.ruoyi.winery.domain.WineryGoods;
+import com.ruoyi.winery.domain.winery.WineryGoods;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

@@ -30,13 +30,13 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 新闻资讯Controller
- * 
+ *
  * @author ruoyi
  * @date 2020-12-31
  */
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
-@RequestMapping("/news/news_content" )
+@RequestMapping("/news/news_content")
 public class NewsContentController extends BaseController {
 
     private final INewsContentService iNewsContentService;
@@ -46,27 +46,26 @@ public class NewsContentController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('news:news_content:list')")
     @GetMapping("/list")
-    public TableDataInfo list(NewsContent newsContent)
-    {
+    public TableDataInfo list(UsernamePasswordAuthenticationToken token, NewsContent newsContent) {
         startPage();
         LambdaQueryWrapper<NewsContent> lqw = Wrappers.lambdaQuery(newsContent);
-        if (newsContent.getDeptId() != null){
-            lqw.eq(NewsContent::getDeptId ,newsContent.getDeptId());
+
+        lqw.eq(NewsContent::getDeptId, getDeptId(token));
+
+        if (StringUtils.isNotBlank(newsContent.getNewsTitle())) {
+            lqw.eq(NewsContent::getNewsTitle, newsContent.getNewsTitle());
         }
-        if (StringUtils.isNotBlank(newsContent.getNewsTitle())){
-            lqw.eq(NewsContent::getNewsTitle ,newsContent.getNewsTitle());
+        if (StringUtils.isNotBlank(newsContent.getNewsBody())) {
+            lqw.eq(NewsContent::getNewsBody, newsContent.getNewsBody());
         }
-        if (StringUtils.isNotBlank(newsContent.getNewsBody())){
-            lqw.eq(NewsContent::getNewsBody ,newsContent.getNewsBody());
+        if (StringUtils.isNotBlank(newsContent.getNewsImage())) {
+            lqw.eq(NewsContent::getNewsImage, newsContent.getNewsImage());
         }
-        if (StringUtils.isNotBlank(newsContent.getNewsImage())){
-            lqw.eq(NewsContent::getNewsImage ,newsContent.getNewsImage());
+        if (newsContent.getNewsType() != null) {
+            lqw.eq(NewsContent::getNewsType, newsContent.getNewsType());
         }
-        if (newsContent.getNewsType() != null){
-            lqw.eq(NewsContent::getNewsType ,newsContent.getNewsType());
-        }
-        if (newsContent.getState() != null){
-            lqw.eq(NewsContent::getState ,newsContent.getState());
+        if (newsContent.getState() != null) {
+            lqw.eq(NewsContent::getState, newsContent.getState());
         }
         List<NewsContent> list = iNewsContentService.list(lqw);
         return getDataTable(list);
@@ -75,30 +74,30 @@ public class NewsContentController extends BaseController {
     /**
      * 导出新闻资讯列表
      */
-    @PreAuthorize("@ss.hasPermi('news:news_content:export')" )
-    @Log(title = "新闻资讯" , businessType = BusinessType.EXPORT)
-    @GetMapping("/export" )
+    @PreAuthorize("@ss.hasPermi('news:news_content:export')")
+    @Log(title = "新闻资讯", businessType = BusinessType.EXPORT)
+    @GetMapping("/export")
     public AjaxResult export(NewsContent newsContent) {
         LambdaQueryWrapper<NewsContent> lqw = new LambdaQueryWrapper<NewsContent>(newsContent);
         List<NewsContent> list = iNewsContentService.list(lqw);
-        ExcelUtil<NewsContent> util = new ExcelUtil<NewsContent>(NewsContent. class);
-        return util.exportExcel(list, "news_content" );
+        ExcelUtil<NewsContent> util = new ExcelUtil<NewsContent>(NewsContent.class);
+        return util.exportExcel(list, "news_content");
     }
 
     /**
      * 获取新闻资讯详细信息
      */
-    @PreAuthorize("@ss.hasPermi('news:news_content:query')" )
-    @GetMapping(value = "/{id}" )
-    public AjaxResult getInfo(@PathVariable("id" ) String id) {
+    @PreAuthorize("@ss.hasPermi('news:news_content:query')")
+    @GetMapping(value = "/{id}")
+    public AjaxResult getInfo(@PathVariable("id") String id) {
         return AjaxResult.success(iNewsContentService.getById(id));
     }
 
     /**
      * 新增新闻资讯
      */
-    @PreAuthorize("@ss.hasPermi('news:news_content:add')" )
-    @Log(title = "新闻资讯" , businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('news:news_content:add')")
+    @Log(title = "新闻资讯", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody NewsContent newsContent) {
         newsContent.setDeptId(getDeptId(token));
@@ -108,8 +107,8 @@ public class NewsContentController extends BaseController {
     /**
      * 修改新闻资讯
      */
-    @PreAuthorize("@ss.hasPermi('news:news_content:edit')" )
-    @Log(title = "新闻资讯" , businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('news:news_content:edit')")
+    @Log(title = "新闻资讯", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody NewsContent newsContent) {
         return toAjax(iNewsContentService.updateById(newsContent) ? 1 : 0);
@@ -118,9 +117,9 @@ public class NewsContentController extends BaseController {
     /**
      * 删除新闻资讯
      */
-    @PreAuthorize("@ss.hasPermi('news:news_content:remove')" )
-    @Log(title = "新闻资讯" , businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}" )
+    @PreAuthorize("@ss.hasPermi('news:news_content:remove')")
+    @Log(title = "新闻资讯", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(iNewsContentService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
     }

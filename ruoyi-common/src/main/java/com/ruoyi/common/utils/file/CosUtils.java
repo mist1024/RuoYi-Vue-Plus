@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -77,8 +78,12 @@ public class CosUtils {
 
         COSObject cosObject = cosClient.getObject(getObjectRequest);
 
+        // 文件类型
         response.setContentType(cosObject.getObjectMetadata().getContentType());
+        // 文件大小
         response.setContentLengthLong(cosObject.getObjectMetadata().getContentLength());
+        // 文件名
+        response.setHeader("Content-Disposition", "attachment;filename=" + cosObject.getKey());
         OutputStream os = null;
         try {
             os = response.getOutputStream();
@@ -104,5 +109,23 @@ public class CosUtils {
         cosClient.shutdown();
     }
 
+
+    public String uploadFile(String type, String filename, File file) {
+
+
+        // 指定要上传到 COS 上对象键
+        String key = ReUtil.replaceAll(StrUtil.trim(Optional.of(filename).orElse(StrUtil.EMPTY)), SPECIAL_CHARACTERS, StrUtil.EMPTY);
+        // 生成 cos 客户端。
+        COSClient cosClient = new COSClient(cosCredentials, clientConfig);
+        try {
+            PutObjectResult putObjectResult = cosClient.putObject(properties.getBucketName(), type + "/" + key, file);
+        } catch (Exception e) {
+        } finally {
+
+            cosClient.shutdown();
+        }
+        return type + "/" + key;
+
+    }
 
 }

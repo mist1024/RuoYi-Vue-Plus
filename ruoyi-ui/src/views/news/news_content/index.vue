@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="部门ID" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入部门ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="部门ID" prop="deptId">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.deptId"-->
+<!--          placeholder="请输入部门ID"-->
+<!--          clearable-->
+<!--          size="small"-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
       <el-form-item label="新闻标题" prop="newsTitle">
         <el-input
           v-model="queryParams.newsTitle"
@@ -87,33 +87,33 @@
         >删除
         </el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['news:news_content:export']"
-        >导出
-        </el-button>
-      </el-col>
+<!--      <el-col :span="1.5">-->
+<!--        <el-button-->
+<!--          type="warning"-->
+<!--          icon="el-icon-download"-->
+<!--          size="mini"-->
+<!--          @click="handleExport"-->
+<!--          v-hasPermi="['news:news_content:export']"-->
+<!--        >导出-->
+<!--        </el-button>-->
+<!--      </el-col>-->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="news_contentList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="规格ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="部门ID" align="center" prop="deptId"/>
+<!--      <el-table-column label="部门ID" align="center" prop="deptId"/>-->
       <el-table-column label="新闻标题" align="center" prop="newsTitle"/>
 <!--      <el-table-column label="新闻详情" align="center" prop="newsBody"/>-->
-      <el-table-column label="新闻封面图" align="center" prop="newsImage">
+      <el-table-column label="新闻封面图" align="center" prop="newsImage" width="100px">
         <template slot-scope="scope">
           <el-image :src="scope.row.newsImage|getImageForKey" style="width: 60px; height: 60px"/>
         </template>
 
       </el-table-column>
       <el-table-column label="新闻类型" align="center" prop="newsType" :formatter="newsTypeFormat"/>
-      <el-table-column label="状态" align="center" prop="state" :formatter="stateFormat">
+      <el-table-column label="状态" align="center" prop="state" :formatter="stateFormat" width="100px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.state === 1 ? 'success' : 'danger'">
             {{scope.row.state | getStateName(stateOptions)}}
@@ -151,8 +151,8 @@
     />
 
     <!-- 添加或修改新闻资讯对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <!--        <el-form-item label="部门ID" prop="deptId">-->
         <!--          <el-input v-model="form.deptId" placeholder="请输入部门ID"/>-->
         <!--        </el-form-item>-->
@@ -195,9 +195,10 @@
         </el-form-item>
 
         <el-form-item label="新闻详情" prop="newsBody">
+          <!--  <el-input v-model="form.newsBody" placeholder="请输入新闻详情" />-->
           <editor :value="form.newsBody" :height="400" :min-height="400" @on-change="onChangeNewsBody"/>
-          <!--          <el-input v-model="form.newsBody" placeholder="请输入新闻详情"/>-->
         </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
