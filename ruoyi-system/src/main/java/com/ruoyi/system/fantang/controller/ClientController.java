@@ -1,9 +1,11 @@
 package com.ruoyi.system.fantang.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
 import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ public class ClientController extends BaseController {
 
     @Autowired
     private IFtReportMealsDaoService reportMealsDaoService;
+
+    @Autowired
+    private IFtStaffSubsidyDaoService staffSubsidyDaoService;
 
     /**
      * 获取用餐时间信息
@@ -293,11 +298,36 @@ public class ClientController extends BaseController {
         List<FtOrderDao> orderList;
 
         if (orderType != 0) {
-            orderList   = orderDaoService.listDetailedByDate(orderType, start, end);
-        }else {
-           orderList =  orderDaoService.listAllDetailedByDate(start, end);
+            orderList = orderDaoService.listDetailedByDate(orderType, start, end);
+        } else {
+            orderList = orderDaoService.listAllDetailedByDate(start, end);
         }
 
         return AjaxResult.success(orderList);
+    }
+
+    /**
+     * 查看补贴记录
+     */
+    @GetMapping("/getStaffSubsidy/{staffId}")
+    public AjaxResult getStaffSubsidy(@PathVariable Long staffId) {
+        QueryWrapper<FtStaffSubsidyDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id",staffId);
+
+        return AjaxResult.success(staffSubsidyDaoService.list(wrapper));
+    }
+
+    /**
+     * 查看补贴余额
+     */
+    @GetMapping("/getStaffSubsidyBalance/{staffId}")
+    public AjaxResult getStaffSubsidyBalance(@PathVariable Long staffId){
+        QueryWrapper<FtStaffSubsidyDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id",staffId);
+        wrapper.orderByDesc("price");
+        wrapper.last("limit 1");
+        FtStaffSubsidyDao staffSubsidyDao = staffSubsidyDaoService.getOne(wrapper);
+        
+        return AjaxResult.success(staffSubsidyDao.getPrice());
     }
 }
