@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtConfigDao;
 import com.ruoyi.system.fantang.domain.FtFoodDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
@@ -47,6 +48,9 @@ public class ClientController extends BaseController {
 
     @Autowired
     private IFtFoodDaoService foodDaoService;
+
+    @Autowired
+    private IFtOrderDaoService iFtOrderDaoService;
 
     /**
      * 获取用餐时间信息
@@ -316,7 +320,7 @@ public class ClientController extends BaseController {
     @GetMapping("/getStaffSubsidy/{staffId}")
     public AjaxResult getStaffSubsidy(@PathVariable Long staffId) {
         QueryWrapper<FtStaffSubsidyDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("staff_id",staffId);
+        wrapper.eq("staff_id", staffId);
 
         return AjaxResult.success(staffSubsidyDaoService.list(wrapper));
     }
@@ -325,13 +329,13 @@ public class ClientController extends BaseController {
      * 查看补贴余额
      */
     @GetMapping("/getStaffSubsidyBalance/{staffId}")
-    public AjaxResult getStaffSubsidyBalance(@PathVariable Long staffId){
+    public AjaxResult getStaffSubsidyBalance(@PathVariable Long staffId) {
         QueryWrapper<FtStaffSubsidyDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("staff_id",staffId);
+        wrapper.eq("staff_id", staffId);
         wrapper.orderByDesc("price");
         wrapper.last("limit 1");
         FtStaffSubsidyDao staffSubsidyDao = staffSubsidyDaoService.getOne(wrapper);
-        
+
         return AjaxResult.success(staffSubsidyDao.getPrice());
     }
 
@@ -339,11 +343,56 @@ public class ClientController extends BaseController {
      * 查看商品清单
      */
     @GetMapping("/getGoodsList")
-    public AjaxResult getGoodsList(){
+    public AjaxResult getGoodsList() {
         QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("type",2);
+        wrapper.eq("type", 2);
         List<FtFoodDao> list = foodDaoService.list(wrapper);
 
         return AjaxResult.success(list);
+    }
+
+    /**
+     * 用餐流水（订单）查看
+     */
+    @GetMapping("/getStaffOrder/{staffId}")
+    public AjaxResult getStaffOrder(@PathVariable Long staffId) {
+        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id", staffId);
+
+        return AjaxResult.success(iFtOrderDaoService.list(wrapper));
+    }
+
+    /**
+     * 获取截止订餐参数
+     */
+    @GetMapping("/getStopDinnerTime")
+    public AjaxResult getStopDinnerTime() {
+        QueryWrapper<FtConfigDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("config_key", "stop_dinner");
+        FtConfigDao ftConfigDao = iFtConfigDaoService.getOne(wrapper);
+
+        return AjaxResult.success(ftConfigDao.getConfigValue());
+    }
+
+    /**
+     * 获取菜品清单
+     */
+    @GetMapping("/getFoodList")
+    public AjaxResult getFoodList() {
+        QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("type", 1);
+        List<FtFoodDao> list = foodDaoService.list(wrapper);
+
+        return AjaxResult.success(list);
+    }
+
+    /**
+     * 获取订餐优惠比例
+     */
+    @GetMapping("/getOrderDiscount/{orderId}")
+    public AjaxResult getOrderDiscount(@PathVariable Long orderId) {
+        FtOrderDao ftOrderDao = orderDaoService.getById(orderId);
+
+        return AjaxResult.success(ftOrderDao.getDiscount());
     }
 }
