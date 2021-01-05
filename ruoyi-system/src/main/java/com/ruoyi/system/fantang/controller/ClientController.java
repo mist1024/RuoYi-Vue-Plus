@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtFoodDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
 import com.ruoyi.system.fantang.service.*;
@@ -43,6 +44,9 @@ public class ClientController extends BaseController {
 
     @Autowired
     private IFtStaffSubsidyDaoService staffSubsidyDaoService;
+
+    @Autowired
+    private IFtFoodDaoService foodDaoService;
 
     /**
      * 获取用餐时间信息
@@ -329,5 +333,17 @@ public class ClientController extends BaseController {
         FtStaffSubsidyDao staffSubsidyDao = staffSubsidyDaoService.getOne(wrapper);
         
         return AjaxResult.success(staffSubsidyDao.getPrice());
+    }
+
+    /**
+     * 查看商品清单
+     */
+    @GetMapping("/getGoodsList")
+    public AjaxResult getGoodsList(){
+        QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("type",2);
+        List<FtFoodDao> list = foodDaoService.list(wrapper);
+
+        return AjaxResult.success(list);
     }
 }
