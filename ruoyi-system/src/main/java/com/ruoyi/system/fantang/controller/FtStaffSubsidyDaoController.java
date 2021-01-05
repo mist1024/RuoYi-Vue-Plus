@@ -48,7 +48,7 @@ public class FtStaffSubsidyDaoController extends BaseController {
         if (StringUtils.isNotBlank(ftStaffSubsidyDao.getSubsidyType())) {
             lqw.eq(FtStaffSubsidyDao::getSubsidyType, ftStaffSubsidyDao.getSubsidyType());
         }
-        if (StringUtils.isNotBlank(ftStaffSubsidyDao.getIncomeType())) {
+        if (ftStaffSubsidyDao.getIncomeType() != null) {
             lqw.eq(FtStaffSubsidyDao::getIncomeType, ftStaffSubsidyDao.getIncomeType());
         }
         if (ftStaffSubsidyDao.getPrice() != null) {
@@ -126,11 +126,11 @@ public class FtStaffSubsidyDaoController extends BaseController {
         List<FtStaffSubsidyDao> ftStaffSubsidyDaoList = new ArrayList<>();
 
         for (FtStaffInfoDao staffDatum : staffData) {
-            if (staffDatum.getGiveOutFlag()){
+            if (staffDatum.getGiveOutFlag()) {
                 FtStaffSubsidyDao ftStaffSubsidyDao = new FtStaffSubsidyDao();
                 ftStaffSubsidyDao.setStaffId(staffDatum.getStaffId());
                 ftStaffSubsidyDao.setSubsidyType(subsidy.getType());
-                ftStaffSubsidyDao.setIncomeType("1");
+                ftStaffSubsidyDao.setIncomeType(1);
                 ftStaffSubsidyDao.setPrice(subsidy.getPrice());
                 ftStaffSubsidyDao.setConsumAt(giveOutDate);
                 ftStaffSubsidyDaoList.add(ftStaffSubsidyDao);

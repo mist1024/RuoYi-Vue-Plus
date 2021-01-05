@@ -61,7 +61,7 @@ public class FtOrderDaoController extends BaseController {
         if (ftOrderDao.getCurrentPrice() != null) {
             lqw.eq(FtOrderDao::getCurrentPrice, ftOrderDao.getCurrentPrice());
         }
-        if (StringUtils.isNotBlank(ftOrderDao.getPayType())) {
+        if (ftOrderDao.getPayType() != null) {
             lqw.eq(FtOrderDao::getPayType, ftOrderDao.getPayType());
         }
         if (ftOrderDao.getWriteOffAt() != null) {

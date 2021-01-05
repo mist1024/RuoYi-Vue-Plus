@@ -110,7 +110,7 @@ public class FtOrderDao implements Serializable {
      * 支付方式
      */
     @Excel(name = "支付方式")
-    private String payType;
+    private Integer payType;
 
     /**
      * 支付标志

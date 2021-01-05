@@ -52,7 +52,7 @@ public class FtStaffSubsidyDao implements Serializable {
      * 收支类型
      */
     @Excel(name = "收支类型")
-    private String incomeType;
+    private Integer incomeType;
 
     /**
      * 金额

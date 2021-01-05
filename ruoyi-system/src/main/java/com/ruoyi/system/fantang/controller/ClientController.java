@@ -4,15 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.fantang.domain.FtConfigDao;
-import com.ruoyi.system.fantang.domain.FtFoodDao;
-import com.ruoyi.system.fantang.domain.FtOrderDao;
-import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
+import com.ruoyi.system.fantang.domain.*;
 import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -330,13 +329,9 @@ public class ClientController extends BaseController {
      */
     @GetMapping("/getStaffSubsidyBalance/{staffId}")
     public AjaxResult getStaffSubsidyBalance(@PathVariable Long staffId) {
-        QueryWrapper<FtStaffSubsidyDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("staff_id", staffId);
-        wrapper.orderByDesc("price");
-        wrapper.last("limit 1");
-        FtStaffSubsidyDao staffSubsidyDao = staffSubsidyDaoService.getOne(wrapper);
+        FtStaffInfoDao staffInfoDao = staffInfoDaoService.getById(staffId);
 
-        return AjaxResult.success(staffSubsidyDao.getPrice());
+        return AjaxResult.success(staffInfoDao.getBalance());
     }
 
     /**
@@ -395,4 +390,97 @@ public class ClientController extends BaseController {
 
         return AjaxResult.success(ftOrderDao.getDiscount());
     }
+
+    /**
+     * 补贴订单收款
+     */
+    @Transactional
+    @PostMapping("/orderCollection")
+    public AjaxResult orderCollection(@RequestBody JSONObject params) {
+
+        // 订单 id
+        Integer orderId = params.getInteger("orderId");
+
+        // 实收
+        BigDecimal receipts = params.getBigDecimal("receipts");
+
+        // 当前订单信息
+        FtOrderDao orderDao = orderDaoService.getById(orderId);
+
+        // 当前订单员工信息
+        FtStaffInfoDao staffInfoDao = staffInfoDaoService.getById(orderDao.getStaffId());
+
+        // 员工账户补贴余额
+        BigDecimal balance = staffInfoDao.getBalance();
+
+        // 余额是否大于实收
+        if (balance.compareTo(receipts) < 0) {
+
+            return AjaxResult.error("补贴余额不足");
+
+        } else {
+
+            // 更新员工账户补贴余额
+            BigDecimal nowBalance = balance.subtract(receipts);
+            staffInfoDao.setBalance(nowBalance);
+
+            // 更新订单信息
+            orderDao.setReceipts(receipts);
+            orderDao.setPayFlag(1);
+            orderDao.setPayType(3);
+            orderDaoService.save(orderDao);
+
+            // 添加补贴流水记录
+            FtStaffSubsidyDao staffSubsidyDao = new FtStaffSubsidyDao();
+            staffSubsidyDao.setStaffId(orderDao.getStaffId());
+            staffSubsidyDao.setIncomeType(2);
+            staffSubsidyDao.setPrice(receipts);
+            staffSubsidyDao.setConsumAt(new Date());
+            staffSubsidyDao.setOrderId(orderDao.getOrderId());
+            staffSubsidyDaoService.save(staffSubsidyDao);
+
+        }
+
+        return AjaxResult.success("已收款");
+    }
+
+    /**
+     * 补贴订单退款
+     */
+    @Transactional
+    @PostMapping("/orderRefund")
+    public AjaxResult orderRefund(@RequestBody JSONObject params){
+
+        // 订单 id
+        Integer orderId = params.getInteger("orderId");
+
+        // 实收
+        BigDecimal receipts = params.getBigDecimal("receipts");
+
+        // 当前订单信息
+        FtOrderDao orderDao = orderDaoService.getById(orderId);
+
+        // 当前订单员工信息
+        FtStaffInfoDao staffInfoDao = staffInfoDaoService.getById(orderDao.getStaffId());
+
+        // 员工账户补贴余额
+        BigDecimal balance = staffInfoDao.getBalance();
+
+        // 更新员工账户补贴余额
+        staffInfoDao.setBalance(balance.add(receipts));
+        staffInfoDaoService.updateById(staffInfoDao);
+
+        // 添加补贴流水记录
+        FtStaffSubsidyDao staffSubsidyDao = new FtStaffSubsidyDao();
+        staffSubsidyDao.setStaffId(orderDao.getStaffId());
+        // 收支类型
+        staffSubsidyDao.setIncomeType(4);
+        staffSubsidyDao.setPrice(receipts);
+        staffSubsidyDao.setConsumAt(new Date());
+        staffSubsidyDao.setOrderId(orderDao.getOrderId());
+        staffSubsidyDaoService.save(staffSubsidyDao);
+
+        return AjaxResult.success("已退款");
+    }
+
 }
