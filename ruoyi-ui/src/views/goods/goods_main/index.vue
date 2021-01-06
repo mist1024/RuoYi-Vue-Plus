@@ -19,8 +19,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-
-
       <el-form-item label="商品类型" prop="goodsType">
         <el-select v-model="queryParams.goodsType" placeholder="请选择商品类型" clearable size="small">
           <el-option label="请选择字典生成" value=""/>
@@ -48,7 +46,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['winery:winery_goods:add']"
+          v-hasPermi="['goods:goods_main:add']"
         >新增
         </el-button>
       </el-col>
@@ -59,7 +57,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['winery:winery_goods:edit']"
+          v-hasPermi="['goods:goods_main:edit']"
         >修改
         </el-button>
       </el-col>
@@ -70,7 +68,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['winery:winery_goods:remove']"
+          v-hasPermi="['goods:goods_main:remove']"
         >删除
         </el-button>
       </el-col>
@@ -80,27 +78,34 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['winery:winery_goods:export']"
+          v-hasPermi="['goods:goods_main:export']"
         >导出
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="winery_goodsList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="goodsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="商品ID" align="center" prop="id" v-if="false"/>
       <el-table-column label="商品名称" align="center" prop="goodsName"/>
       <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
       <el-table-column label="商品类型" align="center" prop="goodsType"/>
-<!--      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>-->
-      <el-table-column label="商品说明" align="center" prop="goodsDesc"/>
+      <!--      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>-->
+      <!--      <el-table-column label="商品说明" align="center" prop="goodsDesc"/>-->
       <el-table-column label="商品封面" align="center" prop="goodsFaceImg">
         <template slot-scope="scope">
-          <el-image :src="scope.row.goodsFaceImg|getImageForKey" style="width: 60px; height: 60px" />
+          <el-image :src="scope.row.goodsFaceImg|getImageForKey" style="width: 60px; height: 60px"/>
         </template>
       </el-table-column>
-<!--      <el-table-column label="商品图片" align="center" prop="goodsImg"/>-->
+      <el-table-column label="状态" align="center" prop="state" :formatter="stateFormat" width="100px">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.state === 1 ? 'success' : 'danger'">
+            {{scope.row.state | getStateName(stateOptions)}}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <!--      <el-table-column label="商品图片" align="center" prop="goodsImg"/>-->
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -109,7 +114,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['winery:winery_goods:edit']"
+            v-hasPermi="['goods:goods_main:edit']"
           >修改
           </el-button>
           <el-button
@@ -117,7 +122,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['winery:winery_goods:remove']"
+            v-hasPermi="['goods:goods_main:remove']"
           >删除
           </el-button>
         </template>
@@ -133,7 +138,7 @@
     />
 
     <!-- 添加或修改商品信息对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 
         <el-form-item label="商品名称" prop="goodsName">
@@ -142,27 +147,38 @@
         <el-form-item label="商品简称" prop="goodsAlias">
           <el-input v-model="form.goodsAlias" placeholder="请输入商品简称"/>
         </el-form-item>
+        <el-form-item label="商品封面" prop="goodsFaceImg">
+          <upload-image :value="form.goodsFaceImg" @input="inputGoodsFaceImg"/>
+          <!--          <el-input v-model="form.goodsFaceImg" placeholder="请输入商品封面" />-->
+        </el-form-item>
+        <el-form-item label="商品图片" prop="goodsImg">
+          <upload-image-multiple :value="form.goodsImg" @input="inputGoodsImg"/>
+          <!--          <el-input v-model="form.goodsImg" placeholder="请输入商品图片"/>-->
+        </el-form-item>
+        <el-form-item label="状态" prop="state">
+
+          <el-radio-group v-model="form.state">
+            <el-radio v-for="(dict, index) in stateOptions" :key="index" :label="parseInt(dict.dictValue)">{{dict.dictLabel}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="商品类型" prop="goodsType">
           <el-select v-model="form.goodsType" placeholder="请选择商品类型">
             <el-option label="请选择字典生成" value=""/>
           </el-select>
         </el-form-item>
         <el-form-item label="关联规格" prop="goodsSpec">
-          <el-input v-model="form.goodsSpec" type="textarea" placeholder="请输入内容"/>
+          <!--          <el-input v-model="form.goodsSpec" type="textarea" placeholder="请输入内容"/>-->
+          <el-transfer v-model="selectedSpecData" :data="specData" filterable
+                       :titles="['商品列表','已关联商品']"
+                       :button-texts="['取消关联', '关联商品']"
+                       @change="handleChangeSpec"
+          ></el-transfer>
         </el-form-item>
         <el-form-item label="商品说明" prop="goodsDesc">
-          <el-input v-model="form.goodsDesc" placeholder="请输入商品说明"/>
+          <!--          <el-input v-model="form.goodsDesc" placeholder="请输入商品说明"/>-->
+          <editor :value="form.goodsDesc" :height="400" :min-height="400" @on-change="onChangeGoodsDesc"/>
         </el-form-item>
-        <el-form-item label="商品封面" prop="goodsFaceImg">
 
-
-          <upload-image :value="form.goodsFaceImg" @input="inputGoodsFaceImg"/>
-          <!--          <el-input v-model="form.goodsFaceImg" placeholder="请输入商品封面" />-->
-        </el-form-item>
-        <el-form-item label="商品图片" prop="goodsImg">
-          <upload-image-multiple :value="form.goodsImg" @input="inputGoodsImg"/>
-<!--          <el-input v-model="form.goodsImg" placeholder="请输入商品图片"/>-->
-        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
@@ -183,18 +199,22 @@ import {
   addWinery_goods,
   updateWinery_goods,
   exportWinery_goods
-} from "@/api/winery/winery_goods";
+} from "@/api/goods/goods_main";
 import UploadImage from '@/components/UploadImage/index'
 import UploadImageMultiple from '@/components/UploadImageMultiple/index'
 
 import CommonMixin from "@/mixin/common";
+import Editor from '@/components/Editor/index';
+import {listSpec} from "@/api/goods/goods_spec";
+import {getDictName} from "@/utils/utils";
 
 export default {
-  name: "Winery_goods",
-  mixins:[CommonMixin],
+  name: "GoodsMain",
+  mixins: [CommonMixin],
   components: {
     UploadImage,
     UploadImageMultiple,
+    Editor
   },
   computed: {},
   data() {
@@ -212,11 +232,13 @@ export default {
       // 总条数
       total: 0,
       // 商品信息表格数据
-      winery_goodsList: [],
+      goodsList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      // 状态字典
+      stateOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -228,15 +250,30 @@ export default {
         goodsDesc: undefined,
         goodsFaceImg: undefined,
         goodsImg: undefined,
+        state: undefined
       },
       // 表单参数
       form: {},
       // 表单校验
-      rules: {}
+      rules: {},
+
+      // 规格
+      specData: [],
+      // 已选规格
+      selectedSpecData: []
+
     };
+  },
+  filters: {
+    getStateName(value, options) {
+      return getDictName(value, options)
+    }
   },
   created() {
     this.getList();
+    this.getDicts("sys_release_status").then(response => {
+      this.stateOptions = response.data;
+    });
   },
   methods: {
     inputGoodsFaceImg(fileName) {
@@ -246,11 +283,15 @@ export default {
     inputGoodsImg(fileName) {
       this.form.goodsImg = fileName
     },
+    // 状态字典翻译
+    stateFormat(row, column) {
+      return this.selectDictLabel(this.stateOptions, row.state);
+    },
     /** 查询商品信息列表 */
     getList() {
       this.loading = true;
       listWinery_goods(this.queryParams).then(response => {
-        this.winery_goodsList = response.rows;
+        this.goodsList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -309,6 +350,22 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改商品信息";
+
+        listSpec({
+          pageNum: 1,
+          pageSize: 999
+        }).then(r => {
+          this.specData = []
+          for (let i = 0; i < r.rows.length; i++) {
+            this.specData.push({
+              key: r.rows[i].id,
+              label: r.rows[i].specName,
+              // disabled: i % 4 === 0
+            });
+          }
+
+          this.selectedSpecData = this.form.goodsSpec.split(',')
+        })
       });
     },
     /** 提交按钮 */
@@ -316,6 +373,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
+            this.form.goodsSpec = this.selectedSpecData.join(',')
             updateWinery_goods(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
@@ -357,6 +415,21 @@ export default {
       }).then(response => {
         this.download(response.msg);
       })
+    },
+    /**
+     * 商品详情
+     * @param value
+     */
+    onChangeGoodsDesc(value) {
+      this.form.goodsDesc = value.html
+    },
+
+
+    /**
+     * 规格关联穿梭框
+     */
+    handleChangeSpec(value, direction, movedKeys) {
+      console.log(value, direction, movedKeys);
     }
   }
 };

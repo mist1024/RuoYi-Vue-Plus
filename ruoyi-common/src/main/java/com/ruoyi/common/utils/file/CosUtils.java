@@ -42,9 +42,18 @@ public class CosUtils {
     @Autowired
     private CosProperties properties;
 
-    // 指定要上传到的存储桶
+    /**
+     * 正则异常字符
+     */
     String SPECIAL_CHARACTERS = "[`~! @#$%^&*()+=|{}':;',//[//]<>/?~！@#￥%……&*（）_——+|{}【】‘；：”“’。，、？]";
 
+    /**
+     * 表单提交文件
+     *
+     * @param type
+     * @param file
+     * @return
+     */
     public String upload(String type, MultipartFile file) {
 
 
@@ -69,10 +78,42 @@ public class CosUtils {
 
     }
 
-    public void getFile(String fileName, HttpServletResponse response) {
+
+    /**
+     * 上传文件
+     *
+     * @param type
+     * @param fileKey
+     * @param file
+     * @return
+     */
+    public String uploadFile(String type, String fileKey, File file) {
+
+        // 指定要上传到 COS 上对象键
+        String key = ReUtil.replaceAll(StrUtil.trim(Optional.of(fileKey).orElse(StrUtil.EMPTY)), SPECIAL_CHARACTERS, StrUtil.EMPTY);
+        // 生成 cos 客户端。
+        COSClient cosClient = new COSClient(cosCredentials, clientConfig);
+        try {
+            PutObjectResult putObjectResult = cosClient.putObject(properties.getBucketName(), type + "/" + key, file);
+        } catch (Exception e) {
+        } finally {
+
+            cosClient.shutdown();
+        }
+        return type + "/" + key;
+
+    }
+
+    /**
+     * 根据文件key下载文件
+     *
+     * @param fileKey
+     * @param response
+     */
+    public void getFile(String fileKey, HttpServletResponse response) {
 
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
-        GetObjectRequest getObjectRequest = new GetObjectRequest(properties.getBucketName(), fileName);
+        GetObjectRequest getObjectRequest = new GetObjectRequest(properties.getBucketName(), fileKey);
         // 限流使用的单位是bit/s, 这里设置下载带宽限制为 10MB/s
         getObjectRequest.setTrafficLimit(80 * 1024 * 1024);
 
@@ -109,23 +150,5 @@ public class CosUtils {
         cosClient.shutdown();
     }
 
-
-    public String uploadFile(String type, String filename, File file) {
-
-
-        // 指定要上传到 COS 上对象键
-        String key = ReUtil.replaceAll(StrUtil.trim(Optional.of(filename).orElse(StrUtil.EMPTY)), SPECIAL_CHARACTERS, StrUtil.EMPTY);
-        // 生成 cos 客户端。
-        COSClient cosClient = new COSClient(cosCredentials, clientConfig);
-        try {
-            PutObjectResult putObjectResult = cosClient.putObject(properties.getBucketName(), type + "/" + key, file);
-        } catch (Exception e) {
-        } finally {
-
-            cosClient.shutdown();
-        }
-        return type + "/" + key;
-
-    }
 
 }

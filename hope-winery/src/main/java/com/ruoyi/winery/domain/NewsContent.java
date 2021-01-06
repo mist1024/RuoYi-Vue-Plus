@@ -69,6 +69,5 @@ private static final long serialVersionUID=1L;
     private Integer newsType;
 
     /** 状态 */
-    @Excel(name = "状态")
     private Integer state;
 }

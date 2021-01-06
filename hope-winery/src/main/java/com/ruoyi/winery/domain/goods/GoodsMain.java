@@ -1,4 +1,4 @@
-package com.ruoyi.winery.domain.winery;
+package com.ruoyi.winery.domain.goods;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -26,8 +26,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("winery_goods")
-public class WineryGoods implements Serializable {
+@TableName("goods_main")
+public class GoodsMain implements Serializable {
 
 private static final long serialVersionUID=1L;
 
@@ -83,4 +83,9 @@ private static final long serialVersionUID=1L;
     /** 备注 */
     @Excel(name = "备注")
     private String remark;
+
+    /**
+     * 状态
+     */
+    private Integer state;
 }

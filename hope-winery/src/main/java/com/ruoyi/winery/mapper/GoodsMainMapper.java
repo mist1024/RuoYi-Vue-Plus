@@ -1,6 +1,6 @@
 package com.ruoyi.winery.mapper;
 
-import com.ruoyi.winery.domain.winery.WineryGoods;
+import com.ruoyi.winery.domain.goods.GoodsMain;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,6 +9,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author ruoyi
  * @date 2020-12-28
  */
-public interface WineryGoodsMapper extends BaseMapper<WineryGoods> {
+public interface GoodsMainMapper extends BaseMapper<GoodsMain> {
 
 }

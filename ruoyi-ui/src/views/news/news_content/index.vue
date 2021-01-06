@@ -415,8 +415,6 @@ export default {
       })
     },
     onChangeNewsBody(value) {
-
-      console.log(value)
       this.form.newsBody = value.html
     }
   }

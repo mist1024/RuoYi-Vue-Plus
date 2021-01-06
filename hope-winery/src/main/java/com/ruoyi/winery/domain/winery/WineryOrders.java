@@ -80,7 +80,7 @@ public class WineryOrders implements Serializable {
      * 商品基准单价
      */
     @Excel(name = "商品基准单价")
-    private Long goodsPrice;
+    private BigDecimal goodsPrice;
 
     /**
      * 商品数量

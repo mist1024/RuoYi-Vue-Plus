@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="部门ID" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入部门ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="部门ID" prop="deptId">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.deptId"-->
+<!--          placeholder="请输入部门ID"-->
+<!--          clearable-->
+<!--          size="small"-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
       <el-form-item label="规格名称" prop="specName">
         <el-input
           v-model="queryParams.specName"
@@ -28,15 +28,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="规格图片" prop="specImg">
-        <el-input
-          v-model="queryParams.specImg"
-          placeholder="请输入规格图片"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="规格图片" prop="specImg">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.specImg"-->
+<!--          placeholder="请输入规格图片"-->
+<!--          clearable-->
+<!--          size="small"-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
       <el-form-item label="规格单价" prop="specPrice">
         <el-input
           v-model="queryParams.specPrice"
@@ -46,15 +46,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="规格详细" prop="detailSpec">
-        <el-input
-          v-model="queryParams.detailSpec"
-          placeholder="请输入规格详细"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="规格详细" prop="detailSpec">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.detailSpec"-->
+<!--          placeholder="请输入规格详细"-->
+<!--          clearable-->
+<!--          size="small"-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -68,7 +68,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['winery:spec:add']"
+          v-hasPermi="['winery:goods_spec:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -78,7 +78,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['winery:spec:edit']"
+          v-hasPermi="['winery:goods_spec:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -88,7 +88,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['winery:spec:remove']"
+          v-hasPermi="['winery:goods_spec:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -97,7 +97,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['winery:spec:export']"
+          v-hasPermi="['winery:goods_spec:export']"
         >导出</el-button>
       </el-col>
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -106,12 +106,18 @@
     <el-table v-loading="loading" :data="specList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="规格ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="部门ID" align="center" prop="deptId" />
+<!--      <el-table-column label="部门ID" align="center" prop="deptId" />-->
       <el-table-column label="规格名称" align="center" prop="specName" />
+      <el-table-column label="规格图片" align="center" prop="specImg" >
+        <template slot-scope="scope">
+          <el-image :src="scope.row.specImg|getImageForKey" style="width: 60px; height: 60px"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="规格单价（元）" align="center" prop="specPrice" />
       <el-table-column label="规格说明" align="center" prop="specDesc" />
-      <el-table-column label="规格图片" align="center" prop="specImg" />
-      <el-table-column label="规格单价" align="center" prop="specPrice" />
-      <el-table-column label="规格详细" align="center" prop="detailSpec" />
+
+
+<!--      <el-table-column label="规格详细" align="center" prop="detailSpec" />-->
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -120,19 +126,19 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['winery:spec:edit']"
+            v-hasPermi="['winery:goods_spec:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['winery:spec:remove']"
+            v-hasPermi="['winery:goods_spec:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -143,10 +149,10 @@
 
     <!-- 添加或修改商品规格对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入部门ID" />
-        </el-form-item>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px" >
+<!--        <el-form-item label="部门ID" prop="deptId">-->
+<!--          <el-input v-model="form.deptId" placeholder="请输入部门ID" />-->
+<!--        </el-form-item>-->
         <el-form-item label="规格名称" prop="specName">
           <el-input v-model="form.specName" placeholder="请输入规格名称" />
         </el-form-item>
@@ -154,10 +160,11 @@
           <el-input v-model="form.specDesc" placeholder="请输入规格说明" />
         </el-form-item>
         <el-form-item label="规格图片" prop="specImg">
-          <el-input v-model="form.specImg" placeholder="请输入规格图片" />
+<!--          <el-input v-model="form.specImg" placeholder="请输入规格图片" />-->
+          <uploadImage v-model="form.specImg"/>
         </el-form-item>
-        <el-form-item label="规格单价" prop="specPrice">
-          <el-input v-model="form.specPrice" placeholder="请输入规格单价" />
+        <el-form-item label="规格单价（元）" prop="specPrice">
+          <el-input v-model="form.specPrice" type="number" placeholder="请输入规格单价" />
         </el-form-item>
         <el-form-item label="规格详细" prop="detailSpec">
           <el-input v-model="form.detailSpec" placeholder="请输入规格详细" />
@@ -175,11 +182,15 @@
 </template>
 
 <script>
-import { listSpec, getSpec, delSpec, addSpec, updateSpec, exportSpec } from "@/api/winery/spec";
+import { listSpec, getSpec, delSpec, addSpec, updateSpec, exportSpec } from "@/api/goods/goods_spec";
+import UploadImage from '@/components/UploadImage';
+import CommonMixin from "@/mixin/common";
 
 export default {
-  name: "Spec",
+  name: "GoodsSpec",
+  mixins:[CommonMixin],
   components: {
+    UploadImage
   },
   data() {
     return {
@@ -292,6 +303,9 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
+
+
+
             updateSpec(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;

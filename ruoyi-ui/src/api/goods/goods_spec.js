@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询商品规格列表
 export function listSpec(query) {
   return request({
-    url: '/winery/spec/list',
+    url: '/goods/goods_spec/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listSpec(query) {
 // 查询商品规格详细
 export function getSpec(id) {
   return request({
-    url: '/winery/spec/' + id,
+    url: '/goods/goods_spec/' + id,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getSpec(id) {
 // 新增商品规格
 export function addSpec(data) {
   return request({
-    url: '/winery/spec',
+    url: '/goods/goods_spec',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addSpec(data) {
 // 修改商品规格
 export function updateSpec(data) {
   return request({
-    url: '/winery/spec',
+    url: '/goods/goods_spec',
     method: 'put',
     data: data
   })
@@ -38,7 +38,7 @@ export function updateSpec(data) {
 // 删除商品规格
 export function delSpec(id) {
   return request({
-    url: '/winery/spec/' + id,
+    url: '/goods/goods_spec/' + id,
     method: 'delete'
   })
 }
@@ -46,7 +46,7 @@ export function delSpec(id) {
 // 导出商品规格
 export function exportSpec(query) {
   return request({
-    url: '/winery/spec/export',
+    url: '/goods/goods_spec/export',
     method: 'get',
     params: query
   })

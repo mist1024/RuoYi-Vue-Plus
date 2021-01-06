@@ -102,6 +102,14 @@ public class MiniController {
 
     }
 
+    @GetMapping("/getRealAuthJson")
+    AjaxResult getRealAuthJson(@RequestParam String openid) {
+
+
+        return AjaxResult.success(miniComponent.getRealAuthJson(openid));
+
+    }
+
     private WineryCompanyRecord parseRecordWineryModel(JSONObject json) {
 
         WineryCompanyRecord record = new WineryCompanyRecord();

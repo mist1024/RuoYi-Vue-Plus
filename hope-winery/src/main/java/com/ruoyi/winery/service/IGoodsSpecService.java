@@ -1,6 +1,6 @@
 package com.ruoyi.winery.service;
 
-import com.ruoyi.winery.domain.winery.WineryGoodsSpec;
+import com.ruoyi.winery.domain.goods.GoodsSpec;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,6 +9,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author ruoyi
  * @date 2020-12-28
  */
-public interface IWineryGoodsSpecService extends IService<WineryGoodsSpec> {
+public interface IGoodsSpecService extends IService<GoodsSpec> {
 
 }
