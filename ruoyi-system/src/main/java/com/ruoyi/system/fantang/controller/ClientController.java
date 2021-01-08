@@ -51,6 +51,9 @@ public class ClientController extends BaseController {
     @Autowired
     private IFtOrderDaoService iFtOrderDaoService;
 
+    @Autowired
+    private IFtFoodDefaultDaoService foodDefaultDaoService;
+
     /**
      * 获取用餐时间信息
      * 日期：2020年12月11日
@@ -382,6 +385,18 @@ public class ClientController extends BaseController {
     }
 
     /**
+     * 获取各餐品的价格清单
+     * @author : 陈智兴
+     * @param
+     */
+    @GetMapping("/getDinnerPriceList")
+    public AjaxResult getDinnerPriceList() {
+        List<FtFoodDefaultDao> list = foodDefaultDaoService.list(null);
+        return AjaxResult.success(list);
+    }
+
+
+    /**
      * 获取订餐优惠比例
      */
     @GetMapping("/getOrderDiscount/{orderId}")
@@ -399,7 +414,9 @@ public class ClientController extends BaseController {
     public AjaxResult orderCollection(@RequestBody JSONObject params) {
 
         // 订单 id
-        Integer orderId = params.getInteger("orderId");
+        Integer orderId = params.getInteger("staffId");
+        // 订餐类型
+        Integer type = params.getInteger("type");
 
         // 实收
         BigDecimal receipts = params.getBigDecimal("receipts");
