@@ -1,5 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
@@ -413,16 +415,33 @@ public class ClientController extends BaseController {
     @PostMapping("/orderCollection")
     public AjaxResult orderCollection(@RequestBody JSONObject params) {
 
-        // 订单 id
-        Integer orderId = params.getInteger("staffId");
+        // 员工 id
+        Long staffId = params.getLong("staffId");
+
         // 订餐类型
         Integer type = params.getInteger("type");
 
-        // 实收
-        BigDecimal receipts = params.getBigDecimal("receipts");
+        // 总价
+        BigDecimal totalPrice =  params.getBigDecimal("receipts");
 
-        // 当前订单信息
-        FtOrderDao orderDao = orderDaoService.getById(orderId);
+        // 生成新订单
+        FtOrderDao orderDao  = new FtOrderDao();
+        orderDao.setOrderType(type);
+        orderDao.setStaffId(staffId);
+        orderDao.setTotalPrice(totalPrice);
+        Date today = new Date();
+        orderDao.setCreateAt(today);
+        orderDao.setOrderSrc("在线订单");
+        // 余额支付
+        orderDao.setPayType(3);
+        // 已支付
+        orderDao.setPayFlag(1);
+        // 未过期
+        orderDao.setExpiredFlag(0);
+        // 未核销
+        orderDao.setWriteOffFlag(0);
+        DateTime tomorrow = DateUtil.offsetDay(today, 1);
+        orderDao.setOrderDate(tomorrow);
 
         // 当前订单员工信息
         FtStaffInfoDao staffInfoDao = staffInfoDaoService.getById(orderDao.getStaffId());
@@ -431,34 +450,30 @@ public class ClientController extends BaseController {
         BigDecimal balance = staffInfoDao.getBalance();
 
         // 余额是否大于实收
-        if (balance.compareTo(receipts) < 0) {
+        if (balance.compareTo(totalPrice) < 0) {
 
             return AjaxResult.error("补贴余额不足");
 
         } else {
 
             // 更新员工账户补贴余额
-            BigDecimal nowBalance = balance.subtract(receipts);
+            BigDecimal nowBalance = balance.subtract(totalPrice);
             staffInfoDao.setBalance(nowBalance);
 
-            // 更新订单信息
-            orderDao.setReceipts(receipts);
-            orderDao.setPayFlag(1);
-            orderDao.setPayType(3);
             orderDaoService.save(orderDao);
 
             // 添加补贴流水记录
             FtStaffSubsidyDao staffSubsidyDao = new FtStaffSubsidyDao();
             staffSubsidyDao.setStaffId(orderDao.getStaffId());
             staffSubsidyDao.setIncomeType(2);
-            staffSubsidyDao.setPrice(receipts);
-            staffSubsidyDao.setConsumAt(new Date());
+            staffSubsidyDao.setPrice(totalPrice);
+            staffSubsidyDao.setConsumAt(today);
             staffSubsidyDao.setOrderId(orderDao.getOrderId());
             staffSubsidyDaoService.save(staffSubsidyDao);
 
         }
 
-        return AjaxResult.success("已收款");
+        return AjaxResult.success(orderDao);
     }
 
     /**
@@ -471,11 +486,14 @@ public class ClientController extends BaseController {
         // 订单 id
         Integer orderId = params.getInteger("orderId");
 
-        // 实收
-        BigDecimal receipts = params.getBigDecimal("receipts");
-
         // 当前订单信息
         FtOrderDao orderDao = orderDaoService.getById(orderId);
+        // 更新订单信息
+        orderDao.setPayFlag(2);
+        orderDaoService.save(orderDao);
+
+        // 总价
+        BigDecimal totalPrice = orderDao.getTotalPrice();
 
         // 当前订单员工信息
         FtStaffInfoDao staffInfoDao = staffInfoDaoService.getById(orderDao.getStaffId());
@@ -484,15 +502,15 @@ public class ClientController extends BaseController {
         BigDecimal balance = staffInfoDao.getBalance();
 
         // 更新员工账户补贴余额
-        staffInfoDao.setBalance(balance.add(receipts));
+        staffInfoDao.setBalance(balance.add(totalPrice));
         staffInfoDaoService.updateById(staffInfoDao);
 
         // 添加补贴流水记录
         FtStaffSubsidyDao staffSubsidyDao = new FtStaffSubsidyDao();
         staffSubsidyDao.setStaffId(orderDao.getStaffId());
-        // 收支类型
+        // 退款
         staffSubsidyDao.setIncomeType(4);
-        staffSubsidyDao.setPrice(receipts);
+        staffSubsidyDao.setPrice(totalPrice);
         staffSubsidyDao.setConsumAt(new Date());
         staffSubsidyDao.setOrderId(orderDao.getOrderId());
         staffSubsidyDaoService.save(staffSubsidyDao);
