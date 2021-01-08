@@ -36,6 +36,7 @@
         <hutool.version>5.4.0</hutool.version>
         <wx-java.version>4.0.0</wx-java.version>
         <cos-java.version>5.6.34</cos-java.version>
+        <itext7-core.version>7.1.13</itext7-core.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -228,6 +229,15 @@
                 <artifactId>hope-winery</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+
+            <!-- pdf编辑生成 -->
+            <dependency>
+                <groupId>com.itextpdf</groupId>
+                <artifactId>itext7-core</artifactId>
+                <version>${itext7-core.version}</version>
+                <type>pom</type>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

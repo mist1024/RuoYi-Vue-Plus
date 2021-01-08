@@ -50,7 +50,6 @@ public class GoodsMainController extends BaseController {
         startPage();
         LambdaQueryWrapper<GoodsMain> lqw = Wrappers.lambdaQuery(goodsMain);
 
-
         lqw.eq(GoodsMain::getDeptId, getDeptId(token));
 
         if (StringUtils.isNotBlank(goodsMain.getGoodsName())) {

@@ -21,7 +21,12 @@
       </el-form-item>
       <el-form-item label="商品类型" prop="goodsType">
         <el-select v-model="queryParams.goodsType" placeholder="请选择商品类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+          <el-option
+            v-for="dict in goodsTypeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
         </el-select>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
@@ -90,7 +95,7 @@
       <el-table-column label="商品ID" align="center" prop="id" v-if="false"/>
       <el-table-column label="商品名称" align="center" prop="goodsName"/>
       <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
-      <el-table-column label="商品类型" align="center" prop="goodsType"/>
+      <el-table-column label="商品类型" align="center" prop="goodsType" :formatter="goodsTypeFormat" width="100px"/>
       <!--      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>-->
       <!--      <el-table-column label="商品说明" align="center" prop="goodsDesc"/>-->
       <el-table-column label="商品封面" align="center" prop="goodsFaceImg">
@@ -239,6 +244,8 @@ export default {
       open: false,
       // 状态字典
       stateOptions: [],
+      // 商品类型字典
+      goodsTypeOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -274,6 +281,10 @@ export default {
     this.getDicts("sys_release_status").then(response => {
       this.stateOptions = response.data;
     });
+
+    this.getDicts("goods_type").then(response => {
+      this.goodsTypeOptions = response.data;
+    });
   },
   methods: {
     inputGoodsFaceImg(fileName) {
@@ -286,6 +297,11 @@ export default {
     // 状态字典翻译
     stateFormat(row, column) {
       return this.selectDictLabel(this.stateOptions, row.state);
+    },
+
+    // 商品类型字典翻译
+    goodsTypeFormat(row, column) {
+      return this.selectDictLabel(this.goodsTypeOptions, row.goodsType);
     },
     /** 查询商品信息列表 */
     getList() {

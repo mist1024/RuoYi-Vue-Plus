@@ -5,8 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.winery.component.MiniComponent;
 import com.ruoyi.winery.domain.winery.WineryCompanyRecord;
 import com.ruoyi.winery.enums.IrrigationTypeEnum;
@@ -38,6 +40,9 @@ public class MiniController {
     IWineryCompanyRecordService recordWineryService;
 
 
+    @Autowired
+    private SysLoginService loginService;
+
     /**
      * 通过微信api授权获取手机号
      *
@@ -53,7 +58,6 @@ public class MiniController {
         if (StrUtil.isBlank(mobile)) {
             return AjaxResult.error("获取失败!");
         }
-
         JSONObject rsp = new JSONObject();
         rsp.set("mobile", mobile);
 
@@ -61,8 +65,29 @@ public class MiniController {
 
     }
 
+    /**
+     * 通过微信api授权获取手机号并注册
+     *
+     * @param json
+     * @return
+     */
+    @Log(title = "发送小程序手机号码并注册", businessType = BusinessType.OTHER)
+    @PostMapping("/registrationByMiniMobile")
+    AjaxResult postMobileRegistration(@RequestBody JSONObject json) {
+
+        String mobile = miniComponent.getMobile(json);
+        if (StrUtil.isBlank(mobile)) {
+            return AjaxResult.error("获取失败!");
+        }
+        JSONObject rsp = new JSONObject();
+        rsp.set("mobile", mobile);
+        String openid = json.getStr("openid");
+        return miniComponent.registration(openid, mobile);
+    }
+
+
     @Log(title = "微信小程序登录", businessType = BusinessType.OTHER)
-    @GetMapping("/login")
+    @GetMapping("/getSession")
     public AjaxResult getSession(@RequestParam("code") String code) throws WxErrorException {
 
         WxMaJscode2SessionResult sessionInfo = miniComponent.login(code);
@@ -72,6 +97,17 @@ public class MiniController {
         log.info("微信小程序获取openid信息成功");
 
         return AjaxResult.success(json);
+    }
+
+
+    @Log(title = "微信小程序登录系统", businessType = BusinessType.OTHER)
+    @PostMapping("/loginByMini")
+    public AjaxResult loginByMini(@RequestBody JSONObject json) {
+        AjaxResult ajax = AjaxResult.success();
+        // 生成令牌
+        String token = miniComponent.loginByMini(json.getStr("openid"));
+        ajax.put(Constants.TOKEN, token);
+        return ajax;
     }
 
 
@@ -86,7 +122,6 @@ public class MiniController {
         if (old != null) {
             record.setId(old.getId());
         }
-
         return AjaxResult.success(recordWineryService.saveOrUpdate(record));
 
     }
