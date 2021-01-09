@@ -142,6 +142,8 @@ public class FtSettleDaoController extends BaseController {
             case 3:
                 ftSettleDao.setType("在线支付");
                 break;
+
+            default:
         }
         
 

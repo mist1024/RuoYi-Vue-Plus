@@ -368,7 +368,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['fantang:invoice:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -378,7 +379,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['fantang:invoice:edit']"
-        >回款登记</el-button>
+        >回款登记
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -388,7 +390,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['fantang:invoice:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -397,18 +400,20 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['fantang:invoice:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="invoiceList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="发票名" align="center" prop="invoiceName"/>
       <el-table-column label="发票号" align="center" prop="invoiceNum"/>
       <el-table-column label="税号" align="center" prop="taxId"/>
-      <el-table-column label="开票类型" align="center" prop="invoiceType"/>
+      <el-table-column label="收款方式" align="center" prop="collectionType"/>
+      <el-table-column label="开票类型" align="center" prop="invoiceType" :formatter="formatInvoiceType"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -417,14 +422,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:invoice:edit']"
-          >回款登记</el-button>
+          >回款登记
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:invoice:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -454,8 +461,7 @@ import {addInvoice, delInvoice, exportInvoice, getInvoice, listInvoice, updateIn
 
 export default {
   name: "Invoice",
-  components: {
-  },
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -480,19 +486,25 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        invoiceType:2,
+        // invoiceType:2,
       },
       // 表单参数
       form: {},
       // 表单校验
-      rules: {
-      }
+      rules: {}
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    formatInvoiceType(row) {
+      if (row.invoiceType === 1 || row.invoiceType === "1") {
+        return "开票"
+      } else {
+        return "挂账"
+      }
+    },
     /** 查询财务收费开票列表 */
     getList() {
       this.loading = true;
@@ -536,7 +548,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -582,7 +594,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
+      }).then(function () {
         return delInvoice(ids);
       }).then(() => {
         this.getList();
@@ -596,7 +608,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
+      }).then(function () {
         return exportInvoice(queryParams);
       }).then(response => {
         this.download(response.msg);

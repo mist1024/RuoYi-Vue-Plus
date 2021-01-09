@@ -327,14 +327,23 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const settleId = row.settleId || this.ids
+
       console.log(row)
-      getSettlement(settleId).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "开票";
-      });
+
+      if (row.type!=="预付款冲减"){
+        this.reset();
+        const settleId = row.settleId || this.ids
+        console.log(row)
+        getSettlement(settleId).then(response => {
+          this.form = response.data;
+          this.open = true;
+          this.title = "开票";
+        });
+      }else {
+          this.msgError("预付款冲减不能开票")
+      }
+
+
     },
     /** 提交按钮 */
     submitForm() {
