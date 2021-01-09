@@ -33,6 +33,10 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
 
     AjaxResult statisGetOrderOfDate(Date date);
 
+    AjaxResult statisGetOrderOfWeek(Date date);
+
+    AjaxResult statisGetOrderOfMonth(Date date);
+
     List<FtOrderDao> listDetailedByDate(Integer orderType, String start, String end);
 
     List<FtOrderDao> listAllDetailedByDate(String start, String end);

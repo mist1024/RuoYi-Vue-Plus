@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -121,5 +122,29 @@ public class FtOrderDaoController extends BaseController {
     @DeleteMapping("/{orderIds}")
     public AjaxResult remove(@PathVariable Long[] orderIds) {
         return toAjax(iFtOrderDaoService.removeByIds(Arrays.asList(orderIds)) ? 1 : 0);
+    }
+
+    /**
+     * 统计日报餐信息
+     */
+    @GetMapping("/getStatisGetOrderOfDay")
+    public AjaxResult getStatisGetOrderOfDay(@RequestParam Date date) {
+        return iFtOrderDaoService.statisGetOrderOfDate(date);
+    }
+
+    /**
+     * 统计周报餐信息
+     */
+    @GetMapping("/getStatisGetOrderOfWeek")
+    public AjaxResult getStatisGetOrderOfWeek(@RequestParam Date date) {
+        return iFtOrderDaoService.statisGetOrderOfWeek(date);
+    }
+
+    /**
+     * 统计月报餐信息
+     */
+    @GetMapping("/getStatisGetOrderOfMonth")
+    public AjaxResult getStatisGetOrderOfMonth(@RequestParam Date date) {
+        return iFtOrderDaoService.statisGetOrderOfMonth(date);
     }
 }

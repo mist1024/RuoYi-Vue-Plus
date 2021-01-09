@@ -51,3 +51,30 @@ export function exportOrder(query) {
     params: query
   })
 }
+
+// 日报餐信息
+export function getStatisGetOrderOfDay() {
+  return request({
+    url: '/fantang/order/getStatisGetOrderOfDay',
+    method: 'get',
+    params: query
+  })
+}
+
+// 周报餐信息
+export function getStatisGetOrderOfWeek() {
+  return request({
+    url: '/fantang/order/getStatisGetOrderOfWeek',
+    method: 'get',
+    params: query
+  })
+}
+
+// 月报餐信息
+export function getStatisGetOrderOfMonth() {
+  return request({
+    url: '/fantang/order/getStatisGetOrderOfMonth',
+    method: 'get',
+    params: query
+  })
+}
