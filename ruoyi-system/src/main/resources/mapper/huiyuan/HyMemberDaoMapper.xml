@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.huiyuan.mapper.HyMemberDaoMapper">
+    
+    <resultMap type="HyMemberDao" id="HyMemberDaoResult">
+        <result property="id"    column="id"    />
+        <result property="tel"    column="tel"    />
+        <result property="password"    column="password"    />
+        <result property="projType"    column="proj_type"    />
+        <result property="points"    column="points"    />
+        <result property="voucher"    column="voucher"    />
+        <result property="balance"    column="balance"    />
+        <result property="device"    column="device"    />
+        <result property="memberUrl"    column="member_url"    />
+        <result property="createAt"    column="create_at"    />
+        <result property="updateAt"    column="update_at"    />
+        <result property="projId"    column="proj_id"    />
+    </resultMap>
+
+
+</mapper>
