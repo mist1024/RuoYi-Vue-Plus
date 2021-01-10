@@ -53,11 +53,11 @@ export function exportOrder(query) {
 }
 
 // 日报餐信息
-export function getStatisGetOrderOfDay() {
+export function getStatisGetOrderOfDay(data) {
   return request({
     url: '/fantang/order/getStatisGetOrderOfDay',
-    method: 'get',
-    params: query
+    method: 'post',
+    data: data
   })
 }
 

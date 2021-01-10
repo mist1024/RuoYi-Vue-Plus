@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
@@ -127,9 +128,11 @@ public class FtOrderDaoController extends BaseController {
     /**
      * 统计日报餐信息
      */
-    @GetMapping("/getStatisGetOrderOfDay")
-    public AjaxResult getStatisGetOrderOfDay(@RequestParam Date date) {
-        return iFtOrderDaoService.statisGetOrderOfDate(date);
+    @PostMapping("/getStatisGetOrderOfDay")
+    public AjaxResult getStatisGetOrderOfDay(@RequestBody JSONObject params) {
+        System.out.println(params);
+        Date selectDay = params.getDate("selectDay");
+        return iFtOrderDaoService.statisGetOrderOfDate(selectDay);
     }
 
     /**

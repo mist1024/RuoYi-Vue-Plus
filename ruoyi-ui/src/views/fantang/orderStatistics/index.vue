@@ -1,43 +1,50 @@
 <template>
   <div class="app-container">
 
-    <el-row>
-      <el-col>
-        选择统计日期
-      </el-col>
-      <el-col>
+    <el-form :inline="true" :model="formDay" class="demo-form-inline">
+      <el-form-item label="日统计">
         <el-date-picker
-          v-model="selectDay"
+          v-model="formDay.selectDay"
           type="date"
-          placeholder="选择日期">
+          placeholder="请选择统计日">
         </el-date-picker>
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col>
-        选择统计周
-      </el-col>
-      <el-col>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onDaySubmit">统计</el-button>
+      </el-form-item>
+    </el-form>
+
+
+    <el-form :inline="true" :model="formWeek" class="demo-form-inline">
+      <el-form-item label="周统计">
         <el-date-picker
-          v-model="selectWeek"
+          v-model="formWeek.selectWeek"
+          :picker-options="{
+            firstDayOfWeek:1
+          }"
           type="week"
           format="yyyy 第 WW 周"
-          placeholder="选择周">
+          placeholder="请选择统计周">
         </el-date-picker>
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col>
-        选择统计月
-      </el-col>
-      <el-col>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onWeekSubmit">统计</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-form :inline="true" :model="formMonth" class="demo-form-inline">
+      <el-form-item label="月统计">
         <el-date-picker
-          v-model="selectMonth"
+          v-model="formMonth.selectMonth"
           type="month"
-          placeholder="选择月">
+          placeholder="请选择统计月">
         </el-date-picker>
-      </el-col>
-    </el-row>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onMonthSubmit">统计</el-button>
+      </el-form-item>
+    </el-form>
+
 
     <!--    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">-->
     <!--      <el-form-item label="订单类型" prop="orderType">-->
@@ -169,49 +176,11 @@
     <!--      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>-->
     <!--    </el-row>-->
 
-    <!--    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">-->
-    <!--      <el-table-column type="selection" width="55" align="center"/>-->
-    <!--      <el-table-column label="订单 id" align="center" prop="orderId" v-if="false"/>-->
-    <!--      <el-table-column label="订单类型" align="center" prop="orderType" :formatter="orderTypeFormat"/>-->
-    <!--      <el-table-column label="清单" align="center" prop="orderList"/>-->
-    <!--      <el-table-column label="总价" align="center" prop="totalPrice"/>-->
-    <!--      <el-table-column label="折扣" align="center" prop="discount"/>-->
-    <!--      <el-table-column label="实收" align="center" prop="receipts"/>-->
-    <!--      <el-table-column label="创建时间" align="center" prop="createAt" width="180">-->
-    <!--        <template slot-scope="scope">-->
-    <!--          <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>-->
-    <!--        </template>-->
-    <!--      </el-table-column>-->
-    <!--      <el-table-column label="订单来源" align="center" prop="orderSrc"/>-->
-    <!--      <el-table-column label="订单现售" align="center" prop="currentPrice"/>-->
-    <!--      <el-table-column label="支付方式" align="center" prop="payType"/>-->
-    <!--      <el-table-column label="核销时间" align="center" prop="writeOffAt" width="180">-->
-    <!--        <template slot-scope="scope">-->
-    <!--          <span>{{ parseTime(scope.row.writeOffAt, '{y}-{m}-{d}') }}</span>-->
-    <!--        </template>-->
-    <!--      </el-table-column>-->
-    <!--      <el-table-column label="是否过期" align="center" prop="isExpired"/>-->
-    <!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
-    <!--        <template slot-scope="scope">-->
-    <!--          <el-button-->
-    <!--            size="mini"-->
-    <!--            type="text"-->
-    <!--            icon="el-icon-edit"-->
-    <!--            @click="handleUpdate(scope.row)"-->
-    <!--            v-hasPermi="['fantang:order:edit']"-->
-    <!--          >修改-->
-    <!--          </el-button>-->
-    <!--          <el-button-->
-    <!--            size="mini"-->
-    <!--            type="text"-->
-    <!--            icon="el-icon-delete"-->
-    <!--            @click="handleDelete(scope.row)"-->
-    <!--            v-hasPermi="['fantang:order:remove']"-->
-    <!--          >删除-->
-    <!--          </el-button>-->
-    <!--        </template>-->
-    <!--      </el-table-column>-->
-    <!--    </el-table>-->
+    <el-table v-loading="loading" :data="orderCountList" border>
+      <el-table-column label="报餐部门" align="center" prop="departName"/>
+      <el-table-column label="报餐类型" align="center" prop="orderType" :formatter="formatOrderType"/>
+      <el-table-column label="报餐数量" align="center" prop="countOrder"/>
+    </el-table>
 
     <!--    <pagination-->
     <!--      v-show="total>0"-->
@@ -225,16 +194,31 @@
 </template>
 
 <script>
-import {addOrder, delOrder, exportOrder, getOrder, listOrder, updateOrder} from "@/api/fantang/order";
+import {
+  addOrder,
+  delOrder,
+  exportOrder,
+  getOrder,
+  getStatisGetOrderOfDay,
+  listOrder,
+  updateOrder
+} from "@/api/fantang/order";
 
 export default {
   name: "Order",
   components: {},
   data() {
     return {
-      selectDay: null,
-      selectWeek:null,
-      selectMonth:null,
+      typeOptions: [],
+      formMonth: {
+        selectMonth: null,
+      },
+      formWeek: {
+        selectWeek: null,
+      },
+      formDay: {
+        selectDay: null,
+      },
       orderTypeOptions: [],
       // 遮罩层
       loading: true,
@@ -250,6 +234,7 @@ export default {
       total: 0,
       // 订单管理表格数据
       orderList: [],
+      orderCountList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -276,8 +261,33 @@ export default {
   },
   created() {
     this.getList();
+    this.getDicts("ft_book_type").then(response => {
+      this.typeOptions = response.data;
+    });
   },
   methods: {
+    formatOrderType(row) {
+      return this.selectDictLabel(this.typeOptions, row.orderType);
+    },
+    onMonthSubmit() {
+      if (this.formMonth.selectMonth != null) {
+        console.log(this.formMonth)
+      }
+    },
+    onWeekSubmit() {
+      if (this.formWeek.selectWeek != null) {
+        console.log(this.formWeek)
+      }
+    },
+    onDaySubmit() {
+      if (this.formDay.selectDay != null) {
+        console.log(this.formDay)
+        getStatisGetOrderOfDay(this.formDay).then(response => {
+          console.log(response)
+          this.orderCountList = response.data;
+        })
+      }
+    },
     /** 查询订单管理列表 */
     getList() {
       this.loading = true;
