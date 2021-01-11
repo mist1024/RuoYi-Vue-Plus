@@ -7,15 +7,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.*;
+import com.ruoyi.system.fantang.mapper.FtFaceEventDaoMapper;
 import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -55,6 +60,9 @@ public class ClientController extends BaseController {
 
     @Autowired
     private IFtFoodDefaultDaoService foodDefaultDaoService;
+
+    @Autowired
+    private IFtFaceEventService faceEventService;
 
     /**
      * 获取用餐时间信息
@@ -516,6 +524,65 @@ public class ClientController extends BaseController {
         staffSubsidyDaoService.save(staffSubsidyDao);
 
         return AjaxResult.success("已退款");
+    }
+
+
+    /**
+     * 人脸识别设备心跳信号
+     * @param request
+     * @return
+     */
+    @PostMapping("/heartbeat")
+    public String HeartbeatControl(HttpServletRequest request){
+        System.out.println("face device heartbeat.....");
+        StringBuffer data = new StringBuffer();
+        String line = null;
+        BufferedReader reader = null;
+        try {
+            reader = request.getReader();
+            while (null != (line = reader.readLine())) {
+                data.append(line);
+            }
+            JSONObject jsonObject = JSONObject.parseObject(data.toString());
+            System.out.println(jsonObject);
+        } catch (IOException e) {
+        } finally {
+        }
+        return data.toString();
+    }
+
+
+    @PostMapping("/Verify")
+    public String VerifyControl(HttpServletRequest request){
+        System.out.println("verify.....");
+        StringBuffer data = new StringBuffer();
+
+        try {
+            BufferedReader reader = request.getReader();
+            String line = null;
+            while (null != (line = reader.readLine()))
+                data.append(line);
+            JSONObject jsonObject = JSONObject.parseObject(data.toString());
+            System.out.println(jsonObject);
+
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("flag", 0);
+            List<FtFaceEventDao> dao = faceEventService.selectByMap(map);
+            if (dao.size() == 0)
+            {
+                JSONObject infoObject = JSONObject.parseObject(jsonObject.getString("info"));
+                FtFaceEventDao eventDao = new FtFaceEventDao();
+
+                eventDao.setDeviceId(infoObject.getString("DeviceID"));
+                eventDao.setPersonId(infoObject.getString("PersonID"));
+//                faceEventService.insert(eventDao);
+            }
+            else {
+            }
+        } catch (IOException e) {
+        } finally {
+        }
+        return "ok";
     }
 
 }
