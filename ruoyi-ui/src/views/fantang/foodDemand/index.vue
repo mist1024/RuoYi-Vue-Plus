@@ -96,12 +96,7 @@
       <el-table-column label="加饭" align="center" prop="rice" width="80px" :formatter="formatRice"/>
       <el-table-column label="加蛋" align="center" prop="egg" width="80px"/>
       <el-table-column label="营养配餐" align="center" prop="nutritionFood" width="120px"/>
-      <!--      <el-table-column label="更新日期" align="center" prop="updateAt" width="180">-->
-      <!--        <template slot-scope="scope">-->
-      <!--          <span>{{ parseTime(scope.row.updateAt, '{y}-{m}-{d}') }}</span>-->
-      <!--        </template>-->
-      <!--      </el-table-column>-->
-      <el-table-column label="启用状态" align="center" prop="flag" width="80px"/>
+      <el-table-column label="启用状态" align="center" prop="flag" width="80px" :formatter="formatFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -173,6 +168,15 @@
         </el-form-item>
         <el-form-item label="加蛋" prop="egg">
           <el-input-number v-model="form.egg" :min="0" :max="5"/>
+        </el-form-item>
+        <el-form-item label="启用状态" prop="meat">
+          <el-switch
+            v-model="form.flag"
+            active-text="是"
+            inactive-text="否"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -271,10 +275,19 @@ export default {
     });
   },
   methods: {
+    formatFlag(row) {
+      if (row.flag === true) {
+        return "启用";
+      } else if (row.flag === false) {
+        return "禁用";
+      } else {
+        return "";
+      }
+    },
     // 格式化菜单回显文字
     formatFoods(row) {
       const _this = this;
-      if (row.foods!=null){
+      if (row.foods != null) {
         let arr = row.foods.split(",").map(Number);
         let ret = arr.map(item => {
           let obj = _this.foodList.find((value => {
@@ -387,7 +400,7 @@ export default {
       const id = row.id || this.ids
       getFoodDemand(id).then(response => {
         this.form = response.data;
-        if (this.form.foods!=null){
+        if (this.form.foods != null) {
           this.form.foods = this.form.foods.split(",").map(Number);
         }
         this.form.type = this.selectDictLabel(this.typeOptions, row.type);
