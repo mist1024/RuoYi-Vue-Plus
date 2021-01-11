@@ -130,7 +130,7 @@ public class FtOrderDaoController extends BaseController {
      */
     @PostMapping("/getStatisGetOrderOfDay")
     public AjaxResult getStatisGetOrderOfDay(@RequestBody JSONObject params) {
-        startPage();
+
         Date selectDay = params.getDate("selectDay");
         Integer statisticsType = params.getInteger("statisticsType");
         Integer pageNum = params.getInteger("pageNum");
@@ -148,15 +148,16 @@ public class FtOrderDaoController extends BaseController {
      */
     @PostMapping("/getStatisGetOrderOfWeek")
     public AjaxResult getStatisGetOrderOfWeek(@RequestBody JSONObject params) {
-        System.out.println(params);
+
         Date selectWeek = params.getDate("selectWeek");
         Integer statisticsType = params.getInteger("statisticsType");
+        Integer pageNum = params.getInteger("pageNum");
+        Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
             return iFtOrderDaoService.statisGetOrderOfWeek(selectWeek);
         } else {
-//            return iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek);
-            return null;
+            return iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek, pageNum, pageSize);
         }
 
     }
@@ -166,14 +167,16 @@ public class FtOrderDaoController extends BaseController {
      */
     @PostMapping("/getStatisGetOrderOfMonth")
     public AjaxResult getStatisGetOrderOfMonth(@RequestBody JSONObject params) {
+
         Date selectMonth = params.getDate("selectMonth");
         Integer statisticsType = params.getInteger("statisticsType");
+        Integer pageNum = params.getInteger("pageNum");
+        Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
             return iFtOrderDaoService.statisGetOrderOfMonth(selectMonth);
         }else {
-//            return iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth);
-            return null;
+            return iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth, pageNum, pageSize);
         }
     }
 }

@@ -74,6 +74,7 @@
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      @pagination="getStatisticsList"
     />
 
   </div>
@@ -133,6 +134,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      // 查询类型
+      selectType: null,
       // 订单管理表格数据
       orderList: [],
       orderCountList: [],
@@ -145,6 +148,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         selectDay: null,
+        selectWeek: null,
+        selectMonth: null,
         statisticsType: null,
       },
       // 表单参数
@@ -160,6 +165,29 @@ export default {
     });
   },
   methods: {
+    getStatisticsList() {
+      if (this.selectType === 1 || this.selectType === '1') {
+        getStatisGetOrderOfDay(this.queryParams).then(response => {
+          console.log(response)
+          this.orderCountList = response.data;
+          this.selectType = 1;
+          this.total = response.total;
+        })
+      } else if (this.selectType === 2 || this.selectType === '2') {
+        getStatisGetOrderOfWeek(this.queryParams).then(response => {
+          console.log(response)
+          this.orderCountList = response.data;
+          this.selectType = 2;
+          this.total = response.total;
+        })
+      } else if (this.selectType === 3 || this.selectType === '3') {
+        getStatisGetOrderOfMonth(this.queryParams).then(response => {
+          this.orderCountList = response.data;
+          this.selectType = 3;
+          this.total = response.total;
+        })
+      }
+    },
     changeStatisticsType(item) {
       console.log(item)
       this.formDay.statisticsType = item;
@@ -190,8 +218,12 @@ export default {
       }
       if (this.formMonth.selectMonth != null && this.formMonth.statisticsType != null) {
         console.log(this.formMonth)
-        getStatisGetOrderOfMonth(this.formMonth).then(response => {
+        this.queryParams.selectMonth = this.formMonth.selectMonth;
+        this.queryParams.statisticsType = this.formMonth.statisticsType;
+        getStatisGetOrderOfMonth(this.queryParams).then(response => {
           this.orderCountList = response.data;
+          this.selectType = 3;
+          this.total = response.total;
         })
       }
     },
@@ -201,9 +233,13 @@ export default {
       }
       if (this.formWeek.selectWeek != null && this.formWeek.statisticsType != null) {
         console.log(this.formWeek)
-        getStatisGetOrderOfWeek(this.formWeek).then(response => {
+        this.queryParams.selectWeek = this.formWeek.selectWeek;
+        this.queryParams.statisticsType = this.formWeek.statisticsType;
+        getStatisGetOrderOfWeek(this.queryParams).then(response => {
           console.log(response)
           this.orderCountList = response.data;
+          this.selectType = 2;
+          this.total = response.total;
         })
       }
     },
@@ -218,6 +254,8 @@ export default {
         getStatisGetOrderOfDay(this.queryParams).then(response => {
           console.log(response)
           this.orderCountList = response.data;
+          this.selectType = 1;
+          // this.total = response.total;
         })
       }
     },
