@@ -62,19 +62,19 @@ export function getStatisGetOrderOfDay(data) {
 }
 
 // 周报餐信息
-export function getStatisGetOrderOfWeek() {
+export function getStatisGetOrderOfWeek(data) {
   return request({
     url: '/fantang/order/getStatisGetOrderOfWeek',
-    method: 'get',
-    params: query
+    method: 'post',
+    data: data
   })
 }
 
 // 月报餐信息
-export function getStatisGetOrderOfMonth() {
+export function getStatisGetOrderOfMonth(data) {
   return request({
     url: '/fantang/order/getStatisGetOrderOfMonth',
-    method: 'get',
-    params: query
+    method: 'post',
+    data: data
   })
 }

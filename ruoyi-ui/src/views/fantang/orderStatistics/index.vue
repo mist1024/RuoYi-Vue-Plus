@@ -43,6 +43,9 @@
       <el-form-item>
         <el-button type="primary" @click="onMonthSubmit">统计</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button @click="resetCount">重置</el-button>
+      </el-form-item>
     </el-form>
 
 
@@ -200,6 +203,8 @@ import {
   exportOrder,
   getOrder,
   getStatisGetOrderOfDay,
+  getStatisGetOrderOfMonth,
+  getStatisGetOrderOfWeek,
   listOrder,
   updateOrder
 } from "@/api/fantang/order";
@@ -266,17 +271,36 @@ export default {
     });
   },
   methods: {
+    resetCount() {
+      this.formDay = {
+        selectDay: null
+      }
+      this.formWeek = {
+        selectWeek: null
+      }
+      this.formMonth = {
+        selectMonth: null
+      }
+      this.orderCountList = null
+    },
     formatOrderType(row) {
       return this.selectDictLabel(this.typeOptions, row.orderType);
     },
     onMonthSubmit() {
       if (this.formMonth.selectMonth != null) {
         console.log(this.formMonth)
+        getStatisGetOrderOfMonth(this.formMonth).then(response => {
+          this.orderCountList = response.data;
+        })
       }
     },
     onWeekSubmit() {
       if (this.formWeek.selectWeek != null) {
         console.log(this.formWeek)
+        getStatisGetOrderOfWeek(this.formWeek).then(response => {
+          console.log(response)
+          this.orderCountList = response.data;
+        })
       }
     },
     onDaySubmit() {

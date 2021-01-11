@@ -130,7 +130,6 @@ public class FtOrderDaoController extends BaseController {
      */
     @PostMapping("/getStatisGetOrderOfDay")
     public AjaxResult getStatisGetOrderOfDay(@RequestBody JSONObject params) {
-        System.out.println(params);
         Date selectDay = params.getDate("selectDay");
         return iFtOrderDaoService.statisGetOrderOfDate(selectDay);
     }
@@ -138,16 +137,19 @@ public class FtOrderDaoController extends BaseController {
     /**
      * 统计周报餐信息
      */
-    @GetMapping("/getStatisGetOrderOfWeek")
-    public AjaxResult getStatisGetOrderOfWeek(@RequestParam Date date) {
-        return iFtOrderDaoService.statisGetOrderOfWeek(date);
+    @PostMapping("/getStatisGetOrderOfWeek")
+    public AjaxResult getStatisGetOrderOfWeek(@RequestBody JSONObject params) {
+        System.out.println(params);
+        Date selectWeek = params.getDate("selectWeek");
+        return iFtOrderDaoService.statisGetOrderOfWeek(selectWeek);
     }
 
     /**
      * 统计月报餐信息
      */
-    @GetMapping("/getStatisGetOrderOfMonth")
-    public AjaxResult getStatisGetOrderOfMonth(@RequestParam Date date) {
-        return iFtOrderDaoService.statisGetOrderOfMonth(date);
+    @PostMapping("/getStatisGetOrderOfMonth")
+    public AjaxResult getStatisGetOrderOfMonth(@RequestBody JSONObject params) {
+        Date selectMonth = params.getDate("selectMonth");
+        return iFtOrderDaoService.statisGetOrderOfMonth(selectMonth);
     }
 }
