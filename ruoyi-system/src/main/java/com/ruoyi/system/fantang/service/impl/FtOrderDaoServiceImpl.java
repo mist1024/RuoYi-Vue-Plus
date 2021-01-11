@@ -131,8 +131,9 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     }
 
     @Override
-    public AjaxResult statisGetOrderOfDateByPerson(Date date) {
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString()));
+    public AjaxResult statisGetOrderOfDateByPerson(Date date, Integer pageNum, Integer pageSize) {
+        Integer offset = (pageNum - 1) * pageSize;
+        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString(),  offset, pageSize));
     }
 
     @Override
@@ -141,8 +142,8 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     }
 
     @Override
-    public AjaxResult statisGetOrderOfWeekByPerson(Date date) {
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString()));
+    public AjaxResult statisGetOrderOfWeekByPerson(Date date , Integer pageNum, Integer pageSize) {
+        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString(),   pageNum, pageSize));
     }
 
     @Override
@@ -151,8 +152,8 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     }
 
     @Override
-    public AjaxResult statisGetOrderOfMonthByPerson(Date date) {
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfMonth(date).toString(), DateUtil.endOfMonth(date).toString()));
+    public AjaxResult statisGetOrderOfMonthByPerson(Date date, Integer pageNum, Integer pageSize) {
+        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfMonth(date).toString(), DateUtil.endOfMonth(date).toString(), pageNum, pageSize));
     }
 
     @Override

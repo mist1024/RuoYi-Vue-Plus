@@ -43,8 +43,8 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
             "\ta.order_type,\n" +
             "\tc.depart_name,\n" +
             "\tb.`name`,\n" +
-            "\tb.tel")
-    List<FtOrderDao> statisGetOrderOfDateByPerson(@Param("start") String start, @Param("end") String end);
+            "\tb.tel limit  #{offset} , #{pageSize}")
+    List<FtOrderDao> statisGetOrderOfDateByPerson(@Param("start") String start, @Param("end") String end, @Param("offset") Integer offset, @Param("pageSize") Integer pageSize);
 
     List<FtOrderDao> listDetailedByDate(@Param("orderType") Integer orderType, @Param("start") String start, @Param("end") String end);
 

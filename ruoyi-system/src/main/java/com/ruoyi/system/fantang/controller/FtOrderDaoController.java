@@ -133,11 +133,13 @@ public class FtOrderDaoController extends BaseController {
         startPage();
         Date selectDay = params.getDate("selectDay");
         Integer statisticsType = params.getInteger("statisticsType");
+        Integer pageNum = params.getInteger("pageNum");
+        Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
             return iFtOrderDaoService.statisGetOrderOfDate(selectDay);
         } else {
-            return iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay);
+            return iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay, pageNum, pageSize);
         }
     }
 
@@ -153,7 +155,8 @@ public class FtOrderDaoController extends BaseController {
         if (statisticsType == 1) {
             return iFtOrderDaoService.statisGetOrderOfWeek(selectWeek);
         } else {
-            return iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek);
+//            return iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek);
+            return null;
         }
 
     }
@@ -169,7 +172,8 @@ public class FtOrderDaoController extends BaseController {
         if (statisticsType == 1) {
             return iFtOrderDaoService.statisGetOrderOfMonth(selectMonth);
         }else {
-            return iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth);
+//            return iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth);
+            return null;
         }
     }
 }
