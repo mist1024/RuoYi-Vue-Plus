@@ -21,10 +21,30 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
 
     @Select("select a.order_type, count(a.order_type) as count_order , c.depart_name   from ft_order a\n" +
             "    LEFT JOIN ft_staff_info b on a.staff_id = b.staff_id\n" +
-            "    LEFT JOIN ft_depart c on b.depart_id = c.depart_id where a.order_date BETWEEN #{start} and #{end}\n" +
+            "    LEFT JOIN ft_depart c on b.depart_id = c.depart_id where b.depart_id = c.depart_id and a.order_date BETWEEN #{start} and #{end}\n" +
             "    GROUP BY a.order_type, c.depart_name")
     List<FtOrderDao> statisGetOrderOfDate(@Param("start") String start, @Param("end") String end);
 
+    @Select("SELECT\n" +
+            "\ta.order_type,\n" +
+            "\tcount( a.order_type ) AS count_order,\n" +
+            "\tc.depart_name,\n" +
+            "\tb.`name` AS staff_name,\n" +
+            "\tb.tel \n" +
+            "FROM\n" +
+            "\tft_order a\n" +
+            "\tLEFT JOIN ft_staff_info b ON a.staff_id = b.staff_id\n" +
+            "\tLEFT JOIN ft_depart c ON b.depart_id = c.depart_id \n" +
+            "WHERE\n" +
+            "\tb.depart_id = c.depart_id \n" +
+            "\tAND a.order_date BETWEEN #{start} \n" +
+            "\tAND #{end} \n" +
+            "GROUP BY\n" +
+            "\ta.order_type,\n" +
+            "\tc.depart_name,\n" +
+            "\tb.`name`,\n" +
+            "\tb.tel")
+    List<FtOrderDao> statisGetOrderOfDateByPerson(@Param("start") String start, @Param("end") String end);
 
     List<FtOrderDao> listDetailedByDate(@Param("orderType") Integer orderType, @Param("start") String start, @Param("end") String end);
 

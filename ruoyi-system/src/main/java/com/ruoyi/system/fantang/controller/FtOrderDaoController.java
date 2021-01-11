@@ -130,8 +130,15 @@ public class FtOrderDaoController extends BaseController {
      */
     @PostMapping("/getStatisGetOrderOfDay")
     public AjaxResult getStatisGetOrderOfDay(@RequestBody JSONObject params) {
+        startPage();
         Date selectDay = params.getDate("selectDay");
-        return iFtOrderDaoService.statisGetOrderOfDate(selectDay);
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        if (statisticsType == 1) {
+            return iFtOrderDaoService.statisGetOrderOfDate(selectDay);
+        } else {
+            return iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay);
+        }
     }
 
     /**
@@ -141,7 +148,14 @@ public class FtOrderDaoController extends BaseController {
     public AjaxResult getStatisGetOrderOfWeek(@RequestBody JSONObject params) {
         System.out.println(params);
         Date selectWeek = params.getDate("selectWeek");
-        return iFtOrderDaoService.statisGetOrderOfWeek(selectWeek);
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        if (statisticsType == 1) {
+            return iFtOrderDaoService.statisGetOrderOfWeek(selectWeek);
+        } else {
+            return iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek);
+        }
+
     }
 
     /**
@@ -150,6 +164,12 @@ public class FtOrderDaoController extends BaseController {
     @PostMapping("/getStatisGetOrderOfMonth")
     public AjaxResult getStatisGetOrderOfMonth(@RequestBody JSONObject params) {
         Date selectMonth = params.getDate("selectMonth");
-        return iFtOrderDaoService.statisGetOrderOfMonth(selectMonth);
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        if (statisticsType == 1) {
+            return iFtOrderDaoService.statisGetOrderOfMonth(selectMonth);
+        }else {
+            return iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth);
+        }
     }
 }

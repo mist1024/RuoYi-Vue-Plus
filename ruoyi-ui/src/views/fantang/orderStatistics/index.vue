@@ -1,8 +1,21 @@
 <template>
   <div class="app-container">
 
+    <el-form :inline="true" :model="formStatisticsType" class="demo-form-inline">
+      <el-form-item label="统计方式">
+        <el-select v-model="formStatisticsType.statisticsType" placeholder="请选择统计方式" @change="changeStatisticsType">
+          <el-option
+            v-for="item in statisticsTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+
     <el-form :inline="true" :model="formDay" class="demo-form-inline">
-      <el-form-item label="日统计">
+      <el-form-item label="日统计" label-width="68px">
         <el-date-picker
           v-model="formDay.selectDay"
           type="date"
@@ -16,7 +29,7 @@
 
 
     <el-form :inline="true" :model="formWeek" class="demo-form-inline">
-      <el-form-item label="周统计">
+      <el-form-item label="周统计" label-width="68px">
         <el-date-picker
           v-model="formWeek.selectWeek"
           :picker-options="{
@@ -33,7 +46,7 @@
     </el-form>
 
     <el-form :inline="true" :model="formMonth" class="demo-form-inline">
-      <el-form-item label="月统计">
+      <el-form-item label="月统计" label-width="68px">
         <el-date-picker
           v-model="formMonth.selectMonth"
           type="month"
@@ -183,15 +196,16 @@
       <el-table-column label="报餐部门" align="center" prop="departName"/>
       <el-table-column label="报餐类型" align="center" prop="orderType" :formatter="formatOrderType"/>
       <el-table-column label="报餐数量" align="center" prop="countOrder"/>
+      <el-table-column label="报餐员工" align="center" prop="staffName"/>
+      <el-table-column label="电话" align="center" prop="tel"/>
     </el-table>
 
-    <!--    <pagination-->
-    <!--      v-show="total>0"-->
-    <!--      :total="total"-->
-    <!--      :page.sync="queryParams.pageNum"-->
-    <!--      :limit.sync="queryParams.pageSize"-->
-    <!--      @pagination="getList"-->
-    <!--    />-->
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+    />
 
   </div>
 </template>
@@ -214,15 +228,28 @@ export default {
   components: {},
   data() {
     return {
+      statisticsTypeOptions: [{
+        value: 1,
+        label: '按部门'
+      }, {
+        value: 2,
+        label: '按人'
+      }],
       typeOptions: [],
+      formStatisticsType: {
+        statisticsType: null,
+      },
       formMonth: {
         selectMonth: null,
+        statisticsType: null,
       },
       formWeek: {
         selectWeek: null,
+        statisticsType: null,
       },
       formDay: {
         selectDay: null,
+        statisticsType: null,
       },
       orderTypeOptions: [],
       // 遮罩层
@@ -248,15 +275,6 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        orderType: null,
-        totalPrice: null,
-        discount: null,
-        receipts: null,
-        createAt: null,
-        orderSrc: null,
-        currentPrice: null,
-        payType: null,
-        writeOffAt: null,
       },
       // 表单参数
       form: {},
@@ -271,7 +289,16 @@ export default {
     });
   },
   methods: {
+    changeStatisticsType(item) {
+      console.log(item)
+      this.formDay.statisticsType = item;
+      this.formWeek.statisticsType = item;
+      this.formMonth.statisticsType = item;
+    },
     resetCount() {
+      this.formStatisticsType = {
+        statisticsType: null
+      }
       this.formDay = {
         selectDay: null
       }
@@ -287,7 +314,10 @@ export default {
       return this.selectDictLabel(this.typeOptions, row.orderType);
     },
     onMonthSubmit() {
-      if (this.formMonth.selectMonth != null) {
+      if (this.formMonth.statisticsType == null) {
+        this.msgError("请选择统计方式")
+      }
+      if (this.formMonth.selectMonth != null && this.formMonth.statisticsType != null) {
         console.log(this.formMonth)
         getStatisGetOrderOfMonth(this.formMonth).then(response => {
           this.orderCountList = response.data;
@@ -295,7 +325,10 @@ export default {
       }
     },
     onWeekSubmit() {
-      if (this.formWeek.selectWeek != null) {
+      if (this.formWeek.statisticsType == null) {
+        this.msgError("请选择统计方式")
+      }
+      if (this.formWeek.selectWeek != null && this.formWeek.statisticsType != null) {
         console.log(this.formWeek)
         getStatisGetOrderOfWeek(this.formWeek).then(response => {
           console.log(response)
@@ -304,7 +337,10 @@ export default {
       }
     },
     onDaySubmit() {
-      if (this.formDay.selectDay != null) {
+      if (this.formDay.statisticsType == null) {
+        this.msgError("请选择统计方式")
+      }
+      if (this.formDay.selectDay != null && this.formDay.statisticsType != null) {
         console.log(this.formDay)
         getStatisGetOrderOfDay(this.formDay).then(response => {
           console.log(response)

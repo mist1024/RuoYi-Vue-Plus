@@ -156,4 +156,10 @@ public class FtOrderDao implements Serializable {
 
     @TableField(exist = false)
     private Long departId;
+
+    @TableField(exist = false)
+    private String staffName;
+
+    @TableField(exist = false)
+    private String tel;
 }
