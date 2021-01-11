@@ -71,6 +71,18 @@ public class FtOrderDao implements Serializable {
     private BigDecimal totalPrice;
 
     /**
+     * 统计总数
+     */
+    @TableField(exist = false)
+    private Integer total;
+
+    /**
+     * 报餐类型
+     */
+    @TableField(exist = false)
+    private Integer type;
+
+    /**
      * 折扣
      */
     @Excel(name = "折扣")

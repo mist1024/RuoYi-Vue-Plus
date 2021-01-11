@@ -7,12 +7,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.fantang.domain.FtFoodDao;
-import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
-import com.ruoyi.system.fantang.domain.FtReportMealsDao;
-import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
+import com.ruoyi.system.fantang.domain.*;
 import com.ruoyi.system.fantang.service.*;
-import com.ruoyi.system.fantang.vo.FtDepartVo;
 import com.ruoyi.system.fantang.vo.FtPatientVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -161,5 +157,38 @@ public class ClientPatientController extends BaseController {
         QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
         wrapper.eq("type", 1);
         return AjaxResult.success(iftFoodDaoService.list(wrapper));
+    }
+
+    /**
+     * 病患报餐日统计
+     */
+    @GetMapping("/getStatisticsReportMealsOfDay")
+    public AjaxResult getStatisticsReportMealsOfDay(@RequestParam("date") Date day) {
+
+        List<FtOrderDao> list = iFtFoodDemandDaoService.getStatisticsOfDay(day);
+
+        return AjaxResult.success(list);
+    }
+
+    /**
+     * 病患报餐周统计
+     */
+    @GetMapping("/getStatisticsReportMealsOfWeek")
+    public AjaxResult getStatisticsReportMealsOfWeek(@RequestParam("date") Date day) {
+
+        List<FtOrderDao> list = iFtFoodDemandDaoService.getStatisticsOfWeek(day);
+
+        return AjaxResult.success(list);
+    }
+
+    /**
+     * 病患报餐月统计
+     */
+    @GetMapping("/getStatisticsReportMealsOfMonth")
+    public AjaxResult getStatisticsReportMealsOfMonth(@RequestParam("date") Date day) {
+
+        List<FtOrderDao> list = iFtFoodDemandDaoService.getStatisticsOfMonth(day);
+
+        return AjaxResult.success(list);
     }
 }

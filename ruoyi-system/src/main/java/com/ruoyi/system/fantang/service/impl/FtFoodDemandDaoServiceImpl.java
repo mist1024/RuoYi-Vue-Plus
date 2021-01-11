@@ -1,11 +1,14 @@
 package com.ruoyi.system.fantang.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.mapper.FtFoodDemandDaoMapper;
 import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,5 +44,20 @@ public class FtFoodDemandDaoServiceImpl extends ServiceImpl<FtFoodDemandDaoMappe
     @Override
     public FtFoodDemandDao getByIdNewFormatter(Long id) {
         return this.baseMapper.getByIdNewFormatter(id);
+    }
+
+    @Override
+    public List<FtOrderDao> getStatisticsOfDay(Date day) {
+        return this.baseMapper.getStatisticsOfDate(DateUtil.beginOfDay(day).toString(), DateUtil.endOfDay(day).toString());
+    }
+
+    @Override
+    public List<FtOrderDao> getStatisticsOfWeek(Date day) {
+        return this.baseMapper.getStatisticsOfDate(DateUtil.beginOfWeek(day).toString(), DateUtil.endOfWeek(day).toString());
+    }
+
+    @Override
+    public List<FtOrderDao> getStatisticsOfMonth(Date day) {
+        return this.baseMapper.getStatisticsOfDate(DateUtil.beginOfMonth(day).toString(), DateUtil.endOfMonth(day).toString());
     }
 }

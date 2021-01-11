@@ -1,9 +1,10 @@
 package com.ruoyi.system.fantang.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,9 +16,15 @@ import java.util.List;
 public interface IFtFoodDemandDaoService extends IService<FtFoodDemandDao> {
     public Integer GenerateOrderByPatientId(Long patientId);
 
-    public Integer GenerateOrderForNewPatient() ;
+    public Integer GenerateOrderForNewPatient();
 
     List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao);
 
     FtFoodDemandDao getByIdNewFormatter(Long id);
+
+    List<FtOrderDao> getStatisticsOfDay(Date day);
+
+    List<FtOrderDao> getStatisticsOfWeek(Date day);
+
+    List<FtOrderDao> getStatisticsOfMonth(Date day);
 }

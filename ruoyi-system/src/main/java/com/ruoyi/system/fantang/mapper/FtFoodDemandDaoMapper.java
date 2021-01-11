@@ -1,8 +1,8 @@
 package com.ruoyi.system.fantang.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -25,4 +25,23 @@ public interface FtFoodDemandDaoMapper extends BaseMapper<FtFoodDemandDao> {
     List<FtFoodDemandDao> listNewFormatter(FtFoodDemandDao ftFoodDemandDao);
 
     FtFoodDemandDao getByIdNewFormatter(Long id);
+
+    @Select("SELECT\n" +
+            "\td.depart_name,\n" +
+            "\tcount(*) AS total,\n" +
+            "\ta.type \n" +
+            "FROM\n" +
+            "\tft_report_meals a\n" +
+            "\tLEFT JOIN ft_food_demand b ON a.patient_id = b.patient_id\n" +
+            "\tLEFT JOIN ft_patient c ON a.patient_id = c.patient_id\n" +
+            "\tLEFT JOIN ft_depart d ON c.depart_id = d.depart_id \n" +
+            "WHERE\n" +
+            "\tb.flag = 1 \n" +
+            "\tAND a.type = b.type \n" +
+            "\tAND c.depart_id = d.depart_id  and  a.create_at BETWEEN #{start} and #{end}\n" +
+            "\t\n" +
+            "GROUP BY\n" +
+            "\td.depart_name,\n" +
+            "\ta.type")
+    List<FtOrderDao> getStatisticsOfDate(@Param("start") String start, @Param("end") String end);
 }
