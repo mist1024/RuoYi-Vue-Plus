@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.winery.mapper.AppDiscussMapper">
+    
+    <resultMap type="AppDiscuss" id="AppDiscussResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="state"    column="state"    />
+        <result property="createUser"    column="create_user"    />
+        <result property="updateUser"    column="update_user"    />
+        <result property="appDiscussReplyId"    column="app_discuss_reply_id"    />
+        <result property="appDiscussText"    column="app_discuss_text"    />
+        <result property="appAssociationId"    column="app_association_id"    />
+        <result property="appDiscussImage"    column="app_discuss_image"    />
+        <result property="appDiscussVideo"    column="app_discuss_video"    />
+        <result property="appDiscussExtraUsername"    column="app_discuss_extra_username"    />
+        <result property="appDiscussExtraMobile"    column="app_discuss_extra_mobile"    />
+        <result property="appDiscussRecommend"    column="app_discuss_recommend"    />
+        <result property="appDiscussType"    column="app_discuss_type"    />
+        <result property="appDiscussReplyUser"    column="app_discuss_reply_user"    />
+    </resultMap>
+
+
+</mapper>
