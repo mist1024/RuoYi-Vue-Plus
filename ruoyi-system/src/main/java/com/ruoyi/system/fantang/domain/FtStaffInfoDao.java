@@ -144,4 +144,9 @@ public class FtStaffInfoDao {
 
     @TableField(exist = false)
     private Boolean giveOutFlag = true;
+
+    /**
+     * 人脸设备里的员工 id
+     */
+    private Long personId;
 }

@@ -22,6 +22,7 @@
         <result property="qrCode" column="qr_code"/>
         <result property="sex" column="sex"/>
         <result property="tel" column="tel"/>
+        <result property="personId" column="person_id"/>
     </resultMap>
 
     <select id="selectStaffInfoWithDepart" parameterType="FtStaffInfoDao"
