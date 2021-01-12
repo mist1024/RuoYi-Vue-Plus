@@ -11,6 +11,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtPatientDao;
+import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
 import com.ruoyi.system.fantang.service.IFtPatientDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ import java.util.List;
 public class FtPatientDaoController extends BaseController {
 
     private final IFtPatientDaoService iFtPatientDaoService;
+
+    private final IFtFoodDemandDaoService iFtFoodDemandDaoService;
 
     /**
      * 查询病人管理列表
@@ -106,8 +109,12 @@ public class FtPatientDaoController extends BaseController {
     public AjaxResult add(@RequestBody FtPatientDao ftPatientDao) {
 
         ftPatientDao.setCreateAt(new Date());
+        ftPatientDao.setOffFlag(0);
+        iFtPatientDaoService.save(ftPatientDao);
 
-        return toAjax(iFtPatientDaoService.save(ftPatientDao) ? 1 : 0);
+        iFtFoodDemandDaoService.GenerateOrderByPatientId(ftPatientDao.getPatientId());
+
+        return AjaxResult.success("已添加");
     }
 
     /**
