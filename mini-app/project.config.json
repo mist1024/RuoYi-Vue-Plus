@@ -24,7 +24,7 @@
 	},
 	"compileType": "miniprogram",
 	"appid": "wx76ec015fc31a1946",
-	"projectname": "hope_wine",
+	"projectname": "mini-app",
 	"miniprogramRoot": "weapp/",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},

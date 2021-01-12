@@ -1,5 +1,0 @@
-
-<van-nav-bar border="{{false}}" custom-style="background:#AC1630;color:#FFF;" data-wpy-evt="20-0" bind:click-left="__dispatcher">
-  <van-icon name="arrow-left" slot="left" color="#fff"></van-icon>
-  <label slot="title" style="color: #fff;">{{title}}</label>
-</van-nav-bar>
