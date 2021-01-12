@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.winery.domain.goods.GoodsMain;
 import com.ruoyi.winery.domain.goods.GoodsSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +28,8 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.winery.service.IGoodsSpecService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+
+import static com.ruoyi.common.utils.SecurityUtils.*;
 
 /**
  * 商品规格Controller
@@ -51,7 +54,7 @@ public class GoodsSpecController extends BaseController {
 
         LambdaQueryWrapper<GoodsSpec> lqw = Wrappers.lambdaQuery(goodsSpec);
 
-        lqw.eq(GoodsSpec::getDeptId, getDeptId(token));
+        lqw.eq(!isAdmin(), GoodsSpec::getDeptId, getDeptId());
 
         if (StringUtils.isNotBlank(goodsSpec.getSpecName())) {
             lqw.like(GoodsSpec::getSpecName, goodsSpec.getSpecName());
@@ -101,7 +104,7 @@ public class GoodsSpecController extends BaseController {
     @Log(title = "商品规格", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody GoodsSpec goodsSpec) {
-        goodsSpec.setDeptId(getDeptId(token));
+        goodsSpec.setDeptId(getDeptId());
         return toAjax(iWineryGoodsSpecService.save(goodsSpec) ? 1 : 0);
     }
 
@@ -112,6 +115,7 @@ public class GoodsSpecController extends BaseController {
     @Log(title = "商品规格", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody GoodsSpec goodsSpec) {
+        goodsSpec.setUpdateBy(getUsername());
         return toAjax(iWineryGoodsSpecService.updateById(goodsSpec) ? 1 : 0);
     }
 

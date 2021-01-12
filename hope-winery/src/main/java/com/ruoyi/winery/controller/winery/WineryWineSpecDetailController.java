@@ -27,6 +27,9 @@ import com.ruoyi.winery.service.IWineryWineSpecDetailService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
+import static com.ruoyi.common.utils.SecurityUtils.getDeptId;
+import static com.ruoyi.common.utils.SecurityUtils.getUsername;
+
 /**
  * 葡萄酒规格详情Controller
  * 
@@ -121,6 +124,8 @@ public class WineryWineSpecDetailController extends BaseController {
     @Log(title = "葡萄酒规格详情" , businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WineryWineSpecDetail wineryWineSpecDetail) {
+        wineryWineSpecDetail.setCreateBy(getUsername());
+        wineryWineSpecDetail.setDeptId(getDeptId());
         return toAjax(iWineryWineSpecDetailService.save(wineryWineSpecDetail) ? 1 : 0);
     }
 
@@ -131,6 +136,7 @@ public class WineryWineSpecDetailController extends BaseController {
     @Log(title = "葡萄酒规格详情" , businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WineryWineSpecDetail wineryWineSpecDetail) {
+        wineryWineSpecDetail.setUpdateBy(getUsername());
         return toAjax(iWineryWineSpecDetailService.updateById(wineryWineSpecDetail) ? 1 : 0);
     }
 

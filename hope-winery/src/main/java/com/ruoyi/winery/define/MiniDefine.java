@@ -8,6 +8,8 @@ public class MiniDefine {
 
     public static final String MINI_MANAGE_USER  = "admin";
 
+    public static final String MINI_USER_SYMBOL = "mini-";
+
     public static final Long MINI_DEPTID = 100L;
 
     public static final String MINI_DEFUALT_PASSWORD = "Xiao4rHospSoft";

@@ -1,6 +1,7 @@
 package com.ruoyi.winery.domain.winery;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -33,13 +34,16 @@ private static final long serialVersionUID=1L;
 
 
     /** 小程序userid */
+    @TableId(value = "id",type = IdType.ASSIGN_UUID)
+    private String id;
+
+    /** 小程序userid */
     @Excel(name = "小程序userid")
-    @TableId(value = "open_id")
     private String openId;
 
     /** 状态 */
     @Excel(name = "状态")
-    private String status;
+    private Integer status;
 
     /** 手机号 */
     @Excel(name = "手机号")
@@ -63,5 +67,15 @@ private static final long serialVersionUID=1L;
 
     /** 租户id */
     @Excel(name = "租户id")
-    private String deptId;
+    private Long deptId;
+
+
+    public WineryMauser(SysUser user) {
+        this.openId = user.getUserName();
+        this.deptId = user.getDeptId();
+        this.nickName = user.getNickName();
+        this.mobile = user.getPhonenumber();
+        this.status = 0;
+
+    }
 }

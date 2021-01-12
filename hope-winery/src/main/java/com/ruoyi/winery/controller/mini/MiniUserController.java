@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
@@ -23,14 +24,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.ruoyi.winery.define.MiniDefine.MINI_USER_SYMBOL;
+
 /**
  * @author tottimctj
  * @since 2020-11-10
  */
 @RestController
-@RequestMapping("/winery/mini")
+@RequestMapping("/winery/mini/user")
 @Slf4j
-public class MiniController {
+public class MiniUserController {
 
 
     @Autowired
@@ -66,35 +69,31 @@ public class MiniController {
     }
 
     /**
-     * 通过微信api授权获取手机号并注册
+     * 小程序进行注册用户
      *
      * @param json
      * @return
      */
-    @Log(title = "发送小程序手机号码并注册", businessType = BusinessType.OTHER)
-    @PostMapping("/registrationByMiniMobile")
+    @Log(title = "小程序进行注册用户", businessType = BusinessType.OTHER)
+    @PostMapping("/registrationByMini")
+    @RepeatSubmit
     AjaxResult postMobileRegistration(@RequestBody JSONObject json) {
 
-        String mobile = miniComponent.getMobile(json);
-        if (StrUtil.isBlank(mobile)) {
-            return AjaxResult.error("获取失败!");
-        }
-        JSONObject rsp = new JSONObject();
-        rsp.set("mobile", mobile);
         String openid = json.getStr("openid");
-        return miniComponent.registration(openid, mobile);
+        String mobile = json.getStr("mobile");
+        Long deptId = json.getLong("deptId");
+        String nickName = json.getJSONObject("userInfo").getStr("nickName");
+        return miniComponent.registration(openid, mobile, nickName, deptId);
     }
 
 
-    @Log(title = "微信小程序登录", businessType = BusinessType.OTHER)
+    @Log(title = "微信小程序登录换取openid", businessType = BusinessType.OTHER)
     @GetMapping("/getSession")
-    public AjaxResult getSession(@RequestParam("code") String code) throws WxErrorException {
-
-        WxMaJscode2SessionResult sessionInfo = miniComponent.login(code);
-
+    public AjaxResult getSession(@RequestParam("code") String code, @RequestParam("deptId") Long deptId) throws WxErrorException {
+        WxMaJscode2SessionResult sessionInfo = miniComponent.login(code, deptId);
         JSONObject json = new JSONObject();
         json.set("openid", sessionInfo.getOpenid());
-        log.info("微信小程序获取openid信息成功");
+        log.info("微信小程序获取openid信息成功:{}", sessionInfo.getOpenid());
 
         return AjaxResult.success(json);
     }
@@ -104,8 +103,9 @@ public class MiniController {
     @PostMapping("/loginByMini")
     public AjaxResult loginByMini(@RequestBody JSONObject json) {
         AjaxResult ajax = AjaxResult.success();
+        String userAccount = MINI_USER_SYMBOL + json.getStr("openid") + "-" + json.getLong("deptId");
         // 生成令牌
-        String token = miniComponent.loginByMini(json.getStr("openid"));
+        String token = miniComponent.loginByMini(userAccount);
         ajax.put(Constants.TOKEN, token);
         return ajax;
     }

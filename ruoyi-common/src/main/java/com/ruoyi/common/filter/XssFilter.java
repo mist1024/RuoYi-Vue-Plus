@@ -13,13 +13,17 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 防止XSS攻击的过滤器
  * 
  * @author ruoyi
  */
+@Slf4j
 public class XssFilter implements Filter
 {
     /**
@@ -57,6 +61,7 @@ public class XssFilter implements Filter
     {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+
         if (handleExcludeURL(req, resp))
         {
             chain.doFilter(request, response);
@@ -94,4 +99,6 @@ public class XssFilter implements Filter
     {
 
     }
+
+  
 }

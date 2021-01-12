@@ -6,6 +6,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.util.SignUtils;
 import com.ruoyi.common.constant.Constants;
@@ -24,6 +25,7 @@ import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.winery.config.wx.WxMiniProperties;
+import com.ruoyi.winery.controller.winery.WineryMauserController;
 import com.ruoyi.winery.domain.winery.WineryMauser;
 import com.ruoyi.winery.service.IWineryMauserService;
 
@@ -81,57 +83,85 @@ public class MiniComponent {
     @Autowired
     private ISysUserService userService;
 
+    @Autowired
+    private IWineryMauserService iWineryMauserService;
 
-    public WxMaJscode2SessionResult login(String code) throws WxErrorException {
+
+    public WxMaJscode2SessionResult login(String code, Long deptId) throws WxErrorException {
 
         WxMaJscode2SessionResult sessionInfo = wxMaService.getUserService().getSessionInfo(code);
 
-        WineryMauser user = wineryMauserService.getById(sessionInfo.getOpenid());
+        WineryMauser user = wineryMauserService.getOne(
+                new LambdaQueryWrapper<WineryMauser>()
+                        .eq(WineryMauser::getDeptId, deptId)
+                        .eq(WineryMauser::getOpenId, sessionInfo.getOpenid())
+        );
         String key = sessionInfo.getOpenid();
         redisCache.setCacheObject(key, sessionInfo.getSessionKey(), 7200, TimeUnit.SECONDS);
         if (user == null) {
             user = new WineryMauser();
             user.setOpenId(sessionInfo.getOpenid());
+            user.setDeptId(deptId);
             log.info("新增user:{}", user);
         }
 
         if (StrUtil.isNotBlank(sessionInfo.getUnionid())) {
             user.setUnionId(sessionInfo.getUnionid());
         }
+
+        user.setStatus(0);
         wineryMauserService.saveOrUpdate(user);
 
         return sessionInfo;
     }
 
-    public AjaxResult registration(String openid, String mobile) {
-
+    public AjaxResult registration(String openid, String mobile, String nickName, Long deptId) {
 
         SysUser user = new SysUser();
-
-        user.setUserName(openid);
+        String userName = MINI_USER_SYMBOL + openid + "-" + deptId;
+        user.setUserName(userName);
         user.setPhonenumber(mobile);
-
-        user.setNickName(mobile);
-        user.setDeptId(MINI_DEPTID);
+        user.setNickName(nickName);
+        user.setDeptId(deptId);
         user.setPassword(MINI_DEFUALT_PASSWORD);
         user.setRoleIds(new Long[]{MINI_DEFUALT_ROLEID});
         user.setPostIds(new Long[]{MINI_DEFUALT_POSTID});
 
-
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
             return AjaxResult.error("新增用户" + user.getUserName() + "失败，登录账号已存在");
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber())
-                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail())
+        }
+
+//
+//        else if (StringUtils.isNotEmpty(user.getPhonenumber())
+//                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+//        }
+
+        else if (StringUtils.isNotEmpty(user.getEmail())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setCreateBy(MINI_MANAGE_USER);
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return userService.insertUser(user) > 0 ? AjaxResult.success(user) : AjaxResult.error();
 
 
+        // 创建查找小程序用户
+        WineryMauser wineryMauser = iWineryMauserService.getOne(
+                new LambdaQueryWrapper<WineryMauser>()
+                        .eq(WineryMauser::getOpenId, openid)
+                        .eq(WineryMauser::getDeptId, user.getDeptId()));
+
+        if (wineryMauser == null) {
+            wineryMauser = new WineryMauser(user);
+        }
+
+        if (userService.insertUser(user) > 0 && iWineryMauserService.saveOrUpdate(wineryMauser)) {
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put(Constants.TOKEN, loginByMini(userName));
+            return ajax;
+        } else {
+            return AjaxResult.error();
+        }
     }
 
     /**
@@ -140,23 +170,23 @@ public class MiniComponent {
      * @param openId
      * @return
      */
-    public String loginByMini(String openId) {
+    public String loginByMini(String userName) {
         // 用户验证
         Authentication authentication = null;
         try {
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(openId, MINI_DEFUALT_PASSWORD));
+                    .authenticate(new UsernamePasswordAuthenticationToken(userName, MINI_DEFUALT_PASSWORD));
         } catch (Exception e) {
             if (e instanceof BadCredentialsException) {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(openId, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(userName, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
                 throw new UserPasswordNotMatchException();
             } else {
-                AsyncManager.me().execute(AsyncFactory.recordLogininfor(openId, Constants.LOGIN_FAIL, e.getMessage()));
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(userName, Constants.LOGIN_FAIL, e.getMessage()));
                 throw new CustomException(e.getMessage());
             }
         }
-        AsyncManager.me().execute(AsyncFactory.recordLogininfor(openId, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         // 生成token
         return tokenService.createToken(loginUser);
@@ -172,7 +202,12 @@ public class MiniComponent {
     public String getMobile(JSONObject json) {
 
         String openid = json.getStr("openid");
-        WineryMauser user = wineryMauserService.getById(openid);
+        String deptId = json.getStr("deptId");
+        // 创建查找小程序用户
+        WineryMauser user = iWineryMauserService.getOne(
+                new LambdaQueryWrapper<WineryMauser>()
+                        .eq(WineryMauser::getOpenId, openid)
+                        .eq(WineryMauser::getDeptId, deptId));
 
         JSONObject detail = json.getJSONObject("detail");
         String encryptedData = detail.getStr("encryptedData");
@@ -209,7 +244,6 @@ public class MiniComponent {
         json.set("nonce_str", IdUtil.fastSimpleUUID());
 
         Map<String, String> params = json.toBean(HashMap.class);
-
 
         json.set("sign", SignUtils.createSign(params, "HMAC-SHA256", wxMiniProperties.getMchKey(), (String[]) null));
 

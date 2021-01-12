@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.winery.domain.goods.GoodsSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ import com.ruoyi.winery.domain.winery.WineryOrders;
 import com.ruoyi.winery.service.IWineryOrdersService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+
+import static com.ruoyi.common.utils.SecurityUtils.*;
 
 /**
  * 客户订单Controller
@@ -49,9 +52,9 @@ public class WineryOrdersController extends BaseController {
     {
         startPage();
         LambdaQueryWrapper<WineryOrders> lqw = Wrappers.lambdaQuery(wineryOrders);
-        if (wineryOrders.getDeptId() != null){
-            lqw.eq(WineryOrders::getDeptId ,wineryOrders.getDeptId());
-        }
+
+        lqw.eq(!isAdmin(), WineryOrders::getDeptId, getDeptId());
+
         if (wineryOrders.getGoodsId() != null){
             lqw.eq(WineryOrders::getGoodsId ,wineryOrders.getGoodsId());
         }
@@ -109,6 +112,8 @@ public class WineryOrdersController extends BaseController {
     @Log(title = "客户订单" , businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WineryOrders wineryOrders) {
+        wineryOrders.setCreateBy(getUsername());
+        wineryOrders.setDeptId(getDeptId());
         return toAjax(iWineryOrdersService.save(wineryOrders) ? 1 : 0);
     }
 
@@ -119,6 +124,7 @@ public class WineryOrdersController extends BaseController {
     @Log(title = "客户订单" , businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WineryOrders wineryOrders) {
+        wineryOrders.setUpdateBy(getUsername());
         return toAjax(iWineryOrdersService.updateById(wineryOrders) ? 1 : 0);
     }
 

@@ -27,6 +27,9 @@ import com.ruoyi.winery.service.IWineryFoodSafetyService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
+import static com.ruoyi.common.utils.SecurityUtils.getDeptId;
+import static com.ruoyi.common.utils.SecurityUtils.getUsername;
+
 /**
  * 食品安全详情Controller
  * 
@@ -118,6 +121,8 @@ public class WineryFoodSafetyController extends BaseController {
     @Log(title = "食品安全详情" , businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WineryFoodSafety wineryFoodSafety) {
+        wineryFoodSafety.setCreateBy(getUsername());
+        wineryFoodSafety.setDeptId(getDeptId());
         return toAjax(iWineryFoodSafetyService.save(wineryFoodSafety) ? 1 : 0);
     }
 
@@ -128,6 +133,7 @@ public class WineryFoodSafetyController extends BaseController {
     @Log(title = "食品安全详情" , businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WineryFoodSafety wineryFoodSafety) {
+        wineryFoodSafety.setUpdateBy(getUsername());
         return toAjax(iWineryFoodSafetyService.updateById(wineryFoodSafety) ? 1 : 0);
     }
 
