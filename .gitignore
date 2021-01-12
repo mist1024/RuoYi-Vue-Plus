@@ -2,7 +2,10 @@
 # Build Tools
 
 .gradle
+*/node_modules/*
+mini-app/weapp
 /build/
+
 !gradle/wrapper/gradle-wrapper.jar
 
 target/
@@ -39,6 +42,9 @@ nbdist/
 *.xml.versionsBackup
 *.swp
 
+
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+
