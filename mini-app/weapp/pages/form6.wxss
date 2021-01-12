@@ -1,0 +1,30 @@
+.header {
+  width: 100%;
+  height: 150rpx;
+  display: flex;
+  justify-content: center;
+}
+.cell-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cell-input input {
+  margin-left: 10px;
+  border: #dddddd solid 1px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  width: 480rpx;
+}
+input {
+  margin-left: 8px;
+  padding: 5px 10px;
+  width: 480rpx;
+}
+.cell-item {
+  margin-left: 22px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+}
+

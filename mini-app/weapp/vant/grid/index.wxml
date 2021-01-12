@@ -1,0 +1,8 @@
+<!----------   wxs start ----------->
+<wxs module="computed" src="./index.wxs"></wxs>
+<!----------   wxs end   ----------->
+
+
+<view class="van-grid custom-class {{ border && !gutter ? 'van-hairline--top' : '' }}" style="{{ computed.rootStyle({ gutter }) }}">
+  <slot></slot>
+</view>

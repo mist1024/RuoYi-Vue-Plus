@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "",
+    "styleIsolation": "shared",
+    "addGlobalClass": true,
+    "component": true,
+    "usingComponents": {}
+}

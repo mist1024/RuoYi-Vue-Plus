@@ -1,0 +1,158 @@
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 150rpx;
+  display: flex;
+  justify-content: center;
+}
+
+
+.cell-item {
+  margin-left: 22px;
+  margin-top: 12px;
+  width: 300rpx;
+}
+
+.cell-item2 {
+  margin-left: 22px;
+  margin-top: 12px;
+  width: 150rpx;
+}
+
+
+</style>
+<template>
+  <nav-bar />
+  <div class="header background-color">
+
+    <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/step2.png" style="width:612rpx; height:120rpx;" />
+  </div>
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">酒精发酵工艺</span>
+    <van-checkbox-group value="{{ wineryForm.fermentationProcess }}" bind:change="onChangeFermentationProcess">
+      <div style="display: flex;margin: 5px;flex-wrap: wrap;">
+        <div class="cell-item" v-for="(item,index) in fermentationProcessType">
+          <van-checkbox name="{{item}}" checked-color="#AC1630">{{item}}</van-checkbox>
+        </div>
+      </div>
+    </van-checkbox-group>
+  </div>
+  <div class="boom" />
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">热化容器</span>
+    <van-checkbox-group value="{{ wineryForm.container }}" bind:change="onChangeContainer">
+      <div style="display: flex;margin: 5px;flex-wrap: wrap;">
+        <div class="cell-item" v-for="(item,index) in containerType">
+          <van-checkbox name="{{item}}" checked-color="#AC1630">{{item}}</van-checkbox>
+        </div>
+      </div>
+    </van-checkbox-group>
+  </div>
+  <div class="boom" />
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">澄清方式</span>
+    <van-checkbox-group value="{{ wineryForm.clarificationMethod }}" bind:change="onChangeClarificationMethod">
+      <div style="display: flex;margin: 5px;flex-wrap: wrap;">
+        <div class="cell-item2" v-for="(item,index) in clarificationMethodType">
+          <van-checkbox name="{{item}}" checked-color="#AC1630">{{item}}</van-checkbox>
+        </div>
+      </div>
+    </van-checkbox-group>
+  </div>
+  <div class="boom" />
+
+
+  <div style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+    <button class="buttonColor-cancel" style="width: 326rpx;" @tap="onBack()">上一步</button>
+    <button class="buttonColor" style="width: 326rpx;" @tap="onNext()">下一步</button>
+  </div>
+
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapActions,mapState } from '@wepy/x'
+import xiao4rBase from '../xiao4rBase'
+import xiao4rApis from '../apis/xiao4rApis'
+
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    // 'before-setData': function(dirty) {
+    //   if (Math.random() < 0.2) {
+    //     console.log('setData canceled')
+    //     return false // Cancel setData
+    //   }
+    //   dirty.time = +new Date()
+    //   return dirty
+    // }
+  },
+
+  data: {
+    fermentationProcessType: ['冷浸渍', '倒灌', '压帽', '二氧化碳浸渍', '整串发酵', '半二氧化碳浸渍', '酒泥陈酿'],
+    containerType: ['不锈钢罐', '橡木桶'],
+    clarificationMethodType: ['沉淀', '下胶', '过滤']
+
+  },
+
+  computed: mapState(['wineryForm']),
+
+  watch: {},
+
+  methods: {
+
+
+    onChangeFermentationProcess(e) {
+      this.wineryForm.fermentationProcess = e.$wx.detail
+    },
+    onChangeContainer(e) {
+      this.wineryForm.container = e.$wx.detail
+    },
+    onChangeClarificationMethod(e) {
+      this.wineryForm.clarificationMethod = e.$wx.detail
+    },
+
+    onNext() {
+
+      if (this.wineryForm.fermentationProcess.length < 1) {
+        xiao4rBase.showToast('请选择酒精发酵工艺!')
+        return
+      }
+
+      if (this.wineryForm.container.length < 1) {
+        xiao4rBase.showToast('请选择热化容器!')
+        return
+      }
+      if (this.wineryForm.clarificationMethod.length < 1) {
+        xiao4rBase.showToast('请选择澄清方式!')
+        return
+      }
+
+      xiao4rBase.navigateTo('form5')
+    },
+    onBack() {
+
+      wx.navigateBack()
+    }
+
+  },
+
+  created() {
+    console.log(this.form)
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

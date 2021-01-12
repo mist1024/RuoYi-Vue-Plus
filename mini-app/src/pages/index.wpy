@@ -1,0 +1,180 @@
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 536rpx;
+  z-index: -10;
+
+
+}
+
+</style>
+<wxs module="m1" lang="babel">
+const getTime = (time) => {
+let date = getDate(time);
+let hour = date.getHours();
+let mins = date.getMinutes();
+let sec = date.getSeconds();
+let milli = date.getMilliseconds();
+return `${hour}:${mins}:${sec}.${milli}`;
+}
+module.exports.getTime = getTime;
+</wxs>
+<template>
+  <image class="header" src="https://www.xiao4r.com/xiao4rstatic/hope_wine/head.png" />
+  <div class="container" style="margin: 0px 25px;">
+    <span style="color: #333;font-size: 26px;">贺兰山东麓葡萄酒产区普查</span>
+    <span style="color: #333;font-size: 13px;">Helan Mountain winery census</span>
+    <div style="display: flex;flex-direction:column; margin-top: 24px;">
+      <span style="color: #333;font-size: 16px;">欢迎您参加贺兰山酒庄普查！</span>
+      <text style="color: #666;font-size: 16px;margin-top: 4px;">
+        　　在宁夏回族自治区政府大力推动以红酒产业为首的九大产业之际，为更好的服务我区酒庄及红酒企业，自治区红酒局决定于近期开展2021年贺兰山产区酒庄普查。
+        非常感谢您选择自主填报的方式参加酒庄普查。您通过微信小程序填报的信息会经加密存储在宁夏回族自治区红酒局，数据仅作为服务我区红酒产业总体规划使用。
+      </text>
+    </div>
+  </div>
+  <div style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+    <button class="buttonColor" style="width: 686rpx;" @tap="onNext()">已阅知</button>
+  </div>
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapActions } from '@wepy/x'
+import xiao4rBase from '../xiao4rBase'
+import xiao4rApis from '../apis/xiao4rApis'
+import userApis from '../apis/userApis'
+import request from '../js/request'
+
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    'before-setData': function(dirty) {
+      if (Math.random() < 0.2) {
+        console.log('setData canceled')
+        return false // Cancel setData
+      }
+      dirty.time = +new Date()
+      return dirty
+    }
+  },
+
+  data: {
+    user: store.state.user
+  },
+
+  computed: {
+    testcomputed() {
+      return 'computed - '
+    },
+    openid() {
+      return store.state.user.openid
+    }
+  },
+
+  methods: {
+    ...mapActions([
+      'setUserAction',
+      'setWineryFormAction'
+    ]),
+    handleViewTap() {
+      console.log('handleVieTap clicked')
+    },
+    tap() {
+
+    },
+    callAppLaunch() {
+      eventHub.$emit('app-launch', { a: 1 }, { b: 2 })
+    },
+    onNext() {
+      xiao4rBase.navigateTo('form1')
+
+      // xiao4rApis.getAuthTest({ openid: store.state.user.openid }).then(r => {
+      //   wx.navigateToMiniProgram({
+      //     appId: 'wx88736d7d39e2eda6',
+      //     path: 'pages/oauth/authindex',
+      //     extraData: r.data
+      //   })
+      // })
+    },
+
+    login() {
+      let self = this
+      wx.showLoading({ title: '正在连接...', mask: true })
+      wx.login({
+        success(res) {
+          let req = userApis.getSession(res.code)
+
+          req.then(rsp => {
+            if (rsp.data.openid) {
+              self.init(rsp.data.openid)
+            } else {
+              xiao4rBase.showToast('登录失败！' + res.errMsg)
+              wx.hideLoading()
+            }
+          })
+          // request.requestTaskMap.get(req.taskId).abort()
+          // console.log('中断请求,req:', req.taskId)
+        },
+        fail(res) {
+          xiao4rBase.showToast('登录失败,正在重试.')
+          wx.hideLoading()
+          self.login()
+        }
+      })
+    },
+
+    async init(openid) {
+      let self = this
+
+      xiao4rBase.saveOpenid(openid)
+
+      wx.getUserInfo({
+        success(res) {
+          self.setUserAction({
+            openid: xiao4rBase.getOpenid(),
+            userInfo: res.userInfo
+          })
+        }
+      })
+
+      await this.getForm()
+      wx.hideLoading()
+    },
+
+    async getForm() {
+      try {
+        let rsp = await xiao4rApis.getForm({ openid: xiao4rBase.getOpenid() })
+        if (rsp.code === 200) {
+          let temp = rsp.data
+          temp.region = temp.region.split(',')
+          temp.fermentationProcess = temp.fermentationProcess.split(',')
+          temp.clarificationMethod = temp.clarificationMethod.split(',')
+          temp.mainPrice = temp.mainPrice.split(',')
+          temp.salesMode = temp.salesMode.split(',')
+          temp.container = temp.container.split(',')
+          temp.awards = temp.awards.split(',')
+          temp.redVariety = JSON.parse(temp.redVariety)
+          temp.whiteVariety = JSON.parse(temp.whiteVariety)
+
+          this.setWineryFormAction(temp)
+        }
+      } catch (e) {
+        xiao4rBase.showToast('获取用户信息失败.' + e)
+      }
+    }
+  },
+
+  ready() {
+    this.login()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

@@ -1,0 +1,32 @@
+<!----------   wxs start ----------->
+<wxs module="m1">
+"use strict";
+
+var getTime = function getTime(time) {
+  var date = getDate(time);
+  var hour = date.getHours();
+  var mins = date.getMinutes();
+  var sec = date.getSeconds();
+  var milli = date.getMilliseconds();
+  return "".concat(hour, ":").concat(mins, ":").concat(sec, ".").concat(milli);
+};
+
+module.exports.getTime = getTime;
+</wxs>
+<!----------   wxs end   ----------->
+
+<image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/head.png" class="header"></image>
+<view style="margin: 0px 25px;" class="container">
+  <label style="color: #333;font-size: 26px;">贺兰山东麓葡萄酒产区普查</label>
+  <label style="color: #333;font-size: 13px;">Helan Mountain winery census</label>
+  <view style="display: flex;flex-direction:column; margin-top: 24px;">
+    <label style="color: #333;font-size: 16px;">欢迎您参加贺兰山酒庄普查！</label>
+    <text style="color: #666;font-size: 16px;margin-top: 4px;">
+      　　在宁夏回族自治区政府大力推动以红酒产业为首的九大产业之际，为更好的服务我区酒庄及红酒企业，自治区红酒局决定于近期开展2021年贺兰山产区酒庄普查。
+      非常感谢您选择自主填报的方式参加酒庄普查。您通过微信小程序填报的信息会经加密存储在宁夏回族自治区红酒局，数据仅作为服务我区红酒产业总体规划使用。
+    </text>
+  </view>
+</view>
+<view style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+  <button data-wpy-evt="11-1" bind:tap="__dispatcher" style="width: 686rpx;" class="buttonColor">已阅知</button>
+</view>

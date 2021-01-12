@@ -1,0 +1,43 @@
+<style lang="less">
+
+</style>
+<template>
+  <van-nav-bar
+    bind:click-left="onBack"
+    border="{{false}}"
+    custom-style="background:#AC1630;color:#FFF;"
+  >
+    <van-icon name="arrow-left" slot="left" color="#fff" />
+    <span style="color: #fff;"  slot="title">{{title}}</span>
+  </van-nav-bar>
+</template>
+<script>
+  import wepy from '@wepy/core'
+
+  wepy.component({
+
+    props: {
+      title: {
+        type: String,
+        default: '贺兰山酒庄普查'
+      }
+
+    },
+    data: {
+    },
+
+    events: {
+
+    },
+
+    methods: {
+
+      onBack() {
+        wx.navigateBack()
+      }
+    },
+
+    onLoad () {
+    }
+  })
+</script>

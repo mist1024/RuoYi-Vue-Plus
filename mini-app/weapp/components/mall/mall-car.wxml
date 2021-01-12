@@ -1,0 +1,21 @@
+
+
+
+<view style="padding: 0 10px 110px 0;background: #fafafa;">
+  <van-checkbox-group value="{{ selectedList }}" data-wpy-evt="85-0" bind:change="__dispatcher">
+    <view wx:for="{{ list }}" wx:for-index="index" wx:for-item="item" wx:key="index" key="{{ index }}" style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">
+      <van-card price="{{ item.price/100 }}" desc="描述信息" title="商品标题" nun="n">
+        <view slot="thumb">
+          <view style="display: inline-flex;align-items: center;margin-top: 12px;">
+            <van-checkbox name="{{ item.id }}"></van-checkbox>
+            <image src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=751441608,3469454349&fm=15&gp=0.jpg" class="van-card__thumb"></image>
+          </view>
+        </view>
+      </van-card>
+    </view>
+  </van-checkbox-group>
+
+  <van-submit-bar price="{{ price }}" button-text="提交订单" button-class="submit-btn" data-wpy-evt="85-1" bind:submit="__dispatcher">
+    <van-checkbox value="{{ isAllSelect }}" data-wpy-evt="85-2" bind:change="__dispatcher" style="margin-top:5px;">全选</van-checkbox>
+  </van-submit-bar>
+</view>

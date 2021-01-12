@@ -1,0 +1,40 @@
+
+
+<nav-bar></nav-bar>
+
+<view class="header background-color">
+
+  <view style="font-size: 15px;font-weight: lighter;color: #FFF;  width: 100%;">
+    <view class="header-cell">
+      <label class="header-title">酒庄名称：</label>
+      <label class="header-value">{{wineryForm.wineryName}}</label>
+    </view>
+    <view class="header-cell">
+      <label class="header-title">酒庄面积：</label>
+      <label class="header-value">{{wineryForm.wineryArea}}亩</label>
+    </view>
+    <view class="header-cell">
+      <label class="header-title">酒庄成立时间：</label>
+      <label class="header-value">{{wineryForm.buildTime}}</label>
+    </view>
+    <view class="header-cell">
+      <label class="header-title">酒庄地址：</label>
+      <label class="header-value">{{wineryForm.region}}  {{wineryForm.address}} </label>
+    </view>
+  </view>
+
+
+</view>
+<view class="fream">
+
+  <view style="width: 558rpx; text-align: left; flex-direction: column;display: flex;">
+    <sapn style="color: #333;font-size: 20px;font-weight: bold;">填报指南</sapn>
+    <sapn style="color: #999; font-size: 14px;">您好，仅需三步即可完成自主填报</sapn>
+  </view>
+  <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/step.png" style="width: 558rpx;margin-top: 16px;"></image>
+
+</view>
+<view style="display: flex;align-items: center; width: 100%;margin: 520rpx 0 25px 0;">
+  <button data-wpy-evt="13-0" bind:tap="__dispatcher" style="width: 686rpx;" class="buttonColor">下一步</button>
+</view>
+
