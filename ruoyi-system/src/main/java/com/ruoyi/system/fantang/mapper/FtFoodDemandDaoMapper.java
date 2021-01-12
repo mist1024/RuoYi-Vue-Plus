@@ -3,6 +3,7 @@ package com.ruoyi.system.fantang.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -32,16 +33,29 @@ public interface FtFoodDemandDaoMapper extends BaseMapper<FtFoodDemandDao> {
             "\ta.type \n" +
             "FROM\n" +
             "\tft_report_meals a\n" +
-            "\tLEFT JOIN ft_food_demand b ON a.patient_id = b.patient_id\n" +
             "\tLEFT JOIN ft_patient c ON a.patient_id = c.patient_id\n" +
             "\tLEFT JOIN ft_depart d ON c.depart_id = d.depart_id \n" +
             "WHERE\n" +
-            "\tb.flag = 1 \n" +
-            "\tAND a.type = b.type \n" +
-            "\tAND c.depart_id = d.depart_id  and  a.create_at BETWEEN #{start} and #{end}\n" +
+            "\tc.depart_id = d.depart_id  and  a.create_at BETWEEN #{start} and #{end}\n" +
             "\t\n" +
             "GROUP BY\n" +
             "\td.depart_name,\n" +
             "\ta.type")
     List<FtOrderDao> getStatisticsOfDate(@Param("start") String start, @Param("end") String end);
+
+    @Select("SELECT\n" +
+            "\ta.type,\n" +
+            "\tc.depart_name,\n" +
+            "\tCOUNT(*) AS total \n" +
+            "FROM\n" +
+            "\tft_food_demand a\n" +
+            "\tLEFT JOIN ft_patient b ON b.patient_id = a.patient_id\n" +
+            "\tLEFT JOIN ft_depart c ON c.depart_id = b.depart_id \n" +
+            "WHERE\n" +
+            "\tb.depart_id = c.depart_id \n" +
+            "\tAND flag = 1 \n" +
+            "GROUP BY\n" +
+            "\ta.type,\n" +
+            "\tc.depart_name")
+    List<FtReportMealsDao> getStatisticsFoodDemand();
 }

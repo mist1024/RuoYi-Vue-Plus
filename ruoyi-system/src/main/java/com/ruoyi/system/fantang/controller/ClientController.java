@@ -528,6 +528,31 @@ public class ClientController extends BaseController {
 
 
     /**
+     * 今日员工报餐统计
+     */
+    @GetMapping("/getStatisticsOrderOfToday")
+    public AjaxResult getStatisticsOrderOfToday() {
+
+        Date today = new Date();
+
+        return orderDaoService.statisGetOrderOfDate(today);
+    }
+
+    /**
+     * 明日员工报餐统计
+     */
+    @GetMapping("/getStatisticsOrderOfTomorrow")
+    public AjaxResult getStatisticsReportMealsOfTomorrow() {
+
+        Date today = new Date();
+        Date tomorrow = DateUtil.offsetDay(today, 1);
+
+        return orderDaoService.statisGetOrderOfDate(tomorrow);
+    }
+
+
+
+    /**
      * 人脸识别设备心跳信号
      * @param request
      * @return

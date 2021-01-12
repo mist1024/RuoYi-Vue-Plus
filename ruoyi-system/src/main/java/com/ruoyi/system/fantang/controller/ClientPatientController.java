@@ -170,6 +170,18 @@ public class ClientPatientController extends BaseController {
         return AjaxResult.success(list);
     }
 
+
+    /**
+     * 明日（未报）病患报餐统计
+     */
+    @GetMapping("/getStatisticsReportMealsOfTomorrow")
+    public AjaxResult getStatisticsReportMealsOfTomorrow() {
+
+        List<FtReportMealsDao> list = iFtFoodDemandDaoService.getStatisticsFoodDemand();
+
+        return AjaxResult.success(list);
+    }
+
     /**
      * 病患报餐周统计
      */

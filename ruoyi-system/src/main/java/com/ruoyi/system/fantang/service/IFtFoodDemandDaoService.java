@@ -3,6 +3,7 @@ package com.ruoyi.system.fantang.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 
 import java.util.Date;
 import java.util.List;
@@ -27,4 +28,6 @@ public interface IFtFoodDemandDaoService extends IService<FtFoodDemandDao> {
     List<FtOrderDao> getStatisticsOfWeek(Date day);
 
     List<FtOrderDao> getStatisticsOfMonth(Date day);
+
+    List<FtReportMealsDao> getStatisticsFoodDemand();
 }

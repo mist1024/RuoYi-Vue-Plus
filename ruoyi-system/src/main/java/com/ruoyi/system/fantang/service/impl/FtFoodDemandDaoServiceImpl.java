@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.mapper.FtFoodDemandDaoMapper;
 import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
 import org.springframework.stereotype.Service;
@@ -59,5 +60,10 @@ public class FtFoodDemandDaoServiceImpl extends ServiceImpl<FtFoodDemandDaoMappe
     @Override
     public List<FtOrderDao> getStatisticsOfMonth(Date day) {
         return this.baseMapper.getStatisticsOfDate(DateUtil.beginOfMonth(day).toString(), DateUtil.endOfMonth(day).toString());
+    }
+
+    @Override
+    public List<FtReportMealsDao> getStatisticsFoodDemand() {
+        return this.baseMapper.getStatisticsFoodDemand();
     }
 }
