@@ -6,10 +6,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.common.DinnerType;
+import com.ruoyi.system.fantang.common.DinnerTypeUtils;
 import com.ruoyi.system.fantang.domain.*;
 import com.ruoyi.system.fantang.mapper.FtFaceEventDaoMapper;
 import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-
+@Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/client_api/staff")
@@ -558,55 +561,73 @@ public class ClientController extends BaseController {
      * @return
      */
     @PostMapping("/heartbeat")
-    public String HeartbeatControl(HttpServletRequest request){
+    public String faceDeviceHeartbeatEvent(@RequestBody JSONObject request){
         System.out.println("face device heartbeat.....");
-        StringBuffer data = new StringBuffer();
-        String line = null;
-        BufferedReader reader = null;
-        try {
-            reader = request.getReader();
-            while (null != (line = reader.readLine())) {
-                data.append(line);
-            }
-            JSONObject jsonObject = JSONObject.parseObject(data.toString());
-            System.out.println(jsonObject);
-        } catch (IOException e) {
-        } finally {
-        }
-        return data.toString();
+        System.out.println(request);
+        return "ok";
+//        StringBuffer data = new StringBuffer();
+//        String line = null;
+//        BufferedReader reader = null;
+//        try {
+//            reader = request.getReader();
+//            while (null != (line = reader.readLine())) {
+//                data.append(line);
+//            }
+//            JSONObject jsonObject = JSONObject.parseObject(data.toString());
+//            System.out.println(jsonObject);
+//        } catch (IOException e) {
+//        } finally {
+//        }
+//        return data.toString();
     }
 
 
-    @PostMapping("/Verify")
-    public String VerifyControl(HttpServletRequest request){
-        System.out.println("verify.....");
-        StringBuffer data = new StringBuffer();
+    @PostMapping("/verify")
+    public String faceDeviceVerifyEvent(@RequestBody JSONObject request){
 
-        try {
-            BufferedReader reader = request.getReader();
-            String line = null;
-            while (null != (line = reader.readLine()))
-                data.append(line);
-            JSONObject jsonObject = JSONObject.parseObject(data.toString());
-            System.out.println(jsonObject);
-
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("flag", 0);
-            List<FtFaceEventDao> dao = faceEventService.selectByMap(map);
-            if (dao.size() == 0)
-            {
-                JSONObject infoObject = JSONObject.parseObject(jsonObject.getString("info"));
-                FtFaceEventDao eventDao = new FtFaceEventDao();
-
-                eventDao.setDeviceId(infoObject.getString("DeviceID"));
-                eventDao.setPersonId(infoObject.getString("PersonID"));
-//                faceEventService.insert(eventDao);
-            }
-            else {
-            }
-        } catch (IOException e) {
-        } finally {
+        // 判断是否在用餐时间，否则只写日志，不处理事件
+        DinnerType dinnerType = DinnerType.GetDinnerType();
+        System.out.println(request);
+        if (dinnerType == DinnerType.notMatch) {
+            log.info("data : {} " , request);
+            return request.toJSONString();
         }
+
+        // 从数据中获取人脸id
+
+        // 跟进人脸id信息，查找该id对应的员工id的当餐订单
+
+        // 将该订餐设置为核销状态
+
+
+//        StringBuffer data = new StringBuffer();
+//
+//        try {
+//            // 从请求头中获取数据
+//            BufferedReader reader = request.getReader();
+//            String line = null;
+//            while (null != (line = reader.readLine()))
+//                data.append(line);
+//            JSONObject jsonObject = JSONObject.parseObject(data.toString());
+//            System.out.println(jsonObject);
+//
+//            HashMap<String, Object> map = new HashMap<>();
+//            map.put("flag", 0);
+//            List<FtFaceEventDao> dao = faceEventService.selectByMap(map);
+//            if (dao.size() == 0)
+//            {
+//                JSONObject infoObject = JSONObject.parseObject(jsonObject.getString("info"));
+//                FtFaceEventDao eventDao = new FtFaceEventDao();
+//
+//                eventDao.setDeviceId(infoObject.getString("DeviceID"));
+//                eventDao.setPersonId(infoObject.getString("PersonID"));
+////                faceEventService.insert(eventDao);
+//            }
+//            else {
+//            }
+//        } catch (IOException e) {
+//        } finally {
+//        }
         return "ok";
     }
 
