@@ -11,7 +11,7 @@
     <el-form :inline="true" :model="dinnerForm">
       <el-row>
         <el-col>
-          <el-form-item label="早餐时间段">
+          <el-form-item label="早餐时间段" label-width="97px">
             <el-time-picker
               is-range
               ref="breakfastPick"
@@ -26,7 +26,7 @@
       </el-row>
       <el-row>
         <el-col>
-          <el-form-item label="午餐时间段">
+          <el-form-item label="午餐时间段" label-width="97px">
             <el-time-picker
               is-range
               v-model="dinnerForm.lunch"
@@ -40,7 +40,7 @@
       </el-row>
       <el-row>
         <el-col>
-          <el-form-item label="晚餐时间段">
+          <el-form-item label="晚餐时间段" label-width="97px">
             <el-time-picker
               is-range
               v-model="dinnerForm.dinner"
@@ -50,12 +50,26 @@
               placeholder="选择时间范围">
             </el-time-picker>
           </el-form-item>
+          <el-button type="primary" @click="submitDinnerForm">提交</el-button>
         </el-col>
       </el-row>
-      <el-form-item>
-        <el-button type="primary" @click="submitDinnerForm">提交</el-button>
-      </el-form-item>
+    </el-form>
 
+    <el-form :inline="true" :model="faceDeviceForm">
+      <el-form-item label="人脸识别设备" label-width="97px">
+        <el-input v-model="faceDeviceForm.deviceId" placeholder="请输入设备 id"></el-input>
+      </el-form-item>
+      <el-form-item label="是否开启">
+        <el-select v-model="faceDeviceForm.deviceFlag" placeholder="请选择是否开启">
+          <el-option
+            v-for="item in deviceFlagOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-button type="primary" @click="submitFaceDeviceForm">提交</el-button>
     </el-form>
 
   </div>
@@ -71,22 +85,36 @@ import {
   updateDinnerTime,
   updateFantangConfig
 } from "@/api/fantang/fantangConfig";
+import {updateFaceDevice} from "../../../api/fantang/fantangConfig";
 
 export default {
   name: "FantangConfig",
   components: {},
   data() {
     return {
+      deviceFlagOptions: [{
+        value: '1',
+        label: '开启'
+      }, {
+        value: '0',
+        label: '关闭'
+      }],
       timeArr: [],
       formInline: {
         configValue: null,
         id: null,
       },
       dinnerForm: {
-        breakfast: [new Date('2016-9-10 8:41'), new Date(2016, 9, 10, 9, 40)],
+        breakfast: [],
         lunch: [],
         dinner: [],
         id: 7,
+      },
+      faceDeviceForm: {
+        deviceId: null,
+        deviceConfigId: 11,
+        deviceFlag: null,
+        flagConfigId: 12,
       },
     };
   },
@@ -101,12 +129,12 @@ export default {
       listFantangConfig().then(response => {
         this.formInline.configValue = response.rows[7].configValue
         this.formInline.id = response.rows[7].id
-        console.log("数据库获取--------", response.rows[6].configValue.split(','))
-
         this.timeArr = response.rows[6].configValue.split(',')
         this.dinnerForm.breakfast = [new Date(2016, 9, 1, this.timeArr[0].split(':')[0], this.timeArr[0].split(':')[1]), new Date(2016, 9, 1, this.timeArr[1].split(':')[0], this.timeArr[1].split(':')[1])];
         this.dinnerForm.lunch = [new Date(2016, 9, 1, this.timeArr[2].split(':')[0], this.timeArr[2].split(':')[1]), new Date(2016, 9, 1, this.timeArr[3].split(':')[0], this.timeArr[3].split(':')[1])];
         this.dinnerForm.dinner = [new Date(2016, 9, 1, this.timeArr[4].split(':')[0], this.timeArr[4].split(':')[1]), new Date(2016, 9, 1, this.timeArr[5].split(':')[0], this.timeArr[5].split(':')[1])];
+        this.faceDeviceForm.deviceId = response.rows[10].configValue;
+        this.faceDeviceForm.deviceFlag = response.rows[11].configValue;
       });
     },
     // 取消按钮
@@ -158,9 +186,20 @@ export default {
       });
     },
 
+    // 人脸识别设备
+    submitFaceDeviceForm() {
+      if (this.faceDeviceForm.deviceId != null && this.faceDeviceForm.deviceId !== ''
+        && this.faceDeviceForm.deviceFlag != null && this.faceDeviceForm.deviceFlag !== '') {
+        console.log(this.faceDeviceForm)
+        updateFaceDevice(this.faceDeviceForm).then(response => {
+            this.msgSuccess("修改成功")
+        })
+
+      }
+    },
+
     // 用餐时间提交
     submitDinnerForm() {
-      console.log(this.dinnerForm)
       updateDinnerTime(this.dinnerForm).then(response => {
         this.msgSuccess("修改成功")
       })
@@ -168,7 +207,6 @@ export default {
 
     // 补贴金额
     onSubmit() {
-      console.log(this.formInline)
       if (this.formInline.configValue != null || this.formInline.configValue !== '')
         updateFantangConfig(this.formInline).then(response => {
           this.msgSuccess("修改成功")

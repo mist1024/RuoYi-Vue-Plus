@@ -155,7 +155,23 @@ public class FtConfigDaoController extends BaseController {
         ftConfigDao.setConfigValue(configValue.toString());
 
         iFtConfigDaoService.update(ftConfigDao, wrapper);
-        System.out.println(params);
-        return null;
+        return AjaxResult.success("已修改");
+    }
+
+    /**
+     * 修改人脸识别设备信息
+     */
+    @PostMapping("/updateFaceDevice")
+    public AjaxResult updateFaceDevice(@RequestBody JSONObject params) {
+
+        String deviceId = params.getString("deviceId");
+        Long deviceConfigId = params.getLong("deviceConfigId");
+        iFtConfigDaoService.updateConfigValue(deviceConfigId, deviceId);
+
+        String deviceFlag = params.getString("deviceFlag");
+        Long flagConfigId = params.getLong("flagConfigId");
+        iFtConfigDaoService.updateConfigValue(flagConfigId, deviceFlag);
+
+        return AjaxResult.success("已修改");
     }
 }

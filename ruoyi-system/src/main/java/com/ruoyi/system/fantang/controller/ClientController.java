@@ -559,20 +559,7 @@ public class ClientController extends BaseController {
         System.out.println("face device heartbeat.....");
         System.out.println(request);
         return "ok";
-//        StringBuffer data = new StringBuffer();
-//        String line = null;
-//        BufferedReader reader = null;
-//        try {
-//            reader = request.getReader();
-//            while (null != (line = reader.readLine())) {
-//                data.append(line);
-//            }
-//            JSONObject jsonObject = JSONObject.parseObject(data.toString());
-//            System.out.println(jsonObject);
-//        } catch (IOException e) {
-//        } finally {
-//        }
-//        return data.toString();
+
     }
 
 
@@ -591,6 +578,13 @@ public class ClientController extends BaseController {
         JSONObject info = request.getJSONObject("info");
         Integer personId = info.getInteger("PersonID");
         Long deviceId = info.getLong("DeviceID");
+
+        // 判断该设备是否有效
+        Boolean isEffective =  iFtConfigDaoService.isDeviceEffective(deviceId);
+        if (!isEffective) {
+            log.info("设备有效性 : {} ", "该人脸识别设备已失效");
+            return "该人脸识别设备已失效";
+        }
 
         // 是否有该员工
         FtStaffInfoDao staffInfoDao = staffInfoDaoService.inStaff(personId);
@@ -616,48 +610,17 @@ public class ClientController extends BaseController {
                 default:
                     throw new IllegalStateException("Unexpected value: " + dinnerType);
             }
-            log.info("人脸核销结果： {}", message);
+            log.info("人脸核销结果 : {}", message);
 
             return message;
 
         } else {
 
             // 如果该人脸id没有对应的员工，则记录找日志中
-
+            log.info("员工查询 : {}", "没有找到该员工");
             return "没有找到该员工";
         }
 
-
-        // 跟进人脸id信息，查找该id对应的员工id的当餐订单
-
-//        StringBuffer data = new StringBuffer();
-//
-//        try {
-//            // 从请求头中获取数据
-//            BufferedReader reader = request.getReader();
-//            String line = null;
-//            while (null != (line = reader.readLine()))
-//                data.append(line);
-//            JSONObject jsonObject = JSONObject.parseObject(data.toString());
-//            System.out.println(jsonObject);
-//
-//            HashMap<String, Object> map = new HashMap<>();
-//            map.put("flag", 0);
-//            List<FtFaceEventDao> dao = faceEventService.selectByMap(map);
-//            if (dao.size() == 0)
-//            {
-//                JSONObject infoObject = JSONObject.parseObject(jsonObject.getString("info"));
-//                FtFaceEventDao eventDao = new FtFaceEventDao();
-//
-//                eventDao.setDeviceId(infoObject.getString("DeviceID"));
-//                eventDao.setPersonId(infoObject.getString("PersonID"));
-////                faceEventService.insert(eventDao);
-//            }
-//            else {
-//            }
-//        } catch (IOException e) {
-//        } finally {
-//        }
     }
 
     /**

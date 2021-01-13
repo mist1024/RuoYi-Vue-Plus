@@ -34,6 +34,14 @@ export function updateDinnerTime(data) {
   })
 }
 
+export function updateFaceDevice(data) {
+  return request({
+    url: '/fantang/fantangConfig/updateFaceDevice',
+    method: 'post',
+    data: data
+  })
+}
+
 // 修改饭堂参数
 export function updateFantangConfig(data) {
   return request({

@@ -1,14 +1,13 @@
 package com.ruoyi.system.fantang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtConfigDao;
 import com.ruoyi.system.fantang.mapper.FtConfigDaoMapper;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,5 +36,35 @@ public class FtConfigDaoServiceImpl extends ServiceImpl<FtConfigDaoMapper, FtCon
         map.put("dinnerEnd", split[5]);
 
         return map;
+    }
+
+    @Override
+    public void updateConfigValue(Long id, String value) {
+
+        UpdateWrapper<FtConfigDao> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", id);
+        FtConfigDao ftConfigDao = new FtConfigDao();
+        ftConfigDao.setConfigValue(value);
+        this.baseMapper.update(ftConfigDao, wrapper);
+    }
+
+    @Override
+    public Boolean isDeviceEffective(Long deviceId) {
+
+        QueryWrapper<FtConfigDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("config_key", "device_id");
+        wrapper.eq("config_value", deviceId.toString());
+        FtConfigDao ftConfigDao = this.baseMapper.selectOne(wrapper);
+
+        if (ftConfigDao == null) {
+            return false;
+
+        } else {
+            QueryWrapper<FtConfigDao> flagWrapper = new QueryWrapper<>();
+            flagWrapper.eq("config_key", "device_flag");
+            FtConfigDao flagDao = this.baseMapper.selectOne(flagWrapper);
+
+            return !"0".equals(flagDao.getConfigValue());
+        }
     }
 }

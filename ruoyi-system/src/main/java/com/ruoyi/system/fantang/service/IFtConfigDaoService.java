@@ -1,7 +1,7 @@
 package com.ruoyi.system.fantang.service;
 
-import com.ruoyi.system.fantang.domain.FtConfigDao;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.system.fantang.domain.FtConfigDao;
 
 import java.util.Map;
 
@@ -14,4 +14,8 @@ import java.util.Map;
 public interface IFtConfigDaoService extends IService<FtConfigDao> {
 
     Map<String, String> getDinnerTimeSetting();
+
+    void updateConfigValue(Long id, String value);
+
+    Boolean isDeviceEffective(Long deviceId);
 }
