@@ -12,6 +12,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.system.fantang.common.DinnerTypeUtils;
 import com.ruoyi.system.fantang.domain.FtConfigDao;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 饭堂参数Controller
@@ -116,9 +115,7 @@ public class FtConfigDaoController extends BaseController {
     @PostMapping("/updateDinnerTime")
     public AjaxResult updateDinnerTime(@RequestBody JSONObject params) {
 
-
         StringBuilder configValue = new StringBuilder();
-
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         JSONArray breakfastJson = params.getJSONArray("breakfast");
@@ -149,12 +146,10 @@ public class FtConfigDaoController extends BaseController {
             }
         }
 
-        UpdateWrapper<FtConfigDao> wrapper = new UpdateWrapper<>();
-        wrapper.eq("id", params.getLong("id"));
-        FtConfigDao ftConfigDao = new FtConfigDao();
-        ftConfigDao.setConfigValue(configValue.toString());
+        iFtConfigDaoService.updateConfigValue(params.getLong("id"),configValue.toString());
 
-        iFtConfigDaoService.update(ftConfigDao, wrapper);
+        DinnerTypeUtils.getInstance(iFtConfigDaoService).updateDinnerTypeUtils(configValue.toString());
+
         return AjaxResult.success("已修改");
     }
 

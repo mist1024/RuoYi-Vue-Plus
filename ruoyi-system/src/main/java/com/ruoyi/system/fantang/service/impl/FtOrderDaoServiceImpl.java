@@ -58,6 +58,7 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
         dao.setStaffId(staffId);
         dao.setOrderType(orderType);
         dao.setOrderDate(demandDate);
+        dao.setCreateAt(new Date());
         QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
         wrapper.eq("staff_id", staffId);
         wrapper.eq("order_type", orderType);
@@ -108,9 +109,11 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
 
     @Override
     public AjaxResult cancelOrder(Long orderId) {
-        FtOrderDao dao = new FtOrderDao();
-        dao.setOrderId(orderId);
-        return AjaxResult.success(this.baseMapper.deleteById(dao));
+        QueryWrapper<FtOrderDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("order_id",orderId);
+        wrapper.eq("write_off_flag", 0);
+
+        return AjaxResult.success(this.baseMapper.delete(wrapper));
     }
 
     @Override

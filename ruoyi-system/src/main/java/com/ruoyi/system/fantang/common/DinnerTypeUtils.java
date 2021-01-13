@@ -23,17 +23,38 @@ public class DinnerTypeUtils {
         }
         return instance;
     }
+    
+    public void updateDinnerTypeUtils(String settings){
+        String[] setting = settings.split(",");
+        if (setting.length != 6) {
+            return;
+        }
+        String today = DateUtil.today();
+        this.breakfastStart = DateUtil.parse(today + " " + setting[0]);
+        this.breakfastEnd = DateUtil.parse(today + " " + setting[1]);
 
-    private final Date breakfastStart;
-    private final Date breakfastEnd;
+        this.lunchStart = DateUtil.parse(today + " " + setting[2]);
+        this.lunchEnd = DateUtil.parse(today + " " + setting[3]);
 
-    private final Date lunchStart;
-    private final Date lunchEnd;
+        this.dinnerStart = DateUtil.parse(today + " " + setting[4]);
+        this.dinnerEnd = DateUtil.parse(today + " " + setting[5]);
 
-    private final Date dinnerStart;
-    private final Date dinnerEnd;
+    }
+
+    private Date breakfastStart;
+    private Date breakfastEnd;
+
+    private Date lunchStart;
+    private Date lunchEnd;
+
+    private Date dinnerStart;
+    private Date dinnerEnd;
 
 
+    /**
+     * 初始化用餐类型判断基础类，加载用餐时间参数
+     * @param configDaoService
+     */
     private DinnerTypeUtils(IFtConfigDaoService configDaoService) {
 
         Map<String, String> setting = configDaoService.getDinnerTimeSetting();
