@@ -49,4 +49,38 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
     List<FtOrderDao> listDetailedByDate(@Param("orderType") Integer orderType, @Param("start") String start, @Param("end") String end);
 
     List<FtOrderDao> listAllDetailedByDate(String start, String end);
+
+
+    @Select("SELECT\n" +
+            "\t* \n" +
+            "FROM\n" +
+            "\tft_order \n" +
+            "WHERE\n" +
+            "\tstaff_id = #{staffId} \n" +
+            "\tAND order_type = #{type} \n" +
+            "\tAND order_date BETWEEN DATE(\n" +
+            "\tNOW()) \n" +
+            "\tAND date_add(\n" +
+            "\tnow(),\n" +
+            "\tINTERVAL 1 DAY)")
+    FtOrderDao getNowOrder(@Param("staffId") Long staffId, @Param("type") int type);
+
+
+    @Insert("INSERT INTO ft_order ( order_type, staff_id, order_list, total_price, create_at, pay_type, pay_flag, write_off_flag, write_off_at, device_id, order_date ) SELECT\n" +
+            "#{type},\n" +
+            "#{staffId},\n" +
+            "b.food_list,\n" +
+            "b.price,\n" +
+            "now(),\n" +
+            "1,\n" +
+            "1,\n" +
+            "1,\n" +
+            "NOW(),\n" +
+            "#{deviceId},\n" +
+            "NOW() \n" +
+            "FROM\n" +
+            "\tft_food_default b \n" +
+            "WHERE\n" +
+            "\tb.type = #{type}")
+    void insertOrderAndWriteOff(@Param("staffId") Long staffId, @Param("type") int type, @Param("deviceId") Long deviceId);
 }

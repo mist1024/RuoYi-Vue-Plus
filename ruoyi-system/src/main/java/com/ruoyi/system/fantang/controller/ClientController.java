@@ -6,10 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.fantang.common.DinnerType;
 import com.ruoyi.system.fantang.common.DinnerTypeUtils;
 import com.ruoyi.system.fantang.domain.*;
-import com.ruoyi.system.fantang.mapper.FtFaceEventDaoMapper;
 import com.ruoyi.system.fantang.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -31,9 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/client_api/staff")
 public class ClientController extends BaseController {
-    /**
-     * 获取用餐时间
-     */
+
     @Autowired
     private IFtConfigDaoService iFtConfigDaoService;
 
@@ -50,7 +42,7 @@ public class ClientController extends BaseController {
     private IFtWeekMenuDaoService weekMenuDaoService;
 
     @Autowired
-    private IFtReportMealsDaoService reportMealsDaoService;
+    private IFtFaceinfoDaoService faceinfoDaoService;
 
     @Autowired
     private IFtStaffSubsidyDaoService staffSubsidyDaoService;
@@ -65,7 +57,7 @@ public class ClientController extends BaseController {
     private IFtFoodDefaultDaoService foodDefaultDaoService;
 
     @Autowired
-    private IFtFaceEventService faceEventService;
+    private IFtStaffStopMealsDaoService staffStopMealsDaoService;
 
     /**
      * 获取用餐时间信息
@@ -85,7 +77,7 @@ public class ClientController extends BaseController {
      * 日期：2020年12月11日
      * 作者：陈智兴
      *
-     * @return
+     * @return AjaxResult
      */
     @GetMapping("/getOrderOfToday/{staffId}")
     public AjaxResult getOrderOfToday(@PathVariable("staffId") Long staffId) {
@@ -287,8 +279,9 @@ public class ClientController extends BaseController {
         Calendar cal = Calendar.getInstance();
         cal.setTime(params.getDate("date"));
         int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
-        if (w < 0)
+        if (w < 0) {
             w = 0;
+        }
         return weekMenuDaoService.getMenuOfDay(weekDays[w]);
     }
 
@@ -399,8 +392,9 @@ public class ClientController extends BaseController {
 
     /**
      * 获取各餐品的价格清单
-     * @author : 陈智兴
+     *
      * @param
+     * @author : 陈智兴
      */
     @GetMapping("/getDinnerPriceList")
     public AjaxResult getDinnerPriceList() {
@@ -433,10 +427,10 @@ public class ClientController extends BaseController {
         Integer type = params.getInteger("type");
 
         // 总价
-        BigDecimal totalPrice =  params.getBigDecimal("receipts");
+        BigDecimal totalPrice = params.getBigDecimal("receipts");
 
         // 生成新订单
-        FtOrderDao orderDao  = new FtOrderDao();
+        FtOrderDao orderDao = new FtOrderDao();
         orderDao.setOrderType(type);
         orderDao.setStaffId(staffId);
         orderDao.setTotalPrice(totalPrice);
@@ -492,7 +486,7 @@ public class ClientController extends BaseController {
      */
     @Transactional
     @PostMapping("/orderRefund")
-    public AjaxResult orderRefund(@RequestBody JSONObject params){
+    public AjaxResult orderRefund(@RequestBody JSONObject params) {
 
         // 订单 id
         Integer orderId = params.getInteger("orderId");
@@ -554,14 +548,14 @@ public class ClientController extends BaseController {
     }
 
 
-
     /**
      * 人脸识别设备心跳信号
+     *
      * @param request
      * @return
      */
     @PostMapping("/heartbeat")
-    public String faceDeviceHeartbeatEvent(@RequestBody JSONObject request){
+    public String faceDeviceHeartbeatEvent(@RequestBody JSONObject request) {
         System.out.println("face device heartbeat.....");
         System.out.println(request);
         return "ok";
@@ -583,22 +577,58 @@ public class ClientController extends BaseController {
 
 
     @PostMapping("/verify")
-    public String faceDeviceVerifyEvent(@RequestBody JSONObject request){
+    public String faceDeviceVerifyEvent(@RequestBody JSONObject request) {
 
         // 判断是否在用餐时间，否则只写日志，不处理事件
-        DinnerType dinnerType = DinnerType.GetDinnerType();
+        DinnerTypeUtils.DinnerType dinnerType = DinnerTypeUtils.getInstance(iFtConfigDaoService).getDinnerType();
         System.out.println(request);
-        if (dinnerType == DinnerType.notMatch) {
-            log.info("data : {} " , request);
+        if (dinnerType == DinnerTypeUtils.DinnerType.notMatch) {
+            log.info("data : {} ", request);
             return request.toJSONString();
         }
 
         // 从数据中获取人脸id
+        JSONObject info = request.getJSONObject("info");
+        Integer personId = info.getInteger("PersonID");
+        Long deviceId = info.getLong("DeviceID");
+
+        // 是否有该员工
+        FtStaffInfoDao staffInfoDao = staffInfoDaoService.inStaff(personId);
+
+        if (staffInfoDao != null) {
+
+            // 获取员工 id
+            Long staffId = staffInfoDao.getStaffId();
+
+            String message;
+
+            // 进行核销，如果该员工没有订餐则自动生成一个订餐记录并核销
+            switch (dinnerType) {
+                case breakfast:
+                    message = orderDaoService.setWriteOff(staffId, 1, deviceId);
+                    break;
+                case lunch:
+                    message = orderDaoService.setWriteOff(staffId, 2, deviceId);
+                    break;
+                case dinner:
+                    message = orderDaoService.setWriteOff(staffId, 3, deviceId);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + dinnerType);
+            }
+            log.info("人脸核销结果： {}", message);
+
+            return message;
+
+        } else {
+
+            // 如果该人脸id没有对应的员工，则记录找日志中
+
+            return "没有找到该员工";
+        }
+
 
         // 跟进人脸id信息，查找该id对应的员工id的当餐订单
-
-        // 将该订餐设置为核销状态
-
 
 //        StringBuffer data = new StringBuffer();
 //
@@ -628,7 +658,19 @@ public class ClientController extends BaseController {
 //        } catch (IOException e) {
 //        } finally {
 //        }
-        return "ok";
+    }
+
+    /**
+     * 自动切换手动报餐时清空停餐记录
+     */
+    @DeleteMapping("deleteStopMeals/{staffId}")
+    public AjaxResult deleteStopMeals(@PathVariable Long staffId) {
+
+        QueryWrapper<FtStaffStopMealsDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("staff_id", staffId);
+        staffStopMealsDaoService.remove(wrapper);
+
+        return AjaxResult.success("已删除");
     }
 
 }

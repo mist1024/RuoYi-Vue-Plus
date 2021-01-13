@@ -168,4 +168,36 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     public List<FtOrderDao> listAllDetailedByDate(String start, String end) {
         return this.baseMapper.listAllDetailedByDate(start, end);
     }
+
+    @Override
+    public String setWriteOff(Long staffId, int type, Long deviceId) {
+        FtOrderDao orderDao = this.baseMapper.getNowOrder(staffId, type);
+
+        if (orderDao != null) {
+
+            // 判断该订单是否已核销
+            if (orderDao.getWriteOffFlag() != 1) {
+
+                // 核销该订单
+                orderDao.setPayType(1);
+                orderDao.setPayFlag(1);
+                orderDao.setWriteOffFlag(1);
+                orderDao.setWriteOffAt(new Date());
+                orderDao.setDeviceId(deviceId);
+
+                this.baseMapper.updateById(orderDao);
+
+                return "该订单已核销";
+            }
+
+            return "该订单已核销，请勿重复刷脸";
+
+        } else {
+
+            // 没有该订单则自动生成一个订餐记录并核销
+            this.baseMapper.insertOrderAndWriteOff(staffId, type, deviceId);
+
+            return "已生产订单并核销";
+        }
+    }
 }

@@ -62,4 +62,11 @@ public class FtStaffInfoDaoServiceImpl extends ServiceImpl<FtStaffInfoDaoMapper,
     public FtStaffInfoDao getDepartInfo(Long staffId) {
         return this.baseMapper.getDepartInfo(staffId);
     }
+
+    @Override
+    public FtStaffInfoDao inStaff(Integer personId) {
+        QueryWrapper<FtStaffInfoDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("person_id", personId);
+        return this.baseMapper.selectOne(wrapper);
+    }
 }
