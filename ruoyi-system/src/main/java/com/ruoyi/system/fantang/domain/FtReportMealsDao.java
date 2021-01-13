@@ -134,5 +134,6 @@ public class FtReportMealsDao implements Serializable {
 
     private Integer egg;
 
+    @TableField(exist = false)
     private Integer total;
 }
