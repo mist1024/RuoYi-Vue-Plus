@@ -3,24 +3,24 @@ package com.ruoyi.system.fantang.common;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.ruoyi.system.fantang.service.IFtConfigDaoService;
-import com.ruoyi.system.fantang.service.impl.FtConfigDaoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Date;
 import java.util.Map;
 
-@Lazy
-@Service
-@Transactional
 public class DinnerTypeUtils {
 
     public enum DinnerType {
         breakfast, lunch, dinner, notMatch;
     }
 
+    public static DinnerTypeUtils instance;
+
+    public static DinnerTypeUtils getInstance() {
+        if (instance == null) {
+            instance = new DinnerTypeUtils();
+        }
+        return instance;
+    }
 
     private Date breakfastStart;
     private Date breakfastEnd;
@@ -30,11 +30,11 @@ public class DinnerTypeUtils {
 
     private Date dinnerStart;
     private Date dinnerEnd;
+
     @Autowired
     IFtConfigDaoService configDaoService;
 
-    @Autowired(required = true)
-    public DinnerTypeUtils() {
+    private DinnerTypeUtils() {
         Map<String, String> setting = configDaoService.getDinnerTimeSetting();
         String today = DateUtil.today();
         this.breakfastStart = DateUtil.parse(today + setting.get("breakfastStart"));
