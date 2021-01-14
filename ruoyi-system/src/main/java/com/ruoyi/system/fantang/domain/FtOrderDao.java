@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.system.fantang.entity.BaseStaff;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -74,7 +75,7 @@ public class FtOrderDao implements Serializable {
      * 统计总数
      */
     @TableField(exist = false)
-    private Integer total;
+    private Long total;
 
     /**
      * 报餐类型

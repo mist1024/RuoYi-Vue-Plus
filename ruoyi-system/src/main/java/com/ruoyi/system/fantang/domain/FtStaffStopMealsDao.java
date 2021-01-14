@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.system.fantang.entity.BaseStaff;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_staff_stop_meals")
-public class FtStaffStopMealsDao implements Serializable {
+public class FtStaffStopMealsDao extends BaseStaff implements Serializable {
 
 private static final long serialVersionUID=1L;
 

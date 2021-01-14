@@ -4,7 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtStaffDemandDao;
 import com.ruoyi.system.fantang.domain.FtStaffStopMealsDao;
 import com.ruoyi.system.fantang.mapper.FtOrderDaoMapper;
 import com.ruoyi.system.fantang.mapper.FtStaffStopMealsDaoMapper;
@@ -202,5 +204,21 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
 
             return "已生产订单并核销";
         }
+    }
+
+    @Override
+    public List<FtFoodDemandDao> getStatisticsReportMealsOfTomorrow() {
+        return this.baseMapper.getStatisticsReportMealsOfTomorrow();
+    }
+
+    @Override
+    public List<FtStaffDemandDao> getStatisticsStaffOfTomorrow() {
+        return this.baseMapper.getStatisticsStaffOfTomorrow();
+
+    }
+
+    @Override
+    public List<FtStaffStopMealsDao> getStopOrderOfTomorrow() {
+        return this.baseMapper.getStopOrderOfTomorrow();
     }
 }

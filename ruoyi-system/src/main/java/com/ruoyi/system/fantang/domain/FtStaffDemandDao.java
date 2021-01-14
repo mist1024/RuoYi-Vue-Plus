@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.system.fantang.entity.BaseStaff;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("ft_staff_demand")
-public class FtStaffDemandDao implements Serializable {
+public class FtStaffDemandDao extends BaseStaff implements Serializable {
 
 private static final long serialVersionUID=1L;
 

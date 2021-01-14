@@ -540,11 +540,13 @@ public class ClientController extends BaseController {
      */
     @GetMapping("/getStatisticsOrderOfTomorrow")
     public AjaxResult getStatisticsReportMealsOfTomorrow() {
+        AjaxResult result = new AjaxResult();
+        result.success();
+        result.put("reports", orderDaoService.getStatisticsReportMealsOfTomorrow());
+        result.put("staffs", orderDaoService.getStatisticsStaffOfTomorrow());
+        result.put("stops", orderDaoService.getStopOrderOfTomorrow());
 
-        Date today = new Date();
-        Date tomorrow = DateUtil.offsetDay(today, 1);
-
-        return orderDaoService.statisGetOrderOfDate(tomorrow);
+        return result;
     }
 
 

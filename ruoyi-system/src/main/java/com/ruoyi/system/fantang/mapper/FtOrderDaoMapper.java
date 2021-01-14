@@ -1,7 +1,10 @@
 package com.ruoyi.system.fantang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtStaffDemandDao;
+import com.ruoyi.system.fantang.domain.FtStaffStopMealsDao;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -83,4 +86,50 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
             "WHERE\n" +
             "\tb.type = #{type}")
     void insertOrderAndWriteOff(@Param("staffId") Long staffId, @Param("type") int type, @Param("deviceId") Long deviceId);
+
+    @Select("SELECT\n" +
+            "\tc.depart_name,\n" +
+            "\ta.type,\n" +
+            "\ta.flag,\n" +
+            "count(*) as total\n" +
+            "FROM\n" +
+            "\tft_food_demand a\n" +
+            "LEFT JOIN ft_patient b ON a.patient_id = b.patient_id\n" +
+            "LEFT JOIN ft_depart c ON b.depart_id = c.depart_id\n" +
+            "WHERE\n" +
+            "\tb.off_flag = 0\n" +
+            "AND a.flag = 1\n" +
+            "GROUP BY a.type, c.depart_name")
+    List<FtFoodDemandDao> getStatisticsReportMealsOfTomorrow();
+
+    @Select("SELECT\n" +
+            "\tc.depart_name,\n" +
+            "\ta.type,\n" +
+            "\tcount(*) as total\n" +
+            "FROM\n" +
+            "\tft_staff_demand a\n" +
+            "LEFT JOIN ft_staff_info b ON a.staff_id = b.staff_id\n" +
+            "LEFT JOIN ft_depart c ON b.depart_id = c.depart_id\n" +
+            "WHERE\n" +
+            "\ta.demand_mode = 1\n" +
+            "GROUP BY\n" +
+            "\tc.depart_name,\n" +
+            "\ta.type")
+    List<FtStaffDemandDao> getStatisticsStaffOfTomorrow();
+
+    @Select("SELECT\n" +
+            "\tc.depart_name,\n" +
+            "\ta.type,\n" +
+            "\tcount(*) as total\n" +
+            "FROM\n" +
+            "\tft_staff_stop_meals a\n" +
+            "LEFT JOIN ft_staff_info b ON a.staff_id = b.staff_id\n" +
+            "LEFT JOIN ft_depart c ON b.depart_id = c.depart_id\n" +
+            "WHERE\n" +
+            "demand_date BETWEEN date_add(NOW(),  INTERVAL 1 DAY)\n" +
+            "AND date_add(now(), INTERVAL 2 DAY)\n" +
+            "GROUP BY\n" +
+            "\tc.depart_name,\n" +
+            "\ta.type\n")
+    List<FtStaffStopMealsDao> getStopOrderOfTomorrow();
 }

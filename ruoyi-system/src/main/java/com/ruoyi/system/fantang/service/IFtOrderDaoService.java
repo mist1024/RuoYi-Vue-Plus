@@ -2,7 +2,10 @@ package com.ruoyi.system.fantang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.domain.FtStaffDemandDao;
+import com.ruoyi.system.fantang.domain.FtStaffStopMealsDao;
 
 import java.util.Date;
 import java.util.List;
@@ -48,4 +51,10 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
     List<FtOrderDao> listAllDetailedByDate(String start, String end);
 
     String setWriteOff(Long staffId, int type, Long deviceId);
+
+    List<FtFoodDemandDao> getStatisticsReportMealsOfTomorrow();
+
+    List<FtStaffDemandDao> getStatisticsStaffOfTomorrow();
+
+    List<FtStaffStopMealsDao> getStopOrderOfTomorrow();
 }

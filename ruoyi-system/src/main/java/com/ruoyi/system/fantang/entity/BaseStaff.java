@@ -8,11 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BasePatient {
-    @TableField(exist = false)
-    public String hospitalId;
-    @TableField(exist = false)
-    public String bedId;
+public class BaseStaff {
     @TableField(exist = false)
     public String name;
     @TableField(exist = false)
