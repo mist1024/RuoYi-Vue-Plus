@@ -17,7 +17,7 @@ import java.util.List;
  * @date 2020-12-03
  */
 public interface FtFoodDemandDaoMapper extends BaseMapper<FtFoodDemandDao> {
-    @Insert("insert into ft_food_demand (patient_id, foods, type) select #{patient_id}, food_list, type FROM ft_food_default")
+    @Insert("insert into ft_food_demand (patient_id, foods, type, flag) select #{patient_id}, food_list, type, 1 FROM ft_food_default")
     public Integer GenerateOrderByPatientId(@Param("patient_id") Long patientId);
 
     @Select("select a.patient_id  from ft_patient a where a.patient_id not in (select patient_id from ft_food_demand c )")
