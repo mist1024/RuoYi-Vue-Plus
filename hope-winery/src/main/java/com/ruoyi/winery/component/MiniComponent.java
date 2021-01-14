@@ -25,11 +25,8 @@ import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.winery.config.wx.WxMiniProperties;
-import com.ruoyi.winery.controller.winery.WineryMauserController;
 import com.ruoyi.winery.domain.winery.WineryMauser;
 import com.ruoyi.winery.service.IWineryMauserService;
-
-import com.sun.tools.javac.util.List;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
