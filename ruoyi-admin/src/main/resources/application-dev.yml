@@ -6,9 +6,9 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://192.168.3.95:3306/fantang_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
-        username: root
-        password: 123456
+        url: jdbc:mysql://120.77.157.122:3306/fantang_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+        username: fantang_test
+        password: FcK2GcNhK54bLGM6
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
