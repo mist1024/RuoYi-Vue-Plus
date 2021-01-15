@@ -32,7 +32,10 @@ public class FtFoodDemandDaoServiceImpl extends ServiceImpl<FtFoodDemandDaoMappe
         // 获取所有未设置默认订餐需求病人
         List<Long> newPatients = this.baseMapper.getNewPatientNotDemand();
         for (Long patientId : newPatients) {
+            // 先创建四个用餐信息
             this.baseMapper.GenerateOrderByPatientId(patientId);
+            // 更新加餐信息为禁用状态
+            this.baseMapper.updateExtraByPatientId(patientId);
         }
         return newPatients.size();
     }

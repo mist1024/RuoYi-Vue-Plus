@@ -7,6 +7,7 @@ import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -58,4 +59,7 @@ public interface FtFoodDemandDaoMapper extends BaseMapper<FtFoodDemandDao> {
             "\ta.type,\n" +
             "\tc.depart_name")
     List<FtReportMealsDao> getStatisticsFoodDemand();
+
+    @Update("UPDATE ft_food_demand set flag = 0 where patient_id = #{patientId} and type = 4 ")
+    void updateExtraByPatientId(@Param("patientId") Long patientId);
 }
