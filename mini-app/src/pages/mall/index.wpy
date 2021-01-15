@@ -41,7 +41,7 @@ module.exports.getTime = getTime;
         mode="aspectFit"
         class="tab-bar-icon"
       />
-      自定义
+      首页
     </van-tabbar-item>
     <van-tabbar-item info="3">
       <image
@@ -56,7 +56,7 @@ module.exports.getTime = getTime;
         mode="aspectFit"
         class="tab-bar-icon"
       />
-      自定义
+      福利购
     </van-tabbar-item>
     <van-tabbar-item info="3">
       <image
@@ -71,7 +71,7 @@ module.exports.getTime = getTime;
         mode="aspectFit"
         class="tab-bar-icon"
       />
-      自定义
+      紫环会
     </van-tabbar-item>
     <van-tabbar-item info="3">
       <image
@@ -86,7 +86,7 @@ module.exports.getTime = getTime;
         mode="aspectFit"
         class="tab-bar-icon"
       />
-      自定义
+      我的
     </van-tabbar-item>
   </van-tabbar>
   <mall-home v-if="pageIndex === 0" />

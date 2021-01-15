@@ -6,8 +6,9 @@ export default {
   },
   methods: {
 
-    navNext (url) {
-      appManager.navigateTo(url)
+    onNavItem (item) {
+      console.log(item)
+      // appManager.navigateTo(item.path)
     },
     navBack() {
       wx.navigateBack()
