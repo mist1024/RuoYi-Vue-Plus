@@ -191,7 +191,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapActions,mapState } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import xiao4rApis from '../apis/xiao4rApis'
 wepy.page({
   store,
@@ -302,29 +302,29 @@ wepy.page({
     },
     onNext() {
       if (!this.wineryForm.plantArea) {
-        xiao4rBase.showToast('请输入种植面积！')
+        appManager.showToast('请输入种植面积！')
         return
       }
 
       if (!this.wineryForm.plantWeight) {
-        xiao4rBase.showToast('请输入产量！')
+        appManager.showToast('请输入产量！')
         return
       }
 
       let error = this.checkVariety(this.wineryForm.redVariety)
       if (error) {
-        xiao4rBase.showToast('请检查红葡萄信息:' + error)
+        appManager.showToast('请检查红葡萄信息:' + error)
         return
       }
 
       error = this.checkVariety(this.wineryForm.whiteVariety)
       if (error) {
-        xiao4rBase.showToast('请检查白葡萄信息:' + error)
+        appManager.showToast('请检查白葡萄信息:' + error)
         return
       }
 
       // this.setFormAction(this.form)
-      xiao4rBase.navigateTo('form4')
+      appManager.navigateTo('form4')
     },
     onBack() {
       // this.setFormAction(this.form)

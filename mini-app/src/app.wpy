@@ -6,9 +6,8 @@
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
+
 }
-
-
 .buttonColor {
   background: #AC1630;
   color: #fff;
@@ -38,6 +37,10 @@
   height: 15px;
 }
 
+.fxc{
+  display: flex;
+  flex-direction: column;
+}
 
 </style>
 
@@ -108,6 +111,7 @@ navigationBarBackgroundColor: '#fff',
 navigationBarTitleText: 'WeChat',
 navigationBarTextStyle: 'white',
 navigationStyle: 'custom',
+backgroundColor: '#222222'
 },
 usingComponents: {
 'nav-bar': './components/nav-bar',

@@ -117,7 +117,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapState } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import xiao4rApis from '../apis/xiao4rApis'
 import validateUtils from '../js/utils/validateUtils'
 
@@ -154,12 +154,12 @@ wepy.page({
 
     async onNext() {
       if (!this.wineryForm.personName) {
-        xiao4rBase.showToast('请输入您的姓名!')
+        appManager.showToast('请输入您的姓名!')
         return
       }
 
       if (!validateUtils.isEmail(this.wineryForm.email)) {
-        xiao4rBase.showToast('请正确输入您的邮箱!')
+        appManager.showToast('请正确输入您的邮箱!')
         return
       }
 
@@ -167,20 +167,20 @@ wepy.page({
       if (this.wineryForm.slogan === '其他') {
         form.slogan = this.slogan
       }
-      form.openid = xiao4rBase.getOpenid()
+      form.openid = appManager.getOpenid()
 
       wx.showLoading({ title: '正在提交...', mask: true })
 
       try {
         let rsp = await xiao4rApis.postForm(form)
         if (rsp.code === 200) {
-          xiao4rBase.showToast('提交成功!')
+          appManager.showToast('提交成功!')
           wx.reLaunch({ url: 'index' })
         } else {
-          xiao4rBase.showToast('提交失败.' + rsp.msg)
+          appManager.showToast('提交失败.' + rsp.msg)
         }
       } catch (e) {
-        xiao4rBase.showToast('提交失败.', e)
+        appManager.showToast('提交失败.', e)
 
       } finally {
         wx.hideLoading()

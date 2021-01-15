@@ -1,7 +1,7 @@
 
 import store from '@/store'
 
-class Xiao4rBase {
+class AppManager {
   saveOpenid(openid) {
     wx.setStorageSync('openid', openid)
     store.dispatch('setOpenidAction', openid)
@@ -22,4 +22,4 @@ class Xiao4rBase {
   }
 }
 
-export default new Xiao4rBase()
+export default new AppManager()

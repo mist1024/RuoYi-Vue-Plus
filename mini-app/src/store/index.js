@@ -1,15 +1,23 @@
 import Vuex from '@wepy/x'
 import { wineryForm } from './wineryForm'
+import { imageDefine } from './constant/imageDefine'
+import { navDefine } from './constant/navDefine'
 
 export default new Vuex.Store({
   state: {
     user: {
       openid: '',
       mobile: '',
-      userInfo: {},
-      token: ''
+      userInfo: {
+        nickName: '未注册用户',
+        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
+      },
+      token: '',
+      company: '企业名称',
     },
-    wineryForm
+    wineryForm,
+    imageDefine,
+    navDefine
   },
   mutations: {
 

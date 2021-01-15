@@ -75,7 +75,7 @@ import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import eventHub from '../../common/eventHub'
-import xiao4rBase from '../../xiao4rBase'
+import appManager from '../../appManager'
 import userApis from '../../apis/userApis'
 
 wepy.component({
@@ -109,29 +109,29 @@ wepy.component({
 
 
       if (!this.isChecked) {
-        xiao4rBase.showToast('请确认xxxx协议.')
+        appManager.showToast('请确认xxxx协议.')
         return false
       }
       if (!this.user.mobile) {
-        xiao4rBase.showToast('请授权获取手机号码.')
+        appManager.showToast('请授权获取手机号码.')
         return false
       }
       if (!this.user.userInfo) {
-        xiao4rBase.showToast('请授权获取用户昵称.')
+        appManager.showToast('请授权获取用户昵称.')
         return false
       }
 
       let self = this
       userApis.registrationByMini(this.user).then(r => {
         if (r.code === 200) {
-          xiao4rBase.showToast('注册成功!')
+          appManager.showToast('注册成功!')
           self.isShow = false
           self.setTokenAction(r.token)
         } else {
-          xiao4rBase.showToast(r.msg)
+          appManager.showToast(r.msg)
         }
       }).catch(e => {
-        xiao4rBase.showToast('注册失败!')
+        appManager.showToast('注册失败!')
       })
     },
     async onGetMobile(e) {
@@ -139,7 +139,7 @@ wepy.component({
       wx.showLoading({ title: '获取中...', mask: true })
       try {
         let rsp = await userApis.sendMobile({
-          openid: xiao4rBase.getOpenid(),
+          openid: appManager.getOpenid(),
           detail: e.$wx.detail
         })
 
@@ -147,10 +147,10 @@ wepy.component({
         if (rsp.code === 200) {
           this.setMobileAction(rsp.data.mobile)
         } else {
-          xiao4rBase.showToast('服务器连接异常.')
+          appManager.showToast('服务器连接异常.')
         }
       } catch (e) {
-        xiao4rBase.showToast('服务器连接异常.')
+        appManager.showToast('服务器连接异常.')
       } finally {
         wx.hideLoading()
       }

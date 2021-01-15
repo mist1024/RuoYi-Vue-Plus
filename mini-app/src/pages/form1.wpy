@@ -161,7 +161,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapState, mapActions } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import userApis from '../apis/userApis'
 
 wepy.page({
@@ -202,16 +202,16 @@ wepy.page({
       wx.showLoading({ title: '获取中...', mask: true })
       try {
         let rsp = await userApis.sendMobile({
-          openid: xiao4rBase.getOpenid(),
+          openid: appManager.getOpenid(),
           detail: e.$wx.detail
         })
 
         if (rsp.code === 200) {
           this.wineryForm.mobile = rsp.data.mobile
         }
-        xiao4rBase.showToast(rsp.msg)
+        appManager.showToast(rsp.msg)
       } catch (e) {
-        xiao4rBase.showToast('服务器连接异常,请联系管理员.')
+        appManager.showToast('服务器连接异常,请联系管理员.')
       } finally {
         wx.hideLoading()
       }
@@ -221,37 +221,37 @@ wepy.page({
       console.log(this.form)
 
       if (!this.wineryForm.mobile) {
-        xiao4rBase.showToast('请授权获取您的手机号')
+        appManager.showToast('请授权获取您的手机号')
         return
       }
 
       if (!this.wineryForm.wineryName) {
-        xiao4rBase.showToast('请输入您的酒庄名称')
+        appManager.showToast('请输入您的酒庄名称')
         return
       }
 
       if (!this.wineryForm.buildTime) {
-        xiao4rBase.showToast('请输入您的酒庄成立时间')
+        appManager.showToast('请输入您的酒庄成立时间')
         return
       }
 
       if (!this.wineryForm.address) {
-        xiao4rBase.showToast('请输入您的酒庄地址')
+        appManager.showToast('请输入您的酒庄地址')
         return
       }
 
       if (!this.wineryForm.wineryArea) {
-        xiao4rBase.showToast('请输入您的酒庄总面积')
+        appManager.showToast('请输入您的酒庄总面积')
         return
       }
 
       if (!this.wineryForm.buildArea) {
-        xiao4rBase.showToast('请输入您的建筑总面积')
+        appManager.showToast('请输入您的建筑总面积')
         return
       }
 
       // this.setFormAction(this.form)
-      xiao4rBase.navigateTo('form2')
+      appManager.navigateTo('form2')
     }
   },
 

@@ -137,7 +137,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapState } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import xiao4rApis from '../apis/xiao4rApis'
 import validateUtils from '../js/utils/validateUtils'
 
@@ -198,31 +198,31 @@ wepy.page({
 
     onNext() {
       if (!validateUtils.isIntOrDecimal(this.wineryForm.annualOutput)) {
-        xiao4rBase.showToast('请输入正确的年产量!')
+        appManager.showToast('请输入正确的年产量!')
         return
       }
 
       if (!validateUtils.isIntOrDecimal(this.wineryForm.stock)) {
-        xiao4rBase.showToast('请输入正确的当前库存!')
+        appManager.showToast('请输入正确的当前库存!')
         return
       }
 
       if (!this.wineryForm.bucketCount) {
-        xiao4rBase.showToast('请输入橡木桶数量!')
+        appManager.showToast('请输入橡木桶数量!')
         return
       }
 
       if (this.wineryForm.mainPrice.length < 1) {
-        xiao4rBase.showToast('请选择主要产品定价!')
+        appManager.showToast('请选择主要产品定价!')
         return
       }
 
       if (this.wineryForm.salesMode.length < 1) {
-        xiao4rBase.showToast('请选择销售方式!')
+        appManager.showToast('请选择销售方式!')
         return
       }
 
-      xiao4rBase.navigateTo('form6')
+      appManager.navigateTo('form6')
     },
     onBack() {
       wx.navigateBack()

@@ -4,8 +4,14 @@
   width: 100%;
   height: 536rpx;
   z-index: -10;
+}
 
-
+.tab-bar-icon {
+  width: 30px;
+  height: 20px;
+}
+page {
+  background-color: #eeeeee;
 }
 
 </style>
@@ -21,20 +27,74 @@ return `${hour}:${mins}:${sec}.${milli}`;
 module.exports.getTime = getTime;
 </wxs>
 <template>
-  <van-tabbar active="{{ pageIndex }}" bind:change="onChange">
-    <van-tabbar-item icon="home-o">热点</van-tabbar-item>
-    <van-tabbar-item icon="shopping-cart-o">购物</van-tabbar-item>
-    <van-tabbar-item icon="comment-o">交流</van-tabbar-item>
-    <van-tabbar-item icon="shopping-cart-o">购物车</van-tabbar-item>
-    <van-tabbar-item icon="user-o">我的</van-tabbar-item>
+  <van-tabbar active="{{ pageIndex }}" bind:change="onChange" fixed>
+    <van-tabbar-item info="3">
+      <image
+        slot="icon"
+        :src="imageDefine.TAP_BAR_ICON1_OFF"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      <image
+        slot="icon-active"
+        :src="imageDefine.TAP_BAR_ICON1_ON"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      自定义
+    </van-tabbar-item>
+    <van-tabbar-item info="3">
+      <image
+        slot="icon"
+        :src="imageDefine.TAP_BAR_ICON2_OFF"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      <image
+        slot="icon-active"
+        :src="imageDefine.TAP_BAR_ICON2_ON"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      自定义
+    </van-tabbar-item>
+    <van-tabbar-item info="3">
+      <image
+        slot="icon"
+        :src="imageDefine.TAP_BAR_ICON3_OFF"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      <image
+        slot="icon-active"
+        :src="imageDefine.TAP_BAR_ICON3_ON"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      自定义
+    </van-tabbar-item>
+    <van-tabbar-item info="3">
+      <image
+        slot="icon"
+        :src="imageDefine.TAP_BAR_ICON4_OFF"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      <image
+        slot="icon-active"
+        :src="imageDefine.TAP_BAR_ICON4_ON"
+        mode="aspectFit"
+        class="tab-bar-icon"
+      />
+      自定义
+    </van-tabbar-item>
   </van-tabbar>
   <mall-home v-if="pageIndex === 0" />
   <mall-shopping v-else-if="pageIndex === 1" />
   <mall-bbs v-else-if="pageIndex === 2" />
-  <mall-car v-else-if="pageIndex === 3" />
-  <mall-my v-else-if="pageIndex === 4" />
+  <mall-my v-else-if="pageIndex === 3" />
   <dialog-registration />
-  <van-button @tap="onTest" >测试</van-button>
+  <van-button @tap="onTest">测试</van-button>
 
 
 </template>
@@ -42,28 +102,33 @@ module.exports.getTime = getTime;
 <script>
 import wepy from '@wepy/core'
 import store from '@/store'
-import { mapActions } from '@wepy/x'
+import { mapState, mapActions } from '@wepy/x'
 import userApis from '../../apis/userApis'
-import xiao4rBase from '../../xiao4rBase'
+import appManager from '../../appManager'
 import eventHub from '../../common/eventHub'
+import defaultMix from '../../mixins/defaultMix'
 
 wepy.page({
   store,
-  hooks: {
-  },
+  hooks: {},
 
+  mixins: [ defaultMix ],
   data: {
     pageIndex: 0
   },
 
   computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'userInfo': state => state.user.userInfo
+    })
   },
 
   methods: {
     ...mapActions([
       'setUserAction',
       'setTokenAction',
-      'setOpenidAction',
+      'setOpenidAction'
     ]),
     onTest() {
       eventHub.$emit('onShowDialogUserInfo')
@@ -90,26 +155,26 @@ wepy.page({
             if (rsp.data.openid) {
               self.init(rsp.data.openid)
             } else {
-              xiao4rBase.showToast('登录失败！' + res.errMsg)
+              appManager.showToast('登录失败！' + res.errMsg)
               wx.hideLoading()
             }
           }).catch(e => {
-            xiao4rBase.showToast('登录失败！' + res.errMsg)
+            appManager.showToast('登录失败！' + res.errMsg)
           })
           // request.requestTaskMap.get(req.taskId).abort()
           // console.log('中断请求,req:', req.taskId)
         },
         fail(res) {
-          xiao4rBase.showToast('登录失败,正在重试.')
+          appManager.showToast('登录失败,正在重试.')
           wx.hideLoading()
           self.login()
         }
       })
     },
     async init(openid) {
-      xiao4rBase.saveOpenid(openid)
+      appManager.saveOpenid(openid)
 
-      let rsp = await userApis.loginByMini({openid: openid})
+      let rsp = await userApis.loginByMini({ openid: openid })
       if (rsp.token) {
         this.setTokenAction(rsp.token)
       }
@@ -128,11 +193,10 @@ wepy.page({
 {
 navigationBarTitleText: '',
 usingComponents: {
-'mall-home': '../../components/mall/mall-home',
-'mall-shopping': '../../components/mall/mall-shopping',
-'mall-bbs': '../../components/mall/mall-bbs',
-'mall-car': '../../components/mall/mall-car',
-'mall-my': '../../components/mall/mall-my',
+'mall-home': '../../components/mall/tab/mall-home',
+'mall-shopping': '../../components/mall/tab/mall-shopping',
+'mall-bbs': '../../components/mall/tab/mall-bbs',
+'mall-my': '../../components/mall/tab/mall-my',
 'dialog-registration': '../../components/user/dialog-registration'
 }
 }

@@ -43,7 +43,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapActions } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import xiao4rApis from '../apis/xiao4rApis'
 import userApis from '../apis/userApis'
 import request from '../js/request'
@@ -90,7 +90,7 @@ wepy.page({
       eventHub.$emit('app-launch', { a: 1 }, { b: 2 })
     },
     onNext() {
-      xiao4rBase.navigateTo('form1')
+      appManager.navigateTo('form1')
 
       // xiao4rApis.getAuthTest({ openid: store.state.user.openid }).then(r => {
       //   wx.navigateToMiniProgram({
@@ -112,7 +112,7 @@ wepy.page({
             if (rsp.data.openid) {
               self.init(rsp.data.openid)
             } else {
-              xiao4rBase.showToast('登录失败！' + res.errMsg)
+              appManager.showToast('登录失败！' + res.errMsg)
               wx.hideLoading()
             }
           })
@@ -120,7 +120,7 @@ wepy.page({
           // console.log('中断请求,req:', req.taskId)
         },
         fail(res) {
-          xiao4rBase.showToast('登录失败,正在重试.')
+          appManager.showToast('登录失败,正在重试.')
           wx.hideLoading()
           self.login()
         }
@@ -130,12 +130,12 @@ wepy.page({
     async init(openid) {
       let self = this
 
-      xiao4rBase.saveOpenid(openid)
+      appManager.saveOpenid(openid)
 
       wx.getUserInfo({
         success(res) {
           self.setUserAction({
-            openid: xiao4rBase.getOpenid(),
+            openid: appManager.getOpenid(),
             userInfo: res.userInfo
           })
         }
@@ -147,7 +147,7 @@ wepy.page({
 
     async getForm() {
       try {
-        let rsp = await xiao4rApis.getForm({ openid: xiao4rBase.getOpenid() })
+        let rsp = await xiao4rApis.getForm({ openid: appManager.getOpenid() })
         if (rsp.code === 200) {
           let temp = rsp.data
           temp.region = temp.region.split(',')
@@ -163,7 +163,7 @@ wepy.page({
           this.setWineryFormAction(temp)
         }
       } catch (e) {
-        xiao4rBase.showToast('获取用户信息失败.' + e)
+        appManager.showToast('获取用户信息失败.' + e)
       }
     }
   },

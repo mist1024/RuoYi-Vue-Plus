@@ -1,4 +1,4 @@
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import { uuid } from './utils/uuid'
 import store from '@/store'
 
@@ -33,7 +33,7 @@ class Xiao4rRequest {
         data: req.data,
         success: rsp => resolve(rsp.data),
         fail: error => {
-          xiao4rBase.showToast('网络连接异常.')
+          appManager.showToast('网络连接异常.')
           reject(error)
         },
         complete: () => {

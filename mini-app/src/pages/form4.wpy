@@ -79,7 +79,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapActions,mapState } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 import xiao4rApis from '../apis/xiao4rApis'
 
 wepy.page({
@@ -123,20 +123,20 @@ wepy.page({
     onNext() {
 
       if (this.wineryForm.fermentationProcess.length < 1) {
-        xiao4rBase.showToast('请选择酒精发酵工艺!')
+        appManager.showToast('请选择酒精发酵工艺!')
         return
       }
 
       if (this.wineryForm.container.length < 1) {
-        xiao4rBase.showToast('请选择热化容器!')
+        appManager.showToast('请选择热化容器!')
         return
       }
       if (this.wineryForm.clarificationMethod.length < 1) {
-        xiao4rBase.showToast('请选择澄清方式!')
+        appManager.showToast('请选择澄清方式!')
         return
       }
 
-      xiao4rBase.navigateTo('form5')
+      appManager.navigateTo('form5')
     },
     onBack() {
 

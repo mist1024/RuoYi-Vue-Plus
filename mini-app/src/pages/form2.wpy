@@ -100,7 +100,7 @@ import wepy from '@wepy/core'
 import eventHub from '../common/eventHub'
 import store from '../store'
 import { mapState } from '@wepy/x'
-import xiao4rBase from '../xiao4rBase'
+import appManager from '../appManager'
 
 wepy.page({
   store,
@@ -124,7 +124,7 @@ wepy.page({
 
   methods: {
     onNext() {
-      xiao4rBase.navigateTo('form3')
+      appManager.navigateTo('form3')
     }
   },
 

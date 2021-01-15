@@ -24,7 +24,7 @@
 import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions } from '@wepy/x'
-import xiao4rBase from '../../xiao4rBase'
+import appManager from '../../../appManager'
 
 wepy.component({
   store,
@@ -41,7 +41,7 @@ wepy.component({
 
     onItem(item) {
       console.log(item)
-      xiao4rBase.navigateTo(`goods-detail?id=${item}`)
+      appManager.navigateTo(`goods-detail?id=${item}`)
     }
   },
 
