@@ -2,6 +2,7 @@ import Vuex from '@wepy/x'
 import { wineryForm } from './wineryForm'
 import { imageDefine } from './constant/imageDefine'
 import { navDefine } from './constant/navDefine'
+import { wineryDefine } from './constant/wineryDefine'
 
 export default new Vuex.Store({
   state: {
@@ -13,11 +14,12 @@ export default new Vuex.Store({
         avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
       },
       token: '',
-      company: '企业名称',
+      company: '企业名称'
     },
     wineryForm,
     imageDefine,
-    navDefine
+    navDefine,
+    wineryDefine
   },
   mutations: {
 

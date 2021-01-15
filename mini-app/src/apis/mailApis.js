@@ -13,6 +13,17 @@ class MallApis {
       data: data
     })
   }
+  getGoodsById(id) {
+    return request.get({
+      url: baseUrl + 'goods/goods_main/' + id,
+    })
+  }
+
+  getGoodsSpecByIds(ids) {
+    return request.get({
+      url: baseUrl + 'goods/goods_spec/listByIds/' + ids,
+    })
+  }
 }
 
 export default new MallApis()

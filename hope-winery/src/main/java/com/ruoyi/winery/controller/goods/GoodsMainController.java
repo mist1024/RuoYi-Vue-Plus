@@ -49,7 +49,7 @@ public class GoodsMainController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('goods:goods_main:list')")
     @GetMapping("/list")
-    public TableDataInfo list(UsernamePasswordAuthenticationToken token, GoodsMain goodsMain) {
+    public TableDataInfo list(GoodsMain goodsMain) {
         startPage();
         LambdaQueryWrapper<GoodsMain> lqw = Wrappers.lambdaQuery(goodsMain);
 

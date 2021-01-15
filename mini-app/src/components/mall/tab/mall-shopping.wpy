@@ -1,3 +1,11 @@
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+
+
 <template>
 
   <van-nav-bar
@@ -19,37 +27,40 @@
     </van-row>
 
 
-    <!--    <div style="display: flex;flex-wrap: wrap;">-->
-    <!--      <div class="filter-button" v-for="(item,index) in filterButtons">-->
-    <!--        <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "-->
-    <!--                    :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}-->
-    <!--        </van-button>-->
-    <!--      </div>-->
-    <!--    </div>-->
+        <div style="display: flex;flex-wrap: wrap;">
+          <div class="filter-button" v-for="(item,index) in filterButtons">
+            <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "
+                        :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}
+            </van-button>
+          </div>
+        </div>
 
 
     <view v-for="(item, index) in records" :key="index"
           style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">
       <van-card
-        price="2.00"
-        :desc="item.goodsDesc"
         :title="item.goodsName"
-        :thumb="parseImage(item.goodsFaceImg)"
+        :desc="item.goodsAlias"
+        :price="item.goodsPrice"
+        :thumb="filters.parseImage(item.goodsFaceImg)"
         @tap="onItem(item)"
       >
-        <view slot="num" style="float:right;">
-          <div>{{'已优惠¥xx元'}}</div>
-        </view>
+<!--        <view slot="num" style="float:right;">-->
+<!--          <div>{{'已优惠¥xx元'}}</div>-->
+<!--        </view>-->
 
       </van-card>
 
-      {{parseImage(item.goodsFaceImg)}}
+
     </view>
+
 
   </view>
 </template>
 
 <script>
+
+
 import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
@@ -80,8 +91,7 @@ wepy.component({
   methods: {
 
     onItem(item) {
-      console.log(item)
-      appManager.navigateTo(`goods-detail?id=${item}`)
+      appManager.navigateTo(`goods-detail?id=${item.id}`)
     },
 
     onFilterBtn(item) {
@@ -94,14 +104,14 @@ wepy.component({
   },
 
   ready() {
-    // let i = 0
-    // while (true) {
-    //   this.filterButtons.push('按钮按钮' + i)
-    //   i++
-    //   if (i > 8) {
-    //     break
-    //   }
-    // }
+    let i = 0
+    while (true) {
+      this.filterButtons.push('按钮按钮' + i)
+      i++
+      if (i > 8) {
+        break
+      }
+    }
 
     mailApis.getGoodsList({}).then(r => {
 

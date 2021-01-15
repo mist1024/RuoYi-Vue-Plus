@@ -100,7 +100,8 @@ pages: [
 'pages/form5',
 'pages/form6',
 'pages/mall/index',
-'pages/mall/goods-detail'
+'pages/mall/goods-detail',
+'pages/winery/winery-detail'
 ],
 navigateToMiniProgramAppIdList: [
 'wx88736d7d39e2eda6'
@@ -141,7 +142,8 @@ usingComponents: {
 "van-grid": "./vant/grid/index",
 "van-grid-item": "./vant/grid-item/index",
 "van-dialog": "./vant/dialog/index",
-"van-image": "./vant/image/index"
+"van-image": "./vant/image/index",
+"van-loading": "./vant/loading/index"
 }
 }
 </config>

@@ -104,6 +104,14 @@
 					"id": -1,
 					"name": "商品详情",
 					"pathName": "pages/mall/goods-detail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "酒庄详情",
+					"pathName": "pages/winery/winery-detail",
+					"query": "",
 					"scene": null
 				}
 			]

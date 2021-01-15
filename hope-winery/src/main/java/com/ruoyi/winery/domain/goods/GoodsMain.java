@@ -68,6 +68,10 @@ private static final long serialVersionUID=1L;
     @Excel(name = "商品图片")
     private String goodsImg;
 
+    /** 商品图片 */
+    @Excel(name = "商品价格")
+    private BigDecimal goodsPrice;
+
     /** 创建者 */
     private String createBy;
 

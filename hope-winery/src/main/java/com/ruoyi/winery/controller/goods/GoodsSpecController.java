@@ -1,5 +1,6 @@
 package com.ruoyi.winery.controller.goods;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
@@ -127,5 +128,17 @@ public class GoodsSpecController extends BaseController {
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(iWineryGoodsSpecService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    }
+
+
+    /**
+     * 查询商品规格列表
+     */
+    @PreAuthorize("@ss.hasPermi('goods:goods_spec:list')")
+    @GetMapping("/listByIds/{ids}")
+    public TableDataInfo listByIds(@PathVariable String[] ids) {
+        startPage();
+        List<GoodsSpec> list = iWineryGoodsSpecService.listByIds(Arrays.asList(ids));
+        return getDataTable(list);
     }
 }

@@ -1,0 +1,152 @@
+<style lang="less">
+
+.bg {
+  z-index: -1;
+  height: 100%;
+  position: fixed;
+  width: 200rpx;
+  background-color: #AC1630;
+}
+
+.winery-item {
+
+  width: 400rpx;
+  height: 60px;
+
+  margin-bottom: 20px;
+  box-shadow: 4px 4px 10px #cccccc;
+  border: #ffffff 1px solid;
+  border-radius: 20px;
+
+  background-color: white;
+  padding: 15px 70rpx;
+
+}
+
+.winery-item-icon {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: white;
+  box-shadow: 4px 4px 10px #cccccc;
+  margin-top: 10px;
+  margin-left: -40rpx;
+  border: #ffffff 1px solid;
+  border-radius: 50%;
+}
+
+.winery-item-arrow {
+
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  background-color: white;
+  box-shadow: 4px 4px 10px #cccccc;
+  margin-top: 18.5px;
+  margin-left: 500rpx;
+  border: #ffffff 1px solid;
+  border-radius: 50%;
+
+}
+
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+<template>
+
+  <nav-bar title="了解酒庄" />
+  <div class="bg" />
+  <div class="container">
+
+
+    <div style="display: flex;" v-for="(item,index) in wineryDefine.WINERY_LIST" @tap="onTap(item)">
+      <div class="winery-item-icon">
+        <van-image style="margin-top: 5px;" round width="50px" height="50px" :src="userInfo.avatar" />
+      </div>
+
+      <div class="winery-item">
+        <div class="fxc" style="margin-left: 20px;">
+          <span style="font-size: 20px;font-weight: bold;">{{item.name}}</span>
+          <span style="color: #999;">{{item.desc}}</span>
+        </div>
+      </div>
+
+      <div class="winery-item-arrow">
+        <van-icon name="arrow" />
+      </div>
+    </div>
+
+
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../mixins/defaultMix'
+
+wepy.page({
+  store,
+  hooks: {},
+
+  mixins: [defaultMix],
+  data: {
+    pageIndex: 0
+  },
+
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'userInfo': state => state.user.userInfo,
+      'wineryDefine': state => state.wineryDefine
+    })
+  },
+
+  methods: {
+    ...mapActions([
+      'setUserAction'
+    ]),
+    handleViewTap() {
+      console.log('handleVieTap clicked')
+    },
+    onTap(item) {
+      console.log(item)
+
+    },
+
+    async init(id) {
+
+    }
+  },
+
+  onLoad(options) {
+    this.init(options.id)
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+usingComponents: {
+
+}
+}
+</config>
