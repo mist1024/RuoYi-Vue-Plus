@@ -163,7 +163,7 @@ public class MiniComponent {
     /**
      * 小程序登录
      *
-     * @param openId
+     * @param userName
      * @return
      */
     public String loginByMini(String userName) {
