@@ -239,7 +239,7 @@
           <el-select v-model="form.patientId" placeholder="请选择病人" @change="changePatient">
             <el-option
               v-for="item in patientOptions"
-              :key="item.name"
+              :key="item.patientId"
               :label="item.name"
               :value="item.patientId"
             ></el-option>
@@ -758,8 +758,10 @@ export default {
     },
     // 响应科室信息切换
     changeDepart(value) {
+      const _this = this;
       selectPatientByDepartId(value).then(response => {
-        this.patientOptions = response.data;
+        _this.patientOptions = response.data;
+        _this.form.patientId = null;
       });
     },
     // 相应病人信息切换

@@ -22,4 +22,8 @@ public interface IFtCateringDaoService extends IService<FtCateringDao> {
     Integer deleteByPatientId(Long[] ids);
 
     Integer cancelByPatientId(Long[] ids);
+
+    List<Long> notInTable(FtCateringDao ftCateringDao);
+
+    List<FtCateringDao> copyAndAdd(List<Long> patientIds, FtCateringDao ftCateringDao);
 }

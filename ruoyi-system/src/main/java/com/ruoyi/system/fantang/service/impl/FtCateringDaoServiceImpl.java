@@ -38,13 +38,9 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
 
         List<Integer> types = ftCateringDao.getTypes();
 
-        List<Long> patientIds = ftCateringDao.getPatientIds();
-
-        for (Long patientId : patientIds) {
-
             for (int i = 1; i < 5; i++) {
                 FtCateringDao cateringDao = new FtCateringDao();
-                cateringDao.setPatientId(patientId);
+                cateringDao.setPatientId(ftCateringDao.getPatientId());
                 cateringDao.setNumber(ftCateringDao.getNumber());
                 cateringDao.setFrequency(ftCateringDao.getFrequency());
                 cateringDao.setCateringUsage(ftCateringDao.getCateringUsage());
@@ -63,7 +59,6 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
                 this.baseMapper.insert(cateringDao);
                 list.add(cateringDao);
             }
-        }
 
         return list;
     }
@@ -98,5 +93,60 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
         }
 
         return rows;
+    }
+
+    @Override
+    public List<Long> notInTable(FtCateringDao ftCateringDao) {
+
+        List<Long> patientIds = ftCateringDao.getPatientIds();
+
+        List<Long> patientNotInTable = new ArrayList<>();
+
+        for (Long patientId : patientIds) {
+            QueryWrapper<FtCateringDao> wrapper = new QueryWrapper<>();
+            wrapper.eq("patient_id", patientId);
+            List<FtCateringDao> ftCateringDaoList = this.baseMapper.selectList(wrapper);
+
+            if (ftCateringDaoList.size() == 0) {
+                patientNotInTable.add(patientId);
+            }
+
+        }
+
+        return patientNotInTable;
+    }
+
+    @Override
+    public List<FtCateringDao> copyAndAdd(List<Long> patientIds, FtCateringDao ftCateringDao) {
+
+        List<FtCateringDao> list = new ArrayList<>();
+
+        List<Integer> types = ftCateringDao.getTypes();
+
+        for (Long patientId : patientIds) {
+            for (int i = 1; i < 5; i++) {
+                FtCateringDao cateringDao = new FtCateringDao();
+                cateringDao.setPatientId(patientId);
+                cateringDao.setNumber(ftCateringDao.getNumber());
+                cateringDao.setFrequency(ftCateringDao.getFrequency());
+                cateringDao.setCateringUsage(ftCateringDao.getCateringUsage());
+                cateringDao.setCreateAt(new Date());
+                cateringDao.setType(i);
+
+                for (Integer type : types) {
+                    if (i == type) {
+                        cateringDao.setFlag(true);
+                        break;
+                    } else {
+                        cateringDao.setFlag(false);
+                    }
+                }
+
+                this.baseMapper.insert(cateringDao);
+                list.add(cateringDao);
+            }
+        }
+
+        return list;
     }
 }

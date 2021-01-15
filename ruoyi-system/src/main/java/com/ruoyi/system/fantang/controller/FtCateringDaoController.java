@@ -161,6 +161,13 @@ public class FtCateringDaoController extends BaseController {
         System.out.println(ftCateringDao);
 
 
+        List<Long> patientIds = iFtCateringDaoService.notInTable(ftCateringDao);
+
+        List<FtCateringDao> ftCateringDaoList = iFtCateringDaoService.copyAndAdd(patientIds, ftCateringDao);
+
+
+
+
         return null;
     }
 }
