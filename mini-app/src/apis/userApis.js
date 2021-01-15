@@ -15,7 +15,7 @@ class UserApis {
   registrationByMini(data) {
     data.deptId = MINI_DEPTID
     return request.post({
-      url: baseUrl + 'mini/user/registrationByMini',
+      url: baseUrl + 'winery/mini/user/registrationByMini',
       data: data
     })
   }
@@ -28,14 +28,14 @@ class UserApis {
   loginByMini(data) {
     data.deptId = MINI_DEPTID
     return request.post({
-      url: baseUrl + 'mini/user/loginByMini',
+      url: baseUrl + 'winery/mini/user/loginByMini',
       data: data
     })
   }
 
   getSession(code) {
     return request.get({
-      url: baseUrl + 'mini/user/getSession',
+      url: baseUrl + 'winery/mini/user/getSession',
       header: formHeader,
       data: {
         'code': code,
@@ -47,7 +47,7 @@ class UserApis {
   sendMobile(data) {
     data.deptId = MINI_DEPTID
     return request.post({
-      url: baseUrl + 'mini/user/sendMobile',
+      url: baseUrl + 'winery/mini/user/sendMobile',
       header: jsonHeader,
       data: data
     })
@@ -55,7 +55,7 @@ class UserApis {
 
   getAuthTest(data) {
     return request.get({
-      url: baseUrl + 'mini/user/test',
+      url: baseUrl + 'winery/mini/user/test',
       header: formHeader,
       data: data
     })

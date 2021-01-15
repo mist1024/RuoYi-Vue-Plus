@@ -89,8 +89,8 @@ module.exports.getTime = getTime;
       自定义
     </van-tabbar-item>
   </van-tabbar>
-  <mall-home v-if="pageIndex === 1" />
-  <mall-shopping v-else-if="pageIndex === 0" />
+  <mall-home v-if="pageIndex === 0" />
+  <mall-shopping v-else-if="pageIndex === 1" />
   <mall-bbs v-else-if="pageIndex === 2" />
   <mall-my v-else-if="pageIndex === 3" />
   <dialog-registration />

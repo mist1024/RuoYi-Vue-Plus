@@ -1,7 +1,7 @@
 
 import request from '../js/request'
 
-export const baseUrl = 'http://127.0.0.1:18989/winery/'
+export const baseUrl = 'http://127.0.0.1:18989/'
 // export const baseUrl = 'http://36.1.50.18:18989/winery/'
 // export const baseUrl = 'http://62.234.123.172:18989/api/'
 // export const baseUrl = 'https://www.xiao4r.com/wine/winery/'
@@ -20,7 +20,7 @@ export const formHeader = {
 class Xiao4rApis {
   postForm(data) {
     return request.post({
-      url: baseUrl + 'mini/postForm',
+      url: baseUrl + 'winery/mini/postForm',
       header: jsonHeader,
       data: data
     })
@@ -28,7 +28,7 @@ class Xiao4rApis {
 
   getForm(data) {
     return request.get({
-      url: baseUrl + 'mini/getForm',
+      url: baseUrl + 'winery/mini/getForm',
       header: formHeader,
       data: data
     })

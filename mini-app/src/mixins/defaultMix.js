@@ -11,6 +11,9 @@ export default {
     },
     navBack() {
       wx.navigateBack()
+    },
+    parseImage(imageKey) {
+      return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
     }
   },
   created () {

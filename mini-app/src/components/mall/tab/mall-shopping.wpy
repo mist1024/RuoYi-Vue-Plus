@@ -19,30 +19,33 @@
     </van-row>
 
 
-    <div style="display: flex;flex-wrap: wrap;">
-      <div class="filter-button" v-for="(item,index) in filterButtons">
-        <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "
-                    :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}
-        </van-button>
-      </div>
-    </div>
+    <!--    <div style="display: flex;flex-wrap: wrap;">-->
+    <!--      <div class="filter-button" v-for="(item,index) in filterButtons">-->
+    <!--        <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "-->
+    <!--                    :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}-->
+    <!--        </van-button>-->
+    <!--      </div>-->
+    <!--    </div>-->
 
 
-    <!--  <view v-for="(item, index) in list" :key="index" style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">-->
-    <!--    <van-card-->
-    <!--      price="2.00"-->
-    <!--      desc="描述信息"-->
-    <!--      title="商品标题"-->
-    <!--      thumb="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=751441608,3469454349&fm=15&gp=0.jpg"-->
-    <!--      @tap="onItem(item)"-->
-    <!--    >-->
-    <!--      <view slot="num" style="float:right;">-->
-    <!--        <div>{{'已优惠¥xx元'}} </div>-->
-    <!--      </view>-->
+    <view v-for="(item, index) in records" :key="index"
+          style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">
+      <van-card
+        price="2.00"
+        :desc="item.goodsDesc"
+        :title="item.goodsName"
+        :thumb="parseImage(item.goodsFaceImg)"
+        @tap="onItem(item)"
+      >
+        <view slot="num" style="float:right;">
+          <div>{{'已优惠¥xx元'}}</div>
+        </view>
 
-    <!--    </van-card>-->
+      </van-card>
 
-    <!--  </view>-->
+      {{parseImage(item.goodsFaceImg)}}
+    </view>
+
   </view>
 </template>
 
@@ -51,14 +54,16 @@ import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import appManager from '../../../appManager'
+import mailApis from '../../../apis/mailApis'
+import defaultMix from '../../../mixins/defaultMix'
 
 wepy.component({
   store,
   hooks: {},
-
+  // mixins: [ defaultMix ],
   data: {
     active: 0,
-    list: [1, 2, 3, 4],
+    records: [],
     currentFilter: '全部',
     filterButtons: ['全部']
 
@@ -82,18 +87,26 @@ wepy.component({
     onFilterBtn(item) {
       console.log(item)
       this.currentFilter = item
+    },
+    parseImage(imageKey) {
+      return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
     }
   },
 
   ready() {
-    let i = 0
-    while (true) {
-      this.filterButtons.push('按钮按钮' + i)
-      i++
-      if (i > 8) {
-        break
-      }
-    }
+    // let i = 0
+    // while (true) {
+    //   this.filterButtons.push('按钮按钮' + i)
+    //   i++
+    //   if (i > 8) {
+    //     break
+    //   }
+    // }
+
+    mailApis.getGoodsList({}).then(r => {
+
+      this.records = r.rows
+    })
   }
 })
 </script>
