@@ -114,9 +114,7 @@
       </van-grid>
 
 
-      <div>
-        <van-image width="100%" height="60px" :src="navDefine.HOME_BANNER.image" style="margin-top: 15px;" />
-      </div>
+      <van-image width="100%" height="60px" :src="navDefine.HOME_BANNER.image" style="margin-top: 15px;" />
 
       <span v-if="columnRecord.length > 0" style="margin:15px 0;font-weight: bold;">热门专题</span>
 

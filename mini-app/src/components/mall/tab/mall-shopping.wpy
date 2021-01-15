@@ -1,29 +1,55 @@
 <template>
 
-  <view style="padding: 0 10px;background: #fafafa;">
+  <van-nav-bar
+    title="福利购"
+  />
+  <view style="margin: 10px;">
 
-  <view v-for="(item, index) in list" :key="index" style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">
-    <van-card
-      price="2.00"
-      desc="描述信息"
-      title="商品标题"
-      thumb="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=751441608,3469454349&fm=15&gp=0.jpg"
-      @tap="onItem(item)"
-    >
-      <view slot="num" style="float:right;">
-        <div>{{"已优惠¥xx元"}} </div>
-      </view>
 
-    </van-card>
+    <van-image class="banner" :src="navDefine.HOME_BANNER.image" />
 
-  </view>
+    <van-row gutter="20">
+      <van-col span="8" style="font-weight: bold;font-size: 20px;">精选推荐</van-col>
+      <van-col offset="10" span="6">
+        <div>
+          <van-icon name="shopping-cart-o" color="#1989fa" />
+          <span style="margin-left: 5px;">购物车</span>
+        </div>
+      </van-col>
+    </van-row>
+
+
+    <div style="display: flex;flex-wrap: wrap;">
+      <div class="filter-button" v-for="(item,index) in filterButtons">
+        <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "
+                    :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}
+        </van-button>
+      </div>
+    </div>
+
+
+    <!--  <view v-for="(item, index) in list" :key="index" style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">-->
+    <!--    <van-card-->
+    <!--      price="2.00"-->
+    <!--      desc="描述信息"-->
+    <!--      title="商品标题"-->
+    <!--      thumb="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=751441608,3469454349&fm=15&gp=0.jpg"-->
+    <!--      @tap="onItem(item)"-->
+    <!--    >-->
+    <!--      <view slot="num" style="float:right;">-->
+    <!--        <div>{{'已优惠¥xx元'}} </div>-->
+    <!--      </view>-->
+
+    <!--    </van-card>-->
+
+    <!--  </view>-->
   </view>
 </template>
 
 <script>
 import wepy from '@wepy/core'
 import store from '@/store'
-import { mapActions } from '@wepy/x'
+import { mapActions, mapState } from '@wepy/x'
 import appManager from '../../../appManager'
 
 wepy.component({
@@ -32,26 +58,47 @@ wepy.component({
 
   data: {
     active: 0,
-    list: [1, 2, 3, 4]
+    list: [1, 2, 3, 4],
+    currentFilter: '全部',
+    filterButtons: ['全部']
+
   },
 
-  computed: {},
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine
+    })
+  },
 
   methods: {
 
     onItem(item) {
       console.log(item)
       appManager.navigateTo(`goods-detail?id=${item}`)
+    },
+
+    onFilterBtn(item) {
+      console.log(item)
+      this.currentFilter = item
     }
   },
 
   ready() {
+    let i = 0
+    while (true) {
+      this.filterButtons.push('按钮按钮' + i)
+      i++
+      if (i > 8) {
+        break
+      }
+    }
   }
 })
 </script>
 <config>
 {
-navigationBarTitleText: ''
 }
 </config>
 <style lang="less">
@@ -60,6 +107,20 @@ navigationBarTitleText: ''
   width: 100%;
   height: 536rpx;
   z-index: -10;
+}
+
+.banner {
+  border: #eeeeee 1px solid;
+  border-radius: 25px;
+  margin-top: 15px;
+  width: 100%;
+  height: 80px;
+}
+
+.filter-button {
+  margin-top: 10px;
+  margin-right: 10px;
+
 }
 
 
