@@ -171,20 +171,17 @@ export default {
           console.log(response)
           this.orderCountList = response.data;
           this.selectType = 1;
-          this.total = response.total;
         })
       } else if (this.selectType === 2 || this.selectType === '2') {
         getStatisGetOrderOfWeek(this.queryParams).then(response => {
           console.log(response)
           this.orderCountList = response.data;
           this.selectType = 2;
-          this.total = response.total;
         })
       } else if (this.selectType === 3 || this.selectType === '3') {
         getStatisGetOrderOfMonth(this.queryParams).then(response => {
           this.orderCountList = response.data;
           this.selectType = 3;
-          this.total = response.total;
         })
       }
     },
@@ -223,7 +220,6 @@ export default {
         getStatisGetOrderOfMonth(this.queryParams).then(response => {
           this.orderCountList = response.data;
           this.selectType = 3;
-          this.total = response.total;
         })
       }
     },
@@ -239,7 +235,6 @@ export default {
           console.log(response)
           this.orderCountList = response.data;
           this.selectType = 2;
-          this.total = response.total;
         })
       }
     },
@@ -255,13 +250,12 @@ export default {
           console.log(response)
           this.orderCountList = response.data;
           this.selectType = 1;
-          // this.total = response.total;
         })
       }
     },
     /** 查询订单管理列表 */
     getList() {
-      this.loading = true;
+      this.loading = false;
       listOrder(this.queryParams).then(response => {
         this.orderList = response.rows;
         this.total = response.total;
