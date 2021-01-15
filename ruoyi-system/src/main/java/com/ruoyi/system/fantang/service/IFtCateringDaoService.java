@@ -16,4 +16,10 @@ public interface IFtCateringDaoService extends IService<FtCateringDao> {
     List<FtCateringDao> listNewFormatter(FtCateringDao ftCateringDao);
 
     FtCateringDao getByIdNewFormatter(Long id);
+
+    List<FtCateringDao> addNutritionCatering(FtCateringDao ftCateringDao);
+
+    Integer deleteByPatientId(Long[] ids);
+
+    Integer cancelByPatientId(Long[] ids);
 }

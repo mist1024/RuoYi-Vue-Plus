@@ -1,7 +1,10 @@
 package com.ruoyi.system.fantang.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.system.fantang.domain.FtCateringDao;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
@@ -68,5 +71,45 @@ public class FtFoodDemandDaoServiceImpl extends ServiceImpl<FtFoodDemandDaoMappe
     @Override
     public List<FtReportMealsDao> getStatisticsFoodDemand() {
         return this.baseMapper.getStatisticsFoodDemand();
+    }
+
+    @Override
+    public Integer updateDayFoodDemand(List<FtCateringDao> ftCateringList) {
+
+        int rows = 0;
+
+        Long patientId = ftCateringList.get(0).getPatientId();
+        QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("patient_id", patientId);
+        wrapper.orderByAsc("type");
+        List<FtFoodDemandDao> foodDemandList = this.baseMapper.selectList(wrapper);
+
+        for (int i = 0; i < 4; i++) {
+            FtFoodDemandDao foodDemand = foodDemandList.get(i);
+            foodDemand.setNutritionFoodId(ftCateringList.get(i).getNumber());
+            foodDemand.setNutritionFoodFlag(ftCateringList.get(i).getFlag());
+            foodDemand.setUpdateAt(new Date());
+            rows += this.baseMapper.updateById(foodDemand);
+        }
+
+        return rows;
+    }
+
+    @Override
+    public Integer cancelNutritionByPatientId(Long[] ids) {
+
+        int rows = 0;
+
+        FtFoodDemandDao foodDemand = new FtFoodDemandDao();
+        foodDemand.setNutritionFoodFlag(false);
+        foodDemand.setUpdateAt(new Date());
+
+        for (Long id : ids) {
+            UpdateWrapper<FtFoodDemandDao> wrapper = new UpdateWrapper<>();
+            wrapper.eq("patient_id", id);
+            rows += this.baseMapper.update(foodDemand, wrapper);
+        }
+
+        return rows;
     }
 }

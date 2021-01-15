@@ -31,5 +31,7 @@ public interface IFtReportMealsDaoService extends IService<FtReportMealsDao> {
     Integer settleMeals(Long settlementId, Long patientId, String lastBillingDate, String selectBillingDate);
 
     ReportMealsPriceEntity sumTotalPrice(Long patientId, Date lastBillingDate, Date selectBillingDate);
+
+    FtReportMealsDao getLastReportMeals(Long patientId);
 }
 

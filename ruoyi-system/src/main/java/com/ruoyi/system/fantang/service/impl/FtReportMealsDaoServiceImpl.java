@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
@@ -11,7 +12,6 @@ import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -69,5 +69,32 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     @Override
     public ReportMealsPriceEntity sumTotalPrice(Long patientId, Date lastBillingDate, Date selectBillingDate) {
         return this.baseMapper.sumTotalPrice(patientId, lastBillingDate, selectBillingDate);
+    }
+
+    @Override
+    public FtReportMealsDao getLastReportMeals(Long patientId) {
+
+        // 获取最近一条已结算的报餐记录
+        QueryWrapper<FtReportMealsDao> flag1Wrapper = new QueryWrapper<>();
+        flag1Wrapper.eq("patient_id", patientId);
+        flag1Wrapper.eq("settlement_flag", 1);
+        flag1Wrapper.orderByDesc("settlement_at");
+        flag1Wrapper.last("limit 1");
+        FtReportMealsDao flag1ReportMealsDao = this.baseMapper.selectOne(flag1Wrapper);
+
+        // 如果是首次结算
+        if (flag1ReportMealsDao == null) {
+
+            // 获取最近一条报餐
+            QueryWrapper<FtReportMealsDao> flag0Wrapper = new QueryWrapper<>();
+            flag0Wrapper.eq("patient_id", patientId);
+            flag0Wrapper.eq("settlement_flag", 1);
+            flag0Wrapper.orderByDesc("settlement_at");
+            flag0Wrapper.last("limit 0");
+
+            return this.baseMapper.selectOne(flag0Wrapper);
+        }
+
+        return flag1ReportMealsDao;
     }
 }

@@ -26,6 +26,15 @@ export function addCatering(data) {
   })
 }
 
+// 拷贝并新增配餐功能
+export function copyAndAdd(data) {
+  return request({
+    url: '/fantang/catering/copyAndAdd',
+    method: 'post',
+    data: data
+  })
+}
+
 // 修改配餐功能
 export function updateCatering(data) {
   return request({
@@ -43,11 +52,27 @@ export function delCatering(id) {
   })
 }
 
+// 作废
+export function cancelCatering(id) {
+  return request({
+    url: '/fantang/catering/cancel/' + id,
+    method: 'put'
+  })
+}
+
 // 导出配餐功能
 export function exportCatering(query) {
   return request({
     url: '/fantang/catering/export',
     method: 'get',
     params: query
+  })
+}
+
+// 根据病人 id 查找
+export function getByPatient(id) {
+  return request({
+    url: '/fantang/catering/getByPatient/' + id,
+    method: 'get'
   })
 }

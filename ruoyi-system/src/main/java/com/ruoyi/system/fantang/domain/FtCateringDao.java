@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,6 +13,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 配餐功能对象 ft_catering
@@ -40,6 +42,12 @@ public class FtCateringDao extends FtCateringVo {
      * 病人 id
      */
     private Long patientId;
+
+    /**
+     * 病人 ids
+     */
+    @TableField(exist = false)
+    private List<Long> patientIds;
 
     /**
      * 正餐类型

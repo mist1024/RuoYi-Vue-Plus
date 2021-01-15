@@ -125,7 +125,7 @@ public class FtFoodDemandDao extends BasePatient implements Serializable {
     /**
      * 营养餐标志
      **/
-    private Integer nutritionFoodFlag;
+    private Boolean nutritionFoodFlag;
 
     /**
      * 营养餐名

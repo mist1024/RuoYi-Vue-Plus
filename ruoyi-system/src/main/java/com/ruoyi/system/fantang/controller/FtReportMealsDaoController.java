@@ -44,14 +44,11 @@ public class FtReportMealsDaoController extends BaseController {
     @GetMapping("/getLastSettlementDate/{patientId}")
     public AjaxResult getLastSettlementDate(@PathVariable("patientId") Long patientId) {
 
-        QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("patient_id", patientId);
-        wrapper.eq("settlement_flag", 1);
-        wrapper.orderByDesc("settlement_at");
-        wrapper.last("limit 1");
-        FtReportMealsDao ftReportMealsDao = iFtReportMealsDaoService.getOne(wrapper);
-        Date createAt = ftReportMealsDao.getCreateAt();
-        Date settlementAt = ftReportMealsDao.getSettlementAt();
+        // 获取最近一次已结算的报餐记录，如果首次结算则返回
+        FtReportMealsDao reportMealsDao =  iFtReportMealsDaoService.getLastReportMeals(patientId);
+
+        Date createAt = reportMealsDao.getCreateAt();
+        Date settlementAt = reportMealsDao.getSettlementAt();
         ReportMealsDayEntity reportMealsDayEntity = new ReportMealsDayEntity();
         if (settlementAt == null) {
             long betweenDays = DateUtil.between(createAt, new Date(), DateUnit.DAY);

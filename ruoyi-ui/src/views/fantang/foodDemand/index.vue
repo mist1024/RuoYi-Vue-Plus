@@ -82,7 +82,8 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="foodDemandList" @selection-change="handleSelectionChange" border>
+    <el-table v-loading="loading" :data="foodDemandList" @selection-change="handleSelectionChange"
+              :span-method="objectSpanMethod" border>
       <!--      <el-table-column type="selection" width="55" align="center"/>-->
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <!--      <el-table-column label="住院号" align="center" prop="hospitalId"/>-->
@@ -95,8 +96,10 @@
       <el-table-column label="加肉" align="center" prop="meat" width="80px" :formatter="formatMeat"/>
       <el-table-column label="加饭" align="center" prop="rice" width="80px" :formatter="formatRice"/>
       <el-table-column label="加蛋" align="center" prop="egg" width="80px"/>
-      <el-table-column label="营养配餐" align="center" prop="nutritionFood" width="120px"/>
       <el-table-column label="启用状态" align="center" prop="flag" width="80px" :formatter="formatFlag"/>
+      <el-table-column label="营养配餐" align="center" prop="nutritionFood" width="130px"/>
+      <el-table-column label="营养配餐启用状态" align="center" prop="nutritionFoodFlag" width="130px"
+                       :formatter="formatNutritionFoodFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -116,6 +119,7 @@
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      :page-sizes="[12, 24]"
       @pagination="getList"
     />
 
@@ -237,7 +241,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 12,
         flag: null,
         name: null,
         bedId: null,
@@ -275,6 +279,48 @@ export default {
     });
   },
   methods: {
+
+    // 控制合并列
+    objectSpanMethod({rowIndex, columnIndex}) {
+      if (columnIndex === 1) {
+        if (rowIndex % 4 === 0) {
+          return {
+            rowspan: 4,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+      } else if (columnIndex === 2) {
+        if (rowIndex % 4 === 0) {
+          return {
+            rowspan: 4,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+      } else if (columnIndex === 0) {
+        if (rowIndex % 4 === 0) {
+          return {
+            rowspan: 4,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+      }
+    },
+
     formatFlag(row) {
       if (row.flag === true) {
         return "启用";
@@ -282,6 +328,15 @@ export default {
         return "禁用";
       } else {
         return "";
+      }
+    },
+    formatNutritionFoodFlag(row) {
+      if (row.nutritionFoodFlag === true) {
+        return "启用";
+      } else if (row.nutritionFoodFlag === false) {
+        return "禁用";
+      } else {
+        return " ";
       }
     },
     // 格式化菜单回显文字
@@ -368,7 +423,8 @@ export default {
         rice: null,
         egg: null,
         orderInfo: null,
-        flag: null
+        flag: null,
+        nutritionFoodFlag: null,
       };
       this.resetForm("form");
     },
