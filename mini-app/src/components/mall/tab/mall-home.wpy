@@ -140,7 +140,7 @@
       </div>
 
 
-      <span v-if="columnRecord.length > 0" style="margin:15px 0;font-weight: bold;">热门活动</span>
+      <span style="margin:15px 0;font-weight: bold;">热门活动</span>
 
       <van-image width="100%" height="60px" :src="navDefine.HOME_BANNER.image" />
 
@@ -169,7 +169,7 @@ import defaultMix from '../../../mixins/defaultMix'
 wepy.component({
   store,
   hooks: {},
-  mixins: [defaultMix],
+
   data: {
     columnRecord: [
       {
@@ -180,6 +180,8 @@ wepy.component({
     ]
 
   },
+
+  mixins: [defaultMix],
   computed: {
     ...mapState({
       'imageDefine': state => state.imageDefine,

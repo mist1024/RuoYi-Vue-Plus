@@ -113,6 +113,13 @@
 					"pathName": "pages/winery/winery-detail",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": 9,
+					"name": "地址管理",
+					"pathName": "pages/mall/user/user-address",
+					"query": "",
+					"scene": null
 				}
 			]
 		}

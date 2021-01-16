@@ -1,9 +1,10 @@
 
 import store from '@/store'
+import eventHub from './common/eventHub'
 
 class AppManager {
   saveOpenid(openid) {
-    wx.setStorageSync('openid', openid)
+
     store.dispatch('setOpenidAction', openid)
   }
 
@@ -12,6 +13,16 @@ class AppManager {
   }
 
   navigateTo(url) {
+    if (!store.state.user.token) {
+      eventHub.$emit('onShowDialogUserInfo')
+      return
+    }
+
+    if (!url) {
+      this.showToast('建设中')
+      return
+    }
+
     wx.navigateTo({
       url: url
     })
