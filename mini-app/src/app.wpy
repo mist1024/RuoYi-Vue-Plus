@@ -31,6 +31,7 @@
   margin-top: 10px;
 }
 
+
 .boom {
   background-color: #F0F1F2;
   width: 100%;
@@ -101,7 +102,9 @@ pages: [
 'pages/form6',
 'pages/mall/index',
 'pages/mall/goods-detail',
+'pages/mall/user/user-address',
 'pages/winery/winery-detail'
+
 ],
 navigateToMiniProgramAppIdList: [
 'wx88736d7d39e2eda6'
@@ -143,7 +146,8 @@ usingComponents: {
 "van-grid-item": "./vant/grid-item/index",
 "van-dialog": "./vant/dialog/index",
 "van-image": "./vant/image/index",
-"van-loading": "./vant/loading/index"
+"van-loading": "./vant/loading/index",
+"van-area": "./vant/area/index"
 }
 }
 </config>

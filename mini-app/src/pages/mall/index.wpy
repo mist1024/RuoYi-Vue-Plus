@@ -89,12 +89,11 @@ module.exports.getTime = getTime;
       我的
     </van-tabbar-item>
   </van-tabbar>
-  <mall-home v-if="pageIndex === 0" />
+  <mall-home v-if="pageIndex === 3" />
   <mall-shopping v-else-if="pageIndex === 1" />
   <mall-bbs v-else-if="pageIndex === 2" />
-  <mall-my v-else-if="pageIndex === 3" />
+  <mall-my v-else-if="pageIndex === 0" />
   <dialog-registration />
-  <van-button @tap="onTest">测试</van-button>
 
 
 </template>
@@ -120,7 +119,7 @@ wepy.page({
   computed: {
     ...mapState({
       'imageDefine': state => state.imageDefine,
-      'userInfo': state => state.user.userInfo
+      'user': state => state.user
     })
   },
 
@@ -130,9 +129,6 @@ wepy.page({
       'setTokenAction',
       'setOpenidAction'
     ]),
-    onTest() {
-      eventHub.$emit('onShowDialogUserInfo')
-    },
     handleViewTap() {
       console.log('handleVieTap clicked')
     },
@@ -140,6 +136,10 @@ wepy.page({
 
     },
     onChange(event) {
+      if (!this.user.token) {
+        eventHub.$emit('onShowDialogUserInfo')
+        return
+      }
       this.pageIndex = event.$wx.detail
     },
     callAppLaunch() {

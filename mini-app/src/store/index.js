@@ -3,12 +3,13 @@ import { wineryForm } from './wineryForm'
 import { imageDefine } from './constant/imageDefine'
 import { navDefine } from './constant/navDefine'
 import { wineryDefine } from './constant/wineryDefine'
+import { userAddress } from './constant/userAddress'
 
 export default new Vuex.Store({
   state: {
     user: {
       openid: '',
-      mobile: '',
+      mobile: '15595184707',
       userInfo: {
         nickName: '未注册用户',
         avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
@@ -19,7 +20,8 @@ export default new Vuex.Store({
     wineryForm,
     imageDefine,
     navDefine,
-    wineryDefine
+    wineryDefine,
+    userAddress
   },
   mutations: {
 
@@ -50,12 +52,15 @@ export default new Vuex.Store({
       commit('setUser', user)
     },
     setOpenidAction({ commit }, openid) {
+      wx.setStorageSync('openid', openid)
       commit('setOpenid', openid)
     },
-    setMobileAction({ commit }, user) {
-      commit('setMobile', user)
+    setMobileAction({ commit }, mobile) {
+      wx.setStorageSync('mobile', mobile)
+      commit('setMobile', mobile)
     },
     setUserInfoAction({ commit }, userInfo) {
+      wx.setStorageSync('userInfo', userInfo)
       commit('setUserInfo', userInfo)
     },
     setTokenAction({ commit }, token) {

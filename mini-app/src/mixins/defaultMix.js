@@ -8,7 +8,7 @@ export default {
 
     onNavItem (item) {
       console.log(item)
-      // appManager.navigateTo(item.path)
+      appManager.navigateTo(item.path)
     },
     navBack() {
       wx.navigateBack()

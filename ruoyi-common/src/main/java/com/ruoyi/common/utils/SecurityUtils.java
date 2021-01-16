@@ -63,7 +63,7 @@ public class SecurityUtils {
     public static boolean matchesPassword(String rawPassword, String encodedPassword) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.matches(rawPassword, encodedPassword);
-    }
+    }o
 
     /**
      * 是否为管理员

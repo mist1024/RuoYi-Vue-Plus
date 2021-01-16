@@ -134,7 +134,8 @@ wepy.page({
 
       wx.getUserInfo({
         success(res) {
-          self.setUserAction({
+          console.log(res)
+          self.setOpenid({
             openid: appManager.getOpenid(),
             userInfo: res.userInfo
           })
