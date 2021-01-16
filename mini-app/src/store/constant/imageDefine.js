@@ -13,6 +13,7 @@ export const imageDefine = {
   TAP_BAR_ICON4_ON: imgbaseUrl + 'nav/4_td.png',
 
   HOME_TITLE_IMAGE: imgbaseUrl + 'doctor.png',
+  HOME_WINE_LAB: imgbaseUrl + 'icon/home_wine_lab.png',
   HOME_NOTICE_ICON: imgbaseUrl + 'icon/home_wine.png',
   ADDRESS_ADD_IMAGE: imgbaseUrl + 'add.png'
 

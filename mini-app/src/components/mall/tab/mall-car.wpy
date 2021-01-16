@@ -30,6 +30,8 @@
     >
       <van-checkbox style="margin-top:5px;" :value="isAllSelect" bind:change="onAllSelect">全选</van-checkbox>
     </van-submit-bar>
+
+    <div style="margin-top: 100px;" />
   </view>
 </template>
 

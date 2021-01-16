@@ -3,7 +3,7 @@
 
 .header-image {
   width: 100%;
-  height: 200px;
+  height: 210px;
   z-index: -1;
   position: absolute;
   top: 0;
@@ -11,7 +11,7 @@
 }
 
 .user-banner {
-  margin-top: 180px;
+  margin-top: 190px;
   border-top: 1px solid #F5F6F7;
   border-top-right-radius: 20px;
   border-top-left-radius: 20px;
@@ -26,10 +26,10 @@
   border: #fff 1px solid;
   border-radius: 20px;
   width: 270rpx;
-  height: 60px;
+  height: 42px;
   box-shadow: 4px 4px 10px #cccccc;
   background-color: #ffffff;
-  padding: 10px;
+  padding: 16px;
   display: flex;
 
   font-weight: bold;
@@ -77,12 +77,12 @@
 
 </style>
 <template>
-  <div class="container" style="margin-bottom: 80px;" >
+  <div class="container" >
     <image class="header-image" :src="navDefine.HOME_HEADER.image" />
     <div class="user-banner" />
 
 
-    <view style="margin: 10px;display: flex;flex-direction: column;">
+    <view style="margin: 0px 16px;display: flex;flex-direction: column;">
       <van-row>
         <van-col offset="1" span="4">
           <van-image round width="96rpx" height="96rpx" :src="user.userInfo.avatarUrl" />
@@ -108,7 +108,8 @@
         color="#333"
         style="margin-top: 16px;"
       >
-        <van-image slot="left-icon" :src="imageDefine.HOME_NOTICE_ICON" width="18px" height="19px" style="margin-top: 5px;margin-left: 5px" />
+        <van-image slot="left-icon" :src="imageDefine.HOME_NOTICE_ICON" width="18px" height="19px"
+                   style="margin-top: 5px;margin-left: 5px" />
       </van-notice-bar>
 
 
@@ -118,7 +119,7 @@
 
           <div class="menu-desc" @tap="onNavItem(navDefine.HOME_MENU1)">
             <div class="fxc">
-              <span style="font-size: 18px;">酒庄介绍</span>
+              <span style="font-size: 16px;">酒庄介绍</span>
               <span class="menu-desc-text">完美酿造工艺</span>
             </div>
             <van-image style="margin-left: 10px;" width="40px" height="40px" :src="navDefine.HOME_MENU1.image" />
@@ -129,7 +130,7 @@
         <van-col offset="2" span="11">
           <div class="menu-desc" @tap="onNavItem(navDefine.HOME_MENU2)">
             <div class="fxc">
-              <span>购买庄酒</span>
+              <span style="font-size: 16px;">购买庄酒</span>
               <span class="menu-desc-text">限量年份套装</span>
             </div>
             <van-image style="margin-left: 10px;" width="40px" height="40px" :src="navDefine.HOME_MENU2.image" />
@@ -144,29 +145,39 @@
         <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
           <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">
 
-            <van-image round width="120rpx" height="120rpx" :src="item.icon" />
-            <span>{{item.name}} </span>
+            <van-image width="68rpx" height="68rpx" :src="item.icon" />
+            <span style="font-size: 12px;font-weight: bold;">{{item.name}} </span>
           </van-grid-item>
         </van-grid>
       </div>
 
 
-      <span style="margin:15px 0;font-weight: bold;">热门活动</span>
+      <div style="margin: 22px 2px 12px 2px; display: flex; align-items: center;">
+        <van-image :src="imageDefine.HOME_WINE_LAB" height="16px" width="5px" />
+        <span style="margin:0px 5px;font-weight: bold;">热门活动</span>
+      </div>
 
-      <van-image width="100%" height="60px" :src="navDefine.HOME_BANNER1.image"
+      <van-image width="100%" height="96px" :src="navDefine.HOME_BANNER1.image"
                  @tap="onNavItem(navDefine.HOME_BANNER1)" />
 
-
-      <span v-if="columnRecord.length > 0" style="margin:15px 0;font-weight: bold;">每日精选</span>
-
-      <div class="column-record-item" v-for="(item, index) in columnRecord" @tap="onNavItem(navDefine.HOME_BANNER2)">
-        <van-image width="100%" height="60px" :src="navDefine.HOME_BANNER2.image" />
-        <div class="column-record-item-text">
-          <span>{{item.title}} </span>
-          <span style="font-size: 12px;font-weight: normal;">{{item.createTime}} </span>
-        </div>
-
+      <div style="margin: 22px 2px 12px 2px; display: flex; align-items: center;">
+        <van-image :src="imageDefine.HOME_WINE_LAB" height="16px" width="5px" />
+        <span style="margin:0px 5px;font-weight: bold;">每日精选</span>
       </div>
+
+      <van-image width="100%" height="128px" :src="navDefine.HOME_BANNER2.image"
+                 @tap="onNavItem(navDefine.HOME_BANNER2)" />
+
+      <!--      <div class="column-record-item" v-for="(item, index) in columnRecord" @tap="onNavItem(navDefine.HOME_BANNER2)">-->
+      <!--        <van-image width="100%" height="128px" :src="navDefine.HOME_BANNER2.image" />-->
+      <!--        <div class="column-record-item-text">-->
+      <!--          <span>{{item.title}} </span>-->
+      <!--          <span style="font-size: 12px;font-weight: normal;">{{item.createTime}} </span>-->
+      <!--        </div>-->
+
+      <!--      </div>-->
+
+      <div style="margin-top: 100px;" />
     </view>
 
   </div>

@@ -69,9 +69,18 @@ module.exports.parseImage = parseImage;
 </wxs>
 <template>
 
-  <nav-bar title="了解酒庄" />
+  <van-nav-bar
+    bind:click-left="onBack"
+    border="{{false}}"
+    fixed
+    z-index="100"
+    custom-style="background:#AC1630;color:#FFF;"
+  >
+    <van-icon name="arrow-left" slot="left" color="#fff" />
+    <span style="color: #fff;"  slot="title">了解酒庄</span>
+  </van-nav-bar>
   <div class="bg" />
-  <div class="container">
+  <div class="container" style="margin-top: 66px;">
 
 
     <div style="display: flex;" v-for="(item,index) in wineryDefine.WINERY_LIST" @tap="onTap(item)">

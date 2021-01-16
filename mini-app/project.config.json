@@ -127,6 +127,13 @@
 					"pathName": "pages/mall/user/user-address-list",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "酒庄调查首页",
+					"pathName": "pages/index",
+					"query": "",
+					"scene": null
 				}
 			]
 		}

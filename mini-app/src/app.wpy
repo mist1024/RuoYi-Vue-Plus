@@ -93,6 +93,7 @@ wepy.app({
 <config>
 {
 pages: [
+'pages/mall/index',
 'pages/index',
 'pages/form1',
 'pages/form2',
@@ -100,7 +101,7 @@ pages: [
 'pages/form4',
 'pages/form5',
 'pages/form6',
-'pages/mall/index',
+
 'pages/mall/goods-detail',
 'pages/mall/user/user-address',
 'pages/mall/user/user-address-list',
