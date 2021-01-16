@@ -50,7 +50,7 @@ public class WineryOrders implements Serializable {
      * 商品ID
      */
     @Excel(name = "商品ID")
-    private Long goodsId;
+    private String goodsId;
 
     /**
      * 商品简称

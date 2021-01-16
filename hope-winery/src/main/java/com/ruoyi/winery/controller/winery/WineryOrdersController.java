@@ -1,9 +1,11 @@
 package com.ruoyi.winery.controller.winery;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
@@ -14,6 +16,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.winery.domain.winery.WineryOrders;
@@ -120,25 +123,29 @@ public class WineryOrdersController extends BaseController {
 
         // 统一下单
         WxPayUnifiedOrderRequest request = new WxPayUnifiedOrderRequest();
+        String userName = getLoginUser().getUser().getUserName();
+        String openId = "";
+        if (userName.contains("mini-")) {
+            openId = userName.split("-")[1];
+        }
+        request.setOpenid(openId);
         request.setTotalFee(wineryOrders.getGoodsPrice().multiply(new BigDecimal(100)).intValue());
         request.setBody(wineryOrders.getGoodsName());
         String outTradeNo = UUID.randomUUID().toString().replace("-", "");
         request.setOutTradeNo(outTradeNo);
         request.setNotifyUrl("");
+        request.setSpbillCreateIp(req.getRemoteAddr());
         request.setTradeType("JSAPI");
-        String userName = getLoginUser().getUser().getUserName();
-        String openId = "";
-        if (userName.contains("mini-")) {
-            openId = userName.split(",")[1];
-        }
-        request.setOpenid(openId);
+
 
         Map<String, Object> map = new HashMap<>();
         try {
             map.put("orderId", wineryOrders.getId());
-            Objects payMsg = wxPayService.createOrder(request);
+            WxPayMpOrderResult payMsg = wxPayService.createOrder(request);
             map.put("payMsg", payMsg);
-            wineryOrders.setPayMsg(payMsg.toString());
+            wineryOrders.setPayMsg(((JSONObject) JSONObject.toJSON(payMsg)).toJSONString());
+            wineryOrders.setOutTradeNo(outTradeNo);
+            wineryOrders.setOrderStatus(0);
             iWineryOrdersService.save(wineryOrders);
             return success("success", map);
         } catch (WxPayException e) {
@@ -188,6 +195,7 @@ public class WineryOrdersController extends BaseController {
         WxPayRefundResult refund = null;
         try {
             refund = wxPayService.refund(request);
+            order.setRefundTime(DateUtils.getNowDate());
             return AjaxResult.success(refund);
         } catch (WxPayException e) {
             e.printStackTrace();
