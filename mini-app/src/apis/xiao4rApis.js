@@ -1,10 +1,6 @@
 
 import request from '../js/request'
-
-export const baseUrl = 'http://127.0.0.1:18989/'
-// export const baseUrl = 'http://36.1.50.18:18989/winery/'
-// export const baseUrl = 'http://62.234.123.172:18989/api/'
-// export const baseUrl = 'https://www.xiao4r.com/wine/winery/'
+import { baseUrl } from '../baseDefine'
 
 export const jsonHeader = {
   'Content-Type': 'application/json'

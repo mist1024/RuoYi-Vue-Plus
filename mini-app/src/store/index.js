@@ -9,10 +9,10 @@ export default new Vuex.Store({
   state: {
     user: {
       openid: '',
-      mobile: '15595184707',
+      mobile: '',
       userInfo: {
         nickName: '未注册用户',
-        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
+        avatarUrl: 'https://img.yzcdn.cn/vant/cat.jpeg'
       },
       token: '',
       company: '企业名称'
@@ -30,7 +30,6 @@ export default new Vuex.Store({
     },
     setOpenid(state, openid) {
       state.user.openid = openid
-      console.log('state.user.openid:', state.user.openid)
     },
     setMobile(state, mobile) {
       state.user.mobile = mobile
@@ -42,11 +41,11 @@ export default new Vuex.Store({
       state.user.token = token
     },
     setWineryForm(state, form) {
-      console.log('远程酒庄表单:', form)
       state.wineryForm = form
-      console.log('本地酒庄表单:', state.wineryForm)
     }
   },
+
+
   actions: {
     setUserAction({ commit }, user) {
       commit('setUser', user)

@@ -11,7 +11,7 @@
   height: 20px;
 }
 page {
-  background-color: #eeeeee;
+  background-color: #F5F6F7;
 }
 
 </style>
@@ -89,10 +89,10 @@ module.exports.getTime = getTime;
       我的
     </van-tabbar-item>
   </van-tabbar>
-  <mall-home v-if="pageIndex === 3" />
+  <mall-home v-if="pageIndex === 0" />
   <mall-shopping v-else-if="pageIndex === 1" />
   <mall-bbs v-else-if="pageIndex === 2" />
-  <mall-my v-else-if="pageIndex === 0" />
+  <mall-my v-else-if="pageIndex === 3" />
   <dialog-registration />
 
 
@@ -177,7 +177,9 @@ wepy.page({
       let rsp = await userApis.loginByMini({ openid: openid })
       if (rsp.token) {
         this.setTokenAction(rsp.token)
+        appManager.setCacheInfo()
       }
+
       wx.hideLoading()
     }
   },

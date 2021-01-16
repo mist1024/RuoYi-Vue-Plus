@@ -1,4 +1,4 @@
-import { imgbaseUrl } from './imageDefine'
+
 
 export const wineryDefine = {
   WINERY_LIST: [

@@ -2,133 +2,92 @@
 
 
 .address-item {
-  border: #fff 1px solid;
-  border-radius: 20px;
+
+  border-radius: 25px;
   width: 660rpx;
   margin-top: 20px;
   background-color: white;
-  box-shadow: 4px 4px 10px #eeeeee;
+  //box-shadow: 4px 4px 10px #eeeeee;
   padding: 10px 10px 0px 10px;
   font-weight: bold;
-
   display: flex;
   flex-direction: column;
-  //align-items: center;
 }
 
+.van-field__label--disabled {
 
-input {
+  color: #333333 !important;
 
-  margin: 12px 15px;
-  font-size: 14px;
+}
+.van-field__label {
+  color: #333333 !important;
+}
+.van-field__input--disabled {
+  color: #333333 !important;
 }
 
-.cell-title {
-  padding: 10px 16px;
-  font-weight: bold;
-}
-
-.cell {
-  margin-top: 10px;
-}
-
-.cell-input {
-  display: flex;
-  justify-content: space-between;
-  margin-right: 15px;
-}
-
-.cell-item {
-  margin-left: 22px;
-  margin-top: 12px;
-  width: 300rpx;
-}
 
 </style>
 <template>
 
-  <nav-bar :title="title" />
-  <div class="container">
+  <nav-bar title="地址管理" />
 
 
-    <div class="address-item">
-      <div class="cell">
-        <span class="cell-title">选择收货地区</span>
-        <radio-group bindchange="onChangeCountry" style="display: flex;">
-          <div class="cell-item" v-for="(item,index) in countryTypes">
-            <radio :value="item" :checked="item === radio" color="#AC3016">{{item}}</radio>
-            <span>{{item}} </span>
-          </div>
-        </radio-group>
+  <div class="container" style="margin: 15px;">
 
-        <van-divider customStyle="margin: 10px 5px;" />
+    <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
+    <view wx:else>
+
+      <div style="display: flex;align-items: center;justify-content: start;width: 100%;margin-left: 10px;">
+
+        <van-image :src="imageDefine.ADDRESS_ADD_IMAGE" width="60rpx" height="60rpx" @tap="onAdd" />
+        <span style="margin-left: 10px;">添加收货地址</span>
+
       </div>
 
-      <div v-if="radio=== '国内'" class="cell">
-        <span class="cell-title">收货地址（省市区）</span>
-        <div style="display: flex;width: 100%;">
-          <picker mode="region" v-model="form.region" bindchange="bindRegionChange" style="width: 700rpx;">
-            <van-field
-              :value="form.region"
-              required
-              center
-              clearable
-              readonly
-              placeholder="请选择"
-              border="{{ false }}"
-            />
-          </picker>
-          <van-icon name="arrow" color="#dddddd" />
+      <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+        <van-empty description="您还没有添加收货地址" />
+        <div style="width: 600rpx;">
+          <van-button round type="info" size="large" @tap="onAdd">点击添加</van-button>
         </div>
-        <van-divider customStyle="margin: 0 5px;" />
       </div>
 
-      <div class="cell">
-        <span class="cell-title">详细地址</span>
+      <div v-for="(item,index) in records" class="address-item"
+           :style="{  border: item.isDefault === 1 ? '#AC1630 1px solid' : '#eeeeee 1px solid'}">
         <van-field
-          :value="form.address"
-          required
-          center
-          clearable
+          label="收货人姓名"
+          :value="item.name"
+          disabled
+          bind:change="onChangeAddress"
+          use-button-slot
+        />
+        <van-field
+          label="手机号码"
+          :value="item.mobile"
+          disabled
+        />
+        <van-field
+          label="地址(省市区)"
+          :value="item.region"
+          disabled
+        />
+        <van-field
+          label="详细地址"
+          :value="item.address"
           type="textarea"
           autosize
-          placeholder="请输入详细地址"
-          bind:change="onChangeAddress"
+          disabled
         />
-        <van-divider customStyle="margin: 0 5px;" />
+
+        <div style="display: flex; justify-content:flex-end;margin: 10px;">
+          <van-button round v-if="item.isDefault !== 1" color="#98002E" size="small" type="info" plain @tap="onSetDefault(item)">设为默认</van-button>
+          <van-button round size="small" color="#98002E" type="info" plain style="margin-left: 20px;" @tap="onEdit(item)">编辑</van-button>
+        </div>
+
       </div>
-      <div class="cell">
-        <span class="cell-title">收货人手机号码</span>
-        <van-field
-          :value="form.mobile"
-          required
-          center
-          clearable
-          type="number"
-          placeholder="请输入手机联系电话号码"
-          bind:change="onChangeMobile"
-        />
-        <van-divider customStyle="margin: 0 5px;" />
-      </div>
-      <div class="cell">
-        <span class="cell-title">收货人姓名</span>
-        <van-field
-          :value="form.name"
-          required
-          center
-          clearable
-          placeholder="请输入收货人姓名"
-          bind:change="onChangeName"
-        />
-        <van-divider customStyle="margin: 0 5px;" />
-      </div>
-
-
-      <van-button round type="info" size="large" style="margin: 20px;" @tap="onSubmit">保存</van-button>
-    </div>
-
-
+    </view>
   </div>
+
 </template>
 
 <script>
@@ -138,20 +97,15 @@ import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import defaultMix from '../../../mixins/defaultMix'
 import appManager from '../../../appManager'
+import addressApis from '../../../apis/addressApis'
+import { userAddressPage } from '../../../store/constant/nav/home'
 
 wepy.page({
   store,
   hooks: {},
   data: {
-    title: '添加地址',
-    countryTypes: ['国内', '海外'],
-    form: {
-      region: ['宁夏回族自治区', '银川市', '西夏区'],
-      address: '',
-      mobile: '',
-      name: ''
-    },
-    radio: '国内'
+    records: [],
+    isInit: false
 
   },
   mixins: [defaultMix],
@@ -165,55 +119,37 @@ wepy.page({
   },
 
   methods: {
-    bindRegionChange(e) {
-      this.form.region = e.$wx.detail.value
+
+    onSetDefault(item) {
+      item.isDefault = 1
+
+      addressApis.editAddress(item).then(r => {
+        this.init()
+      })
     },
-    onChangeCountry(e) {
-      this.radio = e.$wx.detail.value
-      if (this.radio === '海外') {
-        this.form.region = ['海外']
-      } else {
-        this.form.region = ['宁夏回族自治区', '银川市', '西夏区']
-      }
+    onEdit(item) {
+      appManager.navigateTo(userAddressPage + '?id=' + item.id)
     },
+    onAdd() {
+      appManager.navigateTo(userAddressPage)
+    },
+    async init() {
+      this.isInit = false
+      const req = await addressApis.getAddressList()
 
-    onSubmit() {
-
-      console.log(this.form)
-      if (this.form.region.length < 1) {
-        appManager.showToast('请选择收货地区!')
-        return
-      }
-
-      if (!this.form.address) {
-        appManager.showToast('请输入收货详细地址!')
-        return
-      }
-      if (!this.form.mobile) {
-        appManager.showToast('请输入收货人手机号码!')
-        return
-      }
-      if (!this.form.name) {
-        appManager.showToast('请输入收货人姓名!')
-        return
+      if (req.code === 200) {
+        this.records = req.rows
       }
 
-      // TODO 提交
-      this.navBack()
-    },
-    onChangeAddress(e) {
-      this.form.address = e.$wx.detail
-    },
-    onChangeMobile(e) {
-      this.form.mobile = e.$wx.detail
-    },
-    onChangeName(e) {
-      this.form.name = e.$wx.detail
+      this.isInit = true
     }
   },
 
   ready() {
-    this.form.mobile = this.user.mobile
+    this.init()
+  },
+  onShow() {
+    this.init()
   }
 })
 </script>

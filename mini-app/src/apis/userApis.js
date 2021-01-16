@@ -1,7 +1,7 @@
 
 import request from '../js/request'
-import { baseUrl, formHeader, jsonHeader } from './xiao4rApis'
-import { MINI_DEPTID } from '../config'
+import { baseUrl, MINI_DEPTID } from '../baseDefine'
+import { formHeader, jsonHeader } from './xiao4rApis'
 
 /**
  * 用户相关接口

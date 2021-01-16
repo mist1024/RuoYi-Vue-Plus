@@ -1,7 +1,6 @@
 
 import request from '../js/request'
-import { baseUrl, formHeader, jsonHeader } from './xiao4rApis'
-import { MINI_DEPTID } from '../config'
+import { baseUrl } from '../baseDefine'
 
 /**
  * 商城相关接口
@@ -15,13 +14,13 @@ class MallApis {
   }
   getGoodsById(id) {
     return request.get({
-      url: baseUrl + 'goods/goods_main/' + id,
+      url: baseUrl + 'goods/goods_main/' + id
     })
   }
 
   getGoodsSpecByIds(ids) {
     return request.get({
-      url: baseUrl + 'goods/goods_spec/listByIds/' + ids,
+      url: baseUrl + 'goods/goods_spec/listByIds/' + ids
     })
   }
 }

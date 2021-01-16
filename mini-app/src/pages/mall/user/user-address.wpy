@@ -2,7 +2,7 @@
 
 
 .address-item {
-  border: #fff 1px solid;
+  border: #eeeeee 1px solid;
   border-radius: 20px;
   width: 660rpx;
   margin-top: 20px;
@@ -138,6 +138,8 @@ import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import defaultMix from '../../../mixins/defaultMix'
 import appManager from '../../../appManager'
+import userApis from '../../../apis/userApis'
+import addressApis from '../../../apis/addressApis'
 
 wepy.page({
   store,
@@ -146,6 +148,7 @@ wepy.page({
     title: '添加地址',
     countryTypes: ['国内', '海外'],
     form: {
+      id: '',
       region: ['宁夏回族自治区', '银川市', '西夏区'],
       address: '',
       mobile: '',
@@ -177,8 +180,7 @@ wepy.page({
       }
     },
 
-    onSubmit() {
-
+    async onSubmit() {
       console.log(this.form)
       if (this.form.region.length < 1) {
         appManager.showToast('请选择收货地区!')
@@ -194,7 +196,7 @@ wepy.page({
         return
       }
 
-      if (!(/^1[3|4|5|6|8][0-9]\d{4,8}$/.test(this.form.mobile))){
+      if (!(/^1[3|4|5|6|8][0-9]\d{4,8}$/.test(this.form.mobile))) {
         appManager.showToast('请输入正确的手机号码!')
         return
       }
@@ -204,8 +206,25 @@ wepy.page({
         return
       }
 
+      let data = {}
+      Object.assign(data, this.form)
+      data.region = data.region.join(',')
+
+      let r;
+
+      if (!this.form.id) {
+        r = await addressApis.createAddress(data)
+      } else {
+        r = await addressApis.editAddress(data)
+      }
+
+      if (r.code === 200) {
+        this.navBack()
+      } else {
+        appManager.showToast('保存失败')
+      }
+
       // TODO 提交
-      this.navBack()
     },
     onChangeAddress(e) {
       this.form.address = e.$wx.detail
@@ -218,8 +237,21 @@ wepy.page({
     }
   },
 
-  ready() {
+  onLoad(options) {
+    if (options.id) {
+      addressApis.getAddressById(options.id).then(r => {
+        const item = r.data
+        item.region = item.region.split(',')
+        this.form = item
+      })
+      return
+    }
+
     this.form.mobile = this.user.mobile
+  },
+
+  ready() {
+
   }
 })
 </script>

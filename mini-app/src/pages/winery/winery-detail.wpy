@@ -76,7 +76,7 @@ module.exports.parseImage = parseImage;
 
     <div style="display: flex;" v-for="(item,index) in wineryDefine.WINERY_LIST" @tap="onTap(item)">
       <div class="winery-item-icon">
-        <van-image style="margin-top: 5px;" round width="50px" height="50px" :src="userInfo.avatar" />
+        <van-image style="margin-top: 5px;" round width="50px" height="50px" :src="userInfo.avatarUrl" />
       </div>
 
       <div class="winery-item">

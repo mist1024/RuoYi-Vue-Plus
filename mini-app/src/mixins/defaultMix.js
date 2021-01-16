@@ -7,7 +7,6 @@ export default {
   methods: {
 
     onNavItem (item) {
-      console.log(item)
       appManager.navigateTo(item.path)
     },
     navBack() {

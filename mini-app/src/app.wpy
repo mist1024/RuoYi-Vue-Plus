@@ -103,6 +103,7 @@ pages: [
 'pages/mall/index',
 'pages/mall/goods-detail',
 'pages/mall/user/user-address',
+'pages/mall/user/user-address-list',
 'pages/winery/winery-detail'
 
 ],
@@ -147,6 +148,8 @@ usingComponents: {
 "van-dialog": "./vant/dialog/index",
 "van-image": "./vant/image/index",
 "van-loading": "./vant/loading/index",
+"van-empty": "./vant/empty/index",
+"van-notice-bar": "./vant/notice-bar/index",
 "van-area": "./vant/area/index"
 }
 }

@@ -116,8 +116,15 @@
 				},
 				{
 					"id": 9,
-					"name": "地址管理",
+					"name": "新增地址",
 					"pathName": "pages/mall/user/user-address",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "地址管理",
+					"pathName": "pages/mall/user/user-address-list",
 					"query": "",
 					"scene": null
 				}

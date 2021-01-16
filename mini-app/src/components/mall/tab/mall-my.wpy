@@ -64,11 +64,10 @@
   <image class="header-image" :src="imageDefine.HOME_TITLE_IMAGE" />
 
 
-  <div class="container" style="margin: 10px;">
-
+  <div class="container" style="margin: 10px 10px 80px 10px;">
 
     <div class="user-info">
-      <van-image round width="120rpx" height="120rpx" :src="user.userInfo.avatar" />
+      <van-image round width="120rpx" height="120rpx" :src="user.userInfo.avatarUrl" />
       <div class="user-info-msg">
         <span style="font-size: 18px;">{{user.mobile}}</span>
         <span style="font-size: 12px;">{{user.userInfo.nickName}}</span>
@@ -84,7 +83,7 @@
     </div>
     <div class="header-grid-body-bottom">
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
-        <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">
+        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU1" @tap="onNavItem(item)">
           <van-image round width="120rpx" height="120rpx" :src="item.icon" />
           <span style="margin-top: 10px;">{{item.name}} </span>
         </van-grid-item>
@@ -94,7 +93,7 @@
     <div class="grid-body">
       <span style="margin:25px 10px 15px 10px;font-weight: bold;">常用功能</span>
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
-        <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">
+        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU2" @tap="onNavItem(item)">
           <van-image round width="120rpx" height="120rpx" :src="item.icon" />
           <span style="margin-top: 10px;">{{item.name}} </span>
         </van-grid-item>
@@ -104,7 +103,7 @@
     <div class="grid-body">
       <span style="margin:25px 10px 15px 10px;font-weight: bold;">更多推荐</span>
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
-        <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">
+        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU3" @tap="onNavItem(item)">
           <van-image round width="120rpx" height="120rpx" :src="item.icon" />
           <span style="margin-top: 10px;">{{item.name}} </span>
         </van-grid-item>

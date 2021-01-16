@@ -77,10 +77,10 @@
 .van-button--info {
   color: #fff;
   color: var(--button-info-color, #fff);
-  background: yellow;
-  background: var(--button-info-background-color, yellow);
-  border: 1px solid yellow;
-  border: var(--button-border-width, 1px) solid var(--button-info-border-color, yellow)
+  background: #98002E;
+  background: var(--button-info-background-color, #98002E);
+  border: 1px solid #98002E;
+  border: var(--button-border-width, 1px) solid var(--button-info-border-color, #98002E)
 }
 
 .van-button--danger {

@@ -11,7 +11,10 @@ module.exports.parseImage = parseImage;
   <van-nav-bar
     title="福利购"
   />
-  <view style="margin: 10px;">
+
+
+
+  <view style="margin: 10px 10px 80px 10px;">
 
 
     <van-image class="banner" :src="navDefine.HOME_BANNER.image" />
@@ -60,7 +63,6 @@ module.exports.parseImage = parseImage;
 
 <script>
 
-
 import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
@@ -76,7 +78,8 @@ wepy.component({
     active: 0,
     records: [],
     currentFilter: '全部',
-    filterButtons: ['全部']
+    filterButtons: ['全部'],
+    isInit: false
 
   },
 
@@ -100,6 +103,16 @@ wepy.component({
     },
     parseImage(imageKey) {
       return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+    },
+
+    async init() {
+      const req = await mailApis.getGoodsList()
+
+      if (req.code === 200) {
+        this.records = req.rows
+      }
+
+      this.isInit = true
     }
   },
 
@@ -112,11 +125,6 @@ wepy.component({
         break
       }
     }
-
-    mailApis.getGoodsList({}).then(r => {
-
-      this.records = r.rows
-    })
   }
 })
 </script>

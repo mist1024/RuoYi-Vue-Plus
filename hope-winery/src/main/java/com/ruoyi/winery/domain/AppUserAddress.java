@@ -33,7 +33,7 @@ private static final long serialVersionUID=1L;
 
 
     /** ID */
-    @TableId(value = "id")
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
     /** 部门ID */
@@ -42,7 +42,7 @@ private static final long serialVersionUID=1L;
 
     /** 用户ID */
     @Excel(name = "用户ID")
-    private String userId;
+    private Long userId;
 
     /** 是否默认 */
     @Excel(name = "是否默认")
