@@ -105,6 +105,8 @@ pages: [
 'pages/mall/goods-detail',
 'pages/mall/user/user-address',
 'pages/mall/user/user-address-list',
+'pages/mall/order/order-list',
+'pages/mall/shopping-car/shopping-car-list',
 'pages/winery/winery-detail'
 
 ],
@@ -151,6 +153,10 @@ usingComponents: {
 "van-loading": "./vant/loading/index",
 "van-empty": "./vant/empty/index",
 "van-notice-bar": "./vant/notice-bar/index",
+"van-tabs": "./vant/tabs/index",
+"van-tab": "./vant/tab/index",
+"van-submit-bar": "./vant/submit-bar/index",
+
 "van-area": "./vant/area/index"
 }
 }

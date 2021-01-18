@@ -30,7 +30,7 @@
   border: transparent 1px solid;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  width: 660rpx;
+  width: 620rpx;
   margin-top: 20px;
   box-shadow: 4px 4px 10px #eeeeee;
   background-color: orange;

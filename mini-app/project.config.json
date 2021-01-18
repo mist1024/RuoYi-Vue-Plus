@@ -134,6 +134,12 @@
 					"pathName": "pages/index",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "订单列表",
+					"pathName": "pages/mall/order/order-list",
+					"scene": null
 				}
 			]
 		}

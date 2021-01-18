@@ -13,7 +13,8 @@ export const navDefine = {
 
   MY_MENU1: myMenuList1,
   MY_MENU2: myMenuList2,
-  MY_MENU3: myMenuList3
+  MY_MENU3: myMenuList3,
+
+  SHOPPING_CAR_LIST: '/pages/mall/shopping-car/shopping-car-list'
 
 }
-

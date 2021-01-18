@@ -1,0 +1,166 @@
+<style lang="less">
+
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+<template>
+
+  <nav-bar title="我的购物车" />
+
+
+  <div style="width: 100%;">
+
+    <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
+    <view wx:else>
+
+
+      <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+        <van-empty description="暂无内容" />
+      </div>
+
+      <van-checkbox-group value="{{ checkList }}" bind:change="onChangeCheckbox">
+        <div v-for="(item,index) in records" style="width: 100%;">
+
+          <van-card
+            :num="item.goodsCount"
+            :price="item.goodsPrice"
+            desc="描述信息"
+            :title="item.goodsName"
+
+          >
+            <view slot="thumb" style="display: flex; align-items: center;">
+
+              <van-checkbox :name="item.goodsId" />
+              <van-image width="60px" height="60px" :src="filters.parseImage(item.goodsFaceImg)"
+                         style="margin-left: 5px;" />
+            </view>
+            <view slot="footer">
+              <van-stepper id="{{item.id}}" name="{{item.id}}" value="{{item.goodsCount}}" @change="onGoodsCount" />
+            </view>
+          </van-card>
+
+
+        </div>
+      </van-checkbox-group>
+    </view>
+
+
+  </div>
+
+  <van-submit-bar
+    price="{{totalPrice}}"
+    button-text="提交订单"
+    bind:submit="onSubmit"
+    :tip="false"
+  >
+    <van-checkbox
+      value="{{ isCheckedAll }}"
+      checked-color="#07c160"
+      bind:change="onCheckedAll"
+
+    >
+      全选
+    </van-checkbox>
+    <!--    <view slot="tip">您的收货地址不支持同城送,-->
+    <!--      <text>修改地址</text>-->
+    <!--    </view>-->
+  </van-submit-bar>
+
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import orderApis from '../../../apis/orderApis'
+
+wepy.page({
+  store,
+  hooks: {},
+  data: {
+
+    records: [],
+    isInit: false,
+    isCheckedAll: true,
+    checkList: []
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress
+    }),
+    totalPrice() {
+      let temp = this.records.filter(x => this.checkList.indexOf(x.goodsId) > -1)
+      let result = 0.0
+      temp.forEach(x => {
+        result += x.goodsPrice
+      })
+      console.log('总计：', result)
+      return result * 100
+    }
+  },
+  events: {},
+
+  methods: {
+
+    onChangeCheckbox(e) {
+      this.checkList = e.$wx.detail
+      this.isCheckedAll = this.checkList.length === this.records.length
+    },
+    onSubmit() {
+
+    },
+    onCheckedAll(e) {
+      this.isCheckedAll = e.$wx.detail
+      this.checkList = this.isCheckedAll ? this.records.map(x => x.goodsId) : []
+    },
+    onGoodsCount(e) {
+      console.log(e)
+
+      this.records.filter(x => x.id === e.target.id)[0].goodsCount = e.$wx.detail
+    },
+    async init() {
+      this.isInit = false
+      const req = await orderApis.getOrderList()
+
+      if (req.code === 200) {
+        this.records = req.rows
+        this.checkList = this.records.map(x => x.goodsId)
+      }
+
+      this.isInit = true
+    }
+  },
+
+  ready() {
+    this.init()
+  },
+  onShow() {
+    this.init()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+
+usingComponents: {
+'shopping-car-item': '../../../components/mall/shopping-car/shopping-car-item'
+}
+
+
+}
+</config>

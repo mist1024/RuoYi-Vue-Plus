@@ -1,0 +1,108 @@
+<style lang="less">
+
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+<template>
+
+  <nav-bar title="我的订单" />
+
+
+  <div style="width: 100%;">
+
+
+    <van-tabs active="{{ activeTab }}" bind:change="onChangeTab">
+      <van-tab title="全部">
+        <order-list-body />
+      </van-tab>
+      <van-tab title="待付款">
+        <order-list-body />
+      </van-tab>
+      <van-tab title="待收货">
+        <order-list-body />
+      </van-tab>
+      <van-tab title="已完成">
+        <order-list-body />
+      </van-tab>
+      <van-tab title="已取消">
+        <order-list-body />
+      </van-tab>
+    </van-tabs>
+
+
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import appManager from '../../../appManager'
+import addressApis from '../../../apis/addressApis'
+import { userAddressPage } from '../../../store/constant/nav/home'
+import orderApis from '../../../apis/orderApis'
+
+wepy.page({
+  store,
+  hooks: {},
+  data: {
+    activeTab: 0,
+    records: [],
+    isInit: false
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress
+    })
+  },
+
+  methods: {
+
+    onChangeTab(e) {
+      this.activeTab = e.$wx.event.detail.name
+    },
+    async init() {
+      // this.isInit = false
+      // const req = await orderApis.getOrderList()
+      //
+      // if (req.code === 200) {
+      //   this.records = req.rows
+      // }
+      //
+      // this.isInit = true
+    }
+  },
+
+  ready() {
+    this.init()
+  },
+  onShow() {
+    this.init()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+
+usingComponents: {
+'order-list-body': '../../../components/mall/order/order-list-body'
+}
+
+
+}
+</config>

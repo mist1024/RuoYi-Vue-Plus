@@ -4,16 +4,16 @@ export const myMenuList1 = [
   {
     name: '全部订单',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mail/order/orderList'
+    path: '/pages/mall/order/order-list'
   },
   {
     name: '待付款',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mail/order/orderList?orderStatus=1'
+    path: '/pages/mall/order/order-list?orderStatus=1'
   }, {
     name: '待收货',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mail/order/orderList?orderStatus=2'
+    path: '/pages/mall/order/order-list?orderStatus=2'
   }
 ]
 export const myMenuList2 = [

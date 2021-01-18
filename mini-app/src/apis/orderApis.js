@@ -20,6 +20,13 @@ class OrderApis {
     })
   }
 
+  getOrderList(data) {
+    return request.get({
+      url: baseUrl + 'winery/user_orders/list',
+      data: data
+    })
+  }
+
 }
 
 export default new OrderApis()
