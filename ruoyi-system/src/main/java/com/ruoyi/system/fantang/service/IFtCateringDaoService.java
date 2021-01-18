@@ -25,5 +25,5 @@ public interface IFtCateringDaoService extends IService<FtCateringDao> {
 
     List<Long> notInTable(FtCateringDao ftCateringDao);
 
-    List<FtCateringDao> copyAndAdd(List<Long> patientIds, FtCateringDao ftCateringDao);
+    Integer copyAndAdd(Long patientId, List<FtCateringDao> ftCateringDao);
 }

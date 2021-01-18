@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtCateringDao;
+import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.mapper.FtCateringDaoMapper;
+import com.ruoyi.system.fantang.mapper.FtFoodDemandDaoMapper;
 import com.ruoyi.system.fantang.service.IFtCateringDaoService;
+import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +24,9 @@ import java.util.List;
  */
 @Service
 public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, FtCateringDao> implements IFtCateringDaoService {
+
+    @Autowired
+    IFtFoodDemandDaoService foodDemandDaoService;
 
     @Override
     public List<FtCateringDao> listNewFormatter(FtCateringDao ftCateringDao) {
@@ -116,37 +123,31 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
         return patientNotInTable;
     }
 
+    /**
+     * 拷贝粘贴新增指定病患的营养配餐记录并更新该病患默认报餐配置信息
+     * @author 陈智兴
+     * @param patientId
+     * @param ftCateringDao
+     * @return
+     */
     @Override
-    public List<FtCateringDao> copyAndAdd(List<Long> patientIds, FtCateringDao ftCateringDao) {
+    public Integer copyAndAdd(Long patientId, List<FtCateringDao> ftCateringDao) {
 
-        List<FtCateringDao> list = new ArrayList<>();
+        // 为指定病患id批量插入营养配餐配置记录
+        for (FtCateringDao cateringDao : ftCateringDao) {
+            cateringDao.setId(null);
+            cateringDao.setPatientId(patientId);
+            this.baseMapper.insert(cateringDao);
 
-        List<Integer> types = ftCateringDao.getTypes();
-
-        for (Long patientId : patientIds) {
-            for (int i = 1; i < 5; i++) {
-                FtCateringDao cateringDao = new FtCateringDao();
-                cateringDao.setPatientId(patientId);
-                cateringDao.setNumber(ftCateringDao.getNumber());
-                cateringDao.setFrequency(ftCateringDao.getFrequency());
-                cateringDao.setCateringUsage(ftCateringDao.getCateringUsage());
-                cateringDao.setCreateAt(new Date());
-                cateringDao.setType(i);
-
-                for (Integer type : types) {
-                    if (i == type) {
-                        cateringDao.setFlag(true);
-                        break;
-                    } else {
-                        cateringDao.setFlag(false);
-                    }
-                }
-
-                this.baseMapper.insert(cateringDao);
-                list.add(cateringDao);
-            }
+            // 更新该病患默认配餐信息
+            FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
+            foodDemandDao.setNutritionFoodId(cateringDao.getNumber());
+            foodDemandDao.setNutritionFoodFlag(true);
+            QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
+            wrapper.eq("patient_id",patientId);
+            wrapper.eq("type",cateringDao.getType());
+            foodDemandDaoService.update(foodDemandDao, wrapper);
         }
-
-        return list;
+        return 1;
     }
 }

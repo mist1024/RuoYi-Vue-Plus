@@ -1,5 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.annotation.Log;
@@ -153,17 +155,27 @@ public class FtCateringDaoController extends BaseController {
     }
 
     /**
+     * 根据病人 id 查找营养配餐数据
+     */
+    @GetMapping("/getAllByPatient/{patientId}")
+    public AjaxResult getAllByPatient(@PathVariable Long patientId) {
+        QueryWrapper<FtCateringDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("patient_id", patientId);
+        return AjaxResult.success(iFtCateringDaoService.list(wrapper));
+    }
+
+
+    /**
      * 拷贝并新增
      */
     @PostMapping("/copyAndAdd")
-    public AjaxResult copyAndAdd(@RequestBody FtCateringDao ftCateringDao) {
+    public AjaxResult copyAndAdd(@RequestBody JSONObject params) {
+        List<Long> patientIds = params.getJSONArray("patientIds").toJavaList(Long.class);
+        List<FtCateringDao> data = params.getJSONArray("data").toJavaList(FtCateringDao.class);
+        for (Long patientId : patientIds) {
+            Integer ftCateringDaoList = iFtCateringDaoService.copyAndAdd(patientId, data);
+        }
 
-        System.out.println(ftCateringDao);
-
-
-        List<Long> patientIds = iFtCateringDaoService.notInTable(ftCateringDao);
-
-        List<FtCateringDao> ftCateringDaoList = iFtCateringDaoService.copyAndAdd(patientIds, ftCateringDao);
 
 
 

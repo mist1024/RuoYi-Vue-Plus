@@ -76,3 +76,11 @@ export function getByPatient(id) {
     method: 'get'
   })
 }
+
+// 根据病人 id 查找全部四条营养配餐记录
+export function getAllByPatient(id) {
+  return request({
+    url: '/fantang/catering/getAllByPatient/' + id,
+    method: 'get'
+  })
+}

@@ -411,11 +411,12 @@
     </el-dialog>
 
     <!-- 拷贝并新增对话框 -->
-    <el-dialog :title="title" :visible.sync="copyItem" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="copyItem" width="800px" append-to-body>
       <el-form ref="copyItemForm" :model="copyItemForm" :rules="copyItemFormRules" label-width="80px">
         <el-form-item label="科室" prop="departId">
           <el-select v-model="copyItemForm.departId"
                      placeholder="请选择科室"
+                     style="width:450px"
                      @change="changeDepart">
             <el-option
               v-for="item in departOptions"
@@ -425,8 +426,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="病人" prop="patientIds">
-          <el-select v-model="copyItemForm.patientIds" placeholder="请选择病人" multiple>
+        <el-form-item label="病人" prop="patientIds" >
+          <el-select v-model="copyItemForm.patientIds" placeholder="请选择病人" multiple  style="width:450px">
             <el-option
               v-for="item in patientOptions"
               :key="item.name"
@@ -438,54 +439,13 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <!--        <el-form-item label="床号" prop="bedId">-->
-        <!--          <el-input v-model="form.bedId" placeholder="床号" :disabled="true"/>-->
-        <!--        </el-form-item>-->
-        <el-row :gutter="10">
-          <el-col :span="12">
-            <el-form-item label="配餐号" prop="number">
-              <el-select v-model="copyItemForm.number" placeholder="请选择配餐号">
-                <el-option
-                  v-for="item in numberOptions"
-                  :key="item.name"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="用法" prop="cateringUsage">
-              <el-select v-model="copyItemForm.cateringUsage" placeholder="请选择用法">
-                <el-option
-                  v-for="item in cateringUsageOptions"
-                  :key="item.label"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="12">
-            <el-form-item label="正餐类型" prop="types">
-              <el-select v-model="copyItemForm.types"
-                         multiple
-                         @change="changeDinnerType"
-                         placeholder="请选择正餐类型">
-                <el-option
-                  v-for="dict in typeOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="parseInt(dict.dictValue)"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="配餐频次" prop="frequency">
-              <el-select v-model="copyItemForm.frequency" placeholder="请选择频次">
+
+        <el-table :data="copyItemForm.data"
+                  border
+                  :span-method="objectSpanMethodForCopyAndCreate">
+          <el-table-column label="配餐频次" align="center" prop="frequency" width="100px">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.frequency">
                 <el-option
                   v-for="item in frequencyOptions"
                   :key="item.value"
@@ -493,12 +453,48 @@
                   :value="item.value">
                 </el-option>
               </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
+            </template>
+          </el-table-column>
+          <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat" width="120px"/>
+          <el-table-column label="营养配餐" align="center" prop="foodName" width="200px">
+            <template slot-scope="scope">
+              <el-select  v-model="scope.row.number">
+                <el-option
+                  v-for="item in numberOptions"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="用法" align="center" prop="cateringUsage" :formatter="cateringUsageFormat" width="120px">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.cateringUsage" placeholder="请选择用法">
+                <el-option
+                  v-for="item in cateringUsageOptions"
+                  :key="item.label"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="启用标志" align="center" prop="flag" :formatter="formatFlag">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.flag"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                active-text="启用"
+                inactive-text="关闭">
+              </el-switch>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitCopyForm">确 定</el-button>
+        <el-button type="primary" @click="submitCopyForm">拷贝新增</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -517,7 +513,7 @@ import {
 import {listDepart} from "../../../api/fantang/depart";
 import {getBedIdById, selectNoCateringByDepartId} from "../../../api/fantang/patient";
 import {listNutritionFood} from "../../../api/fantang/nutritionFood";
-import {cancelCatering, copyAndAdd, getByPatient} from "../../../api/fantang/catering";
+import {cancelCatering, copyAndAdd, getByPatient, getAllByPatient} from "../../../api/fantang/catering";
 
 export default {
   name: "Catering",
@@ -600,23 +596,8 @@ export default {
       copyItemForm: {},
       // 拷贝并新增表单校验
       copyItemFormRules: {
-        departId: [
-          {required: true, message: "部门不能为空", trigger: "blur"}
-        ],
         patientIds: [
           {required: true, message: "病人不能为空", trigger: "blur"}
-        ],
-        types: [
-          {required: true, message: "正餐类型不能为空", trigger: "blur"}
-        ],
-        cateringUsage: [
-          {required: true, message: "用法不能为空", trigger: "blur"}
-        ],
-        frequency: [
-          {required: true, message: "频次不能为空", trigger: "blur"}
-        ],
-        number: [
-          {required: true, message: "配餐号不能为空", trigger: "blur"}
         ],
       },
       // 表单校验
@@ -678,7 +659,7 @@ export default {
         return "禁用";
       }
     },
-    // 控制合并列
+    // 控制数据合并列
     objectSpanMethod({rowIndex, columnIndex}) {
       if (columnIndex === 1) {
         if (rowIndex % 4 === 0) {
@@ -743,6 +724,25 @@ export default {
         }
       }
     },
+
+    // 控制弹出层“拷贝和新增”数据合并列
+    objectSpanMethodForCopyAndCreate({rowIndex, columnIndex}) {
+      if (columnIndex === 0) {
+        if (rowIndex % 4 === 0) {
+          return {
+            rowspan: 4,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+      }
+    },
+
+
 
     // 响应营养配餐用餐安排多选列表
     changeDinnerType(value) {
@@ -824,17 +824,8 @@ export default {
 
       this.copyItemForm = {
         id: null,
+        data: null,
         patientId: null,
-        type: null,
-        number: null,
-        frequency: null,
-        cateringUsage: null,
-        isReplace: null,
-        flag: null,
-        updateAt: null,
-        updateBy: null,
-        createAt: null,
-        createBy: null,
         cateringDescribe: null
       };
       this.resetForm("copyItemForm");
@@ -880,12 +871,12 @@ export default {
       if (this.ids.length > 1) {
         this.msgError("只能选择一条记录进行拷贝并新增")
       } else {
-        getByPatient(id).then(response => {
-          console.log(response.data)
-          this.copyItemForm.cateringUsage = response.data.cateringUsage;
-          this.copyItemForm.frequency = response.data.frequency;
-          this.copyItemForm.number = response.data.number;
-          this.copyItem = true;
+        this.copyItem = true;
+        getAllByPatient(id).then(response => {
+          this.copyItemForm.data =  response.data;
+          this.copyItemForm.departId =null;
+          this.copyItemForm.patientIds = [];
+          console.log('cateringList-->', this.copyItemForm);
         })
       }
     },
