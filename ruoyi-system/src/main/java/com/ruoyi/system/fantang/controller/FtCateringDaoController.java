@@ -127,7 +127,7 @@ public class FtCateringDaoController extends BaseController {
     }
 
     /**
-     * 作废营养配餐数据
+     * 暂停多个病患营养配餐配置，并更新默认报餐配置
      */
     @PutMapping("/cancel/{ids}")
     @Transactional
@@ -140,7 +140,25 @@ public class FtCateringDaoController extends BaseController {
         // 根据病人 id 修改报餐配置表营养餐启用标志
         iFtFoodDemandDaoService.cancelNutritionByPatientId(ids);
 
-        return AjaxResult.success("已作废");
+        return AjaxResult.success("已暂停");
+    }
+
+
+    /**
+     * 恢复多个病患营养配餐配置，并更新默认报餐配置
+     */
+    @PutMapping("/restoreCatering/{ids}")
+    @Transactional
+    public AjaxResult restoreCatering(@PathVariable Long[] ids) {
+        System.out.println(Arrays.toString(ids));
+
+        // 根据病人 id 修改营养配餐启用标志
+        iFtCateringDaoService.cancelByPatientId(ids);
+
+        // 根据病人 id 修改报餐配置表营养餐启用标志
+        iFtFoodDemandDaoService.cancelNutritionByPatientId(ids);
+
+        return AjaxResult.success("已暂停");
     }
 
     /**
@@ -175,11 +193,6 @@ public class FtCateringDaoController extends BaseController {
         for (Long patientId : patientIds) {
             Integer ftCateringDaoList = iFtCateringDaoService.copyAndAdd(patientId, data);
         }
-
-
-
-
-
-        return null;
+        return AjaxResult.success();
     }
 }

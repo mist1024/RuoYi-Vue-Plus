@@ -114,5 +114,5 @@ public class FtCateringDao extends FtCateringVo {
 
     // 暂停标志
     @Excel(name = "停餐")
-    private Integer suspendFlag;
+    private Boolean suspendFlag;
 }

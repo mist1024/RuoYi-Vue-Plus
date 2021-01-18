@@ -60,6 +60,15 @@ export function cancelCatering(id) {
   })
 }
 
+// 恢复指定病患的营养配餐
+export function restoreCatering(id) {
+  return request({
+    url: '/fantang/catering/restoreCatering/' + id,
+    method: 'put'
+  })
+}
+
+
 // 导出配餐功能
 export function exportCatering(query) {
   return request({

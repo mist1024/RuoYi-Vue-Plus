@@ -92,11 +92,18 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
         FtCateringDao ftCateringDao = new FtCateringDao();
         ftCateringDao.setFlag(false);
         ftCateringDao.setUpdateAt(new Date());
+        ftCateringDao.setSuspendFlag(false);
 
         for (Long id : ids) {
             UpdateWrapper<FtCateringDao> wrapper = new UpdateWrapper<>();
             wrapper.eq("patient_id", id);
             rows += this.baseMapper.update(ftCateringDao, wrapper);
+
+            // 更新该病患的报餐配置记录
+            FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
+            foodDemandDao.setNutritionFoodFlag(false);
+            QueryWrapper<FtFoodDemandDao> wrapper1 = new QueryWrapper<>();
+            foodDemandDaoService.update(foodDemandDao, wrapper1);
         }
 
         return rows;

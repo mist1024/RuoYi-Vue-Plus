@@ -182,6 +182,11 @@
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
+      <el-table-column label="暂停" align="center" prop="suspendFlag" width="80px">
+        <template slot-scope="scope">
+          <el-checkbox v-model="scope.row.suspendFlag"  @change="changeSuspend(scope.row, $event)">暂停</el-checkbox>
+        </template>
+      </el-table-column>
       <el-table-column label="科室" align="center" prop="departName"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="床号" align="center" prop="bedId"/>
@@ -710,6 +715,19 @@ export default {
             colspan: 0
           };
         }
+      } else if (columnIndex === 5) {
+        if (rowIndex % 4 === 0) {
+          return {
+            rowspan: 4,
+            colspan: 1
+          };
+        } else {
+          return {
+            rowspan: 0,
+            colspan: 0
+          };
+        }
+
       } else if (columnIndex === 0) {
         if (rowIndex % 4 === 0) {
           return {
@@ -929,10 +947,39 @@ export default {
         this.msgSuccess("删除成功");
       })
     },
+
+    // 更新指定病患的暂停营养配餐数据
+    changeSuspend(row, e) {
+      if (e){
+        this.$confirm('是否暂停 “' + row.name + '” 的营养配餐数据?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function () {
+          return cancelCatering(row.patientId);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("已暂停");
+        })
+      } else {
+        this.$confirm('是否恢复 “' + row.name + '” 的营养配餐数据?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(function () {
+          return restoreCatering(row.patientId);
+        }).then(() => {
+          this.getList();
+          this.msgSuccess("已恢复");
+        })
+      }
+
+
+    },
     // 作废按钮
     handleCancel(row) {
       const ids = row.patientId || this.ids;
-      console.log("ids-----", ids);
+      console.log("ids-----", row);
       this.$confirm('是否作废 “' + this.names + '” 的营养配餐数据?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
