@@ -1,5 +1,6 @@
 package com.ruoyi.winery.controller.winery;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -114,45 +115,47 @@ public class WineryOrdersController extends BaseController {
     /**
      * 新增客户订单
      */
-    @PreAuthorize("@ss.hasPermi('winery:user_orders:add')")
-    @Log(title = "客户订单", businessType = BusinessType.INSERT)
-    @PostMapping
-    public AjaxResult add(@RequestBody WineryOrders wineryOrders, HttpServletRequest req) {
-        wineryOrders.setCreateBy(getUsername());
-        wineryOrders.setDeptId(getDeptId());
-
-        // 统一下单
-        WxPayUnifiedOrderRequest request = new WxPayUnifiedOrderRequest();
-        String userName = getLoginUser().getUser().getUserName();
-        String openId = "";
-        if (userName.contains("mini-")) {
-            openId = userName.split("-")[1];
-        }
-        request.setOpenid(openId);
-        request.setTotalFee(wineryOrders.getGoodsPrice().multiply(new BigDecimal(100)).intValue());
-        request.setBody(wineryOrders.getGoodsName());
-        String outTradeNo = UUID.randomUUID().toString().replace("-", "");
-        request.setOutTradeNo(outTradeNo);
-        request.setNotifyUrl("");
-        request.setSpbillCreateIp(req.getRemoteAddr());
-        request.setTradeType("JSAPI");
-
-
-        Map<String, Object> map = new HashMap<>();
-        try {
-            map.put("orderId", wineryOrders.getId());
-            WxPayMpOrderResult payMsg = wxPayService.createOrder(request);
-            map.put("payMsg", payMsg);
-            wineryOrders.setPayMsg(((JSONObject) JSONObject.toJSON(payMsg)).toJSONString());
-            wineryOrders.setOutTradeNo(outTradeNo);
-            wineryOrders.setOrderStatus(0);
-            iWineryOrdersService.save(wineryOrders);
-            return success("success", map);
-        } catch (WxPayException e) {
-            e.printStackTrace();
-            return error();
-        }
-    }
+    // @PreAuthorize("@ss.hasPermi('winery:user_orders:add')")
+    // @Log(title = "客户订单", businessType = BusinessType.INSERT)
+    // @PostMapping
+    // public AjaxResult add(@RequestBody List<WineryOrders> wineryOrders, HttpServletRequest req) {
+    //     String username = getUsername();
+    //     Long deptId = getDeptId();
+    //     String outTradeNo = RandomUtil.randomNumbers(15);
+    //     wineryOrders.setCreateBy(getUsername());
+    //     wineryOrders.setDeptId(getDeptId());
+    //
+    //     // 统一下单
+    //     WxPayUnifiedOrderRequest request = new WxPayUnifiedOrderRequest();
+    //     String userName = getLoginUser().getUser().getUserName();
+    //     String openId = "";
+    //     if (userName.contains("mini-")) {
+    //         openId = userName.split("-")[1];
+    //     }
+    //     request.setOpenid(openId);
+    //     request.setTotalFee(wineryOrders.getGoodsPrice().multiply(new BigDecimal(100)).intValue());
+    //     request.setBody("小程序名-订单编号");
+    //     request.setOutTradeNo(outTradeNo);
+    //     request.setNotifyUrl("");
+    //     request.setSpbillCreateIp(req.getRemoteAddr());
+    //     request.setTradeType("JSAPI");
+    //
+    //
+    //     Map<String, Object> map = new HashMap<>();
+    //     try {
+    //         map.put("orderId", wineryOrders.getId());
+    //         WxPayMpOrderResult payMsg = wxPayService.createOrder(request);
+    //         map.put("payMsg", payMsg);
+    //         wineryOrders.setPayMsg(((JSONObject) JSONObject.toJSON(payMsg)).toJSONString());
+    //         wineryOrders.setOutTradeNo(outTradeNo);
+    //         wineryOrders.setOrderStatus(0);
+    //         iWineryOrdersService.save(wineryOrders);
+    //         return success("success", map);
+    //     } catch (WxPayException e) {
+    //         e.printStackTrace();
+    //         return error();
+    //     }
+    // }
 
     /**
      * 修改客户订单
