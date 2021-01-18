@@ -1,5 +1,6 @@
 import { homeBanner, homeBanner1, homeBanner2, homeHeader, homeMenuList, menu1, menu2 } from './nav/home'
 import { myMenuList1, myMenuList2, myMenuList3 } from './nav/my'
+import { orderCheck, orderListPage, shoppingCarList, userAddressListPage } from './nav/pages'
 
 export const navDefine = {
   HOME_MENU_LIST: homeMenuList,
@@ -15,6 +16,9 @@ export const navDefine = {
   MY_MENU2: myMenuList2,
   MY_MENU3: myMenuList3,
 
-  SHOPPING_CAR_LIST: '/pages/mall/shopping-car/shopping-car-list'
+  SHOPPING_CAR_LIST: shoppingCarList,
+  ORDER_LIST_PAGE: orderListPage,
+  ORDER_CHECK: orderCheck,
+  USER_ADDRESS_LIST_PAGE: userAddressListPage,
 
 }

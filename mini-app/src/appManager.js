@@ -1,8 +1,50 @@
 import store from '@/store'
 import eventHub from './common/eventHub'
+import userApis from './apis/userApis'
 
 class AppManager {
+  login(callBack) {
+    let self = this
+    wx.showLoading({ title: '正在连接...', mask: true })
+    wx.login({
+      async success(res) {
+        let req1 = await userApis.getSession(res.code)
+        console.log(req1)
+        if (!req1.data.openid) {
+          self.showToast('登录失败！' + res.errMsg)
+          wx.hideLoading()
+        }
+        self.saveOpenid(req1.data.openid)
+
+        let req2 = await userApis.loginByMini({ openid: self.getOpenid() })
+
+        if (!req1.data.openid) {
+          self.showToast('登录失败！' + res.errMsg)
+          wx.hideLoading()
+        }
+
+        if (req2.token) {
+          store.dispatch('setTokenAction', req2.token)
+          self.setCacheInfo()
+        }
+
+        wx.hideLoading()
+
+        if (callBack) {
+          callBack()
+        }
+      },
+      fail(res) {
+        self.showToast('登录失败,正在重试.')
+        wx.hideLoading()
+        self.login()
+      }
+    }
+    )
+  }
+
   saveOpenid(openid) {
+    console.log('saveOpenid:' + openid)
     store.dispatch('setOpenidAction', openid)
   }
 
@@ -39,14 +81,11 @@ class AppManager {
       return
     }
 
-    console.log('path:', path)
-
     if (!path) {
       this.showToast('建设中')
       return
     }
 
-    console.log('path:', path)
     wx.navigateTo({
       url: path
     })

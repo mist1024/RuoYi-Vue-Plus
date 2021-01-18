@@ -19,9 +19,11 @@
   color: #333333 !important;
 
 }
+
 .van-field__label {
   color: #333333 !important;
 }
+
 .van-field__input--disabled {
   color: #333333 !important;
 }
@@ -53,7 +55,7 @@
       </div>
 
       <div v-for="(item,index) in records" class="address-item"
-           :style="{  border: item.isDefault === 1 ? '#AC1630 1px solid' : '#eeeeee 1px solid'}">
+           :style="{  border: item.isDefault === 1 ? '#AC1630 1px solid' : '#eeeeee 1px solid'}" @tap="onSelect(item)">
         <van-field
           label="收货人姓名"
           :value="item.name"
@@ -80,8 +82,12 @@
         />
 
         <div style="display: flex; justify-content:flex-end;margin: 10px;">
-          <van-button round v-if="item.isDefault !== 1" color="#98002E" size="small" type="info" plain @tap="onSetDefault(item)">设为默认</van-button>
-          <van-button round size="small" color="#98002E" type="info" plain style="margin-left: 20px;" @tap="onEdit(item)">编辑</van-button>
+          <van-button round v-if="item.isDefault !== 1" color="#98002E" size="small" type="info" plain
+                      @tap="onSetDefault(item)">设为默认
+          </van-button>
+          <van-button round size="small" color="#98002E" type="info" plain style="margin-left: 20px;"
+                      @tap="onEdit(item)">编辑
+          </van-button>
         </div>
 
       </div>
@@ -105,7 +111,8 @@ wepy.page({
   hooks: {},
   data: {
     records: [],
-    isInit: false
+    isInit: false,
+    isSelectMode: false
 
   },
   mixins: [defaultMix],
@@ -133,6 +140,17 @@ wepy.page({
     onAdd() {
       appManager.navigateTo(userAddressPage)
     },
+    onSelect(item) {
+      if (!this.isSelectMode) {
+        return
+      }
+
+      item.isDefault = 1
+
+      addressApis.editAddress(item).then(r => {
+        this.navBack()
+      })
+    },
     async init() {
       this.isInit = false
       const req = await addressApis.getAddressList()
@@ -145,9 +163,16 @@ wepy.page({
     }
   },
 
+  onLoad(options) {
+    if (options.isSelectMode) {
+      this.isSelectMode = true
+    }
+  },
+
   ready() {
     this.init()
   },
+
   onShow() {
     this.init()
   }

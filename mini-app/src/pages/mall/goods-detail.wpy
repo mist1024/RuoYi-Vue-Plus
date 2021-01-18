@@ -29,9 +29,10 @@ module.exports.parseImage = parseImage;
         </block>
       </swiper>
 
+
       <van-cell :title="goodsItems.goodsName" value="内容能显示多长" label="描述信息描述信息描述信息描述信息描述信息描述信息描述信息描述信息"
                 border="{{ false }}" />
-      <van-cell title="选择规格" is-link @tap="onShowSpec" />
+      <van-cell title="选择下单" is-link @tap="onShowSpec" />
 
       <div style="margin: 10px 15px;">
         <span>商品详情</span>
@@ -49,13 +50,13 @@ module.exports.parseImage = parseImage;
         bind:close="onCloseSpec"
       >
         <van-card
-          :title="goodsSpec.specName"
-          :desc="goods.specDesc"
-          :price="goodsSpec.specPrice"
-          :thumb="filters.parseImage(goodsSpec.specImg)"
+          :title="goodsItem.goodsName"
+          :desc="goodsItem.specDesc"
+          :price="goodsItem.goodsPrice"
+          :thumb="filters.parseImage(goodsItem.goodsFaceImg)"
         >
           <view slot="num" style="float:right;">
-<!--            <div>{{'已优惠¥xx元'}}</div>-->
+            <!--            <div>{{'已优惠¥xx元'}}</div>-->
           </view>
 
         </van-card>
@@ -74,7 +75,8 @@ module.exports.parseImage = parseImage;
           </van-col>
         </van-row>
 
-        <van-button round type="danger" size="small" style="float:right;margin-top:10px;margin-right: 10px;">下一步
+        <van-button round type="danger" size="small" style="float:right;margin-top:10px;margin-right: 10px;"
+                    @tap="onSubmit()">下一步
         </van-button>
 
       </van-popup>
@@ -93,8 +95,12 @@ module.exports.parseImage = parseImage;
 <script>
 import wepy from '@wepy/core'
 import store from '@/store'
-import { mapActions } from '@wepy/x'
+import { mapActions, mapState } from '@wepy/x'
 import mailApis from '../../apis/mailApis'
+import orderApis from '../../apis/orderApis'
+import appManager from '../../appManager'
+import { navDefine, orderCheck, orderListPage } from '../../store/constant/navDefine'
+import { defaultOrder } from '../../store/constant/orderDefine'
 
 wepy.page({
   store,
@@ -111,6 +117,9 @@ wepy.page({
 
   computed: {
 
+    ...mapState({
+      'order': state => state.order
+    }),
     goodsImages() {
       if (!this.goodsItem || !this.goodsItem.goodsImg) {
         return []
@@ -118,12 +127,12 @@ wepy.page({
 
       return this.goodsItem.goodsImg.split(',')
     }
+
   },
 
   methods: {
     ...mapActions([
-      'setUserAction',
-      'setFormAction'
+      'setOrderAction'
     ]),
     handleViewTap() {
       console.log('handleVieTap clicked')
@@ -152,13 +161,41 @@ wepy.page({
       const goodsSpecReq = await mailApis.getGoodsSpecByIds(ids)
 
       this.goodsSpec = goodsSpecReq.rows[0]
+    },
+
+    onSubmit() {
+      console.log(123)
+      // wx.showLoading({ title: '正在生成订单.', mask: true })
+
+      const item = this.goodsItem
+
+      let orderItem = {
+        goodsId: item.id,
+        goodsName: item.goodsName,
+        goodsType: item.goodsType,
+        goodsSpec: item.goodsSpec,
+        goodsFaceImg: item.goodsFaceImg,
+        goodsPrice: item.goodsPrice,
+        goodsCount: this.count
+      }
+      console.log('订单:', item)
+
+      let order = defaultOrder
+
+      defaultOrder.orderDetailList.push(orderItem)
+
+      this.setOrderAction(order)
+
+      appManager.navigateTo(navDefine.ORDER_CHECK)
     }
   },
 
   onLoad(options) {
     this.init(options.id)
+  },
+  onShow() {
+    console.log(this.order)
   }
-
 
 })
 </script>
