@@ -70,6 +70,17 @@ public class FtPatientDaoController extends BaseController {
     }
 
     /**
+     * 根据 departId 查询所有没有营养配餐的病人列表
+     * @author 陈智兴
+     */
+    @GetMapping("/selectNoCateringByDepartId/{departId}")
+    public AjaxResult selectNoCateringByDepartId(@PathVariable("departId") Long departId) {
+        List<FtPatientDao> list = iFtPatientDaoService.selectNoCateringByDepartId(departId);
+        return AjaxResult.success(list);
+    }
+
+
+    /**
      * 根据 patientId 查询病人床号
      */
     @GetMapping("/getBedIdById/{patientId}")

@@ -29,4 +29,9 @@ public class FtPatientDaoServiceImpl extends ServiceImpl<FtPatientDaoMapper, FtP
     public List<FtPatientVo> getReportMealsByDepart(Long departId, String createAt) {
         return this.baseMapper.getReportMealsByDepart(departId,createAt);
     }
+
+    @Override
+    public List<FtPatientDao> selectNoCateringByDepartId(Long departId) {
+        return this.baseMapper.selectNoCateringByDepartId(departId);
+    }
 }

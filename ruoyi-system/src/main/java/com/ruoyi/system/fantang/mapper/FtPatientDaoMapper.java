@@ -55,4 +55,7 @@ public interface FtPatientDaoMapper extends BaseMapper<FtPatientDao> {
     List<FtPatientVo> getReportMealsToday(@Param("createAt") String createAt, @Param("patientId") Long patientId);
 
     List<FtPatientVo> getReportMealsByDepart(@Param("departId") Long departId, @Param("createAt") String createAt);
+
+    @Select("SELECT * from ft_patient where depart_id = #{departId} and patient_id not in (SELECT patient_id from ft_catering) ")
+    List<FtPatientDao> selectNoCateringByDepartId(@Param("departId") Long departId);
 }

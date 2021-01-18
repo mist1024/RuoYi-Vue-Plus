@@ -17,6 +17,14 @@ export function selectPatientByDepartId(departId) {
   })
 }
 
+// 根据 departId 查询所有没有营养配餐的病人列表
+export function selectNoCateringByDepartId(departId) {
+  return request({
+    url: '/fantang/patient/selectNoCateringByDepartId/' + departId,
+    method: 'get',
+  })
+}
+
 // 根据 patientId 查询病人床号
 export function getBedIdById(patientId) {
   return request({

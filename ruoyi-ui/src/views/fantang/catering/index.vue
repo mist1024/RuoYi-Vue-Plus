@@ -103,7 +103,7 @@
           :disabled="multiple"
           @click="handleCancel"
           v-hasPermi="['fantang:catering:remove']"
-        >作废
+        >暂停
         </el-button>
       </el-col>
       <el-col :span="1.5">
@@ -510,10 +510,10 @@ import {
   getCatering,
   listCatering,
   updateCatering
-} from "@/api/fantang/catering";
-import {listDepart} from "@/api/fantang/depart";
-import {getBedIdById, selectPatientByDepartId} from "@/api/fantang/patient";
-import {listNutritionFood} from "@/api/fantang/nutritionFood";
+} from "../../../api/fantang/catering";
+import {listDepart} from "../../../api/fantang/depart";
+import {getBedIdById, selectNoCateringByDepartId} from "../../../api/fantang/patient";
+import {listNutritionFood} from "../../../api/fantang/nutritionFood";
 import {cancelCatering, copyAndAdd, getByPatient} from "../../../api/fantang/catering";
 
 export default {
@@ -656,6 +656,7 @@ export default {
     })
   },
   methods: {
+    // 格式化数据列“用法”显示文本
     cateringUsageFormat(row) {
       if (row.cateringUsage === 1 || row.cateringUsage === '1') {
         return "鼻饲";
@@ -666,6 +667,7 @@ export default {
       }
     },
 
+    // 格式化数据列“启用”显示文本
     formatFlag(row) {
       if (row.flag === true) {
         return "启用";
@@ -759,7 +761,7 @@ export default {
     // 响应科室信息切换
     changeDepart(value) {
       const _this = this;
-      selectPatientByDepartId(value).then(response => {
+      selectNoCateringByDepartId(value).then(response => {
         _this.patientOptions = response.data;
         _this.form.patientId = null;
       });

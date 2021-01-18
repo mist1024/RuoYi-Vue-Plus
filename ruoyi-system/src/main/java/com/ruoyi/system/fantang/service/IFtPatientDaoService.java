@@ -19,4 +19,6 @@ public interface IFtPatientDaoService extends IService<FtPatientDao> {
     AjaxResult getReportMealsToday(String createAt, Long patientId);
 
     List<FtPatientVo> getReportMealsByDepart(Long departId, String createAt);
+
+    List<FtPatientDao> selectNoCateringByDepartId(Long departId);
 }
