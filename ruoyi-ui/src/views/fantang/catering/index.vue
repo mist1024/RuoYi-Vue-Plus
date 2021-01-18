@@ -242,7 +242,10 @@
               :key="item.patientId"
               :label="item.name"
               :value="item.patientId"
-            ></el-option>
+            >
+              <span style="float: left">{{ item.name }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px; margin-right:16px">{{ item.bedId }}</span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="床号" prop="bedId">
