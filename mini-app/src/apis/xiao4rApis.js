@@ -10,6 +10,7 @@ export const formHeader = {
   'Content-Type': 'application/x-www-form-urlencoded'
 }
 
+
 /**
  * 接口
  */
@@ -29,6 +30,7 @@ class Xiao4rApis {
       data: data
     })
   }
+
 }
 
 export default new Xiao4rApis()

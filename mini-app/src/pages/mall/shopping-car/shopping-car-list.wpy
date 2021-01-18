@@ -128,8 +128,6 @@ wepy.page({
       this.checkList = this.isCheckedAll ? this.records.map(x => x.goodsId) : []
     },
     onGoodsCount(e) {
-      console.log(e)
-
       this.records.filter(x => x.id === e.target.id)[0].goodsCount = e.$wx.detail
     },
     async init() {

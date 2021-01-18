@@ -1,26 +1,28 @@
 import { imgbaseUrl } from '../../../baseDefine'
+import { orderListPage, userAddressListPage } from './pages'
+
 
 export const myMenuList1 = [
   {
     name: '全部订单',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mall/order/order-list'
+    path: orderListPage
   },
   {
     name: '待付款',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mall/order/order-list?orderStatus=1'
+    path: orderListPage + '?orderStatus=1'
   }, {
     name: '待收货',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mall/order/order-list?orderStatus=2'
+    path: orderListPage + '?orderStatus=2'
   }
 ]
 export const myMenuList2 = [
   {
     name: '地址管理',
     icon: imgbaseUrl + 'doctor.png',
-    path: '/pages/mall/user/user-address-list'
+    path: userAddressListPage
   },
   {
     name: '发票管理',

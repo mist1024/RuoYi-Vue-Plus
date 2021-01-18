@@ -4,6 +4,7 @@ import { imageDefine } from './constant/imageDefine'
 import { navDefine } from './constant/navDefine'
 import { wineryDefine } from './constant/wineryDefine'
 import { userAddress } from './constant/userAddress'
+import { currentOrder } from './constant/orderDefine'
 
 export default new Vuex.Store({
   state: {
@@ -17,6 +18,8 @@ export default new Vuex.Store({
       token: '',
       company: '企业名称'
     },
+    // 订单
+    order: currentOrder,
     wineryForm,
     imageDefine,
     navDefine,
@@ -42,9 +45,11 @@ export default new Vuex.Store({
     },
     setWineryForm(state, form) {
       state.wineryForm = form
+    },
+    setOrder(state, order) {
+      state.order = order
     }
   },
-
 
   actions: {
     setUserAction({ commit }, user) {
@@ -67,6 +72,9 @@ export default new Vuex.Store({
     },
     setWineryFormAction({ commit }, form) {
       commit('setWineryForm', form)
+    },
+    setOrderAction({commit}, order) {
+      commit('setOrder', order)
     }
 
   }

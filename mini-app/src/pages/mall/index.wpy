@@ -10,6 +10,7 @@
   width: 30px;
   height: 20px;
 }
+
 page {
   background-color: #F5F6F7;
 }
@@ -111,7 +112,7 @@ wepy.page({
   store,
   hooks: {},
 
-  mixins: [ defaultMix ],
+  mixins: [defaultMix],
   data: {
     pageIndex: 0
   },
@@ -126,7 +127,6 @@ wepy.page({
   methods: {
     ...mapActions([
       'setUserAction',
-      'setTokenAction',
       'setOpenidAction'
     ]),
     handleViewTap() {
@@ -143,49 +143,12 @@ wepy.page({
       this.pageIndex = event.$wx.detail
     },
     callAppLaunch() {
-    },
-    login() {
-      let self = this
-      wx.showLoading({ title: '正在连接...', mask: true })
-      wx.login({
-        success(res) {
-          let req = userApis.getSession(res.code)
-
-          req.then(rsp => {
-            if (rsp.data.openid) {
-              self.init(rsp.data.openid)
-            } else {
-              appManager.showToast('登录失败！' + res.errMsg)
-              wx.hideLoading()
-            }
-          }).catch(e => {
-            appManager.showToast('登录失败！' + res.errMsg)
-          })
-          // request.requestTaskMap.get(req.taskId).abort()
-          // console.log('中断请求,req:', req.taskId)
-        },
-        fail(res) {
-          appManager.showToast('登录失败,正在重试.')
-          wx.hideLoading()
-          self.login()
-        }
-      })
-    },
-    async init(openid) {
-      appManager.saveOpenid(openid)
-
-      let rsp = await userApis.loginByMini({ openid: openid })
-      if (rsp.token) {
-        this.setTokenAction(rsp.token)
-        appManager.setCacheInfo()
-      }
-
-      wx.hideLoading()
     }
+
   },
 
   ready() {
-    this.login()
+    appManager.login()
   },
   onShow() {
   }

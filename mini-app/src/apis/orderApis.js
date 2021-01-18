@@ -13,9 +13,9 @@ class OrderApis {
    * @param data
    * @returns {Promise实例对象}
    */
-  createOrders(data) {
+  createOrder(data) {
     return request.post({
-      url: baseUrl + 'winery/user_orders',
+      url: baseUrl + 'winery/order',
       data: data
     })
   }

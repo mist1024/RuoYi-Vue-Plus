@@ -192,6 +192,7 @@ import defaultMix from '../../../mixins/defaultMix'
 import orderApis from '../../../apis/orderApis'
 import appManager from '../../../appManager'
 import { navDefine } from '../../../store/constant/navDefine'
+import xiao4rApis from '../../../apis/xiao4rApis'
 
 wepy.component({
   store,
@@ -223,37 +224,35 @@ wepy.component({
       appManager.navigateTo(navDefine.SHOPPING_CAR_LIST)
       return
 
-      let test = {
-        goodsId: '12',
-        goodsName: 'test',
-        goodsType: '1',
-        goodsSpec: 'test',
-        goodsFaceImg: 'test',
-        goodsPrice: 0.1,
-        goodsCount: 1,
-        remark: 'test'
-      }
+      // xiao4rApis.test({
+      //
+      //   channel_bs: '28',
+      //   clientType: 'mini',
+      //   fee: '0.01',
+      //   kh: '29000051611',
+      //   openId: appManager.getOpenid(),
+      //   org_no: '29',
+      //   userId: '2475772'
+      //
+      // }).then(r => {
+      //   let payData = r.data.payMsg
+      //   wx.requestPayment({
+      //     appId: payData.appId,
+      //     timeStamp: payData.timeStamp,
+      //     nonceStr: payData.nonceStr,
+      //     package: payData.packageValue,
+      //     signType: payData.signType,
+      //     paySign: payData.paySign,
+      //     success: function(res) {
+      //
+      //     },
+      //     fail: function(res) {
+      //     }
+      //   })
+      // })
 
-      orderApis.createOrders(test).then(r => {
-        if (r.code !== 200) {
-          return
-        }
 
-        let payData = r.data.payMsg
-        wx.requestPayment({
-          appId: payData.appId,
-          timeStamp: payData.timeStamp,
-          nonceStr: payData.nonceStr,
-          package: payData.packageValue,
-          signType: payData.signType,
-          paySign: payData.paySign,
-          success: function(res) {
 
-          },
-          fail: function(res) {
-          }
-        })
-      })
     }
   },
 
