@@ -79,7 +79,7 @@ public class FtCateringDao extends FtCateringVo {
     private Integer isReplace;
 
     /**
-     * 作废标志
+     * 启用标志
      */
     private Boolean flag;
 
@@ -111,4 +111,8 @@ public class FtCateringDao extends FtCateringVo {
      */
     @Excel(name = "描述")
     private String cateringDescribe;
+
+    // 暂停标志
+    @Excel(name = "停餐")
+    private Integer suspendFlag;
 }
