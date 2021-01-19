@@ -95,6 +95,7 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
 
         FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
         foodDemandDao.setNutritionFoodFlag(false);
+        foodDemandDao.setOpenFlag(false);
 
         for (Long id : ids) {
             UpdateWrapper<FtCateringDao> wrapper = new UpdateWrapper<>();
@@ -152,6 +153,7 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
             FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
             foodDemandDao.setNutritionFoodId(cateringDao.getNumber());
             foodDemandDao.setNutritionFoodFlag(true);
+            foodDemandDao.setOpenFlag(true);
             QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
             wrapper.eq("patient_id", patientId);
             wrapper.eq("type", cateringDao.getType());
@@ -169,10 +171,20 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
         ftCateringDao.setUpdateAt(new Date());
         ftCateringDao.setSuspendFlag(true);
 
+        FtFoodDemandDao ftFoodDemandDao = new FtFoodDemandDao();
+        ftFoodDemandDao.setOpenFlag(true);
+        ftFoodDemandDao.setUpdateAt(new Date());
+
+
         for (Long id : ids) {
             UpdateWrapper<FtCateringDao> wrapper = new UpdateWrapper<>();
             wrapper.eq("patient_id", id);
             rows += this.baseMapper.update(ftCateringDao, wrapper);
+
+            // 更新该病患的报餐配置记录
+            UpdateWrapper<FtFoodDemandDao> foodDemandWrapper = new UpdateWrapper<>();
+            foodDemandWrapper.eq("patient_id", id);
+            foodDemandDaoService.update(ftFoodDemandDao, foodDemandWrapper);
         }
 
         return rows;
@@ -202,6 +214,7 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
             FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
             foodDemandDao.setNutritionFoodId(ftCateringDao.getNumber());
             foodDemandDao.setNutritionFoodFlag(ftCateringDao.getFlag());
+            foodDemandDao.setOpenFlag(ftCateringDao.getSuspendFlag());
             QueryWrapper<FtFoodDemandDao> foodDemandWrapper = new QueryWrapper<>();
             foodDemandWrapper.eq("patient_id", id);
             foodDemandWrapper.eq("type", i + 1);

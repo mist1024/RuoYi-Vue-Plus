@@ -22,6 +22,7 @@
         <result property="flag" column="flag"/>
         <result property="nutritionFoodId" column="nutrition_food_id"/>
         <result property="nutritionFoodFlag" column="nutrition_food_flag"/>
+        <result property="openFlag" column="open_flag"/>
     </resultMap>
 
     <select id="listNewFormatter" resultType="com.ruoyi.system.fantang.domain.FtFoodDemandDao">

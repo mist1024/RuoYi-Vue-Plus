@@ -25,6 +25,7 @@
         <result property="meat" column="meat"/>
         <result property="rice" column="rice"/>
         <result property="egg" column="egg"/>
+        <result property="openFlag" column="open_flag"/>
     </resultMap>
 
     <select id="listMealsWithInSettle" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">

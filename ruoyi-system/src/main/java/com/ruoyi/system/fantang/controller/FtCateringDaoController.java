@@ -190,17 +190,12 @@ public class FtCateringDaoController extends BaseController {
     @PutMapping("/paste")
     public AjaxResult paste(@RequestBody JSONObject params) {
 
-        System.out.println(params);
-
         List<Long> ids = params.getJSONArray("ids").toJavaList(Long.class);
-        
         List<FtCateringDao> ftCateringDaoList = params.getJSONArray("copyItem").toJavaList(FtCateringDao.class);
-
 
         for (Long id : ids) {
             iFtCateringDaoService.paste(id,ftCateringDaoList);
         }
-        
 
         return AjaxResult.success("已修改");
     }

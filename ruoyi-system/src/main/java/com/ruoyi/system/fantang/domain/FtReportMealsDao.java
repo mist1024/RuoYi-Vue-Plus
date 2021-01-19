@@ -136,4 +136,6 @@ public class FtReportMealsDao implements Serializable {
 
     @TableField(exist = false)
     private Integer total;
+    
+    private Boolean openFlag;
 }

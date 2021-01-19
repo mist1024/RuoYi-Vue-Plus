@@ -88,6 +88,7 @@ public class FtFoodDemandDaoServiceImpl extends ServiceImpl<FtFoodDemandDaoMappe
             FtFoodDemandDao foodDemand = foodDemandList.get(i);
             foodDemand.setNutritionFoodId(ftCateringList.get(i).getNumber());
             foodDemand.setNutritionFoodFlag(ftCateringList.get(i).getFlag());
+            foodDemand.setOpenFlag(true);
             foodDemand.setUpdateAt(new Date());
             rows += this.baseMapper.updateById(foodDemand);
         }

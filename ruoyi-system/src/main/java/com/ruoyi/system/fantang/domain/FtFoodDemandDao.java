@@ -132,4 +132,6 @@ public class FtFoodDemandDao extends BasePatient implements Serializable {
      */
     @TableField(exist = false)
     private String nutritionFood;
+    
+    private Boolean openFlag;
 }
