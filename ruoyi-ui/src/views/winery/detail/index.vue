@@ -46,14 +46,8 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="明细状态:
-5.退款申请
-6.退款中
-7.退款成功" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择明细状态:
-5.退款申请
-6.退款中
-7.退款成功" clearable size="small">
+      <el-form-item label="明细状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择明细状态" clearable size="small">
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
@@ -130,10 +124,7 @@
       <el-table-column label="订单ID" align="center" prop="orderId" />
       <el-table-column label="商品ID" align="center" prop="goodsId" />
       <el-table-column label="商品数量" align="center" prop="goodsCount" />
-      <el-table-column label="明细状态:
-5.退款申请
-6.退款中
-7.退款成功" align="center" prop="status" />
+      <el-table-column label="明细状态" align="center" prop="status" />
       <el-table-column label="统一退单号" align="center" prop="refundNo" />
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template slot-scope="scope">
@@ -159,7 +150,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -186,10 +177,7 @@
         <el-form-item label="商品数量" prop="goodsCount">
           <el-input v-model="form.goodsCount" placeholder="请输入商品数量" />
         </el-form-item>
-        <el-form-item label="明细状态:
-5.退款申请
-6.退款中
-7.退款成功">
+        <el-form-item label="明细状态">
           <el-radio-group v-model="form.status">
             <el-radio label="1">请选择字典生成</el-radio>
           </el-radio-group>
@@ -268,10 +256,7 @@ export default {
           { required: true, message: "商品ID不能为空", trigger: "blur" }
         ],
         status: [
-          { required: true, message: "明细状态:
-5.退款申请
-6.退款中
-7.退款成功不能为空", trigger: "blur" }
+          { required: true, message: "明细状态不能为空", trigger: "blur" }
         ],
         createTime: [
           { required: true, message: "创建时间不能为空", trigger: "blur" }
