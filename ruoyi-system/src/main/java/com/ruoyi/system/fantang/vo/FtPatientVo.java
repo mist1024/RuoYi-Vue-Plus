@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 public class FtPatientVo extends FtPatientDao {
 
+    @TableField(exist = false)
+    private Boolean openFlag;
     List<FtReportMealsDao> reportMealsList;
 
 }

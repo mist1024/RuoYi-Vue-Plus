@@ -32,7 +32,8 @@
                c.vegetables,
                c.meat,
                c.rice,
-               c.egg
+               c.egg,
+               c.open_flag
         from ft_patient a
                  LEFT JOIN ft_depart b on a.depart_id = b.depart_id
                  RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
@@ -45,6 +46,7 @@
         <result property="departName" column="depart_name"></result>
         <result property="bedId" column="bed_id"></result>
         <result property="hospitalId" column="hospital_id"></result>
+        <result property="openFlag" column="open_flag"></result>
         <collection property="reportMealsList" ofType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
             <result property="id" column="id"></result>
             <result property="createAt" column="create_at"></result>
@@ -81,7 +83,8 @@
                c.vegetables,
                c.meat,
                c.rice,
-               c.egg
+               c.egg,
+               c.open_flag
         from ft_patient a
                  LEFT JOIN ft_depart b on a.depart_id = b.depart_id
                  RIGHT JOIN ft_report_meals c on a.patient_id = c.patient_id
