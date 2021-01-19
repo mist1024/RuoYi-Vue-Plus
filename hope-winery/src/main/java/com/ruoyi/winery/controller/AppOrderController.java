@@ -222,7 +222,7 @@ public class AppOrderController extends BaseController {
     }
 
     @Log(title = "回调", businessType = BusinessType.OTHER)
-    @PostMapping("/payNotify")
+    @PostMapping("/pay/payNotify")
     String payNotify(@RequestBody String xmlData) throws WxPayException {
         WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
         // TODO 根据自己业务场景需要构造返回对象
