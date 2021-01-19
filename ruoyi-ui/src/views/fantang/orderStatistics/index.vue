@@ -169,18 +169,21 @@ export default {
       if (this.selectType === 1 || this.selectType === '1') {
         getStatisGetOrderOfDay(this.queryParams).then(response => {
           console.log(response)
-          this.orderCountList = response.data;
+          this.orderCountList = response.data.records;
+          this.total = response.data.total;
           this.selectType = 1;
         })
       } else if (this.selectType === 2 || this.selectType === '2') {
         getStatisGetOrderOfWeek(this.queryParams).then(response => {
           console.log(response)
-          this.orderCountList = response.data;
+          this.orderCountList = response.data.records;
+          this.total = response.data.total;
           this.selectType = 2;
         })
       } else if (this.selectType === 3 || this.selectType === '3') {
         getStatisGetOrderOfMonth(this.queryParams).then(response => {
-          this.orderCountList = response.data;
+          this.orderCountList = response.data.records;
+          this.total = response.data.total;
           this.selectType = 3;
         })
       }
@@ -218,7 +221,8 @@ export default {
         this.queryParams.selectMonth = this.formMonth.selectMonth;
         this.queryParams.statisticsType = this.formMonth.statisticsType;
         getStatisGetOrderOfMonth(this.queryParams).then(response => {
-          this.orderCountList = response.data;
+          this.orderCountList = response.data.records;
+          this.total = response.data.total;
           this.selectType = 3;
         })
       }
@@ -233,7 +237,8 @@ export default {
         this.queryParams.statisticsType = this.formWeek.statisticsType;
         getStatisGetOrderOfWeek(this.queryParams).then(response => {
           console.log(response)
-          this.orderCountList = response.data;
+          this.orderCountList = response.data.records;
+          this.total = response.data.total;
           this.selectType = 2;
         })
       }
@@ -248,7 +253,8 @@ export default {
         this.queryParams.statisticsType = this.formDay.statisticsType;
         getStatisGetOrderOfDay(this.queryParams).then(response => {
           console.log(response)
-          this.orderCountList = response.data;
+          this.orderCountList = response.data.records;
+          this.total = response.data.total;
           this.selectType = 1;
         })
       }

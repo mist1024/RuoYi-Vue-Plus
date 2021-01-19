@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
@@ -34,17 +35,17 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
 
     AjaxResult cancelStopOrder(Long orderId);
 
-    AjaxResult statisGetOrderOfDate(Date date);
+    IPage<FtOrderDao> statisGetOrderOfDate(Date date, Integer pageNum, Integer pageSize);
 
-    AjaxResult statisGetOrderOfDateByPerson(Date date, Integer pageNum, Integer pageSize);
+    IPage<FtOrderDao> statisGetOrderOfDateByPerson(Date date, Integer pageNum, Integer pageSize);
 
-    AjaxResult statisGetOrderOfWeek(Date date);
+    IPage<FtOrderDao> statisGetOrderOfWeek(Date date, Integer pageNum, Integer pageSize);
 
-    AjaxResult statisGetOrderOfWeekByPerson(Date date, Integer pageNum, Integer pageSize);
+    IPage<FtOrderDao> statisGetOrderOfWeekByPerson(Date date, Integer pageNum, Integer pageSize);
 
-    AjaxResult statisGetOrderOfMonth(Date date);
+    IPage<FtOrderDao> statisGetOrderOfMonth(Date date, Integer pageNum, Integer pageSize);
 
-    AjaxResult statisGetOrderOfMonthByPerson(Date date, Integer pageNum, Integer pageSize);
+    IPage<FtOrderDao> statisGetOrderOfMonthByPerson(Date date, Integer pageNum, Integer pageSize);
 
     List<FtOrderDao> listDetailedByDate(Integer orderType, String start, String end);
 

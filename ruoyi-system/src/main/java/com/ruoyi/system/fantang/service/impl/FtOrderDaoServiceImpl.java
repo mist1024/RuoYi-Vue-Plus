@@ -2,6 +2,8 @@ package com.ruoyi.system.fantang.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
@@ -132,36 +134,39 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     }
 
     @Override
-    public AjaxResult statisGetOrderOfDate(Date date) {
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDate(DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString()));
+    public IPage<FtOrderDao> statisGetOrderOfDate(Date date, Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.statisGetOrderOfDate(page, DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString());
     }
 
     @Override
-    public AjaxResult statisGetOrderOfDateByPerson(Date date, Integer pageNum, Integer pageSize) {
-        Integer offset = (pageNum - 1) * pageSize;
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString(), offset, pageSize));
+    public IPage<FtOrderDao> statisGetOrderOfDateByPerson(Date date, Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.statisGetOrderOfDateByPerson(page, DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString());
     }
 
     @Override
-    public AjaxResult statisGetOrderOfWeek(Date date) {
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDate(DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString()));
+    public IPage<FtOrderDao> statisGetOrderOfWeek(Date date, Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.statisGetOrderOfDate(page, DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString());
     }
 
     @Override
-    public AjaxResult statisGetOrderOfWeekByPerson(Date date, Integer pageNum, Integer pageSize) {
-        Integer offset = (pageNum - 1) * pageSize;
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString(), offset, pageSize));
+    public IPage<FtOrderDao> statisGetOrderOfWeekByPerson(Date date, Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.statisGetOrderOfDateByPerson(page, DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString());
     }
 
     @Override
-    public AjaxResult statisGetOrderOfMonth(Date date) {
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDate(DateUtil.beginOfMonth(date).toString(), DateUtil.endOfMonth(date).toString()));
+    public IPage<FtOrderDao> statisGetOrderOfMonth(Date date, Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.statisGetOrderOfDate(page, DateUtil.beginOfMonth(date).toString(), DateUtil.endOfMonth(date).toString());
     }
 
     @Override
-    public AjaxResult statisGetOrderOfMonthByPerson(Date date, Integer pageNum, Integer pageSize) {
-        Integer offset = (pageNum - 1) * pageSize;
-        return AjaxResult.success(this.baseMapper.statisGetOrderOfDateByPerson(DateUtil.beginOfMonth(date).toString(), DateUtil.endOfMonth(date).toString(), offset, pageSize));
+    public IPage<FtOrderDao> statisGetOrderOfMonthByPerson(Date date, Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.statisGetOrderOfDateByPerson(page, DateUtil.beginOfMonth(date).toString(), DateUtil.endOfMonth(date).toString());
     }
 
     @Override

@@ -137,9 +137,9 @@ public class FtOrderDaoController extends BaseController {
         Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
-            return iFtOrderDaoService.statisGetOrderOfDate(selectDay);
+            return  AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDate(selectDay, pageNum, pageSize));
         } else {
-            return iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay, pageNum, pageSize);
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay, pageNum, pageSize));
         }
     }
 
@@ -155,9 +155,9 @@ public class FtOrderDaoController extends BaseController {
         Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
-            return iFtOrderDaoService.statisGetOrderOfWeek(selectWeek);
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfWeek(selectWeek, pageNum, pageSize));
         } else {
-            return iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek, pageNum, pageSize);
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek, pageNum, pageSize));
         }
 
     }
@@ -174,9 +174,9 @@ public class FtOrderDaoController extends BaseController {
         Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
-            return iFtOrderDaoService.statisGetOrderOfMonth(selectMonth);
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfMonth(selectMonth, pageNum, pageSize));
         }else {
-            return iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth, pageNum, pageSize);
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth, pageNum, pageSize));
         }
     }
 }

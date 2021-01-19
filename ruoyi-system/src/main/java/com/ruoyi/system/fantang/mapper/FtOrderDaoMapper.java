@@ -1,6 +1,8 @@
 package com.ruoyi.system.fantang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.domain.FtStaffDemandDao;
@@ -26,7 +28,7 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
             "    LEFT JOIN ft_staff_info b on a.staff_id = b.staff_id\n" +
             "    LEFT JOIN ft_depart c on b.depart_id = c.depart_id where b.depart_id = c.depart_id and a.order_date BETWEEN #{start} and #{end}\n" +
             "    GROUP BY a.order_type, c.depart_name")
-    List<FtOrderDao> statisGetOrderOfDate(@Param("start") String start, @Param("end") String end);
+    IPage<FtOrderDao>  statisGetOrderOfDate(Page<FtOrderDao> page, @Param("start") String start, @Param("end") String end);
 
     @Select("SELECT\n" +
             "\ta.order_type,\n" +
@@ -46,8 +48,8 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
             "\ta.order_type,\n" +
             "\tc.depart_name,\n" +
             "\tb.`name`,\n" +
-            "\tb.tel limit  #{offset} , #{pageSize}")
-    List<FtOrderDao> statisGetOrderOfDateByPerson(@Param("start") String start, @Param("end") String end, @Param("offset") Integer offset, @Param("pageSize") Integer pageSize);
+            "\tb.tel")
+    IPage<FtOrderDao> statisGetOrderOfDateByPerson(Page<FtOrderDao> page, @Param("start") String start, @Param("end") String end);
 
     List<FtOrderDao> listDetailedByDate(@Param("orderType") Integer orderType, @Param("start") String start, @Param("end") String end);
 

@@ -287,7 +287,7 @@ public class ClientController extends BaseController {
 
     @GetMapping("/StatisGetOrderOfDate")
     public AjaxResult statisGetOrderOfDate(@RequestParam Date date) {
-        return orderDaoService.statisGetOrderOfDate(date);
+        return AjaxResult.success(orderDaoService.statisGetOrderOfDate(date,1 ,50));
     }
 
     /**
@@ -532,7 +532,7 @@ public class ClientController extends BaseController {
 
         Date today = new Date();
 
-        return orderDaoService.statisGetOrderOfDate(today);
+        return AjaxResult.success(orderDaoService.statisGetOrderOfDate(today, 1, 100));
     }
 
     /**
