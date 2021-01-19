@@ -1,5 +1,6 @@
 export const shoppingCarList = '/pages/mall/shopping-car/shopping-car-list'
 export const orderListPage = '/pages/mall/order/order-list'
+export const orderDetailListPage = '/pages/mall/order/order-detail-list'
 export const orderCheck = '/pages/mall/order/order-check'
 export const userAddressListPage = '/pages/mall/user/user-address-list'
 export const goodsDetailPage = '/pages/mall/goods/goods-detail'

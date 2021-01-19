@@ -11,28 +11,23 @@ module.exports.parseImage = parseImage;
 </wxs>
 <template>
 
-  <nav-bar title="我的订单" />
+  <nav-bar title="退款记录" />
 
 
   <div style="width: 100%;">
 
 
     <van-tabs active="{{ activeTab }}" bind:change="onChangeTab">
-      <van-tab title="全部">
-        <order-list-body />
+      <van-tab title="退款成功">
+        <order-detail-list-body status="3"  />
       </van-tab>
-      <van-tab title="待支付">
-        <order-list-body status="0" />
+      <van-tab title="退款申请">
+        <order-detail-list-body status="1" />
       </van-tab>
-      <van-tab title="待收货">
-        <order-list-body status="2" />
+      <van-tab title="退款中">
+        <order-detail-list-body status="2" />
       </van-tab>
-      <van-tab title="交易完成">
-        <order-list-body status="3" />
-      </van-tab>
-      <van-tab title="已取消">
-        <order-list-body status="1" />
-      </van-tab>
+
     </van-tabs>
 
 
@@ -76,21 +71,7 @@ wepy.page({
       this.activeTab = e.$wx.detail.index
     },
     async init() {
-      // this.isInit = false
-      // const req = await orderApis.getOrderList()
-      //
-      // if (req.code === 200) {
-      //   this.records = req.rows
-      // }
-      //
-      // this.isInit = true
-    }
-  },
 
-  onLoad(options) {
-
-    if (options.orderStatus) {
-      this.activeTab = Number(options.orderStatus)
     }
   },
 
@@ -107,8 +88,7 @@ wepy.page({
 navigationBarTitleText: '',
 
 usingComponents: {
-'order-list-body': '../../../components/mall/order/order-list-body',
-'order-detail-body': '../../../components/mall/order/order-detail-body'
+'order-detail-list-body': '../../../components/mall/order/order-detail-list-body',
 }
 
 

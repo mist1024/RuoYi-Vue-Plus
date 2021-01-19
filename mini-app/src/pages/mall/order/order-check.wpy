@@ -42,7 +42,7 @@ module.exports.parseImage = parseImage;
         </div>
       </div>
 
-      <div v-else class="fream" @tap="onSelectAddress">
+      <div v-else class="fream" >
 
         <div style="display: flex; justify-content: space-between;">
           <van-icon name="home-o" size="60rpx" />
@@ -56,7 +56,7 @@ module.exports.parseImage = parseImage;
               <span style="margin-top: 5px;">{{currentAddress.address}}</span>
             </div>
           </div>
-          <van-icon name="arrow" />
+          <van-icon name="arrow" @tap="onSelectAddress" />
         </div>
 
         <div style="display: flex; justify-content:flex-end;margin: 10px;">

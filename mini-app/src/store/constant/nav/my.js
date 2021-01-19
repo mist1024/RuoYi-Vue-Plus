@@ -1,5 +1,5 @@
 import { imgbaseUrl } from '../../../baseDefine'
-import { orderListPage, userAddressListPage } from './pages'
+import { orderDetailListPage, orderListPage, userAddressListPage } from './pages'
 
 
 export const myMenuList1 = [
@@ -25,9 +25,9 @@ export const myMenuList2 = [
     path: userAddressListPage
   },
   {
-    name: '发票管理',
+    name: '退款管理',
     icon: imgbaseUrl + 'doctor.png',
-    path: ''
+    path: orderDetailListPage
   }, {
     name: '优惠券',
     icon: imgbaseUrl + 'doctor.png',

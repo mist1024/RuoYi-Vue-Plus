@@ -24,13 +24,11 @@ module.exports.parseImage = parseImage;
 
       <div v-for="(item,index) in records"  style="width: 100%;">
         <van-card
-          :num="item.goodsPrice"
-          tag="标签"
-          price="10.00"
-          desc="描述信息"
-          :title="item.goodsName"
-          :thumb="filters.parseImage(item.goodsFaceImg)"
-
+          :num="item.goodsCount"
+          :price="item.goodsCount * item.goods.goodsPrice"
+          :desc="item.goods.goodsAlias"
+          :title="item.goods.goodsName"
+          :thumb="filters.parseImage(item.goods.goodsFaceImg)"
         >
           <view slot="footer">
             <van-button size="mini" plain @tap="onRefund(item)">申请退款</van-button>

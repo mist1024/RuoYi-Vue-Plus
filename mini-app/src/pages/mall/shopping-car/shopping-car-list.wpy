@@ -130,6 +130,11 @@ wepy.page({
       this.isCheckedAll = this.checkList.length === this.shoppingCar.length
     },
     onSubmit() {
+      if (this.shoppingCar.length < 1) {
+        appManager.showToast('购物车中没有商品.')
+        return
+      }
+
       let order = {
         addressId: '',
         orderDetailList: [],

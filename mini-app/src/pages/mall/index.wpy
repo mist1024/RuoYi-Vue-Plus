@@ -29,7 +29,7 @@ module.exports.getTime = getTime;
 </wxs>
 <template>
   <van-tabbar active="{{ pageIndex }}" bind:change="onChange" fixed active-color="#AC1630">
-    <van-tabbar-item info="3" >
+    <van-tabbar-item  >
       <image
         slot="icon"
         :src="imageDefine.TAP_BAR_ICON1_OFF"
@@ -44,7 +44,7 @@ module.exports.getTime = getTime;
       />
       首页
     </van-tabbar-item>
-    <van-tabbar-item info="3">
+    <van-tabbar-item >
       <image
         slot="icon"
         :src="imageDefine.TAP_BAR_ICON2_OFF"
@@ -59,7 +59,7 @@ module.exports.getTime = getTime;
       />
       福利购
     </van-tabbar-item>
-    <van-tabbar-item info="3">
+    <van-tabbar-item >
       <image
         slot="icon"
         :src="imageDefine.TAP_BAR_ICON3_OFF"
@@ -74,7 +74,7 @@ module.exports.getTime = getTime;
       />
       紫环会
     </van-tabbar-item>
-    <van-tabbar-item info="3">
+    <van-tabbar-item >
       <image
         slot="icon"
         :src="imageDefine.TAP_BAR_ICON4_OFF"

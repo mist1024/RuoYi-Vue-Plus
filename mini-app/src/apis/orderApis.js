@@ -1,4 +1,3 @@
-
 import request from '../js/request'
 import { baseUrl } from '../baseDefine'
 
@@ -28,6 +27,13 @@ class OrderApis {
   refundOrder(id) {
     return request.post({
       url: baseUrl + 'winery/detail/refund/' + id
+    })
+  }
+
+  getOrderDetailList(data) {
+    return request.get({
+      url: baseUrl + 'winery/detail/list',
+      data: data
     })
   }
 }
