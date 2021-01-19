@@ -4,6 +4,8 @@ import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
@@ -217,5 +219,13 @@ public class AppOrderController extends BaseController {
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(iAppOrderService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    }
+
+    @Log(title = "回调", businessType = BusinessType.OTHER)
+    @PostMapping("/payNotify")
+    String payNotify(@RequestBody String xmlData) throws WxPayException {
+        WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
+        // TODO 根据自己业务场景需要构造返回对象
+        return WxPayNotifyResponse.success("成功");
     }
 }

@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="商户名称" prop="name">
+      <el-form-item label="商户名称" prop="mchName">
         <el-input
-          v-model="queryParams.name"
+          v-model="queryParams.mchName"
           placeholder="请输入商户名称"
           clearable
           size="small"
@@ -28,9 +28,9 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="介绍" prop="desc">
+      <el-form-item label="介绍" prop="mchDesc">
         <el-input
-          v-model="queryParams.desc"
+          v-model="queryParams.mchDesc"
           placeholder="请输入介绍"
           clearable
           size="small"
@@ -88,10 +88,10 @@
     <el-table v-loading="loading" :data="merchantList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="商户名称" align="center" prop="name" />
+      <el-table-column label="商户名称" align="center" prop="mchName" />
       <el-table-column label="副标题" align="center" prop="subtitle" />
       <el-table-column label="图标" align="center" prop="avatar" />
-      <el-table-column label="介绍" align="center" prop="desc" />
+      <el-table-column label="介绍" align="center" prop="mchDesc" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -111,7 +111,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -123,8 +123,8 @@
     <!-- 添加或修改商户对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商户名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入商户名称" />
+        <el-form-item label="商户名称" prop="mchName">
+          <el-input v-model="form.mchName" placeholder="请输入商户名称" />
         </el-form-item>
         <el-form-item label="副标题" prop="subtitle">
           <el-input v-model="form.subtitle" placeholder="请输入副标题" />
@@ -132,8 +132,8 @@
         <el-form-item label="图标" prop="avatar">
           <el-input v-model="form.avatar" placeholder="请输入图标" />
         </el-form-item>
-        <el-form-item label="介绍" prop="desc">
-          <el-input v-model="form.desc" placeholder="请输入介绍" />
+        <el-form-item label="介绍" prop="mchDesc">
+          <el-input v-model="form.mchDesc" placeholder="请输入介绍" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -175,10 +175,10 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        name: undefined,
+        mchName: undefined,
         subtitle: undefined,
         avatar: undefined,
-        desc: undefined,
+        mchDesc: undefined,
       },
       // 表单参数
       form: {},
@@ -209,10 +209,10 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        name: undefined,
+        mchName: undefined,
         subtitle: undefined,
         avatar: undefined,
-        desc: undefined,
+        mchDesc: undefined,
         createTime: undefined,
         updateTime: undefined
       };
