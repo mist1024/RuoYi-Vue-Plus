@@ -27,13 +27,13 @@ module.exports.parseImage = parseImage;
     </van-row>
 
 
-        <div style="display: flex;flex-wrap: wrap;">
-          <div class="filter-button" v-for="(item,index) in filterButtons">
-            <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "
-                        :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}
-            </van-button>
-          </div>
-        </div>
+    <div style="display: flex;flex-wrap: wrap;">
+      <div class="filter-button" v-for="(item,index) in filterButtons">
+        <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "
+                    :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}
+        </van-button>
+      </div>
+    </div>
 
 
     <view v-for="(item, index) in records" :key="index"
@@ -45,9 +45,9 @@ module.exports.parseImage = parseImage;
         :thumb="filters.parseImage(item.goodsFaceImg)"
         @tap="onItem(item)"
       >
-<!--        <view slot="num" style="float:right;">-->
-<!--          <div>{{'已优惠¥xx元'}}</div>-->
-<!--        </view>-->
+        <!--        <view slot="num" style="float:right;">-->
+        <!--          <div>{{'已优惠¥xx元'}}</div>-->
+        <!--        </view>-->
 
       </van-card>
 
@@ -66,6 +66,7 @@ import { mapActions, mapState } from '@wepy/x'
 import appManager from '../../../appManager'
 import mailApis from '../../../apis/mailApis'
 import defaultMix from '../../../mixins/defaultMix'
+import { goodsDetailPage } from '../../../store/constant/nav/pages'
 
 wepy.component({
   store,
@@ -90,7 +91,7 @@ wepy.component({
   methods: {
 
     onItem(item) {
-      appManager.navigateTo(`goods-detail?id=${item.id}`)
+      appManager.navigateTo(goodsDetailPage + `?id=${item.id}`)
     },
 
     onFilterBtn(item) {

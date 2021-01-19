@@ -6,8 +6,6 @@ import { baseUrl } from '../baseDefine'
  * 订单相关接口
  */
 class OrderApis {
-
-
   /**
    * 创建订单
    * @param data
@@ -22,11 +20,16 @@ class OrderApis {
 
   getOrderList(data) {
     return request.get({
-      url: baseUrl + 'winery/user_orders/list',
+      url: baseUrl + 'winery/order/list',
       data: data
     })
   }
 
+  refundOrder(id) {
+    return request.post({
+      url: baseUrl + 'winery/detail/refund/' + id
+    })
+  }
 }
 
 export default new OrderApis()

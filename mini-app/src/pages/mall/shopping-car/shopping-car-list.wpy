@@ -20,17 +20,16 @@ module.exports.parseImage = parseImage;
     <view wx:else>
 
 
-      <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+      <div v-if="shoppingCar.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
         <van-empty description="暂无内容" />
       </div>
 
       <van-checkbox-group value="{{ checkList }}" bind:change="onChangeCheckbox">
-        <div v-for="(item,index) in records" style="width: 100%;">
+        <div v-for="(item,index) in shoppingCar" style="width: 100%;">
 
           <van-card
-            :num="item.goodsCount"
             :price="item.goodsPrice"
-            desc="描述信息"
+            :desc="item.remark"
             :title="item.goodsName"
 
           >
@@ -40,8 +39,12 @@ module.exports.parseImage = parseImage;
               <van-image width="60px" height="60px" :src="filters.parseImage(item.goodsFaceImg)"
                          style="margin-left: 5px;" />
             </view>
-            <view slot="footer">
-              <van-stepper id="{{item.id}}" name="{{item.id}}" value="{{item.goodsCount}}" @change="onGoodsCount" />
+            <view slot="num">
+              <div style="display: flex;align-items: center;justify-content: flex-end;">
+                <span style="font-size: 15px;margin-right: 5px;">数量:</span>
+                <van-stepper id="{{item.goodsId}}" name="{{item.goodsId}}" value="{{item.goodsCount}}"
+                             @change="onGoodsCount" />
+              </div>
             </view>
           </van-card>
 
@@ -81,14 +84,14 @@ import store from '@/store'
 
 import { mapActions, mapState } from '@wepy/x'
 import defaultMix from '../../../mixins/defaultMix'
-import orderApis from '../../../apis/orderApis'
+import { navDefine } from '../../../store/constant/navDefine'
+import appManager from '../../../appManager'
 
 wepy.page({
   store,
   hooks: {},
   data: {
 
-    records: [],
     isInit: false,
     isCheckedAll: true,
     checkList: []
@@ -100,13 +103,15 @@ wepy.page({
       'imageDefine': state => state.imageDefine,
       'user': state => state.user,
       'navDefine': state => state.navDefine,
-      'userAddress': state => state.userAddress
+      'userAddress': state => state.userAddress,
+      'shoppingCar': state => state.shoppingCar
+
     }),
     totalPrice() {
-      let temp = this.records.filter(x => this.checkList.indexOf(x.goodsId) > -1)
+      let temp = this.shoppingCar.filter(x => this.checkList.indexOf(x.goodsId) > -1)
       let result = 0.0
       temp.forEach(x => {
-        result += x.goodsPrice
+        result += (x.goodsPrice * x.goodsCount)
       })
       console.log('总计：', result)
       return result * 100
@@ -115,30 +120,39 @@ wepy.page({
   events: {},
 
   methods: {
+    ...mapActions([
+      'setOrderAction',
+      'setShoppingCarAction'
+    ]),
 
     onChangeCheckbox(e) {
       this.checkList = e.$wx.detail
-      this.isCheckedAll = this.checkList.length === this.records.length
+      this.isCheckedAll = this.checkList.length === this.shoppingCar.length
     },
     onSubmit() {
+      let order = {
+        addressId: '',
+        orderDetailList: [],
+        remark: ''
+      }
 
+      order.orderDetailList = this.shoppingCar
+
+      this.setOrderAction(order)
+
+      appManager.navigateTo(navDefine.ORDER_CHECK)
     },
     onCheckedAll(e) {
       this.isCheckedAll = e.$wx.detail
-      this.checkList = this.isCheckedAll ? this.records.map(x => x.goodsId) : []
+      this.checkList = this.isCheckedAll ? this.shoppingCar.map(x => x.goodsId) : []
     },
     onGoodsCount(e) {
-      this.records.filter(x => x.id === e.target.id)[0].goodsCount = e.$wx.detail
+      this.shoppingCar.filter(x => x.goodsId === e.target.id)[0].goodsCount = e.$wx.detail
+      this.setShoppingCarAction(this.shoppingCar)
     },
     async init() {
       this.isInit = false
-      const req = await orderApis.getOrderList()
-
-      if (req.code === 200) {
-        this.records = req.rows
-        this.checkList = this.records.map(x => x.goodsId)
-      }
-
+      this.checkList = this.shoppingCar.map(x => x.goodsId)
       this.isInit = true
     }
   },
@@ -156,7 +170,6 @@ wepy.page({
 navigationBarTitleText: '',
 
 usingComponents: {
-'shopping-car-item': '../../../components/mall/shopping-car/shopping-car-item'
 }
 
 

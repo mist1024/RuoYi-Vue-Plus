@@ -21,17 +21,17 @@ module.exports.parseImage = parseImage;
       <van-tab title="全部">
         <order-list-body />
       </van-tab>
-      <van-tab title="待付款">
-        <order-list-body />
+      <van-tab title="待支付">
+        <order-list-body status="0" />
       </van-tab>
       <van-tab title="待收货">
-        <order-list-body />
+        <order-list-body status="2" />
       </van-tab>
-      <van-tab title="已完成">
-        <order-list-body />
+      <van-tab title="交易完成">
+        <order-list-body status="3"  />
       </van-tab>
       <van-tab title="已取消">
-        <order-list-body />
+        <order-list-body status="1" />
       </van-tab>
     </van-tabs>
 
@@ -73,7 +73,7 @@ wepy.page({
   methods: {
 
     onChangeTab(e) {
-      this.activeTab = e.$wx.event.detail.name
+      this.activeTab = e.$wx.detail.index
     },
     async init() {
       // this.isInit = false
@@ -100,7 +100,8 @@ wepy.page({
 navigationBarTitleText: '',
 
 usingComponents: {
-'order-list-body': '../../../components/mall/order/order-list-body'
+'order-list-body': '../../../components/mall/order/order-list-body',
+'order-detail-body': '../../../components/mall/order/order-detail-body'
 }
 
 

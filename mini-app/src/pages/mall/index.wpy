@@ -28,8 +28,8 @@ return `${hour}:${mins}:${sec}.${milli}`;
 module.exports.getTime = getTime;
 </wxs>
 <template>
-  <van-tabbar active="{{ pageIndex }}" bind:change="onChange" fixed>
-    <van-tabbar-item info="3">
+  <van-tabbar active="{{ pageIndex }}" bind:change="onChange" fixed active-color="#AC1630">
+    <van-tabbar-item info="3" >
       <image
         slot="icon"
         :src="imageDefine.TAP_BAR_ICON1_OFF"

@@ -102,7 +102,7 @@ pages: [
 'pages/form5',
 'pages/form6',
 
-'pages/mall/goods-detail',
+'pages/mall/goods/goods-detail',
 'pages/mall/user/user-address',
 'pages/mall/user/user-address-list',
 'pages/mall/order/order-list',

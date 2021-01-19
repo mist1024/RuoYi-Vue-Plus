@@ -4,7 +4,6 @@ import { imageDefine } from './constant/imageDefine'
 import { navDefine } from './constant/navDefine'
 import { wineryDefine } from './constant/wineryDefine'
 import { userAddress } from './constant/userAddress'
-import { currentOrder } from './constant/orderDefine'
 
 export default new Vuex.Store({
   state: {
@@ -19,7 +18,9 @@ export default new Vuex.Store({
       company: '企业名称'
     },
     // 订单
-    order: currentOrder,
+    order: {},
+    // 购物车
+    shoppingCar: [],
     wineryForm,
     imageDefine,
     navDefine,
@@ -48,6 +49,11 @@ export default new Vuex.Store({
     },
     setOrder(state, order) {
       state.order = order
+    },
+    setShoppingCar(state, shoppingCar) {
+
+      state.shoppingCar = shoppingCar
+
     }
   },
 
@@ -75,6 +81,10 @@ export default new Vuex.Store({
     },
     setOrderAction({commit}, order) {
       commit('setOrder', order)
+    },
+    setShoppingCarAction({commit}, shoppingCar) {
+      wx.setStorageSync('shoppingCar', shoppingCar)
+      commit('setShoppingCar', shoppingCar)
     }
 
   }

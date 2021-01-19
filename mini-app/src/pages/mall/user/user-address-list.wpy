@@ -82,7 +82,7 @@
         />
 
         <div style="display: flex; justify-content:flex-end;margin: 10px;">
-          <van-button round v-if="item.isDefault !== 1" color="#98002E" size="small" type="info" plain
+          <van-button round v-if="item.isDefault !== 1 && !isSelectMode" color="#98002E" size="small" type="info" plain
                       @tap="onSetDefault(item)">设为默认
           </van-button>
           <van-button round size="small" color="#98002E" type="info" plain style="margin-left: 20px;"

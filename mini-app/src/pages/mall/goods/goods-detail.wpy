@@ -1,5 +1,9 @@
 <style lang="less">
 
+img {
+  width: 100%;
+  display: block;
+}
 
 </style>
 
@@ -17,13 +21,13 @@ module.exports.parseImage = parseImage;
 
     <van-loading v-if="!goodsItem" style="margin-top: 20px;" />
 
-    <div v-else>
+    <div v-else style="margin-bottom: 80px;">
 
       <swiper indicator-dots="true" autoplay="true" interval="3000" style="height: 750rpx;">
         <block v-for="(item,index) in goodsImages" wx:key="index">
           <swiper-item>
             <view class="swiper-item">
-              <image :src="filters.parseImage(item)" style="width: 100%;height: 750rpx;" mode="scaleToFill" />
+              <image :src="filters.parseImage(item)" style="width: 100%;height: 750rpx;" mode="aspectFit" />
             </view>
           </swiper-item>
         </block>
@@ -36,8 +40,9 @@ module.exports.parseImage = parseImage;
 
       <div style="margin: 10px 15px;">
         <span>商品详情</span>
-        <div style="margin-top: 10px;">
+        <div style="margin-top: 10px;width:100%;">
           <rich-text :nodes="goodsItem.goodsDesc" />
+
         </div>
       </div>
 
@@ -76,16 +81,16 @@ module.exports.parseImage = parseImage;
         </van-row>
 
         <van-button round type="danger" size="small" style="float:right;margin-top:10px;margin-right: 10px;"
-                    @tap="onSubmit()">下一步
+                    @tap="onSubmit">下一步
         </van-button>
 
       </van-popup>
 
       <van-goods-action>
-        <van-goods-action-icon icon="cart-o" text="购物车" info="5" />
-        <van-goods-action-icon icon="shop-o" text="酒庄" />
-        <van-goods-action-button color="#be99ff" text="加入购物车" type="warning" @tap="onShowSpec" />
-        <van-goods-action-button color="#7232dd" text="立即购买" @tap="onShowSpec" />
+        <van-goods-action-icon icon="cart-o" text="购物车" :info="shoppingCar.length" @tap="onShppingCar" />
+        <van-goods-action-icon icon="shop-o" text="酒庄" @tap="onWinery" />
+        <van-goods-action-button color="#be99ff" text="加入购物车" type="warning" @tap="onShowSpec('shoppingCar')" />
+        <van-goods-action-button color="#7232dd" text="立即购买" @tap="onShowSpec('order')" />
       </van-goods-action>
     </div>
   </div>
@@ -96,29 +101,29 @@ module.exports.parseImage = parseImage;
 import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
-import mailApis from '../../apis/mailApis'
-import orderApis from '../../apis/orderApis'
-import appManager from '../../appManager'
-import { navDefine, orderCheck, orderListPage } from '../../store/constant/navDefine'
-import { defaultOrder } from '../../store/constant/orderDefine'
+import mailApis from '../../../apis/mailApis'
+import { navDefine } from '../../../store/constant/navDefine'
+import appManager from '../../../appManager'
+
+import { shoppingCarList } from '../../../store/constant/nav/pages'
 
 wepy.page({
   store,
   hooks: {},
 
   data: {
-    detail: '<p style=\'color: #AC1630\'>富文本详情</p>',
-
     isShowSpec: false,
     count: 1,
     goodsItem: null,
-    goodsSpec: null
+    goodsSpec: null,
+    submitMode: 'order'
   },
 
   computed: {
 
     ...mapState({
-      'order': state => state.order
+      'order': state => state.order,
+      'shoppingCar': state => state.shoppingCar
     }),
     goodsImages() {
       if (!this.goodsItem || !this.goodsItem.goodsImg) {
@@ -132,7 +137,8 @@ wepy.page({
 
   methods: {
     ...mapActions([
-      'setOrderAction'
+      'setOrderAction',
+      'setShoppingCarAction'
     ]),
     handleViewTap() {
       console.log('handleVieTap clicked')
@@ -141,14 +147,16 @@ wepy.page({
 
     },
 
-    onShowSpec() {
+    onShowSpec(mode) {
       this.isShowSpec = true
+      this.submitMode = mode
     },
     onCloseSpec() {
       this.isShowSpec = false
     },
     onChangeCount(e) {
       console.log(e)
+      this.count = e.$wx.detail
     },
 
     callAppLaunch() {
@@ -156,17 +164,14 @@ wepy.page({
     async init(id) {
       const goodsReq = await mailApis.getGoodsById(id)
       this.goodsItem = goodsReq.data
-      const ids = this.goodsItem.goodsSpec.split(',')
-      console.log(ids)
-      const goodsSpecReq = await mailApis.getGoodsSpecByIds(ids)
+      // const ids = this.goodsItem.goodsSpec.split(',')
+      // console.log(ids)
+      // const goodsSpecReq = await mailApis.getGoodsSpecByIds(ids)
 
-      this.goodsSpec = goodsSpecReq.rows[0]
+      // this.goodsSpec = goodsSpecReq.rows[0]
     },
 
     onSubmit() {
-      console.log(123)
-      // wx.showLoading({ title: '正在生成订单.', mask: true })
-
       const item = this.goodsItem
 
       let orderItem = {
@@ -178,15 +183,45 @@ wepy.page({
         goodsPrice: item.goodsPrice,
         goodsCount: this.count
       }
+
+      this.isShowSpec = false
+
+      switch (this.submitMode) {
+        case 'order':
+
+          this.nextOrder(orderItem)
+          break
+
+        case 'shoppingCar':
+          this.addShoppingCar(orderItem)
+          break
+      }
+    },
+
+    nextOrder(item) {
       console.log('订单:', item)
 
-      let order = defaultOrder
+      let order = {
+        addressId: '',
+        orderDetailList: [],
+        remark: ''
+      }
 
-      defaultOrder.orderDetailList.push(orderItem)
+      order.orderDetailList.push(item)
 
       this.setOrderAction(order)
 
       appManager.navigateTo(navDefine.ORDER_CHECK)
+    },
+    addShoppingCar(item) {
+      this.shoppingCar.push(item)
+      this.setShoppingCarAction(this.shoppingCar)
+    },
+    onWinery() {
+      appManager.showToast('建设中')
+    },
+    onShppingCar() {
+      appManager.navigateTo(shoppingCarList)
     }
   },
 
@@ -203,9 +238,9 @@ wepy.page({
 {
 navigationBarTitleText: '',
 usingComponents: {
-"van-goods-action": "../../vant/goods-action/index",
-"van-goods-action-icon": "../../vant/goods-action-icon/index",
-"van-goods-action-button": "../../vant/goods-action-button/index"
+"van-goods-action": "../../../vant/goods-action/index",
+"van-goods-action-icon": "../../../vant/goods-action-icon/index",
+"van-goods-action-button": "../../../vant/goods-action-button/index"
 }
 }
 </config>

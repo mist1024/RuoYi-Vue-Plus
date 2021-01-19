@@ -44,7 +44,7 @@ class AppManager {
   }
 
   saveOpenid(openid) {
-    console.log('saveOpenid:' + openid)
+    // console.log('saveOpenid:' + openid)
     store.dispatch('setOpenidAction', openid)
   }
 
@@ -56,10 +56,12 @@ class AppManager {
     const mobile = wx.getStorageSync('mobile')
     const openid = wx.getStorageSync('openid')
     const userInfo = wx.getStorageSync('userInfo')
+    const shoppingCar = wx.getStorageSync('shoppingCar')
 
     console.log('setCacheInfo:', mobile)
     console.log('setCacheInfo:', openid)
     console.log('setCacheInfo:', userInfo)
+    console.log('shoppingCar:', shoppingCar)
 
     if (mobile) {
       store.dispatch('setMobileAction', mobile)
@@ -71,6 +73,9 @@ class AppManager {
 
     if (userInfo) {
       store.dispatch('setUserInfoAction', userInfo)
+    }
+    if (shoppingCar) {
+      store.dispatch('setShoppingCarAction', shoppingCar)
     }
   }
 
