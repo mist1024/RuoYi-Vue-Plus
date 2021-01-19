@@ -111,7 +111,7 @@ public class MiniComponent {
         return sessionInfo;
     }
 
-    public AjaxResult registration(String openid, String mobile, String nickName, Long deptId) {
+    public AjaxResult registration(String openid, String mobile, String nickName, Long deptId, String avatar) {
 
         SysUser user = new SysUser();
         String userName = MINI_USER_SYMBOL + openid + "-" + deptId;
@@ -119,6 +119,7 @@ public class MiniComponent {
         user.setPhonenumber(mobile);
         user.setNickName(nickName);
         user.setDeptId(deptId);
+        user.setAvatar(avatar);
         user.setPassword(MINI_DEFUALT_PASSWORD);
         user.setRoleIds(new Long[]{MINI_DEFUALT_ROLEID});
         user.setPostIds(new Long[]{MINI_DEFUALT_POSTID});

@@ -8,8 +8,10 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.framework.web.service.SysLoginService;
+import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.winery.component.MiniComponent;
 import com.ruoyi.winery.domain.winery.WineryCompanyRecord;
 import com.ruoyi.winery.enums.IrrigationTypeEnum;
@@ -44,7 +46,7 @@ public class MiniUserController {
 
 
     @Autowired
-    private SysLoginService loginService;
+    private ISysUserService userService;
 
     /**
      * 通过微信api授权获取手机号
@@ -83,7 +85,8 @@ public class MiniUserController {
         String mobile = json.getStr("mobile");
         Long deptId = json.getLong("deptId");
         String nickName = json.getJSONObject("userInfo").getStr("nickName");
-        return miniComponent.registration(openid, mobile, nickName, deptId);
+        String avatar = json.getJSONObject("userInfo").getStr("avatarUrl");
+        return miniComponent.registration(openid, mobile, nickName, deptId, avatar);
     }
 
 
@@ -107,6 +110,16 @@ public class MiniUserController {
         // 生成令牌
         String token = miniComponent.loginByMini(userAccount);
         ajax.put(Constants.TOKEN, token);
+        SysUser user =  userService.selectUserByUserName(userAccount);
+
+        JSONObject userInfo = new JSONObject();
+        userInfo.set("nickName",user.getNickName());
+        userInfo.set("avatarUrl" ,user.getAvatar());
+        userInfo.set("mobile" ,user.getPhonenumber());
+
+        ajax.put("userInfo", userInfo);
+
+
         return ajax;
     }
 

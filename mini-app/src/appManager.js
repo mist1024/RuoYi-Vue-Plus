@@ -26,7 +26,10 @@ class AppManager {
         if (req2.token) {
           store.dispatch('setTokenAction', req2.token)
           self.setCacheInfo()
+          self.setRemoteUserInfo(req2.userInfo)
         }
+
+
 
         wx.hideLoading()
 
@@ -50,6 +53,11 @@ class AppManager {
 
   getOpenid() {
     return wx.getStorageSync('openid')
+  }
+
+  setRemoteUserInfo(userInfo) {
+    store.dispatch('setMobileAction', userInfo.mobile)
+    store.dispatch('setUserInfoAction', userInfo)
   }
 
   setCacheInfo() {
