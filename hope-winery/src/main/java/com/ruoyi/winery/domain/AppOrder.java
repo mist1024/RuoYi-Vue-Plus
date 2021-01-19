@@ -63,6 +63,10 @@ private static final long serialVersionUID=1L;
     @Excel(name = "运单号")
     private String transportNo;
 
+    /** 流水号 */
+    @Excel(name = "流水号")
+    private String transitionId;
+
     /** 订单状态（0待支付1已取消2已支付3待收货4交易完成） */
     @Excel(name = "订单状态" , readConverterExp = "0=待支付,1=已取消,2=已支付,3=待收货,4=交易完成")
     private Integer status;

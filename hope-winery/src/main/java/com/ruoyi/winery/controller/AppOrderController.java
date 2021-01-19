@@ -12,6 +12,7 @@ import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.itextpdf.io.util.DateTimeUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -225,6 +226,11 @@ public class AppOrderController extends BaseController {
     @PostMapping("/pay/payNotify")
     String payNotify(@RequestBody String xmlData) throws WxPayException {
         WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
+        AppOrder order = iAppOrderService.getById(notifyResult.getOutTradeNo());
+        order.setTransitionId(notifyResult.getTransactionId());
+        order.setStatus(2);
+        order.setPayTime(DateUtils.getNowDate());
+        iAppOrderService.updateById(order);
         // TODO 根据自己业务场景需要构造返回对象
         return WxPayNotifyResponse.success("成功");
     }
