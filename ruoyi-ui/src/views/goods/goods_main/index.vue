@@ -152,6 +152,9 @@
         <el-form-item label="商品简称" prop="goodsAlias">
           <el-input v-model="form.goodsAlias" placeholder="请输入商品简称"/>
         </el-form-item>
+        <el-form-item label="商品价格" prop="goodsPrice">
+                  <el-input type="number" v-model="form.goodsPrice" placeholder="请输入商品价格"/>
+                </el-form-item>
         <el-form-item label="商品封面" prop="goodsFaceImg">
           <upload-image :value="form.goodsFaceImg" @input="inputGoodsFaceImg"/>
           <!--          <el-input v-model="form.goodsFaceImg" placeholder="请输入商品封面" />-->
@@ -257,6 +260,7 @@ export default {
         goodsDesc: undefined,
         goodsFaceImg: undefined,
         goodsImg: undefined,
+        goodsPrice: undefined,
         state: undefined
       },
       // 表单参数
@@ -328,6 +332,7 @@ export default {
         goodsDesc: undefined,
         goodsFaceImg: undefined,
         goodsImg: undefined,
+        goodsPrice: undefined,
         createBy: undefined,
         createTime: undefined,
         updateBy: undefined,

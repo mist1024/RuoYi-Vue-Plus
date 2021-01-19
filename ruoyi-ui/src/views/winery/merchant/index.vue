@@ -90,8 +90,12 @@
       <el-table-column label="ID" align="center" prop="id" v-if="false"/>
       <el-table-column label="商户名称" align="center" prop="mchName" />
       <el-table-column label="副标题" align="center" prop="subtitle" />
-      <el-table-column label="图标" align="center" prop="avatar" />
-      <el-table-column label="介绍" align="center" prop="mchDesc" />
+              <el-table-column label="图标" align="center" prop="avatar">
+                      <template slot-scope="scope">
+                        <el-image :src="'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + scope.row.avatar" style="width: 60px; height: 60px"/>
+                      </template>
+                    </el-table-column>
+      <!--<el-table-column label="介绍" align="center" prop="mchDesc" />-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -121,7 +125,7 @@
     />
 
     <!-- 添加或修改商户对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商户名称" prop="mchName">
           <el-input v-model="form.mchName" placeholder="请输入商户名称" />
@@ -130,10 +134,10 @@
           <el-input v-model="form.subtitle" placeholder="请输入副标题" />
         </el-form-item>
         <el-form-item label="图标" prop="avatar">
-          <el-input v-model="form.avatar" placeholder="请输入图标" />
+          <uploadImage v-model="form.avatar"/>
         </el-form-item>
         <el-form-item label="介绍" prop="mchDesc">
-          <el-input v-model="form.mchDesc" placeholder="请输入介绍" />
+                    <editor :value="form.mchDesc" :height="400" :min-height="400" @on-change="onChangeNewsBody"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -146,10 +150,13 @@
 
 <script>
 import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant } from "@/api/winery/merchant";
-
+import UploadImage from '@/components/UploadImage';
+import Editor from '@/components/Editor';
 export default {
   name: "Merchant",
   components: {
+    Editor,
+    UploadImage
   },
   data() {
     return {
@@ -296,7 +303,10 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
-    }
+    },
+    onChangeNewsBody(value) {
+          this.form.mchDesc = value.html
+        }
   }
 };
 </script>

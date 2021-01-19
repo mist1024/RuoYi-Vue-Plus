@@ -33,7 +33,7 @@ private static final long serialVersionUID=1L;
 
 
     /** ID */
-    @TableId(value = "id")
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
     /** 商户名称 */
