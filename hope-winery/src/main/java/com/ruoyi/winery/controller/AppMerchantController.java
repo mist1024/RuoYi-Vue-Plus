@@ -51,8 +51,8 @@ public class AppMerchantController extends BaseController {
     {
         startPage();
         LambdaQueryWrapper<AppMerchant> lqw = Wrappers.lambdaQuery(appMerchant);
-        if (StringUtils.isNotBlank(appMerchant.getName())){
-            lqw.like(AppMerchant::getName ,appMerchant.getName());
+        if (StringUtils.isNotBlank(appMerchant.getMchName())){
+            lqw.like(AppMerchant::getMchName ,appMerchant.getMchName());
         }
         if (StringUtils.isNotBlank(appMerchant.getSubtitle())){
             lqw.eq(AppMerchant::getSubtitle ,appMerchant.getSubtitle());
@@ -60,8 +60,8 @@ public class AppMerchantController extends BaseController {
         if (StringUtils.isNotBlank(appMerchant.getAvatar())){
             lqw.eq(AppMerchant::getAvatar ,appMerchant.getAvatar());
         }
-        if (StringUtils.isNotBlank(appMerchant.getDesc())){
-            lqw.eq(AppMerchant::getDesc ,appMerchant.getDesc());
+        if (StringUtils.isNotBlank(appMerchant.getMchDesc())){
+            lqw.eq(AppMerchant::getMchDesc ,appMerchant.getMchDesc());
         }
         List<AppMerchant> list = iAppMerchantService.list(lqw);
         return getDataTable(list);
@@ -96,10 +96,10 @@ public class AppMerchantController extends BaseController {
     @Log(title = "商户" , businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody AppMerchant appMerchant) {
-        String richText = appMerchant.getDesc();
+        String richText = appMerchant.getMchDesc();
         if (richText != null && StringUtils.isNotEmpty(richText)) {
             Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");
-            appMerchant.setDesc(doc.body().children().toString());
+            appMerchant.setMchDesc(doc.body().children().toString());
         }
         return toAjax(iAppMerchantService.save(appMerchant) ? 1 : 0);
     }
@@ -111,10 +111,10 @@ public class AppMerchantController extends BaseController {
     @Log(title = "商户" , businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody AppMerchant appMerchant) {
-        String richText = appMerchant.getDesc();
+        String richText = appMerchant.getMchDesc();
         if (richText != null && StringUtils.isNotEmpty(richText)) {
             Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");
-            appMerchant.setDesc(doc.body().children().toString());
+            appMerchant.setMchDesc(doc.body().children().toString());
         }
         return toAjax(iAppMerchantService.updateById(appMerchant) ? 1 : 0);
     }

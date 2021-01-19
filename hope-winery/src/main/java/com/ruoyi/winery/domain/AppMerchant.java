@@ -38,7 +38,7 @@ private static final long serialVersionUID=1L;
 
     /** 商户名称 */
     @Excel(name = "商户名称")
-    private String name;
+    private String mchName;
 
     /** 副标题 */
     @Excel(name = "副标题")
@@ -50,7 +50,7 @@ private static final long serialVersionUID=1L;
 
     /** 介绍 */
     @Excel(name = "介绍")
-    private String desc;
+    private String mchDesc;
 
     /** 创建者 */
     private String createBy;
