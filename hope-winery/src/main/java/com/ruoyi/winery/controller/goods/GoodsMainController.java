@@ -1,13 +1,19 @@
 package com.ruoyi.winery.controller.goods;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import java.util.List;
 import java.util.Arrays;
 
+import com.itextpdf.styledxmlparser.jsoup.Jsoup;
+import com.itextpdf.styledxmlparser.jsoup.nodes.Document;
+import com.itextpdf.styledxmlparser.jsoup.nodes.Element;
+import com.itextpdf.styledxmlparser.jsoup.select.Elements;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.winery.utils.RichTextUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +116,11 @@ public class GoodsMainController extends BaseController {
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody GoodsMain goodsMain) {
         goodsMain.setDeptId(getDeptId());
+        String richText = goodsMain.getGoodsDesc();
+        if (richText != null && StringUtils.isNotEmpty(richText)) {
+            Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");
+            goodsMain.setGoodsDesc(doc.body().children().toString());
+        }
         return toAjax(iWineryGoodsService.save(goodsMain) ? 1 : 0);
     }
 
@@ -121,6 +132,11 @@ public class GoodsMainController extends BaseController {
     @PutMapping
     public AjaxResult edit(@RequestBody GoodsMain goodsMain) {
         goodsMain.setUpdateBy(getUsername());
+        String richText = goodsMain.getGoodsDesc();
+        if (richText != null && StringUtils.isNotEmpty(richText)) {
+            Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");
+            goodsMain.setGoodsDesc(doc.body().children().toString());
+        }
         return toAjax(iWineryGoodsService.updateById(goodsMain) ? 1 : 0);
     }
 

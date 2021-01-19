@@ -81,7 +81,8 @@ public class CommonController {
 
 
             String fileName = cosUtils.upload(type, file);
-            String url = serverConfig.getUrl() + "/common/file?fileName=" + fileName;
+            // String url = serverConfig.getUrl() + "/common/file?fileName=" + fileName;
+            String url = "https://winery-1257413599.cos.ap-beijing.myqcloud.com/" + fileName;
             AjaxResult ajax = AjaxResult.success();
             ajax.put("fileName", fileName);
             ajax.put("url", url);
