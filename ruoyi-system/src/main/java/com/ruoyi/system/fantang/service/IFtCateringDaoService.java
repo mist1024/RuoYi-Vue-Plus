@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtCateringDao;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,4 +27,8 @@ public interface IFtCateringDaoService extends IService<FtCateringDao> {
     List<Long> notInTable(FtCateringDao ftCateringDao);
 
     Integer copyAndAdd(Long patientId, List<FtCateringDao> ftCateringDao);
+
+    Integer restoreByPatientId(Long[] ids);
+
+    void paste(Long id, List<FtCateringDao> ftCateringDaoList);
 }

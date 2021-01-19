@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtCateringDao;
 import com.ruoyi.system.fantang.domain.FtFoodDemandDao;
 import com.ruoyi.system.fantang.mapper.FtCateringDaoMapper;
-import com.ruoyi.system.fantang.mapper.FtFoodDemandDaoMapper;
 import com.ruoyi.system.fantang.service.IFtCateringDaoService;
 import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,27 +44,27 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
 
         List<Integer> types = ftCateringDao.getTypes();
 
-            for (int i = 1; i < 5; i++) {
-                FtCateringDao cateringDao = new FtCateringDao();
-                cateringDao.setPatientId(ftCateringDao.getPatientId());
-                cateringDao.setNumber(ftCateringDao.getNumber());
-                cateringDao.setFrequency(ftCateringDao.getFrequency());
-                cateringDao.setCateringUsage(ftCateringDao.getCateringUsage());
-                cateringDao.setCreateAt(new Date());
-                cateringDao.setType(i);
+        for (int i = 1; i < 5; i++) {
+            FtCateringDao cateringDao = new FtCateringDao();
+            cateringDao.setPatientId(ftCateringDao.getPatientId());
+            cateringDao.setNumber(ftCateringDao.getNumber());
+            cateringDao.setFrequency(ftCateringDao.getFrequency());
+            cateringDao.setCateringUsage(ftCateringDao.getCateringUsage());
+            cateringDao.setCreateAt(new Date());
+            cateringDao.setType(i);
 
-                for (Integer type : types) {
-                    if (i == type) {
-                        cateringDao.setFlag(true);
-                        break;
-                    } else {
-                        cateringDao.setFlag(false);
-                    }
+            for (Integer type : types) {
+                if (i == type) {
+                    cateringDao.setFlag(true);
+                    break;
+                } else {
+                    cateringDao.setFlag(false);
                 }
-
-                this.baseMapper.insert(cateringDao);
-                list.add(cateringDao);
             }
+
+            this.baseMapper.insert(cateringDao);
+            list.add(cateringDao);
+        }
 
         return list;
     }
@@ -94,16 +93,18 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
         ftCateringDao.setUpdateAt(new Date());
         ftCateringDao.setSuspendFlag(false);
 
+        FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
+        foodDemandDao.setNutritionFoodFlag(false);
+
         for (Long id : ids) {
             UpdateWrapper<FtCateringDao> wrapper = new UpdateWrapper<>();
             wrapper.eq("patient_id", id);
             rows += this.baseMapper.update(ftCateringDao, wrapper);
 
             // 更新该病患的报餐配置记录
-            FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
-            foodDemandDao.setNutritionFoodFlag(false);
-            QueryWrapper<FtFoodDemandDao> wrapper1 = new QueryWrapper<>();
-            foodDemandDaoService.update(foodDemandDao, wrapper1);
+            UpdateWrapper<FtFoodDemandDao> foodDemandWrapper = new UpdateWrapper<>();
+            foodDemandWrapper.eq("patient_id", id);
+            foodDemandDaoService.update(foodDemandDao, foodDemandWrapper);
         }
 
         return rows;
@@ -132,10 +133,11 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
 
     /**
      * 拷贝粘贴新增指定病患的营养配餐记录并更新该病患默认报餐配置信息
-     * @author 陈智兴
+     *
      * @param patientId
      * @param ftCateringDao
      * @return
+     * @author 陈智兴
      */
     @Override
     public Integer copyAndAdd(Long patientId, List<FtCateringDao> ftCateringDao) {
@@ -151,10 +153,61 @@ public class FtCateringDaoServiceImpl extends ServiceImpl<FtCateringDaoMapper, F
             foodDemandDao.setNutritionFoodId(cateringDao.getNumber());
             foodDemandDao.setNutritionFoodFlag(true);
             QueryWrapper<FtFoodDemandDao> wrapper = new QueryWrapper<>();
-            wrapper.eq("patient_id",patientId);
-            wrapper.eq("type",cateringDao.getType());
+            wrapper.eq("patient_id", patientId);
+            wrapper.eq("type", cateringDao.getType());
             foodDemandDaoService.update(foodDemandDao, wrapper);
         }
         return 1;
+    }
+
+    @Override
+    public Integer restoreByPatientId(Long[] ids) {
+
+        int rows = 0;
+
+        FtCateringDao ftCateringDao = new FtCateringDao();
+        ftCateringDao.setUpdateAt(new Date());
+        ftCateringDao.setSuspendFlag(true);
+
+        for (Long id : ids) {
+            UpdateWrapper<FtCateringDao> wrapper = new UpdateWrapper<>();
+            wrapper.eq("patient_id", id);
+            rows += this.baseMapper.update(ftCateringDao, wrapper);
+        }
+
+        return rows;
+    }
+
+    @Override
+    public void paste(Long id, List<FtCateringDao> ftCateringDaoList) {
+
+        for (int i = 0; i < 4; i++) {
+
+            FtCateringDao ftCateringDao = ftCateringDaoList.get(i);
+            FtCateringDao cateringDao = new FtCateringDao();
+            cateringDao.setCateringUsage(ftCateringDao.getCateringUsage());
+            cateringDao.setFlag(ftCateringDao.getFlag());
+            cateringDao.setFrequency(ftCateringDao.getFrequency());
+            cateringDao.setNumber(ftCateringDao.getNumber());
+            cateringDao.setSuspendFlag(ftCateringDao.getSuspendFlag());
+            cateringDao.setUpdateAt(new Date());
+
+            // 更新该病患营养配餐信息
+            UpdateWrapper<FtCateringDao> wrapper = new UpdateWrapper<>();
+            wrapper.eq("patient_id", id);
+            wrapper.eq("type", i + 1);
+            this.baseMapper.update(cateringDao, wrapper);
+
+            // 更新该病患默认配餐信息
+            FtFoodDemandDao foodDemandDao = new FtFoodDemandDao();
+            foodDemandDao.setNutritionFoodId(ftCateringDao.getNumber());
+            foodDemandDao.setNutritionFoodFlag(ftCateringDao.getFlag());
+            QueryWrapper<FtFoodDemandDao> foodDemandWrapper = new QueryWrapper<>();
+            foodDemandWrapper.eq("patient_id", id);
+            foodDemandWrapper.eq("type", i + 1);
+            foodDemandDaoService.update(foodDemandDao, foodDemandWrapper);
+
+        }
+
     }
 }

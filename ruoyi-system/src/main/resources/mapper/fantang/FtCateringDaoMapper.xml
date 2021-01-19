@@ -18,6 +18,7 @@
         <result property="createAt" column="create_at"/>
         <result property="createBy" column="create_by"/>
         <result property="cateringDescribe" column="catering_describe"/>
+        <result property="suspendFlag" column="suspend_flag"/>
     </resultMap>
 
     <select id="listNewFormatter" resultType="com.ruoyi.system.fantang.domain.FtCateringDao">
@@ -39,7 +40,7 @@
         <if test="bedId != null">and b.bed_id = #{bedId}</if>
         <if test="departId != null">and b.depart_id = #{departId}</if>
         <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
-        <if test="flag != null">and a.flag = #{flag}</if>
+        <if test="suspendFlag != null">and a.suspend_flag = #{suspendFlag}</if>
         ORDER BY
         b.patient_id,
         `type` ASC

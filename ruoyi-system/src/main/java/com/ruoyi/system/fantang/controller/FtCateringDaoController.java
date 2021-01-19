@@ -1,6 +1,5 @@
 package com.ruoyi.system.fantang.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,9 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 配餐功能Controller
@@ -134,11 +131,8 @@ public class FtCateringDaoController extends BaseController {
     public AjaxResult cancel(@PathVariable Long[] ids) {
         System.out.println(Arrays.toString(ids));
 
-        // 根据病人 id 修改营养配餐启用标志
+        // 根据病人 id 修改 营养配餐 启用标志
         iFtCateringDaoService.cancelByPatientId(ids);
-
-        // 根据病人 id 修改报餐配置表营养餐启用标志
-        iFtFoodDemandDaoService.cancelNutritionByPatientId(ids);
 
         return AjaxResult.success("已暂停");
     }
@@ -153,12 +147,9 @@ public class FtCateringDaoController extends BaseController {
         System.out.println(Arrays.toString(ids));
 
         // 根据病人 id 修改营养配餐启用标志
-        iFtCateringDaoService.cancelByPatientId(ids);
+        iFtCateringDaoService.restoreByPatientId(ids);
 
-        // 根据病人 id 修改报餐配置表营养餐启用标志
-        iFtFoodDemandDaoService.cancelNutritionByPatientId(ids);
-
-        return AjaxResult.success("已暂停");
+        return AjaxResult.success("已恢复");
     }
 
     /**
@@ -195,4 +186,23 @@ public class FtCateringDaoController extends BaseController {
         }
         return AjaxResult.success();
     }
+
+    @PutMapping("/paste")
+    public AjaxResult paste(@RequestBody JSONObject params) {
+
+        System.out.println(params);
+
+        List<Long> ids = params.getJSONArray("ids").toJavaList(Long.class);
+        
+        List<FtCateringDao> ftCateringDaoList = params.getJSONArray("copyItem").toJavaList(FtCateringDao.class);
+
+
+        for (Long id : ids) {
+            iFtCateringDaoService.paste(id,ftCateringDaoList);
+        }
+        
+
+        return AjaxResult.success("已修改");
+    }
+
 }

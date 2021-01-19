@@ -42,11 +42,11 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="是否启用" prop="flag">
-        <el-select v-model="queryParams.flag"
+      <el-form-item label="是否暂停" prop="suspendFlag">
+        <el-select v-model="queryParams.suspendFlag"
                    size="small"
                    @keyup.enter.native="handleQuery"
-                   placeholder="请选是否启用">
+                   placeholder="请选是否暂停">
           <el-option
             v-for="item in flagOptions"
             :key="item.value"
@@ -84,20 +84,31 @@
         >修改
         </el-button>
       </el-col>
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="danger"-->
+      <!--          icon="el-icon-delete"-->
+      <!--          size="mini"-->
+      <!--          :disabled="multiple"-->
+      <!--          @click="handleDelete"-->
+      <!--          v-hasPermi="['fantang:catering:remove']"-->
+      <!--        >删除-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
-          type="danger"
+          type="success"
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
-          @click="handleDelete"
+          @click="handleRecovery"
           v-hasPermi="['fantang:catering:remove']"
-        >删除
+        >恢复
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
+          type="danger"
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
@@ -145,7 +156,7 @@
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
-          @click=""
+          @click="handleCopy"
           v-hasPermi="['fantang:catering:remove']"
         >拷贝
         </el-button>
@@ -156,7 +167,7 @@
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
-          @click=""
+          @click="handlePaste"
           v-hasPermi="['fantang:catering:remove']"
         >粘贴
         </el-button>
@@ -182,11 +193,7 @@
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-      <el-table-column label="暂停" align="center" prop="suspendFlag" width="80px">
-        <template slot-scope="scope">
-          <el-checkbox v-model="scope.row.suspendFlag"  @change="changeSuspend(scope.row, $event)">暂停</el-checkbox>
-        </template>
-      </el-table-column>
+      <el-table-column label="是否暂停" align="center" prop="suspendFlag" width="80px" :formatter="suspendFlagFormat"/>
       <el-table-column label="科室" align="center" prop="departName"/>
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="床号" align="center" prop="bedId"/>
@@ -210,6 +217,7 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:catering:edit']"
+            v-if="scope.row.suspendFlag"
           >修改
           </el-button>
         </template>
@@ -431,8 +439,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="病人" prop="patientIds" >
-          <el-select v-model="copyItemForm.patientIds" placeholder="请选择病人" multiple  style="width:450px">
+        <el-form-item label="病人" prop="patientIds">
+          <el-select v-model="copyItemForm.patientIds" placeholder="请选择病人" multiple style="width:450px">
             <el-option
               v-for="item in patientOptions"
               :key="item.name"
@@ -463,7 +471,7 @@
           <el-table-column label="正餐类型" align="center" prop="type" :formatter="typeFormat" width="120px"/>
           <el-table-column label="营养配餐" align="center" prop="foodName" width="200px">
             <template slot-scope="scope">
-              <el-select  v-model="scope.row.number">
+              <el-select v-model="scope.row.number">
                 <el-option
                   v-for="item in numberOptions"
                   :key="item.id"
@@ -473,7 +481,8 @@
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="用法" align="center" prop="cateringUsage" :formatter="cateringUsageFormat" width="120px">
+          <el-table-column label="用法" align="center" prop="cateringUsage" :formatter="cateringUsageFormat"
+                           width="120px">
             <template slot-scope="scope">
               <el-select v-model="scope.row.cateringUsage" placeholder="请选择用法">
                 <el-option
@@ -509,16 +518,20 @@
 <script>
 import {
   addCatering,
+  cancelCatering,
+  copyAndAdd,
   delCatering,
   exportCatering,
+  getAllByPatient,
   getCatering,
   listCatering,
+  paste,
+  restoreCatering,
   updateCatering
 } from "../../../api/fantang/catering";
 import {listDepart} from "../../../api/fantang/depart";
 import {getBedIdById, selectNoCateringByDepartId} from "../../../api/fantang/patient";
 import {listNutritionFood} from "../../../api/fantang/nutritionFood";
-import {cancelCatering, copyAndAdd, getByPatient, getAllByPatient} from "../../../api/fantang/catering";
 
 export default {
   name: "Catering",
@@ -551,10 +564,10 @@ export default {
       // 作废标志
       flagOptions: [{
         value: 1,
-        label: '是'
+        label: '启用'
       }, {
         value: 0,
-        label: '否'
+        label: '暂停'
       }],
       // 科室列表
       departOptions: [],
@@ -590,6 +603,7 @@ export default {
         pageNum: 1,
         pageSize: 12,
         flag: null,
+        suspendFlag: null,
         hospitalId: null,
         name: null,
         departId: null,
@@ -599,6 +613,8 @@ export default {
       form: {},
       // 拷贝并新增表单
       copyItemForm: {},
+      // 拷贝表单
+      copyForm: [],
       // 拷贝并新增表单校验
       copyItemFormRules: {
         patientIds: [
@@ -761,7 +777,6 @@ export default {
     },
 
 
-
     // 响应营养配餐用餐安排多选列表
     changeDinnerType(value) {
       if (value.length === 1) {
@@ -814,6 +829,15 @@ export default {
     typeFormat(row, column) {
       return this.selectDictLabel(this.typeOptions, row.type);
     },
+    suspendFlagFormat(row) {
+      if (row.suspendFlag === true) {
+        return "启用"
+      } else if (row.suspendFlag === false) {
+        return "暂停"
+      } else {
+        return " ";
+      }
+    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -836,7 +860,8 @@ export default {
         updateBy: null,
         createAt: null,
         createBy: null,
-        cateringDescribe: null
+        cateringDescribe: null,
+        suspendFlag: null,
       };
       this.resetForm("form");
 
@@ -891,13 +916,59 @@ export default {
       } else {
         this.copyItem = true;
         getAllByPatient(id).then(response => {
-          this.copyItemForm.data =  response.data;
-          this.copyItemForm.departId =null;
+          this.copyItemForm.data = response.data;
+          this.copyItemForm.departId = null;
           this.copyItemForm.patientIds = [];
           console.log('cateringList-->', this.copyItemForm);
         })
       }
     },
+
+    // 拷贝
+    handleCopy(row) {
+      this.reset();
+      const id = row.id || this.ids;
+      if (this.ids.length > 1) {
+        this.msgError("只能选择一条记录进行拷贝")
+      } else {
+        console.log(id);
+        getAllByPatient(id).then(response => {
+          console.log("该病人 4 条数据------", response.data)
+          this.copyForm = response.data;
+          console.log("暂存中的 4 条数据", this.copyForm);
+        })
+      }
+    },
+
+    // 粘贴
+    handlePaste(row) {
+      const id = row.id || this.ids;
+      console.log("要粘贴的病人 id ----------------", id)
+      // if (Object.keys(this.copyForm).length ===0) {
+      //   this.msgError("请先进行复制操作")
+      // } else {
+      //   console.log("即将粘贴的数据------", this.copyForm)
+      //   paste( this.copyForm).then(response => {
+      //       console.log("修改成功")
+      //   })
+      // }
+      if (this.copyForm.length < 4) {
+        this.msgError("请先进行复制操作")
+      } else {
+        console.log("即将粘贴的数据------", this.copyForm)
+
+        let data = {
+          copyItem: this.copyForm,
+          ids: id,
+        }
+        console.log("传的对象-----", data);
+        paste(data).then(response => {
+          console.log("修改成功")
+          this.getList();
+        })
+      }
+    },
+
     /** 拷贝并新增提交按钮 */
     submitCopyForm() {
       this.$refs["copyItemForm"].validate(valid => {
@@ -950,7 +1021,7 @@ export default {
 
     // 更新指定病患的暂停营养配餐数据
     changeSuspend(row, e) {
-      if (e){
+      if (e) {
         this.$confirm('是否暂停 “' + row.name + '” 的营养配餐数据?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -980,7 +1051,7 @@ export default {
     handleCancel(row) {
       const ids = row.patientId || this.ids;
       console.log("ids-----", row);
-      this.$confirm('是否作废 “' + this.names + '” 的营养配餐数据?', "警告", {
+      this.$confirm('是否暂停 “' + this.names + '” 的营养配餐数据?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -988,7 +1059,21 @@ export default {
         return cancelCatering(ids);
       }).then(() => {
         this.getList();
-        this.msgSuccess("已作废");
+        this.msgSuccess("已暂停");
+      })
+    },
+    handleRecovery(row) {
+      const ids = row.patientId || this.ids;
+      console.log("ids-----", row);
+      this.$confirm('是否恢复 “' + this.names + '” 的营养配餐数据?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return restoreCatering(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("已恢复");
       })
     },
     /** 导出按钮操作 */

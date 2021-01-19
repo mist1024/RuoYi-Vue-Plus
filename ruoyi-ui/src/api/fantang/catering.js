@@ -35,6 +35,15 @@ export function copyAndAdd(data) {
   })
 }
 
+// 粘贴
+export function paste(data) {
+  return request({
+    url: '/fantang/catering/paste',
+    method: 'put',
+    data: data
+  })
+}
+
 // 修改配餐功能
 export function updateCatering(data) {
   return request({
