@@ -36,7 +36,7 @@ module.exports.parseImage = parseImage;
 
       <van-cell :title="goodsItems.goodsName" value="内容能显示多长" label="描述信息描述信息描述信息描述信息描述信息描述信息描述信息描述信息"
                 border="{{ false }}" />
-      <van-cell title="选择下单" is-link @tap="onShowSpec" />
+      <van-cell title="立即下单" is-link @tap="onShowSpec" />
 
       <div style="margin: 10px 15px;">
         <span>商品详情</span>
@@ -72,7 +72,7 @@ module.exports.parseImage = parseImage;
           <van-col offset="1" span="8">
             <div style="display: flex; flex-direction: column;">
               <span>购买数量</span>
-              <span style="font-size: 12px; color: #cccccc;">剩余:xx</span>
+              <span style="font-size: 12px; color: #cccccc;">剩余:{{goodsItem.goodsStock}}</span>
             </div>
           </van-col>
           <van-col offset="7" span="8">

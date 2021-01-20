@@ -17,6 +17,7 @@
       :limit="5"
       :file-list="fileList"
       :on-exceed="handleExceed"
+      :on-change="handleChange"
       list-type="picture">
 
       <el-button size="small" type="primary">点击上传</el-button>
@@ -46,10 +47,8 @@ export default {
       default: "",
     },
   },
-  filters: {
-    image(value) {
-      return process.env.VUE_APP_BASE_API + "/common/file?fileName=" + value
-    }
+  watch: {
+
   },
   computed: {
 
@@ -87,6 +86,7 @@ export default {
     },
     handleRemove(file, fileList) {
       let temp = fileList.map(x => {
+        console.log(x)
         return  x.response.fileName
       })
 
@@ -101,11 +101,14 @@ export default {
         message: "超出上传数量限制",
         type: 'error'
       })
-
+    },
+    handleChange(file, fileList) {
+    },
+    setFileList(list) {
+      this.fileList = list
 
     }
-  },
-  watch: {},
+  }
 };
 </script>
 

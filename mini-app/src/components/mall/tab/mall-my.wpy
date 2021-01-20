@@ -3,7 +3,7 @@
 
 .header-image {
   width: 100%;
-  height: 200px;
+  height: 273px;
   z-index: -1;
   position: absolute;
   top: 0;
@@ -61,7 +61,7 @@
 </style>
 <template>
 
-  <image class="header-image" :src="imageDefine.HOME_TITLE_IMAGE" />
+  <image class="header-image" :src="imageDefine.MY_HEADER"  />
 
 
   <div class="container" style="margin: 10px 10px 80px 10px;">
@@ -69,19 +69,30 @@
     <div class="user-info">
       <van-image round width="90rpx" height="90rpx" :src="user.userInfo.avatarUrl" />
       <div class="user-info-msg">
-        <span style="font-size: 18px;">{{user.mobile}}</span>
-        <span style="font-size: 12px;">{{user.userInfo.nickName}}</span>
+        <span style="font-size: 18px;font-weight: bold;">{{user.userInfo.nickName}}</span>
+        <span style="font-size: 12px;">{{user.mobile}}</span>
       </div>
     </div>
 
-    <div class="header-grid-body-top">
-      <div style="display: flex;">
-        <span>{{user.userInfo.nickName}} </span>
-        <van-tag round type="primary">标签</van-tag>
+<!--    <div class="header-grid-body-top">-->
+<!--      <div style="display: flex;">-->
+<!--        <span>{{user.userInfo.nickName}} </span>-->
+<!--        <van-tag round type="primary">标签</van-tag>-->
 
-      </div>
-    </div>
-    <div class="header-grid-body-bottom">
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="header-grid-body-bottom">-->
+<!--      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">-->
+<!--        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU1" @tap="onNavItem(item)">-->
+<!--          <van-image round width="90rpx" height="90rpx" :src="item.icon" />-->
+<!--          <span style="margin-top: 10px;">{{item.name}} </span>-->
+<!--        </van-grid-item>-->
+<!--      </van-grid>-->
+<!--    </div>-->
+
+    <div class="grid-body">
+      <span style="margin:25px 10px 15px 10px;font-weight: bold;">我的订单</span>
+      <van-divider />
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
         <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU1" @tap="onNavItem(item)">
           <van-image round width="90rpx" height="90rpx" :src="item.icon" />
@@ -92,6 +103,7 @@
 
     <div class="grid-body">
       <span style="margin:25px 10px 15px 10px;font-weight: bold;">常用功能</span>
+      <van-divider />
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
         <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU2" @tap="onNavItem(item)">
           <van-image round width="90rpx" height="90rpx" :src="item.icon" />
@@ -100,15 +112,15 @@
       </van-grid>
     </div>
 
-    <div class="grid-body">
-      <span style="margin:25px 10px 15px 10px;font-weight: bold;">更多推荐</span>
-      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
-        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU3" @tap="onNavItem(item)">
-          <van-image round width="90rpx" height="90rpx" :src="item.icon" />
-          <span style="margin-top: 10px;">{{item.name}} </span>
-        </van-grid-item>
-      </van-grid>
-    </div>
+<!--    <div class="grid-body">-->
+<!--      <span style="margin:25px 10px 15px 10px;font-weight: bold;">更多推荐</span>-->
+<!--      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">-->
+<!--        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU3" @tap="onNavItem(item)">-->
+<!--          <van-image round width="90rpx" height="90rpx" :src="item.icon" />-->
+<!--          <span style="margin-top: 10px;">{{item.name}} </span>-->
+<!--        </van-grid-item>-->
+<!--      </van-grid>-->
+<!--    </div>-->
 
     <div style="margin-top: 100px;" />
 

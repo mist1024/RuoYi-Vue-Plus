@@ -105,8 +105,9 @@
     <el-table v-loading="loading" :data="goodsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="商品ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="商户名称" align="center" prop="deptId" :formatter="deptFormat" width="100px"/>
       <el-table-column label="商品名称" align="center" prop="goodsName"/>
+      <el-table-column label="商户名称" align="center" prop="deptId" :formatter="deptFormat" width="100px"/>
+      <el-table-column label="排序" align="center" prop="sort"/>
       <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
       <el-table-column label="商品价格" align="center" prop="goodsPrice"/>
       <el-table-column label="商品库存" align="center" prop="goodsStock"/>
@@ -179,6 +180,10 @@
         <el-form-item label="商品简称" prop="goodsAlias">
           <el-input v-model="form.goodsAlias" placeholder="请输入商品简称"/>
         </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input type="number" v-model="form.sort" placeholder="请输入排序(升序)"/>
+        </el-form-item>
+
         <el-form-item label="商品价格" prop="goodsPrice">
           <el-input type="number" v-model="form.goodsPrice" placeholder="请输入商品价格"/>
         </el-form-item>
@@ -191,7 +196,7 @@
           <!--          <el-input v-model="form.goodsFaceImg" placeholder="请输入商品封面" />-->
         </el-form-item>
         <el-form-item label="商品图片" prop="goodsImg">
-          <upload-image-multiple :value="form.goodsImg" @input="inputGoodsImg"/>
+          <upload-image-multiple id="multipleImg" ref="multipleImg" :value="form.goodsImg" @input="inputGoodsImg"/>
           <!--          <el-input v-model="form.goodsImg" placeholder="请输入商品图片"/>-->
         </el-form-item>
         <el-form-item label="状态" prop="state">
@@ -254,6 +259,8 @@ import Editor from '@/components/Editor/index';
 import {listSpec} from "@/api/goods/goods_spec";
 import {getDept, listDept} from "@/api/system/dept";
 import {selectDictLabel} from "@/utils/ruoyi";
+import * as settings from "@/settings";
+import {imageBaseUrl} from "@/settings";
 
 export default {
   name: "GoodsMain",
@@ -304,7 +311,8 @@ export default {
         goodsPrice: undefined,
         goodsStock: undefined,
         deptId: undefined,
-        state: 0
+        state: undefined,
+        sort: undefined
       },
       // 表单参数
       form: {},
@@ -359,10 +367,15 @@ export default {
 
     // 商户类型字典翻译
     deptFormat(row, column) {
+
       if (this.deptOptions.length < 1) {
         return ''
       }
-      return this.deptOptions.filter(x => x.deptId === row.deptId)[0].deptName
+
+      const dept = this.deptOptions.filter(x => x.deptId === row.deptId)[0]
+
+
+      return dept.deptName
     },
     /** 查询商品信息列表 */
     getList() {
@@ -397,7 +410,8 @@ export default {
         updateBy: undefined,
         updateTime: undefined,
         state: 0,
-        remark: undefined
+        remark: undefined,
+        sort: 10
       };
       this.resetForm("form");
     },
@@ -431,6 +445,33 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改商品信息";
+
+
+        this.$nextTick(() => {
+
+          const imageList = this.form.goodsImg.split(',')
+
+          const fileList = []
+          this.$refs.multipleImg.setFileList(fileList)
+
+          imageList.forEach(x => {
+            fileList.push({
+              name: x,
+              url: imageBaseUrl + x,
+              response: {
+                msg: "操作成功",
+                fileName: x,
+                code: 200,
+                url: imageBaseUrl + x,
+              }
+            })
+          })
+
+
+          this.$refs.multipleImg.setFileList(fileList)
+
+        })
+
 
         listSpec({
           pageNum: 1,

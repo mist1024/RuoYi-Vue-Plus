@@ -1,12 +1,13 @@
 import Vue from 'vue'
+import {imageBaseUrl} from "@/settings";
 
 
 Vue.filter('getImageForKey', val => {
-  return "https://winery-1257413599.cos.ap-beijing.myqcloud.com/" + val
+  return imageBaseUrl + val
 })
 
 Vue.filter('getImage200', val => {
-  return "https://winery-1257413599.cos.ap-beijing.myqcloud.com/" + val + "?imageMogr2/thumbnail/!200x200r/|imageMogr2/gravity/center/crop/200x200/interlace/0"
+  return imageBaseUrl + val + "?imageMogr2/thumbnail/!200x200r/|imageMogr2/gravity/center/crop/200x200/interlace/0"
 })
 
 

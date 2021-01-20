@@ -86,6 +86,8 @@ public class GoodsMainController extends BaseController {
         if (StringUtils.isNotBlank(goodsMain.getGoodsImg())) {
             lqw.eq(GoodsMain::getGoodsImg, goodsMain.getGoodsImg());
         }
+        lqw.orderByAsc(GoodsMain::getSort);
+
         List<GoodsMain> list = iWineryGoodsService.list(lqw);
         return getDataTable(list);
     }
@@ -119,7 +121,7 @@ public class GoodsMainController extends BaseController {
     @Log(title = "商品信息", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody GoodsMain goodsMain) {
-        goodsMain.setDeptId(getDeptId());
+//        goodsMain.setDeptId(getDeptId());
         goodsMain.setCreateBy(getUsername());
         String richText = goodsMain.getGoodsDesc();
         if (richText != null && StringUtils.isNotEmpty(richText)) {

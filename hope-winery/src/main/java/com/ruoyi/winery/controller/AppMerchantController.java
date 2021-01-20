@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import com.itextpdf.styledxmlparser.jsoup.nodes.Document;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.winery.domain.goods.GoodsMain;
 import com.ruoyi.winery.utils.RichTextUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,6 +64,7 @@ public class AppMerchantController extends BaseController {
         if (StringUtils.isNotBlank(appMerchant.getMchDesc())){
             lqw.eq(AppMerchant::getMchDesc ,appMerchant.getMchDesc());
         }
+        lqw.orderByAsc(AppMerchant::getSort);
         List<AppMerchant> list = iAppMerchantService.list(lqw);
         return getDataTable(list);
     }

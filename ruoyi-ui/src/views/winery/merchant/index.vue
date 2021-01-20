@@ -51,7 +51,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['winery:merchant:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -61,7 +62,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['winery:merchant:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -71,7 +73,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['winery:merchant:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -80,21 +83,24 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['winery:merchant:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="merchantList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="商户名称" align="center" prop="mchName" />
-      <el-table-column label="副标题" align="center" prop="subtitle" />
-              <el-table-column label="图标" align="center" prop="avatar">
-                      <template slot-scope="scope">
-                        <el-image :src="'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + scope.row.avatar" style="width: 60px; height: 60px"/>
-                      </template>
-                    </el-table-column>
+      <el-table-column label="商户名称" align="center" prop="mchName"/>
+      <el-table-column label="排序" align="center" prop="sort"/>
+      <el-table-column label="副标题" align="center" prop="subtitle"/>
+      <el-table-column label="图标" align="center" prop="avatar">
+        <template slot-scope="scope">
+          <el-image :src="scope.row.avatar | getImageForKey"
+                    style="width: 60px; height: 60px"/>
+        </template>
+      </el-table-column>
       <!--<el-table-column label="介绍" align="center" prop="mchDesc" />-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -104,14 +110,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['winery:merchant:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['winery:merchant:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -128,25 +136,31 @@
     <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商户名称" prop="mchName">
-          <el-input v-model="form.mchName" placeholder="请输入商户名称" />
+          <el-input v-model="form.mchName" placeholder="请输入商户名称"/>
+        </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input type="number" v-model="form.sort" placeholder="请输入排序(升序)"/>
         </el-form-item>
         <el-form-item label="副标题" prop="subtitle">
-          <el-input v-model="form.subtitle" placeholder="请输入副标题" />
+          <el-input v-model="form.subtitle" placeholder="请输入副标题"/>
         </el-form-item>
         <el-form-item label="图标" prop="avatar">
           <uploadImage v-model="form.avatar"/>
         </el-form-item>
 
-        <el-form-item label="封面大图" prop="faceImage">
+        <el-form-item label="封面横图" prop="faceImage">
           <uploadImage v-model="form.faceImage"/>
+        </el-form-item>
+        <el-form-item label="内容置顶图" prop="topImage">
+          <uploadImage v-model="form.topImage"/>
         </el-form-item>
 
         <el-form-item label="获奖信息" prop="award">
-          <el-input v-model="form.award" placeholder="获奖信息(多条使用英文逗号分割)" />
+          <el-input v-model="form.award" placeholder="获奖信息(多条使用英文逗号分割)"/>
         </el-form-item>
 
         <el-form-item label="介绍" prop="mchDesc">
-                    <editor :value="form.mchDesc" :height="400" :min-height="400" @on-change="onChangeNewsBody"/>
+          <editor :value="form.mchDesc" :height="400" :min-height="400" @on-change="onChangeNewsBody"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -158,14 +172,26 @@
 </template>
 
 <script>
-import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant } from "@/api/winery/merchant";
+import {
+  listMerchant,
+  getMerchant,
+  delMerchant,
+  addMerchant,
+  updateMerchant,
+  exportMerchant
+} from "@/api/winery/merchant";
 import UploadImage from '@/components/UploadImage';
 import Editor from '@/components/Editor';
+import CommonMixin from "@/mixin/common";
+
 export default {
   name: "Merchant",
   components: {
     Editor,
     UploadImage
+  },
+  mixins: {
+    CommonMixin
   },
   data() {
     return {
@@ -196,13 +222,14 @@ export default {
         avatar: undefined,
         mchDesc: undefined,
         award: undefined,
-        faceImage:undefined
+        faceImage: undefined,
+        topImage: undefined,
+        sort: undefined
       },
       // 表单参数
       form: {},
       // 表单校验
-      rules: {
-      }
+      rules: {}
     };
   },
   created() {
@@ -234,7 +261,7 @@ export default {
         createTime: undefined,
         updateTime: undefined,
         award: undefined,
-        faceImage:undefined
+        faceImage: undefined
       };
       this.resetForm("form");
     },
@@ -251,7 +278,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -294,32 +321,32 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除商户编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delMerchant(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delMerchant(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有商户数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportMerchant(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return exportMerchant(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     },
     onChangeNewsBody(value) {
-          this.form.mchDesc = value.html
-        }
+      this.form.mchDesc = value.html
+    }
   }
 };
 </script>

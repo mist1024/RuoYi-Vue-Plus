@@ -90,8 +90,8 @@
 .van-card__price {
   display: inline-block;
   font-weight: 700;
-  color: #ee0a24;
-  color: var(--card-price-color, #ee0a24);
+  color: #98002E;
+  color: var(--card-price-color, #98002E);
   font-size: 12px;
   font-size: var(--card-price-font-size, 12px)
 }

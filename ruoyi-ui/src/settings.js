@@ -1,4 +1,7 @@
 module.exports = {
+
+  imageBaseUrl: 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/',
+
   title: '酒庄管理系统',
 
   /**

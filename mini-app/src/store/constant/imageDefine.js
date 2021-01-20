@@ -1,6 +1,5 @@
 import { imgbaseUrl, sysImgBaseUrl } from '../../baseDefine'
 
-
 export const imageDefine = {
   SYS_IMG_BASE_URL: sysImgBaseUrl,
   TAP_BAR_ICON1_OFF: imgbaseUrl + 'nav/1.png',
@@ -16,6 +15,10 @@ export const imageDefine = {
   HOME_WINE_LAB: imgbaseUrl + 'icon/home_wine_lab.png',
   HOME_NOTICE_ICON: imgbaseUrl + 'icon/home_wine.png',
   ADDRESS_ADD_IMAGE: imgbaseUrl + 'add.png',
-  WINERY_HEADER: imgbaseUrl + 'winery/winery-header.png'
+  WINERY_HEADER: imgbaseUrl + 'winery/winery-header.png',
+  SHOPPING_BANNER: imgbaseUrl + 'shopping/list-banner.png',
+  LIST_BAG: imgbaseUrl + 'shopping/list-bag.png',
+  MY_HEADER: imgbaseUrl + 'my/header.png',
+  BBS_BG: imgbaseUrl + 'bbs/bg.gif'
 
 }

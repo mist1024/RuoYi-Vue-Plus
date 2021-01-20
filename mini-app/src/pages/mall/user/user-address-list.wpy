@@ -40,12 +40,6 @@
     <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
     <view wx:else>
 
-      <div style="display: flex;align-items: center;justify-content: start;width: 100%;margin-left: 10px;">
-
-        <van-image :src="imageDefine.ADDRESS_ADD_IMAGE" width="60rpx" height="60rpx" @tap="onAdd" />
-        <span style="margin-left: 10px;">添加收货地址</span>
-
-      </div>
 
       <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
         <van-empty description="您还没有添加收货地址" />
@@ -91,6 +85,11 @@
         </div>
 
       </div>
+
+
+
+      <van-button round type="info" size="large" @tap="onAdd" style="margin-top: 20px;">+ 新建收获地址</van-button>
+
     </view>
   </div>
 

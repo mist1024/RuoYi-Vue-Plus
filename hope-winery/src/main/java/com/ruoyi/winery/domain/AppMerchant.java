@@ -52,6 +52,10 @@ private static final long serialVersionUID=1L;
     @Excel(name = "封面图")
     private String faceImage;
 
+    /** 置顶图 */
+    @Excel(name = "置顶图")
+    private String topImage;
+
     /** 奖项信息 */
     @Excel(name = "奖项信息")
     private String award;
@@ -71,4 +75,9 @@ private static final long serialVersionUID=1L;
 
     /** 更新时间 */
     private Date updateTime;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }
