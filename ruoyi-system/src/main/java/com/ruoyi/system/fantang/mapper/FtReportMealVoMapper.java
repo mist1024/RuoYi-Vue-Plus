@@ -30,10 +30,10 @@ public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
 //    select d.*, (select sum(price) from ft_food f where FIND_IN_SET(f.food_id,d.foods)) as price from ft_food_demand d
     // 根据病患配餐表，生成次日报餐记录，并通过ft_food 菜品价格计算菜单总价
     @Insert("insert into ft_report_meals " +
-            "(create_at, type, patient_id, foods, settlement_flag, dining_at, price, open_flag ) " +
+            "(create_at, type, patient_id, foods, settlement_flag, dining_at, price, open_flag , nutrition_food_flag, nutrition_food_id) " +
             "select date_add(now(), interval 1 day), d.type, d.patient_id , d.foods, 0 , date_add(now(), interval 1 day),  " +
             "(select sum(price) from ft_food f " +
-            "where FIND_IN_SET(f.food_id,d.foods)) as price, open_flag from ft_food_demand d " +
+            "where FIND_IN_SET(f.food_id,d.foods)) as price, d.open_flag d.nutrition_food_flag, d.nutrition_food_id from ft_food_demand d " +
             "LEFT JOIN ft_patient p on p.patient_id = d.patient_id and p.off_flag = 0")
     public void insertTomorrowReportMeal();
 }
