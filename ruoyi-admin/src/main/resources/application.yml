@@ -192,20 +192,7 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
-#微信小程序支付配置
-wxmini:
-  appId: wx76ec015fc31a1946 #微信公众号或者小程序等的appid 必填
-  mchId: 1486984962
-  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
-  notifyUrl: http://41.liyiren.me:8696/winery/order/pay/payNotify
-  subAppId: #服务商模式下的子商户公众账号ID
-  subMchId: #服务商模式下的子商户号
-  tradeType: JSAPI  #交易类型
-  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
-  secret: 94ee42c0899a6ceccf353e1e729c50d4 #微信小程序的Secret
-  token: xiao4r #微信小程序消息服务器配置的token
-  aesKey: jNXajd2sQSMYQNg3rcdMF9HraUJxXF0iswgdMxVik9W #微信小程序消息服务器配置的EncodingAESKey
-  msgDataFormat: JSON
+
 
 # cos存储配置
 tencent-cos:
@@ -214,3 +201,19 @@ tencent-cos:
   secretId: AKIDovztW8x0DpQnunSw2uXUDhw3IH0fQC75
   secretKey: rCH8tOfjX5XjegYBXfkZWc2E75nJq9Dx
   region: ap-beijing
+
+
+#微信小程序支付配置
+wxmini:
+  appId: wx76ec015fc31a1946 #微信公众号或者小程序等的appid 必填
+  mchId: 1486984962
+  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
+
+  subAppId: #服务商模式下的子商户公众账号ID
+  subMchId: #服务商模式下的子商户号
+  tradeType: JSAPI  #交易类型
+  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+  secret: 94ee42c0899a6ceccf353e1e729c50d4 #微信小程序的Secret
+  token: xiao4r #微信小程序消息服务器配置的token
+  aesKey: jNXajd2sQSMYQNg3rcdMF9HraUJxXF0iswgdMxVik9W #微信小程序消息服务器配置的EncodingAESKey
+  msgDataFormat: JSON

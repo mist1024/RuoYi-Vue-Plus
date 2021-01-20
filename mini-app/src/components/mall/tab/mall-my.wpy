@@ -10,7 +10,7 @@
 }
 
 .user-info {
-  margin-top: 100px;
+  margin-top: 130px;
   margin-left: 20px;
   margin-right: 20px;
   display: flex;
@@ -67,7 +67,7 @@
   <div class="container" style="margin: 10px 10px 80px 10px;">
 
     <div class="user-info">
-      <van-image round width="90rpx" height="90rpx" :src="user.userInfo.avatarUrl" />
+      <van-image round width="120rpx" height="120rpx" :src="user.userInfo.avatarUrl" />
       <div class="user-info-msg">
         <span style="font-size: 18px;font-weight: bold;">{{user.userInfo.nickName}}</span>
         <span style="font-size: 12px;">{{user.mobile}}</span>
@@ -95,7 +95,7 @@
       <van-divider />
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
         <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU1" @tap="onNavItem(item)">
-          <van-image round width="90rpx" height="90rpx" :src="item.icon" />
+          <van-image width="48rpx" height="40rpx" :src="item.icon" />
           <span style="margin-top: 10px;">{{item.name}} </span>
         </van-grid-item>
       </van-grid>
@@ -106,7 +106,7 @@
       <van-divider />
       <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
         <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU2" @tap="onNavItem(item)">
-          <van-image round width="90rpx" height="90rpx" :src="item.icon" />
+          <van-image width="48rpx" height="40rpx" :src="item.icon" />
           <span style="margin-top: 10px;">{{item.name}} </span>
         </van-grid-item>
       </van-grid>
