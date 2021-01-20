@@ -29,8 +29,8 @@ module.exports.parseImage = parseImage;
 
     <div style="display: flex;flex-wrap: wrap;">
       <div class="filter-button" v-for="(item,index) in filterButtons">
-        <van-button round size="small" :color=" currentFilter === item ? '#7232dd' : '#7232dd' "
-                    :plain="currentFilter === item ? false : true" @tap="onFilterBtn(item)">{{item}}
+        <van-button round size="small" :color="currentFilter.dictLabel === item.dictLabel ? '#7232dd' : '#7232dd' "
+                    :plain="currentFilter.dictLabel === item.dictLabel ? false : true" @tap="onFilterBtn(item)">{{item.dictLabel}}
         </van-button>
       </div>
     </div>
@@ -67,6 +67,7 @@ import appManager from '../../../appManager'
 import mallApis from '../../../apis/mallApis'
 import defaultMix from '../../../mixins/defaultMix'
 import { goodsDetailPage } from '../../../store/constant/nav/pages'
+import xiao4rApis from '../../../apis/xiao4rApis'
 
 wepy.component({
   store,
@@ -75,8 +76,10 @@ wepy.component({
   data: {
     active: 0,
     records: [],
-    currentFilter: '全部',
-    filterButtons: ['全部']
+    currentFilter: {
+      dictLabel: '全部'
+    },
+    filterButtons: []
 
   },
 
@@ -95,16 +98,15 @@ wepy.component({
     },
 
     onFilterBtn(item) {
-      console.log(item)
       this.currentFilter = item
     },
-    parseImage(imageKey) {
-      return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
-    },
-
     async init() {
-
       this.isInit = false
+
+      const dict = await xiao4rApis.getDicts('goods_type')
+
+      this.filterButtons = dict.data
+
       const req = await mallApis.getGoodsList()
 
       this.records = req.rows
@@ -114,14 +116,6 @@ wepy.component({
   },
 
   ready() {
-    let i = 0
-    while (true) {
-      this.filterButtons.push('按钮按钮' + i)
-      i++
-      if (i > 8) {
-        break
-      }
-    }
     this.init()
   }
 })

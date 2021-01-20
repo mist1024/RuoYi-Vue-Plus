@@ -59,7 +59,11 @@ public class GoodsMainController extends BaseController {
         startPage();
         LambdaQueryWrapper<GoodsMain> lqw = Wrappers.lambdaQuery(goodsMain);
 
-        lqw.eq(!isAdmin(), GoodsMain::getDeptId, getDeptId());
+
+        // 不是系统管理员且不是小程序用户的时候仅能看到自己部门的
+        lqw.eq(!isAdmin() && !getUsername().contains("mini-"),
+                GoodsMain::getDeptId, getDeptId());
+
 
         if (StringUtils.isNotBlank(goodsMain.getGoodsName())) {
             lqw.like(GoodsMain::getGoodsName, goodsMain.getGoodsName());

@@ -127,7 +127,7 @@
         </van-col>
 
 
-        <van-col offset="2" span="11">
+        <van-col offset="1" span="11">
           <div class="menu-desc" @tap="onNavItem(navDefine.HOME_MENU2)">
             <div class="fxc">
               <span style="font-size: 16px;">购买庄酒</span>

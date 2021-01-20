@@ -1,4 +1,3 @@
-
 import request from '../js/request'
 import { baseUrl } from '../baseDefine'
 
@@ -9,7 +8,6 @@ export const jsonHeader = {
 export const formHeader = {
   'Content-Type': 'application/x-www-form-urlencoded'
 }
-
 
 /**
  * 接口
@@ -34,10 +32,9 @@ class Xiao4rApis {
   // 根据字典类型查询字典数据信息
   getDicts(dictType) {
     return request.get({
-      url: '/system/dict/data/type/' + dictType,
+      url: baseUrl + 'system/dict/data/type/' + dictType
     })
   }
-
 }
 
 export default new Xiao4rApis()
