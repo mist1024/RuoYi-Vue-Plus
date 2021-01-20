@@ -17,14 +17,13 @@ export default {
     }
   },
   created () {
-    console.log('created page')
 
     let pages = getCurrentPages()
-    console.log(pages)
+    // console.log(pages)
     let currPage = null
     if (pages.length) {
       currPage = pages[pages.length - 1]
     }
-    console.log(currPage)
+    console.log("currPage:", currPage)
   }
 }

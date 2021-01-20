@@ -101,7 +101,7 @@ module.exports.parseImage = parseImage;
 import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
-import mailApis from '../../../apis/mailApis'
+import mallApis from '../../../apis/mallApis'
 import { navDefine } from '../../../store/constant/navDefine'
 import appManager from '../../../appManager'
 
@@ -162,11 +162,11 @@ wepy.page({
     callAppLaunch() {
     },
     async init(id) {
-      const goodsReq = await mailApis.getGoodsById(id)
+      const goodsReq = await mallApis.getGoodsById(id)
       this.goodsItem = goodsReq.data
       // const ids = this.goodsItem.goodsSpec.split(',')
       // console.log(ids)
-      // const goodsSpecReq = await mailApis.getGoodsSpecByIds(ids)
+      // const goodsSpecReq = await mallApis.getGoodsSpecByIds(ids)
 
       // this.goodsSpec = goodsSpecReq.rows[0]
     },

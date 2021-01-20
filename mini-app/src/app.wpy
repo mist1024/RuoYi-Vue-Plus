@@ -109,7 +109,8 @@ pages: [
 'pages/mall/order/order-detail-list',
 'pages/mall/order/order-check',
 'pages/mall/shopping-car/shopping-car-list',
-'pages/winery/winery-detail'
+'pages/winery/winery-detail',
+'pages/winery/winery-list'
 
 ],
 navigateToMiniProgramAppIdList: [
@@ -158,6 +159,7 @@ usingComponents: {
 "van-tabs": "./vant/tabs/index",
 "van-tab": "./vant/tab/index",
 "van-submit-bar": "./vant/submit-bar/index",
+"van-tag": "./vant/tag/index",
 
 "van-area": "./vant/area/index"
 }

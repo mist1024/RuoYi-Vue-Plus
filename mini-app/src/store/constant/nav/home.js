@@ -1,4 +1,5 @@
 import { imgbaseUrl } from '../../../baseDefine'
+import { wineryListPage } from './pages'
 
 const homeImg = imgbaseUrl + 'home/'
 
@@ -38,7 +39,7 @@ export const homeBanner = {
 
 export const menu1 = {
   image: homeImg + 'home_menu1.png',
-  path: ''
+  path: wineryListPage
 }
 export const menu2 = {
   image: homeImg + 'home_menu2.png',

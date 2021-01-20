@@ -64,7 +64,7 @@ import wepy from '@wepy/core'
 import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import appManager from '../../../appManager'
-import mailApis from '../../../apis/mailApis'
+import mallApis from '../../../apis/mallApis'
 import defaultMix from '../../../mixins/defaultMix'
 import { goodsDetailPage } from '../../../store/constant/nav/pages'
 
@@ -105,7 +105,7 @@ wepy.component({
     async init() {
 
       this.isInit = false
-      const req = await mailApis.getGoodsList()
+      const req = await mallApis.getGoodsList()
 
       this.records = req.rows
 

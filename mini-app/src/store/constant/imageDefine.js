@@ -15,6 +15,7 @@ export const imageDefine = {
   HOME_TITLE_IMAGE: imgbaseUrl + 'doctor.png',
   HOME_WINE_LAB: imgbaseUrl + 'icon/home_wine_lab.png',
   HOME_NOTICE_ICON: imgbaseUrl + 'icon/home_wine.png',
-  ADDRESS_ADD_IMAGE: imgbaseUrl + 'add.png'
+  ADDRESS_ADD_IMAGE: imgbaseUrl + 'add.png',
+  WINERY_HEADER: imgbaseUrl + 'winery/winery-header.png'
 
 }

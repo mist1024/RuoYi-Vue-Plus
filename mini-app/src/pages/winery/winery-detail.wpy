@@ -139,6 +139,9 @@ wepy.page({
       console.log(item)
 
     },
+    onBack() {
+      wx.navigateBack()
+    },
 
     async init(id) {
 
