@@ -264,6 +264,7 @@
 
     created() {
       this.getList();
+      this.buildSuggestionList();
       this.myGetUser();
     },
     mounted() {
@@ -314,6 +315,21 @@
         return (restaurant) => {
           return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
         };
+      },
+
+      buildSuggestionList() {
+        listNoPrepayment(this.queryParams).then(response => {
+          let prepaymentList = response.data.records;
+          this.suggestionList = prepaymentList.map(item => {
+            return {
+              "value": item.hospitalId,
+              "departName": item.departName,
+              "name": item.name,
+              "bedId": item.bedId,
+              "patientId": item.patientId,
+            }
+          });
+        });
       },
 
       // 填充所有待缴预付伙食费的病人清单
