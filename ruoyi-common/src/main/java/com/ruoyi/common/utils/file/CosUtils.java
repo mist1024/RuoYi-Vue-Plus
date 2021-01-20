@@ -58,7 +58,9 @@ public class CosUtils {
 
 
         // 指定要上传到 COS 上对象键
-        String key = ReUtil.replaceAll(StrUtil.trim(fastSimpleUUID() + Optional.of(file.getOriginalFilename()).orElse(StrUtil.EMPTY)), SPECIAL_CHARACTERS, StrUtil.EMPTY);
+        String filename = file.getOriginalFilename();
+        String suffix = filename.substring(filename.lastIndexOf("."));
+        String key = ReUtil.replaceAll(fastSimpleUUID() + "." + suffix, SPECIAL_CHARACTERS, StrUtil.EMPTY);
         // 生成 cos 客户端。
         COSClient cosClient = new COSClient(cosCredentials, clientConfig);
         ObjectMetadata metadata = new ObjectMetadata();

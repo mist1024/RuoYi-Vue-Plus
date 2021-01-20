@@ -28,15 +28,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="支付参数" prop="payMsg">
-        <el-input
-          v-model="queryParams.payMsg"
-          placeholder="请输入支付参数"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="总金额" prop="totalFee">
         <el-input
           v-model="queryParams.totalFee"
@@ -127,10 +118,8 @@
     <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="订单ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="部门ID" align="center" prop="deptId" />
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="收货地址ID" align="center" prop="addressId" />
-      <el-table-column label="支付参数" align="center" prop="payMsg" />
       <el-table-column label="总金额" align="center" prop="totalFee" />
       <el-table-column label="运单号" align="center" prop="transportNo" />
       <el-table-column label="订单状态" align="center" prop="status" />
@@ -144,6 +133,11 @@
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.cancelTime, '{y}-{m}-{d}') }}</span>
         </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>-->
+<!--        </template>-->
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -164,7 +158,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -176,17 +170,11 @@
     <!-- 添加或修改订单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入部门ID" />
-        </el-form-item>
         <el-form-item label="用户ID" prop="userId">
           <el-input v-model="form.userId" placeholder="请输入用户ID" />
         </el-form-item>
         <el-form-item label="收货地址ID" prop="addressId">
           <el-input v-model="form.addressId" placeholder="请输入收货地址ID" />
-        </el-form-item>
-        <el-form-item label="支付参数" prop="payMsg">
-          <el-input v-model="form.payMsg" placeholder="请输入支付参数" />
         </el-form-item>
         <el-form-item label="总金额" prop="totalFee">
           <el-input v-model="form.totalFee" placeholder="请输入总金额" />
@@ -258,10 +246,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        deptId: undefined,
         userId: undefined,
         addressId: undefined,
-        payMsg: undefined,
         totalFee: undefined,
         transportNo: undefined,
         status: undefined,
@@ -309,10 +295,8 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        deptId: undefined,
         userId: undefined,
         addressId: undefined,
-        payMsg: undefined,
         totalFee: undefined,
         transportNo: undefined,
         status: 0,
