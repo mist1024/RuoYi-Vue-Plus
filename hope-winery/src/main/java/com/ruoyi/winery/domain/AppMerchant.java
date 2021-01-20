@@ -36,6 +36,11 @@ private static final long serialVersionUID=1L;
     @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
+    /**
+     * 部门id
+     */
+    private Long deptId;
+
     /** 商户名称 */
     @Excel(name = "商户名称")
     private String mchName;

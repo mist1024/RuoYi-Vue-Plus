@@ -85,7 +85,16 @@ page {
 const parseImage = (imageKey) => {
 return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
 }
+const parseAwards = (value) => {
+if (!value) {
+return []
+}
+
+return value.split(',')
+}
+
 module.exports.parseImage = parseImage;
+module.exports.parseAwards = parseAwards;
 </wxs>
 <template>
 
@@ -122,23 +131,26 @@ module.exports.parseImage = parseImage;
 
         <div class="winery-item">
           <van-image :src="filters.parseImage(item.avatar)" width="100%" height="128px" />
-          <div style="margin-left: 20px;margin-top:20px;display: flex;align-items: center;">
+          <div style="margin-left: 20px;margin-top:35px;display: flex;align-items: center;">
             <span style="font-size: 20px;font-weight: bold;width: 120px;">{{item.mchName}}</span>
             <span style="color: #999;font-size: 12px;width: 200px;margin-left: 8px;">{{item.subtitle}}</span>
           </div>
 
 
-          <div style="margin: 19px 8px 15px 8px;">
-            <van-tag color="#F8F4E8" text-color="#CCA049" style="margin-right: 8px;">xxxxxxxxxxx大赛·金奖</van-tag>
-            <van-tag color="#EDF4FA" text-color="#828E99">xxxxxxxxxx大赛·银奖</van-tag>
+          <div style="margin: 19px 15px 15px 8px;">
+
+
+            <van-tag v-for="(awardItem,index) in filters.parseAwards(item.award)"
+                     :color="index === 0 ? '#F8F4E8' : '#EDF4FA' " :text-color="index === 0 ? '#CCA049' : '#828E99'"
+                     style="margin-right: 8px;">{{awardItem}}
+            </van-tag>
           </div>
         </div>
 
 
-
-<!--        <div class="winery-item-arrow">-->
-<!--          <van-icon name="arrow" />-->
-<!--        </div>-->
+        <!--        <div class="winery-item-arrow">-->
+        <!--          <van-icon name="arrow" />-->
+        <!--        </div>-->
       </div>
 
     </div>

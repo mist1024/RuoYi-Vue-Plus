@@ -1,6 +1,7 @@
 import store from '@/store'
 import eventHub from './common/eventHub'
 import userApis from './apis/userApis'
+import { webViewPage } from './store/constant/nav/pages'
 
 class AppManager {
   login(callBack) {
@@ -28,8 +29,6 @@ class AppManager {
           self.setCacheInfo()
           self.setRemoteUserInfo(req2.userInfo)
         }
-
-
 
         wx.hideLoading()
 
@@ -95,7 +94,7 @@ class AppManager {
     }
 
     if (!path) {
-      this.showToast('建设中')
+      this.showToast('建设中，敬请期待.')
       return
     }
 
@@ -106,6 +105,12 @@ class AppManager {
 
   showToast(msg) {
     wx.showToast({ title: msg, icon: 'none' })
+  }
+
+  navWeb(url) {
+    store.state.currWebUrl = url
+
+    this.navigateTo(webViewPage)
   }
 }
 

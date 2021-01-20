@@ -15,7 +15,8 @@ export default new Vuex.Store({
         avatarUrl: 'https://img.yzcdn.cn/vant/cat.jpeg'
       },
       token: '',
-      company: '企业名称'
+      company: '企业名称',
+      currWebUrl: ''
     },
     // 订单
     order: {},

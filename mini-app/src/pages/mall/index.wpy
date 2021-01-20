@@ -90,9 +90,9 @@ module.exports.getTime = getTime;
       我的
     </van-tabbar-item>
   </van-tabbar>
-  <mall-home v-if="pageIndex === 0" />
+  <mall-home v-if="pageIndex === 0" @changeTab="changeTab" />
   <mall-shopping v-else-if="pageIndex === 1" />
-  <mall-bbs v-else-if="pageIndex === 2" />
+  <mall-bbs v-else-if="pageIndex === 2" @changeTab="changeTab" />
   <mall-my v-else-if="pageIndex === 3" />
   <dialog-registration />
 
@@ -143,6 +143,9 @@ wepy.page({
       this.pageIndex = event.$wx.detail
     },
     callAppLaunch() {
+    },
+    changeTab(index) {
+      this.pageIndex = index
     }
 
   },

@@ -116,12 +116,25 @@ wepy.page({
       merchanApis.getMerchantInfo(id).then(r => {
         this.wineryItem = r.data
       })
+    },
+
+    async initByDept(deptId) {
+      merchanApis.getMerchantInfoByDeptId(deptId).then(r => {
+        this.wineryItem = r.data
+      })
     }
   },
 
   onLoad(options) {
-    this.init(options.id)
+
+    if (options.id) {
+      this.init(options.id)
+    } else if (options.deptId) {
+      this.initByDept(options.deptId)
+    }
+
   }
+}
 
 })
 </script>

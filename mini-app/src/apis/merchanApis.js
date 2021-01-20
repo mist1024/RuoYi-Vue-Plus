@@ -19,6 +19,12 @@ class MerchanApis {
       url: baseUrl + 'winery/merchant/' + id
     })
   }
+
+  getMerchantInfoByDeptId(deptId) {
+    return request.get({
+      url: baseUrl + 'winery/merchant/dept/' + deptId
+    })
+  }
 }
 
 export default new MerchanApis()
