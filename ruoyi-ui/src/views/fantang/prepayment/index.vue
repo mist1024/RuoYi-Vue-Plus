@@ -98,12 +98,12 @@
       <el-table-column label="科室" align="center" prop="departName" width="180">
       </el-table-column>
       <el-table-column label="床号" align="center" prop="bedId"/>
-      <el-table-column label="结算" align="center" prop="settlementFlag" :formatter="formatSettlementFlag"/>
-      <el-table-column label="结算时间" align="center" prop="settlementAt" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.settlementAt, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column label="结算" align="center" prop="prepaid" />
+<!--      <el-table-column label="结算时间" align="center" prop="settlementAt" width="180">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ parseTime(scope.row.settlementAt, '{y}-{m}-{d}') }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -131,7 +131,7 @@
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
-      @pagination="getDefaultNoPrepayment"
+      @pagination="getList"
     />
 
     <!-- 添加或修改收费管理对话框 -->
@@ -194,7 +194,7 @@
     listPrepayment,
     listNoPrepayment,
     updatePrepayment
-  } from "@/api/fantang/prepayment";
+  } from "../../../api/fantang/prepayment";
   import {getCountById, listAllPrepay, listPrepay} from "../../../api/fantang/prepayment";
   import {getUserProfile} from "../../../api/system/user";
 
@@ -209,15 +209,12 @@
         postGroup: null,
 
         settlementFlagOptions: [{
-          value: null,
-          label: '未交费'
-        }, {
           value: 0,
-          label: '未结算'
+          label: '已缴费'
         }, {
           value: 1,
-          label: '已结算'
-        }, ],
+          label: '未交费'
+        }],
         suggestionList: [],
         NoPrepayments: [],
         state: '',
@@ -245,7 +242,7 @@
           pageSize: 10,
           collectAt: null,
           settlementAt: null,
-          settlementFlag: null,
+          settlementFlag: 0,
           prepaid: null,
           prepaidAt: null,
           hospitalId: null,
@@ -264,14 +261,30 @@
         }
       };
     },
+
     created() {
-      this.getDefaultNoPrepayment();
+      this.getList();
       this.myGetUser();
     },
     mounted() {
     },
 
     methods: {
+      // 获取数据列表，跟进筛选条件不同获取不同类型的数据
+      getList() {
+        if (this.queryParams.settlementFlag === 0) {
+          // 查询已交预付费信息
+          listPrepay(this.queryParams).then(response => {
+            this.prepaymentList = response.data.records;
+            this.total = response.data.total;
+            this.loading = false;
+          })
+        } else {
+          this.getDefaultNoPrepayment();
+        }
+
+      },
+
       // 获取用户相关信息
       myGetUser() {
         getUserProfile().then(response => {
@@ -282,31 +295,9 @@
       },
       // 处理筛选结算标志
       selectSettlementFlag(value) {
-        console.log("value", value)
-        if (value === null) {
-          this.getDefaultNoPrepayment();
-        } else if (value === 0) {
-          this.loading = true;
-          listPrepay().then(response => {
-            this.prepaymentList = response.rows;
-            this.loading = false;});
-        } else {
-          this.loading = true;
-          listAllPrepay().then(response => {
-            this.prepaymentList = response.rows;
-            this.loading = false;
-          });
-        }
+        this.getList();
       },
 
-      // 格式化结算标志回显
-      formatSettlementFlag(row) {
-        if (row.settlementFlag === null)
-          return "未交费";
-        if (row.settlementFlag === 1)
-          return "已结算";
-        return "未结算";
-      },
       // 响应自动查询回显
       querySearch(queryString, cb) {
         var restaurants = this.suggestionList;
@@ -329,8 +320,9 @@
       getDefaultNoPrepayment() {
         this.loading = true;
         listNoPrepayment(this.queryParams).then(response => {
-          this.NoPrepayments = response.rows;
-          this.suggestionList = this.NoPrepayments.map(item => {
+          this.prepaymentList = response.data.records;
+          this.total = response.data.total;
+          this.suggestionList = this.prepaymentList.map(item => {
             return {
               "value": item.hospitalId,
               "departName": item.departName,

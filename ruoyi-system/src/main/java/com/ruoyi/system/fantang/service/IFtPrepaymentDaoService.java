@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
@@ -14,9 +15,9 @@ import java.util.List;
  */
 public interface IFtPrepaymentDaoService extends IService<FtPrepaymentDao> {
 
-    List<FtPrepaymentVo> listNoPrepay();
+    IPage<FtPrepaymentVo> listNoPrepay(Integer pageNum, Integer pageSize);
 
-    List<FtPrepaymentVo> listPrepay();
+    IPage<FtPrepaymentVo> listPrepay(Integer pageNum, Integer pageSize);
 
     List<FtPrepaymentVo> listAllPrepay();
 

@@ -68,18 +68,15 @@ public class FtPrepaymentDaoController extends BaseController {
     // 查询所有待缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listNoPrepay")
-    public TableDataInfo listNoPrepay() {
-        startPage();
-        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.listNoPrepay();
-        return getDataTable(list);
+    public AjaxResult listNoPrepay(@RequestParam("pageNum")Integer pageNum, @RequestParam("pageSize")Integer pageSize) {
+        return AjaxResult.success(iFtPrepaymentDaoService.listNoPrepay(pageNum, pageSize));
     }
 
     // 查询所有已缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listPrepay")
-    public TableDataInfo listPrepay() {
-        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.listPrepay();
-        return getDataTable(list);
+    public AjaxResult listPrepay(@RequestParam("pageNum")Integer pageNum, @RequestParam("pageSize")Integer pageSize) {
+        return AjaxResult.success(iFtPrepaymentDaoService.listPrepay(pageNum, pageSize));
     }
 
     // 查询所有已结算列表

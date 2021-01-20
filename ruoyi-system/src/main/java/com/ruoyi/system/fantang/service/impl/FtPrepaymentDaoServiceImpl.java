@@ -1,7 +1,10 @@
 package com.ruoyi.system.fantang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import com.ruoyi.system.fantang.mapper.FtPrepaymentDaoMapper;
@@ -20,13 +23,15 @@ import java.util.List;
 public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMapper, FtPrepaymentDao> implements IFtPrepaymentDaoService {
 
     @Override
-    public List<FtPrepaymentVo> listNoPrepay() {
-        return this.baseMapper.listNoPrepay();
+    public IPage<FtPrepaymentVo> listNoPrepay(Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.listNoPrepay(page);
     }
 
     @Override
-    public List<FtPrepaymentVo> listPrepay() {
-        return this.baseMapper.listPrepay();
+    public IPage<FtPrepaymentVo> listPrepay(Integer pageNum, Integer pageSize) {
+        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.listPrepay(page);
     }
 
     @Override

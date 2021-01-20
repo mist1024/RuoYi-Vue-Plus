@@ -1,18 +1,20 @@
 import request from '@/utils/request'
 
 // 查询所有未缴预付费病人列表
-export function listNoPrepayment() {
+export function listNoPrepayment(query) {
   return request({
     url: '/fantang/prepayment/listNoPrepay',
     method: 'get',
+    params: query
   })
 }
 
 // 查询所有已缴预付费病人列表
-export function listPrepay() {
+export function listPrepay(query) {
   return request({
     url: '/fantang/prepayment/listPrepay',
     method: 'get',
+    params: query
   })
 }
 
