@@ -384,7 +384,9 @@ public class ClientController extends BaseController {
     @GetMapping("/getFoodList")
     public AjaxResult getFoodList() {
         QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("type", 1);
+        wrapper.eq("type", 1)
+                .or()
+                .eq("type", 4);
         List<FtFoodDao> list = foodDaoService.list(wrapper);
 
         return AjaxResult.success(list);
