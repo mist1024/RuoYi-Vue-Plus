@@ -36,7 +36,7 @@ wepy.page({
 </script>
 <config>
 {
-navigationBarText: '详情',
+navigationBarTitleText: '详情',
 navigationBarTextStyle: 'black',
 
 }

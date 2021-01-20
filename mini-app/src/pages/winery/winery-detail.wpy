@@ -12,12 +12,10 @@
 
   width: 400rpx;
   height: 60px;
-
   margin-bottom: 20px;
   box-shadow: 4px 4px 10px #cccccc;
   border: #ffffff 1px solid;
   border-radius: 20px;
-
   background-color: white;
   padding: 15px 70rpx;
 
@@ -126,15 +124,13 @@ wepy.page({
   },
 
   onLoad(options) {
-
+    console.log(options)
     if (options.id) {
       this.init(options.id)
     } else if (options.deptId) {
       this.initByDept(options.deptId)
     }
-
   }
-}
 
 })
 </script>

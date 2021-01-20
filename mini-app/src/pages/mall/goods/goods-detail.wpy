@@ -34,7 +34,7 @@ module.exports.parseImage = parseImage;
       </swiper>
 
 
-      <van-cell :title="goodsItems.goodsName" value="内容能显示多长" label="描述信息描述信息描述信息描述信息描述信息描述信息描述信息描述信息"
+      <van-cell :title="goodsItems.goodsName" value="特价" label="goodsItems.goodsAlias"
                 border="{{ false }}" />
       <van-cell title="立即下单" is-link @tap="onShowSpec" />
 
@@ -105,7 +105,7 @@ import mallApis from '../../../apis/mallApis'
 import { navDefine } from '../../../store/constant/navDefine'
 import appManager from '../../../appManager'
 
-import { shoppingCarList } from '../../../store/constant/nav/pages'
+import { shoppingCarList, wineryDetailPage } from '../../../store/constant/nav/pages'
 
 wepy.page({
   store,
@@ -218,7 +218,10 @@ wepy.page({
       this.setShoppingCarAction(this.shoppingCar)
     },
     onWinery() {
-      appManager.showToast('建设中')
+      // appManager.showToast('建设中')
+
+      appManager.navigateTo(wineryDetailPage + '?deptId=' + this.goodsItem.deptId)
+
     },
     onShppingCar() {
       appManager.navigateTo(shoppingCarList)

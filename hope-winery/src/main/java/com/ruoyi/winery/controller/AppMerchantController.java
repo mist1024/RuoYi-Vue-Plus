@@ -95,7 +95,7 @@ public class AppMerchantController extends BaseController {
      * 获取商户详细信息
      */
     @PreAuthorize("@ss.hasPermi('winery:merchant:query')")
-    @GetMapping(value = "dept/{id}")
+    @GetMapping(value = "dept/{deptId}")
     public AjaxResult getInfoByDeptId(@PathVariable("deptId") String deptId) {
 
         return AjaxResult.success(iAppMerchantService.getOne(new LambdaQueryWrapper<AppMerchant>().eq(AppMerchant::getDeptId, deptId)));
