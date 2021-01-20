@@ -32,13 +32,13 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 商户Controller
- * 
+ *
  * @author ruoyi
  * @date 2021-01-19
  */
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
-@RequestMapping("/winery/merchant" )
+@RequestMapping("/winery/merchant")
 public class AppMerchantController extends BaseController {
 
     private final IAppMerchantService iAppMerchantService;
@@ -48,21 +48,20 @@ public class AppMerchantController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('winery:merchant:list')")
     @GetMapping("/list")
-    public TableDataInfo list(AppMerchant appMerchant)
-    {
+    public TableDataInfo list(AppMerchant appMerchant) {
         startPage();
         LambdaQueryWrapper<AppMerchant> lqw = Wrappers.lambdaQuery(appMerchant);
-        if (StringUtils.isNotBlank(appMerchant.getMchName())){
-            lqw.like(AppMerchant::getMchName ,appMerchant.getMchName());
+        if (StringUtils.isNotBlank(appMerchant.getMchName())) {
+            lqw.like(AppMerchant::getMchName, appMerchant.getMchName());
         }
-        if (StringUtils.isNotBlank(appMerchant.getSubtitle())){
-            lqw.eq(AppMerchant::getSubtitle ,appMerchant.getSubtitle());
+        if (StringUtils.isNotBlank(appMerchant.getSubtitle())) {
+            lqw.eq(AppMerchant::getSubtitle, appMerchant.getSubtitle());
         }
-        if (StringUtils.isNotBlank(appMerchant.getAvatar())){
-            lqw.eq(AppMerchant::getAvatar ,appMerchant.getAvatar());
+        if (StringUtils.isNotBlank(appMerchant.getAvatar())) {
+            lqw.eq(AppMerchant::getAvatar, appMerchant.getAvatar());
         }
-        if (StringUtils.isNotBlank(appMerchant.getMchDesc())){
-            lqw.eq(AppMerchant::getMchDesc ,appMerchant.getMchDesc());
+        if (StringUtils.isNotBlank(appMerchant.getMchDesc())) {
+            lqw.eq(AppMerchant::getMchDesc, appMerchant.getMchDesc());
         }
         lqw.orderByAsc(AppMerchant::getSort);
         List<AppMerchant> list = iAppMerchantService.list(lqw);
@@ -72,30 +71,41 @@ public class AppMerchantController extends BaseController {
     /**
      * 导出商户列表
      */
-    @PreAuthorize("@ss.hasPermi('winery:merchant:export')" )
-    @Log(title = "商户" , businessType = BusinessType.EXPORT)
-    @GetMapping("/export" )
+    @PreAuthorize("@ss.hasPermi('winery:merchant:export')")
+    @Log(title = "商户", businessType = BusinessType.EXPORT)
+    @GetMapping("/export")
     public AjaxResult export(AppMerchant appMerchant) {
         LambdaQueryWrapper<AppMerchant> lqw = new LambdaQueryWrapper<AppMerchant>(appMerchant);
         List<AppMerchant> list = iAppMerchantService.list(lqw);
-        ExcelUtil<AppMerchant> util = new ExcelUtil<AppMerchant>(AppMerchant. class);
-        return util.exportExcel(list, "merchant" );
+        ExcelUtil<AppMerchant> util = new ExcelUtil<AppMerchant>(AppMerchant.class);
+        return util.exportExcel(list, "merchant");
     }
 
     /**
      * 获取商户详细信息
      */
-    @PreAuthorize("@ss.hasPermi('winery:merchant:query')" )
-    @GetMapping(value = "/{id}" )
-    public AjaxResult getInfo(@PathVariable("id" ) String id) {
+    @PreAuthorize("@ss.hasPermi('winery:merchant:query')")
+    @GetMapping(value = "/{id}")
+    public AjaxResult getInfo(@PathVariable("id") String id) {
         return AjaxResult.success(iAppMerchantService.getById(id));
+    }
+
+
+    /**
+     * 获取商户详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('winery:merchant:query')")
+    @GetMapping(value = "dept/{id}")
+    public AjaxResult getInfoByDeptId(@PathVariable("deptId") String deptId) {
+
+        return AjaxResult.success(iAppMerchantService.getOne(new LambdaQueryWrapper<AppMerchant>().eq(AppMerchant::getDeptId, deptId)));
     }
 
     /**
      * 新增商户
      */
-    @PreAuthorize("@ss.hasPermi('winery:merchant:add')" )
-    @Log(title = "商户" , businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('winery:merchant:add')")
+    @Log(title = "商户", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody AppMerchant appMerchant) {
         String richText = appMerchant.getMchDesc();
@@ -109,8 +119,8 @@ public class AppMerchantController extends BaseController {
     /**
      * 修改商户
      */
-    @PreAuthorize("@ss.hasPermi('winery:merchant:edit')" )
-    @Log(title = "商户" , businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('winery:merchant:edit')")
+    @Log(title = "商户", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody AppMerchant appMerchant) {
         String richText = appMerchant.getMchDesc();
@@ -124,9 +134,9 @@ public class AppMerchantController extends BaseController {
     /**
      * 删除商户
      */
-    @PreAuthorize("@ss.hasPermi('winery:merchant:remove')" )
-    @Log(title = "商户" , businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}" )
+    @PreAuthorize("@ss.hasPermi('winery:merchant:remove')")
+    @Log(title = "商户", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(iAppMerchantService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
     }
