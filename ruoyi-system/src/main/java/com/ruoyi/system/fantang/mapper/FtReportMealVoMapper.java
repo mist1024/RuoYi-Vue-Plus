@@ -33,7 +33,7 @@ public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
             "(create_at, type, patient_id, foods, settlement_flag, dining_at, price, open_flag , nutrition_food_flag, nutrition_food_id) " +
             "select date_add(now(), interval 1 day), d.type, d.patient_id , d.foods, 0 , date_add(now(), interval 1 day),  " +
             "(select sum(price) from ft_food f " +
-            "where FIND_IN_SET(f.food_id,d.foods)) as price, d.open_flag d.nutrition_food_flag, d.nutrition_food_id from ft_food_demand d " +
+            "where FIND_IN_SET(f.food_id,d.foods)) as price, d.open_flag, 0, d.nutrition_food_id from ft_food_demand d " +
             "LEFT JOIN ft_patient p on p.patient_id = d.patient_id and p.off_flag = 0")
     public void insertTomorrowReportMeal();
 }
