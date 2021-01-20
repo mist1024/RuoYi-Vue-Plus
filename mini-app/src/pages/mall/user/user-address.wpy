@@ -146,7 +146,8 @@ wepy.page({
   hooks: {},
   data: {
     title: '添加地址',
-    countryTypes: ['国内', '海外'],
+    // countryTypes: ['国内', '海外'],
+    countryTypes: ['国内'],
     form: {
       id: '',
       region: ['宁夏回族自治区', '银川市', '西夏区'],
