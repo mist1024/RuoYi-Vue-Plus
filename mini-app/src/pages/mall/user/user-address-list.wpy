@@ -87,8 +87,9 @@
       </div>
 
 
-
-      <van-button round type="info" size="large" @tap="onAdd" style="margin-top: 20px;">+ 新建收获地址</van-button>
+      <div style="margin-top: 20px;">
+        <van-button round type="info" size="large" @tap="onAdd">+ 新建收获地址</van-button>
+      </div>
 
     </view>
   </div>

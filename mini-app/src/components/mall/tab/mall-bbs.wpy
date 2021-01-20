@@ -4,63 +4,68 @@
   width: 100%;
   height: 536rpx;
   z-index: -10;
-
 }
+
 
 </style>
 <template>
-  <div class="contianer">
+  <view style="background-color: white;flex-direction: column;display: flex; align-items: center;padding-bottom: 600px;">
 
-    <van-image :src="imageDefine.BBS_BG">
+    <van-image :src="imageDefine.BBS_BG" width="400rpx" height="400rpx" style="margin-top: 100px;" />
+    <span style="margin-top: 10px;font-size: 26px;color: #940D46;font-weight: bold;">敬请期待</span>
+    <span style="margin-top: 10px;font-size: 14px;color: #999;">即将上线更多福利，记得关注哦～</span>
 
-<!--    <van-panel v-for="(item,index) in list" :key="index" :title="item.user" desc="三星客户" status=" " use-footer-slot>-->
-<!--      <van-row>-->
-<!--        <van-col span="8">-->
-<!--          <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />-->
-<!--        </van-col>-->
-<!--        <van-col span="8">span: 8</van-col>-->
-<!--      </van-row>-->
+    <van-button round type="info" @tap="onButton" style="margin-top: 10px;">先逛逛葡萄酒</van-button>
 
-<!--      <view style="display: flex;font-size: 14px;">{{item.context}}</view>-->
+    <!--    <van-panel v-for="(item,index) in list" :key="index" :title="item.user" desc="三星客户" status=" " use-footer-slot>-->
+    <!--      <van-row>-->
+    <!--        <van-col span="8">-->
+    <!--          <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" />-->
+    <!--        </van-col>-->
+    <!--        <van-col span="8">span: 8</van-col>-->
+    <!--      </van-row>-->
 
-<!--      <van-grid column-num="3" border="{{ false }}">-->
-<!--        <van-grid-item use-slot v-for=" 3 " wx:for-item="index">-->
-<!--          <image-->
-<!--            style="width: 100%; height: 90px;"-->
-<!--            src="https://img.yzcdn.cn/vant/apple-{{ index + 1 }}.jpg"-->
-<!--          />-->
-<!--        </van-grid-item>-->
-<!--      </van-grid>-->
+    <!--      <view style="display: flex;font-size: 14px;">{{item.context}}</view>-->
 
-<!--      <van-divider />-->
-<!--      <view style="display: flex;font-size: 14px;">-->
-<!--        <span style="color: cornflowerblue;">用户xxx<span-->
-<!--          style="color: #333333;">的回复: 内容很牛逼，挺内容很牛逼，挺内容很牛逼，挺内容很牛逼，挺内容很牛逼，挺</span></span>-->
+    <!--      <van-grid column-num="3" border="{{ false }}">-->
+    <!--        <van-grid-item use-slot v-for=" 3 " wx:for-item="index">-->
+    <!--          <image-->
+    <!--            style="width: 100%; height: 90px;"-->
+    <!--            src="https://img.yzcdn.cn/vant/apple-{{ index + 1 }}.jpg"-->
+    <!--          />-->
+    <!--        </van-grid-item>-->
+    <!--      </van-grid>-->
 
-<!--      </view>-->
-<!--      <view slot="footer">-->
-<!--        <view style="display: flex;justify-content: flex-end;">-->
-<!--          <van-button v-if="true" size="small">删除</van-button>-->
-<!--          <van-button v-if="true" size="small" type="danger" style="margin-left: 10px;">编辑</van-button>-->
-<!--          <van-button size="small" type="danger" style="margin-left: 10px;" @tap="onReply(item)">回复</van-button>-->
-<!--        </view>-->
-<!--      </view>-->
-<!--    </van-panel>-->
+    <!--      <van-divider />-->
+    <!--      <view style="display: flex;font-size: 14px;">-->
+    <!--        <span style="color: cornflowerblue;">用户xxx<span-->
+    <!--          style="color: #333333;">的回复: 内容很牛逼，挺内容很牛逼，挺内容很牛逼，挺内容很牛逼，挺内容很牛逼，挺</span></span>-->
+
+    <!--      </view>-->
+    <!--      <view slot="footer">-->
+    <!--        <view style="display: flex;justify-content: flex-end;">-->
+    <!--          <van-button v-if="true" size="small">删除</van-button>-->
+    <!--          <van-button v-if="true" size="small" type="danger" style="margin-left: 10px;">编辑</van-button>-->
+    <!--          <van-button size="small" type="danger" style="margin-left: 10px;" @tap="onReply(item)">回复</van-button>-->
+    <!--        </view>-->
+    <!--      </view>-->
+    <!--    </van-panel>-->
 
 
-<!--    <van-dialog-->
-<!--      use-slot-->
-<!--      title="标题"-->
-<!--      show="{{ isShowInput }}"-->
-<!--      show-cancel-button-->
-<!--      bind:close="onCloseInput"-->
-<!--      bind:confirm="onConfirmInput"-->
-<!--    >-->
-<!--      <image src="https://img.yzcdn.cn/1.jpg" />-->
-<!--    </van-dialog>-->
+    <!--    <van-dialog-->
+    <!--      use-slot-->
+    <!--      title="标题"-->
+    <!--      show="{{ isShowInput }}"-->
+    <!--      show-cancel-button-->
+    <!--      bind:close="onCloseInput"-->
+    <!--      bind:confirm="onConfirmInput"-->
+    <!--    >-->
+    <!--      <image src="https://img.yzcdn.cn/1.jpg" />-->
+    <!--    </van-dialog>-->
 
-<!--    <div style="margin-top: 100px;" />-->
-  </div>
+    <!--    <div style="margin-top: 100px;" />-->
+  </view>
+
 </template>
 
 <script>
@@ -96,6 +101,9 @@ wepy.component({
     },
     onConfirmInput() {
       this.isShowInput = false
+    },
+    onButton() {
+      this.$emit('changeTab', 1)
     }
   },
 

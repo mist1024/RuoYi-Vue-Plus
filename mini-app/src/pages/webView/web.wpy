@@ -1,0 +1,43 @@
+<style lang="less">
+
+
+
+</style>
+<template>
+
+  <web-view src="{{currWebUrl}}" />
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+
+wepy.page({
+  store,
+  hooks: {
+
+  },
+
+  data: {
+    url: ''
+
+  },
+  computed: mapState(['currWebUrl']),
+
+  methods: {
+
+  },
+  ready() {
+    this.url = store.state.currWebUrl
+  }
+})
+</script>
+<config>
+{
+navigationBarText: '详情',
+navigationBarTextStyle: 'black',
+
+}
+</config>

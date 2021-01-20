@@ -11,7 +11,7 @@ module.exports.parseImage = parseImage;
   <van-nav-bar
     title="福利购"
   />
-  <view class="contianer" style="margin: 10px 16px 80px 16px;">
+  <view class="" style="margin: 10px 16px 80px 16px;">
 
 
     <van-image class="banner" :src="imageDefine.SHOPPING_BANNER" width="686rpx"

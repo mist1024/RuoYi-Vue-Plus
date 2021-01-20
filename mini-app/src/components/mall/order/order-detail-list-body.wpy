@@ -64,7 +64,7 @@ module.exports.parseOrderStatus = parseOrderStatus;
   <div style="width: 100%;">
 
     <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px; display: flex;align-items: center;flex-direction: column;"></van-loading>
-    <view class="contianer" style="margin: 10px;" wx:else>
+    <view class="" style="margin: 10px;" wx:else>
 
 
       <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">

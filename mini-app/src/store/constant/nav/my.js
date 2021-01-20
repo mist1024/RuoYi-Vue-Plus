@@ -29,7 +29,7 @@ export const myMenuList2 = [
     icon: imgbaseUrl + '/my/tool_2.png',
     path: orderDetailListPage
   }, {
-    name: '优惠券',
+    name: '条款政策',
     icon: imgbaseUrl + '/my/tool_3.png',
     path: ''
   }

@@ -110,7 +110,8 @@ pages: [
 'pages/mall/order/order-check',
 'pages/mall/shopping-car/shopping-car-list',
 'pages/winery/winery-detail',
-'pages/winery/winery-list'
+'pages/winery/winery-list',
+'pages/webView/web'
 
 ],
 navigateToMiniProgramAppIdList: [
