@@ -23,6 +23,12 @@ class MallApis {
       url: baseUrl + 'goods/goods_spec/listByIds/' + ids
     })
   }
+
+  getActivityList() {
+    return request.get({
+      url: baseUrl + 'winery/activity/open/list'
+    })
+  }
 }
 
 export default new MallApis()

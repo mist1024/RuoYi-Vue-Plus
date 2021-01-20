@@ -11,8 +11,8 @@ export default new Vuex.Store({
       openid: '',
       mobile: '',
       userInfo: {
-        nickName: '未注册用户',
-        avatarUrl: 'https://img.yzcdn.cn/vant/cat.jpeg'
+        nickName: '游客',
+        avatarUrl: imageDefine.USER
       },
       token: '',
       company: '企业名称',

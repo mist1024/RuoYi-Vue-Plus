@@ -19,6 +19,7 @@ export const imageDefine = {
   SHOPPING_BANNER: imgbaseUrl + 'shopping/list-banner.png',
   LIST_BAG: imgbaseUrl + 'shopping/list-bag.png',
   MY_HEADER: imgbaseUrl + 'my/header.png',
-  BBS_BG: imgbaseUrl + 'bbs/bg.gif'
+  BBS_BG: imgbaseUrl + 'bbs/bg.gif',
+  USER: imgbaseUrl + 'user.png'
 
 }

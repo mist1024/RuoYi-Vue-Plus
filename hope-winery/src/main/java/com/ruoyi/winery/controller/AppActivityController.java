@@ -83,7 +83,7 @@ public class AppActivityController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('winery:activity:query')" )
     @GetMapping(value = "/{id}" )
-    public AjaxResult getInfo(@PathVariable("id" ) Long id) {
+    public AjaxResult getInfo(@PathVariable("id" ) String id) {
         return AjaxResult.success(iAppActivityService.getById(id));
     }
 
@@ -113,7 +113,32 @@ public class AppActivityController extends BaseController {
     @PreAuthorize("@ss.hasPermi('winery:activity:remove')" )
     @Log(title = "活动" , businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}" )
-    public AjaxResult remove(@PathVariable Long[] ids) {
+    public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(iAppActivityService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    }
+
+
+    /**
+     * 查询活动列表(开放)
+     */
+    @GetMapping("/open/list")
+    public TableDataInfo openList(AppActivity appActivity)
+    {
+        startPage();
+        LambdaQueryWrapper<AppActivity> lqw = Wrappers.lambdaQuery(appActivity);
+        if (StringUtils.isNotBlank(appActivity.getUrl())){
+            lqw.eq(AppActivity::getUrl ,appActivity.getUrl());
+        }
+        if (appActivity.getType() != null){
+            lqw.eq(AppActivity::getType ,appActivity.getType());
+        }
+        if (StringUtils.isNotBlank(appActivity.getImage())){
+            lqw.eq(AppActivity::getImage ,appActivity.getImage());
+        }
+        if (appActivity.getImageHeight() != null){
+            lqw.eq(AppActivity::getImageHeight ,appActivity.getImageHeight());
+        }
+        List<AppActivity> list = iAppActivityService.list(lqw);
+        return getDataTable(list);
     }
 }
