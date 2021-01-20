@@ -155,8 +155,8 @@ public class ClientPatientController extends BaseController {
     @GetMapping("/getFoodPrice")
     public AjaxResult getFoodPrice() {
         QueryWrapper<FtFoodDao> wrapper = new QueryWrapper<>();
-        wrapper.eq("type", 1);
-        wrapper.gt("dinner_type", 0);
+        wrapper.in("type", 1,4)
+                .gt("dinner_type", 0);
         return AjaxResult.success(iftFoodDaoService.list(wrapper));
     }
 
