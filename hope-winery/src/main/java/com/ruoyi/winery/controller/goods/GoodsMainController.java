@@ -116,6 +116,7 @@ public class GoodsMainController extends BaseController {
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody GoodsMain goodsMain) {
         goodsMain.setDeptId(getDeptId());
+        goodsMain.setCreateBy(getUsername());
         String richText = goodsMain.getGoodsDesc();
         if (richText != null && StringUtils.isNotEmpty(richText)) {
             Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");

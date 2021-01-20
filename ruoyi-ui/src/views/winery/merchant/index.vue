@@ -136,6 +136,15 @@
         <el-form-item label="图标" prop="avatar">
           <uploadImage v-model="form.avatar"/>
         </el-form-item>
+
+        <el-form-item label="封面大图" prop="faceImage">
+          <uploadImage v-model="form.faceImage"/>
+        </el-form-item>
+
+        <el-form-item label="获奖信息" prop="award">
+          <el-input v-model="form.award" placeholder="获奖信息(多条使用英文逗号分割)" />
+        </el-form-item>
+
         <el-form-item label="介绍" prop="mchDesc">
                     <editor :value="form.mchDesc" :height="400" :min-height="400" @on-change="onChangeNewsBody"/>
         </el-form-item>
@@ -186,6 +195,8 @@ export default {
         subtitle: undefined,
         avatar: undefined,
         mchDesc: undefined,
+        award: undefined,
+        faceImage:undefined
       },
       // 表单参数
       form: {},
@@ -221,7 +232,9 @@ export default {
         avatar: undefined,
         mchDesc: undefined,
         createTime: undefined,
-        updateTime: undefined
+        updateTime: undefined,
+        award: undefined,
+        faceImage:undefined
       };
       this.resetForm("form");
     },

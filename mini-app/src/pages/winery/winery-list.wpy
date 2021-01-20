@@ -153,6 +153,8 @@ import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import defaultMix from '../../mixins/defaultMix'
 import merchanApis from '../../apis/merchanApis'
+import appManager from '../../appManager'
+import { wineryDetailPage } from '../../store/constant/nav/pages'
 
 wepy.page({
   store,
@@ -180,7 +182,7 @@ wepy.page({
       console.log('handleVieTap clicked')
     },
     onTap(item) {
-      console.log(item)
+      appManager.navigateTo(wineryDetailPage + '?id=' + item.id)
     },
     onBack() {
       wx.navigateBack()

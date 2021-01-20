@@ -17,7 +17,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 商户对象 app_merchant
- * 
+ *
  * @author ruoyi
  * @date 2021-01-19
  */
@@ -47,6 +47,14 @@ private static final long serialVersionUID=1L;
     /** 图标 */
     @Excel(name = "图标")
     private String avatar;
+
+    /** 封面图 */
+    @Excel(name = "封面图")
+    private String faceImage;
+
+    /** 奖项信息 */
+    @Excel(name = "奖项信息")
+    private String award;
 
     /** 介绍 */
     @Excel(name = "介绍")
