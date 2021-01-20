@@ -220,8 +220,8 @@ import {
 import UploadImage from '@/components/UploadImage';
 import CommonMixin from "@/mixin/common";
 import Editor from '@/components/Editor';
-import {getDictName} from "@/utils/utils";
 import {delTable} from "@/api/tool/gen";
+import {selectDictLabel} from "@/utils/ruoyi";
 
 export default {
   name: "News_content",
@@ -283,7 +283,7 @@ export default {
   },
   filters: {
     getStateName(value, options) {
-      return getDictName(value, options)
+      return selectDictLabel(options, value)
     }
   },
   created() {

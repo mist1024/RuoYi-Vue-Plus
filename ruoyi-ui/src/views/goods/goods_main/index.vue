@@ -105,7 +105,7 @@
     <el-table v-loading="loading" :data="goodsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="商品ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="商户名称" align="center" prop="deptId" :formatter="mchFormat" width="100px"/>
+      <el-table-column label="商户名称" align="center" prop="deptId" :formatter="deptFormat" width="100px"/>
       <el-table-column label="商品名称" align="center" prop="goodsName"/>
       <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
       <el-table-column label="商品价格" align="center" prop="goodsPrice"/>
@@ -165,10 +165,10 @@
         <el-form-item label="商户" prop="deptId">
           <el-select v-model="form.deptId" placeholder="请选择商户">
             <el-option
-              v-for="dict in mchOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictValue"
+              v-for="dict in deptOptions"
+              :key="dict.deptId"
+              :label="dict.deptName"
+              :value="dict.deptId"
             />
           </el-select>
         </el-form-item>
@@ -252,7 +252,8 @@ import UploadImageMultiple from '@/components/UploadImageMultiple/index'
 import CommonMixin from "@/mixin/common";
 import Editor from '@/components/Editor/index';
 import {listSpec} from "@/api/goods/goods_spec";
-import {getDictName} from "@/utils/utils";
+import {getDept, listDept} from "@/api/system/dept";
+import {selectDictLabel} from "@/utils/ruoyi";
 
 export default {
   name: "GoodsMain",
@@ -288,7 +289,7 @@ export default {
       // 商品类型字典
       goodsTypeOptions: [],
       // 商户类型字典
-      mchOptions: [],
+      deptOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -302,6 +303,7 @@ export default {
         goodsImg: undefined,
         goodsPrice: undefined,
         goodsStock: undefined,
+        deptId: undefined,
         state: 0
       },
       // 表单参数
@@ -318,7 +320,7 @@ export default {
   },
   filters: {
     getStateName(value, options) {
-      return getDictName(value, options)
+      return selectDictLabel(options, value);
     }
   },
   created() {
@@ -331,9 +333,11 @@ export default {
       this.goodsTypeOptions = response.data;
     });
 
-    this.getDicts("merchant_dept").then(response => {
-      this.mchOptions = response.data;
-    });
+    listDept().then(r => {
+
+      this.deptOptions = r.data.filter(x => x.parentId === 300)
+
+    })
   },
   methods: {
     inputGoodsFaceImg(fileName) {
@@ -354,8 +358,11 @@ export default {
     },
 
     // 商户类型字典翻译
-    mchFormat(row, column) {
-      return this.selectDictLabel(this.mchOptions, row.deptId);
+    deptFormat(row, column) {
+      if (this.deptOptions.length < 1) {
+        return ''
+      }
+      return this.deptOptions.filter(x => x.deptId === row.deptId)[0].deptName
     },
     /** 查询商品信息列表 */
     getList() {
@@ -375,6 +382,7 @@ export default {
     reset() {
       this.form = {
         id: undefined,
+        deptId: undefined,
         goodsName: undefined,
         goodsAlias: undefined,
         goodsType: undefined,
