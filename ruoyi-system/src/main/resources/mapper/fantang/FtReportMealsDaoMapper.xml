@@ -27,14 +27,17 @@
         <result property="egg" column="egg"/>
         <result property="openFlag" column="open_flag"/>
         <result property="diningAt" column="dining_at"/>
+        <result property="diningFlag" column="dining_flag"/>
     </resultMap>
 
     <select id="listMealsWithInSettle" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
-        select sum(a.price) as price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code
+        select sum(a.total_price ) as price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code
         from ft_report_meals a
         LEFT JOIN ft_patient b on a.patient_id = b.patient_id
         LEFT JOIN ft_depart c on b.depart_id = c.depart_id
         <where>
+            a.dining_flag = 1
+            AND b.off_flag = 0
             <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
             <if test="departId != null">and b.depart_id = #{departId}</if>
             <if test="name != null and name !=''">and b.name = #{name}</if>

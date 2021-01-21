@@ -180,4 +180,9 @@ public class FtReportMealsDao implements Serializable {
      */
     @TableField(exist = false)
     private Date endOfDay;
+
+    /**
+     * 用餐标志
+     */
+    private Integer diningFlag;
 }

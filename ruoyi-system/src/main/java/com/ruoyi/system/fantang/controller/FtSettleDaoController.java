@@ -69,8 +69,8 @@ public class FtSettleDaoController extends BaseController {
         // 根据病人 id ，上次结算日期，选择日期查询病人非营养餐记录
         QueryWrapper<FtReportMealsDao> reportMealsWrapper = new QueryWrapper<>();
         reportMealsWrapper.eq("patient_id", patientId);
-//        reportMealsWrapper.eq("nutrition_food_flag", 0);
-        reportMealsWrapper.between("create_at", sdf.format(lastBillingDate), sdf.format(selectBillingDate));
+        reportMealsWrapper.eq("dining_flag",1);
+        reportMealsWrapper.between("dining_at", sdf.format(lastBillingDate), sdf.format(selectBillingDate));
         List<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.list(reportMealsWrapper);
 
         ReportMealsPriceEntity reportMealsPrice = iFtReportMealsDaoService.sumTotalPrice(patientId, lastBillingDate, selectBillingDate);

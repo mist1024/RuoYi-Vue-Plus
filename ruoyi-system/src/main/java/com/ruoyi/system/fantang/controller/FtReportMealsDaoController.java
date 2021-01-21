@@ -10,8 +10,10 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
+import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static com.ruoyi.common.core.domain.AjaxResult.success;
 
 /**
  * 报餐管理Controller
@@ -36,31 +40,49 @@ public class FtReportMealsDaoController extends BaseController {
 
     private final IFtReportMealsDaoService iFtReportMealsDaoService;
 
+    @Autowired
+    private IFtPrepaymentDaoService prepaymentDaoService;
+
 
     /**
      * 查询指定用户上一次结算的日期，并通过这个日期计算未结算的天数
      */
     @GetMapping("/getLastSettlementDate/{patientId}")
     public AjaxResult getLastSettlementDate(@PathVariable("patientId") Long patientId) {
+        // 初始化一个返回对象
+        AjaxResult result = AjaxResult.success();
 
-        // 获取最近一次已结算的报餐记录，如果首次结算则返回
+        // 获取该病患的预付费数据
+        FtPrepaymentDao prepaymentDao = prepaymentDaoService.getByPatientId(patientId);
+        result.put("prepayment", prepaymentDao);
+
+        // 获取最近一次已结算的报餐记录，如果首次结算则返回第一条已用餐的记录
         FtReportMealsDao reportMealsDao = iFtReportMealsDaoService.getLastReportMeals(patientId);
 
-        Date createAt = reportMealsDao.getCreateAt();
+        // 获取用餐日期
+        Date diningAt = reportMealsDao.getDiningAt();
+        // 获取结算日期
         Date settlementAt = reportMealsDao.getSettlementAt();
         ReportMealsDayEntity reportMealsDayEntity = new ReportMealsDayEntity();
-        if (settlementAt == null) {
-            long betweenDays = DateUtil.between(createAt, new Date(), DateUnit.DAY);
-            reportMealsDayEntity.setDays(betweenDays);
-            reportMealsDayEntity.setLastCreateDate(createAt);
-            return AjaxResult.success(reportMealsDayEntity);
-        }
-        long days = DateUtil.between(settlementAt, new Date(), DateUnit.DAY);
 
+        // 如果首次结算
+        if (settlementAt == null) {
+            // 计算第一条已用餐的用餐时间与现在相差多少天
+            long betweenDays = DateUtil.between(diningAt, new Date(), DateUnit.DAY);
+            reportMealsDayEntity.setDays(betweenDays);
+            reportMealsDayEntity.setLastCreateDate(diningAt);
+            result.put("reportMeals", reportMealsDayEntity);
+
+            return result;
+        }
+
+        //计算上次结算日期与现在相差多少天
+        long days = DateUtil.between(settlementAt, new Date(), DateUnit.DAY);
         reportMealsDayEntity.setSettlementAt(settlementAt);
         reportMealsDayEntity.setDays(days);
+        result.put("reportMeals", reportMealsDayEntity);
 
-        return AjaxResult.success(reportMealsDayEntity);
+        return result;
     }
 
 
@@ -161,7 +183,7 @@ public class FtReportMealsDaoController extends BaseController {
      */
     @GetMapping("/countBillingBetween")
     public AjaxResult countBillingBetween(ReportMealsDayEntity dao) {
-        return AjaxResult.success(iFtReportMealsDaoService.countBillingBetween(dao));
+        return success(iFtReportMealsDaoService.countBillingBetween(dao));
     }
 
     /**
@@ -170,7 +192,7 @@ public class FtReportMealsDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:meals:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
-        return AjaxResult.success(iFtReportMealsDaoService.getById(id));
+        return success(iFtReportMealsDaoService.getById(id));
     }
 
     /**

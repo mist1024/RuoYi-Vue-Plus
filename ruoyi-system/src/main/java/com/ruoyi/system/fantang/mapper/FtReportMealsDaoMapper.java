@@ -36,7 +36,7 @@ public interface FtReportMealsDaoMapper extends BaseMapper<FtReportMealsDao> {
      * @param selectBillingDate
      * @return
      */
-    @Select("SELECT a.patient_id,sum(a.price) as dinner_total_price , sum(a.nutrition_food_price ) as nutrition_total_price , sum(a.total_price) as sum_total_price FROM ft_report_meals a where a.patient_id = #{patientId} and a.create_at BETWEEN #{lastBillingDate} AND #{selectBillingDate}")
+    @Select("SELECT a.patient_id,sum(a.price) as dinner_total_price , sum(a.nutrition_food_price ) as nutrition_total_price , sum(a.total_price) as sum_total_price FROM ft_report_meals a where a.patient_id = #{patientId} and a.dining_at BETWEEN #{lastBillingDate} AND #{selectBillingDate}")
     ReportMealsPriceEntity sumTotalPrice(@Param("patientId") Long patientId, @Param("lastBillingDate") Date lastBillingDate, @Param("selectBillingDate") Date selectBillingDate);
 
     List<FtReportMealsDao> listNutrition(@Param("beginOfDay") DateTime beginOfDay, @Param("endOfDay") DateTime endOfDay, FtReportMealsDao ftReportMealsDao);

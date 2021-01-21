@@ -76,10 +76,11 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     @Override
     public FtReportMealsDao getLastReportMeals(Long patientId) {
 
-        // 获取最近一条已结算的报餐记录
+        // 获取最近一条已用餐结算的报餐记录
         QueryWrapper<FtReportMealsDao> flag1Wrapper = new QueryWrapper<>();
         flag1Wrapper.eq("patient_id", patientId);
         flag1Wrapper.eq("settlement_flag", 1);
+        flag1Wrapper.eq("dining_flag", 1);
         flag1Wrapper.orderByDesc("settlement_at");
         flag1Wrapper.last("limit 1");
         FtReportMealsDao flag1ReportMealsDao = this.baseMapper.selectOne(flag1Wrapper);
@@ -87,9 +88,10 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
         // 如果是首次结算
         if (flag1ReportMealsDao == null) {
 
-            // 获取第一条报餐数据
+            // 获取第一条 已用餐 报餐记录
             QueryWrapper<FtReportMealsDao> flag0Wrapper = new QueryWrapper<>();
             flag0Wrapper.eq("patient_id", patientId);
+            flag0Wrapper.eq("dining_flag", 1);
             flag0Wrapper.orderByAsc("dining_at");
             flag0Wrapper.last("limit 1");
 
