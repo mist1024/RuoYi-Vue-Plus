@@ -54,38 +54,6 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button-->
-      <!--          type="primary"-->
-      <!--          icon="el-icon-plus"-->
-      <!--          size="mini"-->
-      <!--          @click="handleAdd"-->
-      <!--          v-hasPermi="['fantang:settle:add']"-->
-      <!--        >伙食费收款-->
-      <!--        </el-button>-->
-      <!--      </el-col>-->
-      <el-col :span="1.5">
-        <el-button
-            type="success"
-            icon="el-icon-edit"
-            size="mini"
-            :disabled="single"
-            @click="handleUpdate"
-            v-hasPermi="['fantang:settle:edit']"
-        >出院结算
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="mini"
-            :disabled="multiple"
-            @click="handleDelete"
-            v-hasPermi="['fantang:settle:remove']"
-        >删除
-        </el-button>
-      </el-col>
       <el-col :span="1.5">
         <el-button
             type="warning"
@@ -123,7 +91,7 @@
               icon="el-icon-edit"
               @click="clickAddLeaveSettlement(scope.row)"
               v-hasPermi="['fantang:settle:AddLeaveSettlement']"
-          >出院结算
+          >查看详情
           </el-button>
         </template>
       </el-table-column>
@@ -254,33 +222,79 @@
     </el-dialog>
 
     <!--    出院结算弹出层对话框-->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog title="用餐详情" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="leaveForm" :model="leaveForm" :rules="rules" label-width="80px">
-        <el-form-item label="记录清单" prop="list">
-          <el-input v-model="leaveForm.list" placeholder="请输入记录清单"/>
+        <el-form-item label="住院号" prop="hospitalId">
+          <el-input v-model="leaveForm.hospitalId" :disabled="true"/>
         </el-form-item>
-        <el-form-item label="结算总价" prop="price">
-          <el-input v-model="leaveForm.price" placeholder="请输入结算总价"/>
-        </el-form-item>
-        <el-form-item label="应收" prop="payable">
-          <el-input v-model="leaveForm.payable" placeholder="请输入应收"/>
-        </el-form-item>
-        <el-form-item label="实收" prop="receipts">
-          <el-input v-model="leaveForm.receipts" placeholder="请输入实收"/>
-        </el-form-item>
-        <el-form-item label="结算类型" prop="type">
-          <el-select v-model="leaveForm.type" placeholder="请选择结算类型">
-            <el-option label="请选择字典生成" value=""/>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="退款总额" prop="refund">
-          <el-input v-model="leaveForm.refund" placeholder="请输入退款总额"/>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="姓名" prop="name">
+              <el-input v-model="leaveForm.name" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="科室" prop="departName">
+              <el-input v-model="leaveForm.departName" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="床号" prop="bedId">
+              <el-input v-model="leaveForm.bedId" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="上次结算 / 用餐日期" prop="lastBillingDate">
+              <el-date-picker
+                  v-model="leaveForm.lastBillingDate"
+                  align="right"
+                  type="date"
+                  value-format="yyyy-MM-dd"
+                  :disabled="true">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="未结算天数" prop="settlementDays">
+              <el-input v-model="leaveForm.settlementDays" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="结算总价" prop="price">
+              <el-input v-model="this.sumTotalPrice" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="已收预付伙食费" prop="prepayment">
+          <el-input v-model="formAddNewSettlement.prepayment" :disabled="true"/>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
+      <el-row>
+        报餐明细
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="4">
+          正餐总价：{{ dinnerTotalPrice }}
+        </el-col>
+        <el-col :span="4">
+          营养餐总价：{{ nutritionTotalPrice }}
+        </el-col>
+      </el-row>
+      <el-row>
+        报餐总价：{{ sumTotalPrice }}
+      </el-row>
+      <el-table v-loading="loading" :data="mealsList">
+        <el-table-column label="报餐日期" align="center" prop="createAt" width="180">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="正餐价格" align="center" prop="price"/>
+        <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
+        <el-table-column label="报餐总价" align="center" prop="totalPrice"/>
+      </el-table>
     </el-dialog>
   </div>
 </template>
@@ -553,9 +567,8 @@ export default {
 
     // 出院伙食费结算按钮
     clickAddLeaveSettlement() {
-      this.flagAddNewSettlementOpen = true;
+      this.open = true;
       this.flagAddPrepaymentShow = true;
-
     },
 
     // 处理筛选结算标志

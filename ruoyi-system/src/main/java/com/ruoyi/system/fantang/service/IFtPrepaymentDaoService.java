@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface IFtPrepaymentDaoService extends IService<FtPrepaymentDao> {
 
-    IPage<FtPrepaymentVo> listNoPrepay(Integer pageNum, Integer pageSize);
+    List<FtPrepaymentVo> listNoPrepay();
 
     IPage<FtPrepaymentVo> listPrepay(Integer pageNum, Integer pageSize);
 

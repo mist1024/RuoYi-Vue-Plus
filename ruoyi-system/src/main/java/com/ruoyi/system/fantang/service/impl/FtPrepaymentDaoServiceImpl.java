@@ -23,9 +23,8 @@ import java.util.List;
 public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMapper, FtPrepaymentDao> implements IFtPrepaymentDaoService {
 
     @Override
-    public IPage<FtPrepaymentVo> listNoPrepay(Integer pageNum, Integer pageSize) {
-        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
-        return this.baseMapper.listNoPrepay(page);
+    public List<FtPrepaymentVo> listNoPrepay() {
+        return this.baseMapper.listNoPrepay();
     }
 
     @Override

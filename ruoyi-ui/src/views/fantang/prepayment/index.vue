@@ -56,28 +56,6 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['fantang:prepayment:edit']"
-        >修改
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['fantang:prepayment:remove']"
-        >删除
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
           type="warning"
           icon="el-icon-download"
           size="mini"
@@ -98,7 +76,7 @@
       <el-table-column label="科室" align="center" prop="departName" width="180">
       </el-table-column>
       <el-table-column label="床号" align="center" prop="bedId"/>
-      <el-table-column label="结算" align="center" prop="prepaid" />
+      <el-table-column label="预付款余额" align="center" prop="prepaid" />
 <!--      <el-table-column label="结算时间" align="center" prop="settlementAt" width="180">-->
 <!--        <template slot-scope="scope">-->
 <!--          <span>{{ parseTime(scope.row.settlementAt, '{y}-{m}-{d}') }}</span>-->
@@ -109,18 +87,11 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
+            icon="el-icon-news"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['fantang:prepayment:edit']"
-          >修改
-          </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
             v-hasPermi="['fantang:prepayment:remove']"
-          >删除
+            v-if=""
+          >出院结清
           </el-button>
         </template>
       </el-table-column>
@@ -135,7 +106,7 @@
     />
 
     <!-- 添加或修改收费管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="formAddPrepayment" :model="formAddPrepayment" :rules="rules" label-width="120px">
         <el-form-item label="住院号" prop="hospitalId">
           <el-autocomplete
@@ -143,32 +114,35 @@
             v-model="formAddPrepayment.hospitalId"
             :fetch-suggestions="querySearch"
             placeholder="请输入住院号"
-            @select="handleSelect">
+            @select="handleSelect" style="width: 250px">
             <i
               class="el-icon-edit el-input__icon"
               slot="suffix"
               @click="handleIconClick">
             </i>
-            <template slot-scope="{ item }">
+            <template slot-scope="{ item }" style="width: 300px">
               <div class="name">{{ item.name }}</div>
               <span class="addr">
                 {{ item.departName }}
                 <el-divider direction="vertical"></el-divider>
                 {{ item.bedId}}
+                <el-divider direction="vertical"></el-divider>
+                {{ item.value}}
               </span>
             </template>
           </el-autocomplete>
         </el-form-item>
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="formAddPrepayment.name"  readonly/>
+          <el-input v-model="formAddPrepayment.name" style="width: 250px" readonly/>
         </el-form-item>
         <el-form-item label="预付费金额" prop="prepaid">
           <el-input v-model="formAddPrepayment.prepaid"
                     onKeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" type="number"
-                    placeholder="请输入预付费金额"/>
+                    placeholder="请输入预付费金额"
+                    style="width: 250px" />
         </el-form-item>
         <el-form-item label="预付费时间" prop="prepaidAt">
-          <el-date-picker clearable size="small" style="width: 200px"
+          <el-date-picker clearable size="small" style="width: 250px"
                           v-model="formAddPrepayment.prepaidAt"
                           type="date"
                           value-format="yyyy-MM-dd"
@@ -186,19 +160,18 @@
 </template>
 
 <script>
-  import {
-    addPrepayment,
-    delPrepayment,
-    exportPrepayment,
-    getPrepayment,
-    listPrepayment,
-    listNoPrepayment,
-    updatePrepayment
-  } from "../../../api/fantang/prepayment";
-  import {getCountById, listAllPrepay, listPrepay} from "../../../api/fantang/prepayment";
-  import {getUserProfile} from "../../../api/system/user";
+import {
+  addPrepayment,
+  delPrepayment,
+  exportPrepayment,
+  getCountById,
+  getPrepayment,
+  listNoPrepayment,
+  listPrepay
+} from "../../../api/fantang/prepayment";
+import {getUserProfile} from "../../../api/system/user";
 
-  export default {
+export default {
     name: "Prepayment",
     components: {},
     data() {
@@ -318,8 +291,9 @@
       },
 
       buildSuggestionList() {
-        listNoPrepayment(this.queryParams).then(response => {
-          let prepaymentList = response.data.records;
+        listNoPrepayment().then(response => {
+          console.log("aaaaaaaaaaaaa",response);
+          let prepaymentList = response.rows;
           this.suggestionList = prepaymentList.map(item => {
             return {
               "value": item.hospitalId,
@@ -336,8 +310,8 @@
       getDefaultNoPrepayment() {
         this.loading = true;
         listNoPrepayment(this.queryParams).then(response => {
-          this.prepaymentList = response.data.records;
-          this.total = response.data.total;
+          this.prepaymentList = response.rows;
+          this.total = response.total;
           this.suggestionList = this.prepaymentList.map(item => {
             return {
               "value": item.hospitalId,
@@ -418,27 +392,25 @@
         const prepaymentId = row.prepaymentId || this.ids
         getPrepayment(prepaymentId).then(response => {
           this.formAddPrepayment = response.data;
+          console.log(response.data)
           this.open = true;
-          this.title = "修改收费管理";
+          this.title = "出院结清";
         });
       },
       /** 提交按钮 */
       submitformAddPrepayment() {
+
+        // 1、检查该用户是否找推荐列表中，如果不在，认为该用户是已经缴费的用户
         let hospitalId = this.formAddPrepayment.hospitalId;
         this.formAddPrepayment.collectBy = this.user.userName;
         this.$refs["formAddPrepayment"].validate(valid => {
           if (valid) {
-            if (!this.NoPrepayments.find(function(x) {
-              return x.hospitalId === hospitalId;
+            if (!this.suggestionList.find(x=> {
+              return x.value === hospitalId;
             })) {
               this.msgError("未找到该住院号记录，请先添加！");
               return ;
             }
-
-            getCountById(this.formAddPrepayment.patientId).then(response => {
-              console.log("getCountbyId", response);
-            });
-
 
             this.formAddPrepayment.prepaidAt = null;
             console.log("form -->", this.formAddPrepayment)
@@ -446,6 +418,7 @@
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
+              this.buildSuggestionList();
             });
           }
         });

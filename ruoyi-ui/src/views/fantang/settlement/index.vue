@@ -29,7 +29,12 @@
       <!--      </el-form-item>-->
       <el-form-item label="结算类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择结算类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+          <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
         </el-select>
       </el-form-item>
       <!--      <el-form-item label="退款总额" prop="refund">-->
@@ -60,33 +65,33 @@
       <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['fantang:settlement:edit']"
+            type="success"
+            icon="el-icon-edit"
+            size="mini"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['fantang:settlement:edit']"
         >开票
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['fantang:settlement:remove']"
+            type="danger"
+            icon="el-icon-delete"
+            size="mini"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['fantang:settlement:remove']"
         >删除
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['fantang:settlement:export']"
+            type="warning"
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExport"
+            v-hasPermi="['fantang:settlement:export']"
         >导出
         </el-button>
       </el-col>
@@ -108,19 +113,19 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['fantang:settlement:edit']"
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUpdate(scope.row)"
+              v-hasPermi="['fantang:settlement:edit']"
           >开票
           </el-button>
           <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['fantang:settlement:remove']"
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+              v-hasPermi="['fantang:settlement:remove']"
           >删除
           </el-button>
         </template>
@@ -128,11 +133,11 @@
     </el-table>
 
     <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改结算管理对话框 -->
@@ -151,14 +156,6 @@
           <el-input v-model="form.receipts" placeholder="请输入实收" :disabled="true"/>
         </el-form-item>
         <el-form-item label="结算类型" prop="type">
-          <!--          <el-select v-model="form.type" placeholder="请选择结算类型">-->
-          <!--            <el-option-->
-          <!--              v-for="item in typeOptions"-->
-          <!--              :key="item.value"-->
-          <!--              :label="item.label"-->
-          <!--              :value="item.value">-->
-          <!--            </el-option>-->
-          <!--          </el-select>-->
           <el-input v-model="form.type" placeholder="请输入结算类型" :disabled="true"/>
         </el-form-item>
         <el-form-item label="发票名" prop="invoiceName">
@@ -173,10 +170,10 @@
         <el-form-item label="开票类型" prop="invoiceType">
           <el-select v-model="form.invoiceType" placeholder="请选择开票类型">
             <el-option
-              v-for="item in typeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+                v-for="item in invoiceTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -202,11 +199,27 @@ export default {
   components: {},
   data() {
     return {
-      typeOptions: [{
+      invoiceTypeOptions: [{
         value: 1,
         label: '开票'
       }, {
         value: 2,
+        label: '挂账'
+      }],
+      typeOptions: [{
+        value: '现金',
+        label: '现金'
+      }, {
+        value: '预付款冲减',
+        label: '预付款冲减'
+      }, {
+        value: '银行汇款',
+        label: '银行汇款'
+      }, {
+        value: '在线支付',
+        label: '在线支付'
+      }, {
+        value: '挂账',
         label: '挂账'
       }],
       // 遮罩层
@@ -259,7 +272,19 @@ export default {
         ],
         refund: [
           {required: true, message: "退款总额不能为空", trigger: "blur"}
-        ]
+        ],
+        invoiceName: [
+          {required: true, message: "发票名不能为空", trigger: "blur"}
+        ],
+        taxId: [
+          {required: true, message: "税号不能为空", trigger: "blur"}
+        ],
+        invoiceNum: [
+          {required: true, message: "发票号不能为空", trigger: "blur"}
+        ],
+        invoiceType: [
+          {required: true, message: "开票类型不能为空", trigger: "blur"}
+        ],
       }
     };
   },
@@ -327,23 +352,14 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-
+      this.reset();
+      const settleId = row.settleId || this.ids
       console.log(row)
-
-      if (row.type!=="预付款冲减"){
-        this.reset();
-        const settleId = row.settleId || this.ids
-        console.log(row)
-        getSettlement(settleId).then(response => {
-          this.form = response.data;
-          this.open = true;
-          this.title = "开票";
-        });
-      }else {
-          this.msgError("预付款冲减不能开票")
-      }
-
-
+      getSettlement(settleId).then(response => {
+        this.form = response.data;
+        this.open = true;
+        this.title = "开票";
+      });
     },
     /** 提交按钮 */
     submitForm() {

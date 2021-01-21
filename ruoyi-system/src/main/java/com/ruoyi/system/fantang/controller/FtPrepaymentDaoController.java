@@ -68,8 +68,9 @@ public class FtPrepaymentDaoController extends BaseController {
     // 查询所有待缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listNoPrepay")
-    public AjaxResult listNoPrepay(@RequestParam("pageNum")Integer pageNum, @RequestParam("pageSize")Integer pageSize) {
-        return AjaxResult.success(iFtPrepaymentDaoService.listNoPrepay(pageNum, pageSize));
+    public TableDataInfo listNoPrepay() {
+        startPage();
+        return getDataTable(iFtPrepaymentDaoService.listNoPrepay());
     }
 
     // 查询所有已缴费列表
