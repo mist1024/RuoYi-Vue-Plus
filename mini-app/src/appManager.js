@@ -88,6 +88,8 @@ class AppManager {
 
   navigateTo(path) {
     console.log('path:', path)
+
+
     if (!store.state.user.token) {
       eventHub.$emit('onShowDialogUserInfo')
       return

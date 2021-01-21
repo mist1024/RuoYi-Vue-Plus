@@ -35,7 +35,7 @@
         border="{{ false }}"
         use-button-slot
       >
-        <van-button slot="button" size="small" plain type="info" open-type="getPhoneNumber"
+        <van-button slot="button" size="small" plain type="info" color="#AC1630" open-type="getPhoneNumber"
                     bind:getphonenumber="onGetMobile">授权
         </van-button>
       </van-field>
@@ -58,11 +58,14 @@
       <!--        </van-button>-->
       <!--      </van-field>-->
 
-      <view style="margin:10px;">
+      <view style="margin:10px;display: flex;">
         <van-checkbox :value="isChecked" shape="square" bind:change="onChangeCheak" checked-color="#AC1630"
-                      style="font-size: 14px;color: #AC1630;">
-          我同意<span style="color: cornflowerblue;">xxxxx </span>用户协议
-        </van-checkbox>
+        />
+
+        <span style="font-size: 13px;color: #AC1630;margin-left: 5px;">我同意并遵守紫色名片
+          <span style="color: cornflowerblue;" @tap="onTapPrivacy">《隐私政策》 </span>及
+          <span style="color: cornflowerblue;" @tap="onTapAgreement">《用户条款》 </span>
+          的全部内容</span>
       </view>
 
     </van-dialog>
@@ -77,18 +80,18 @@ import { mapActions, mapState } from '@wepy/x'
 import eventHub from '../../common/eventHub'
 import appManager from '../../appManager'
 import userApis from '../../apis/userApis'
+import { newsDetailPage } from '../../store/constant/nav/pages'
 
 wepy.component({
   store,
   props: {},
   hooks: {},
 
-
   data: {
     that: this,
     isShow: false,
     model: {},
-    isChecked: false,
+    isChecked: false
   },
 
   computed: mapState(['user']),
@@ -106,7 +109,6 @@ wepy.component({
       console.log('getUserInfo:', event.$wx.detail)
       this.setUserInfoAction(event.$wx.detail.userInfo)
       console.log('userInfo:', store.state.user.userInfo)
-
 
       if (!this.isChecked) {
         appManager.showToast('请确认xxxx协议.')
@@ -160,6 +162,16 @@ wepy.component({
     },
     onClose() {
       this.isShow = false
+    },
+    onTapAgreement() {
+      wx.navigateTo({
+        url: newsDetailPage + '?id=' + 'fb4109a4020b2a2a9d1172f66d043897'
+      })
+    },
+    onTapPrivacy() {
+      wx.navigateTo({
+        url: newsDetailPage + '?id=' + 'a1e5ec18ae13036d14c94bf0e5d11756'
+      })
     }
 
   },

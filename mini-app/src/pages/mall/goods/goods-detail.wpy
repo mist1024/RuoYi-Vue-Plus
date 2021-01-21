@@ -21,7 +21,7 @@ module.exports.parseImage = parseImage;
 
     <van-loading v-if="!goodsItem" style="margin-top: 20px;" />
 
-    <div v-else style="margin-bottom: 80px;">
+    <div v-else style="margin-bottom: 80px; width: 100%;">
 
       <swiper indicator-dots="true" autoplay="true" interval="3000" style="height: 750rpx;">
         <block v-for="(item,index) in goodsImages" wx:key="index">
@@ -33,7 +33,7 @@ module.exports.parseImage = parseImage;
         </block>
       </swiper>
 
-      <div style="padding: 10px;display:flex;flex-direction: column;">
+      <div style="padding: 10px;display:flex;flex-direction: column;width: 100%;">
         <span style="color: #333; font-size: 16px;font-weight: bold;">{{goodsItem.goodsName}}</span>
         <span style="color: #999; font-size: 14px;margin-top: 3px;">{{goodsItem.goodsAlias}}</span>
       </div>

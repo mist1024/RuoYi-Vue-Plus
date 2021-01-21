@@ -109,6 +109,7 @@ pages: [
 'pages/mall/order/order-detail-list',
 'pages/mall/order/order-check',
 'pages/mall/shopping-car/shopping-car-list',
+'pages/news/news-detail',
 'pages/winery/winery-detail',
 'pages/winery/winery-list',
 'pages/webView/web'

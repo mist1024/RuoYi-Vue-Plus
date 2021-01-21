@@ -29,6 +29,18 @@ class MallApis {
       url: baseUrl + 'winery/activity/open/list'
     })
   }
+
+  getNotice() {
+    return request.get({
+      url: baseUrl + 'winery/activity/open/notice'
+    })
+  }
+
+  getNewsContent(id) {
+    return request.get({
+      url: baseUrl + 'news/news_content/open/' + id
+    })
+  }
 }
 
 export default new MallApis()

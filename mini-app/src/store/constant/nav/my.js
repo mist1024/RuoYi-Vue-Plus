@@ -1,5 +1,5 @@
 import { imgbaseUrl } from '../../../baseDefine'
-import { orderDetailListPage, orderListPage, userAddressListPage } from './pages'
+import { newsDetailPage, orderDetailListPage, orderListPage, userAddressListPage } from './pages'
 
 
 export const myMenuList1 = [
@@ -29,9 +29,9 @@ export const myMenuList2 = [
     icon: imgbaseUrl + '/my/tool_2.png',
     path: orderDetailListPage
   }, {
-    name: '条款政策',
+    name: '隐私政策',
     icon: imgbaseUrl + '/my/tool_3.png',
-    path: ''
+    path: newsDetailPage + '?id=' + 'a1e5ec18ae13036d14c94bf0e5d11756'
   }
 ]
 

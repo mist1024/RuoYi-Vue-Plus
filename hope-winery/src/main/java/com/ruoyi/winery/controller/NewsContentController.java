@@ -128,4 +128,12 @@ public class NewsContentController extends BaseController {
     public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(iNewsContentService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
     }
+
+    /**
+     * 获取新闻资讯详细信息
+     */
+    @GetMapping(value = "/open/{id}")
+    public AjaxResult getOpenInfo(@PathVariable("id") String id) {
+        return AjaxResult.success(iNewsContentService.getById(id));
+    }
 }

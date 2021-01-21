@@ -68,18 +68,15 @@ module.exports.parseImage = parseImage;
 <template>
 
 
-  <nav-bar title="酒庄信息" />
+  <nav-bar :title="newItem.newsTitle" />
   <div class="container">
-    <van-loading v-if="!wineryItem" style="margin-top: 20px;" />
-    <div v-else style="margin-bottom: 80px;">
-      <image :src="filters.parseImage(wineryItem.topImage)" style="width: 100%;height: 750rpx;" mode="aspectFit" />
-      <div style="margin: 10px 15px;display: flex;flex-direction: column;">
-        <div style="font-size: 20px;font-weight: bold;">{{wineryItem.mchName}}</div>
-        <div style="font-size: 14px;color: #999999;">{{wineryItem.subtitle}}</div>
+    <van-loading v-if="!newItem" style="margin-top: 20px;" />
 
-        <span style="margin-top: 20px;font-weight: bold;">酒庄简介</span>
+    <div v-else style="margin-bottom: 80px;">
+      <div style="margin: 10px 15px;display: flex;flex-direction: column;">
+
         <div style="margin-top: 10px;width:100%;">
-          <rich-text :nodes="wineryItem.mchDesc" />
+          <rich-text :nodes="newItem.newsBody" />
         </div>
       </div>
 
@@ -94,6 +91,7 @@ import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import defaultMix from '../../mixins/defaultMix'
 import merchanApis from '../../apis/merchanApis'
+import mallApis from '../../apis/mallApis'
 
 wepy.page({
   store,
@@ -101,7 +99,8 @@ wepy.page({
 
   mixins: [defaultMix],
   data: {
-    wineryItem: null
+    newItem: null,
+    title: ''
   },
 
   computed: {
@@ -113,14 +112,8 @@ wepy.page({
   methods: {
     ...mapActions([]),
     async init(id) {
-      merchanApis.getMerchantInfo(id).then(r => {
-        this.wineryItem = r.data
-      })
-    },
-
-    async initByDept(deptId) {
-      merchanApis.getMerchantInfoByDeptId(deptId).then(r => {
-        this.wineryItem = r.data
+      mallApis.getNewsContent(id).then(r => {
+        this.newItem = r.data
       })
     }
   },
@@ -129,8 +122,6 @@ wepy.page({
     console.log(options)
     if (options.id) {
       this.init(options.id)
-    } else if (options.deptId) {
-      this.initByDept(options.deptId)
     }
   }
 
