@@ -101,7 +101,6 @@ public class AppOrderDetail implements Serializable {
     @Excel(name = "退款理由")
     private String refundReason;
 
-
     /**
      * 创建时间
      */

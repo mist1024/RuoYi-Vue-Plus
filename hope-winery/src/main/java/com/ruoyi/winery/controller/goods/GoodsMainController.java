@@ -86,6 +86,11 @@ public class GoodsMainController extends BaseController {
         if (StringUtils.isNotBlank(goodsMain.getGoodsImg())) {
             lqw.eq(GoodsMain::getGoodsImg, goodsMain.getGoodsImg());
         }
+
+        if (isMiniUser()) {
+            lqw.eq(GoodsMain::getState,  1);
+        }
+
         lqw.orderByAsc(GoodsMain::getSort);
 
         List<GoodsMain> list = iWineryGoodsService.list(lqw);

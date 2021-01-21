@@ -47,14 +47,36 @@ default:
 break
 
 }
-
 return result
+}
 
+const parseOrderDetailStatus = (status) => {
+
+let result = '未知状态'
+switch(status) {
+case 0:
+result = '未退款'
+break
+case 1:
+result = '退款申请'
+break
+case 2:
+result = '退款中'
+break
+case 3:
+result = '退款成功'
+break
+default:
+break
 
 }
+return result
+}
+
 
 module.exports.parseImage = parseImage;
 module.exports.parseOrderStatus = parseOrderStatus;
+module.exports.parseOrderDetailStatus = parseOrderDetailStatus;
 </wxs>
 <template>
 
@@ -83,19 +105,41 @@ module.exports.parseOrderStatus = parseOrderStatus;
             :title="item.goods.goodsName"
             :thumb="filters.parseImage(item.goods.goodsFaceImg)"
           >
-            <view slot="footer">
-              <van-button v-if="row.status === 2 || row.status === 4" size="mini" plain @tap="onRefund(item)">申请退款
-              </van-button>
+            <view slot="footer" style="display: flex; flex-direction: column;text-align: left;">
 
-              <van-button size="mini" plain @tap="onDetail(item)" style="margin-left: 10px;margin-top: 10px;">查看详情</van-button>
+
+              <div style="display:flex;align-items: center;width: 100%; justify-content: flex-end;">
+
+                <van-tag v-if="item.status !== 0" color="#ffe1e1" text-color="#ad0000">
+                  {{filters.parseOrderDetailStatus(item.status)}}
+                </van-tag>
+                <van-button v-else-if="(row.status === 2 || row.status === 4) && item.status === 0" size="mini" plain
+                            @tap="onRefund(item)">申请退款
+                </van-button>
+                <van-button size="mini" plain @tap="onDetail(item)" style="margin-left: 10px;">商品详情</van-button>
+              </div>
             </view>
           </van-card>
-
-          <div v-if="row.status === 0">
-            <van-divider />
-            <van-button style="float: right;margin-right: 16px;" size="mini" plain @tap="onPay(row)">继续支付</van-button>
+        </div>
+        <div style="padding: 15px;">
+          <div style="display: flex;margin-top: 10px;align-items: center;width: 100%;">
+            <span style="color: #333; font-size: 13px;">收货人:{{row.postName}}</span> <span
+            style="margin-left: 5px; color: #999999; font-size: 12px;">{{row.postMobile}}</span>
           </div>
 
+          <div
+            style="display: flex;margin-top: 5px;align-items: center;width: 100%;flex-wrap: wrap;">
+              <span style="color: #333; font-size: 13px;">
+                收货地址:{{row.postRegion}}{{row.postAddress}}
+              </span>
+          </div>
+        </div>
+        <div v-if="row.status === 0">
+          <van-divider />
+          <div style="float: right;margin-right: 16px;display: flex;">
+            <van-button size="mini" plain @tap="onPay(row)">继续支付</van-button>
+            <van-button size="mini" plain @tap="onCancel(row)" style="margin-left: 10px;">取消订单</van-button>
+          </div>
         </div>
       </div>
     </view>
@@ -113,6 +157,7 @@ import appManager from '../../../appManager'
 
 import orderApis from '../../../apis/orderApis'
 import { goodsDetailPage } from '../../../store/constant/nav/pages'
+import eventHub from '../../../common/eventHub'
 
 wepy.component({
   store,
@@ -140,13 +185,22 @@ wepy.component({
 
     onRefund(item) {
       // 申请退款
-      orderApis.refundOrder(item.id)
+      appManager.showToast('即将开放:如需联系退款请拨打客服热线17395097925')
     },
     onDetail(item) {
       appManager.navigateTo(goodsDetailPage + '?id=' + item.goods.id)
     },
+    onCancel(item) {
+      let data = {
+        id: item.id,
+        status: 1
+      }
+      orderApis.editOrder(data).then(r => {
+        appManager.showToast(r.msg)
+        this.$emit('reload')
+      })
+    },
     onPay(item) {
-
       let self = this
       console.log(item)
       let payData = JSON.parse(item.payMsg)
@@ -189,11 +243,12 @@ wepy.component({
   },
 
   ready() {
-    console.log('ready')
+    eventHub.$on('refreshOrderList', (...args) => {
+      this.init()
+    })
     this.init()
   },
   onShow() {
-    console.log('onShow')
     this.init()
   }
 })

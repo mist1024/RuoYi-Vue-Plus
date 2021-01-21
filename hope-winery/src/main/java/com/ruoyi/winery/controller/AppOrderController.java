@@ -241,6 +241,12 @@ public class AppOrderController extends BaseController {
     @Log(title = "订单", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody AppOrder appOrder) {
+
+        // 0=待支付,1=已取消,2=已支付,3=待收货,4=交易完成
+        if (appOrder.getStatus() == 1) {
+            appOrder.setCancelTime(DateUtils.getNowDate());
+        }
+
         return toAjax(iAppOrderService.updateById(appOrder) ? 1 : 0);
     }
 
@@ -266,4 +272,7 @@ public class AppOrderController extends BaseController {
         // TODO 根据自己业务场景需要构造返回对象
         return WxPayNotifyResponse.success("成功");
     }
+
+
+
 }

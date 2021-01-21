@@ -17,7 +17,10 @@ export default new Vuex.Store({
       token: '',
       company: '企业名称',
       currWebUrl: ''
+
     },
+    // 热开关
+    hotSwitch: false,
     // 订单
     order: {},
     // 购物车
@@ -52,9 +55,7 @@ export default new Vuex.Store({
       state.order = order
     },
     setShoppingCar(state, shoppingCar) {
-
       state.shoppingCar = shoppingCar
-
     }
   },
 

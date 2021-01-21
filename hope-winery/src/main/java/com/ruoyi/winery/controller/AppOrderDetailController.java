@@ -157,7 +157,7 @@ public class AppOrderDetailController extends BaseController {
         return toAjax(iAppOrderDetailService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
     }
 
-    @PreAuthorize("@ss.hasPermi('winery:detail:remove')")
+    @PreAuthorize("@ss.hasPermi('winery:detail:refund')")
     @Log(title = "退款", businessType = BusinessType.OTHER)
     @PostMapping("/refund/{id}")
     AjaxResult refund(@PathVariable String id) {

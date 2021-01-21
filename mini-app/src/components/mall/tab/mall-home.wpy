@@ -100,7 +100,7 @@ module.exports.parseImage = parseImage;
             <span style="font-size: 11px;color: #999999;">{{user.mobile}}</span>
           </div>
         </van-col>
-        <van-col offset="1" span="7">
+        <van-col offset="1" span="7" v-if="hotSwitch">
           <van-button round style="height: 25px;" size="small" plain color="#AC1630" @tap="onShoppingCar">
             <van-icon name="shopping-cart-o" color="#AC1630" />
             <span style="margin-left: 5px;color: #333333;">购物车</span>
@@ -120,7 +120,7 @@ module.exports.parseImage = parseImage;
       </van-notice-bar>
 
 
-      <van-row style="margin-top: 20px;">
+      <van-row style="margin-top: 20px;" v-if="hotSwitch">
         <van-col span="11">
 
 
@@ -148,7 +148,7 @@ module.exports.parseImage = parseImage;
       </van-row>
 
 
-      <div class="grid-body">
+      <div class="grid-body" v-if="hotSwitch">
         <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
           <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">
 
@@ -240,7 +240,8 @@ wepy.component({
     ...mapState({
       'imageDefine': state => state.imageDefine,
       'user': state => state.user,
-      'navDefine': state => state.navDefine
+      'navDefine': state => state.navDefine,
+      'hotSwitch': state => state.hotSwitch
     })
   },
 

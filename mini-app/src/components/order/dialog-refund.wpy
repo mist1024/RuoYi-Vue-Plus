@@ -1,0 +1,101 @@
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+
+
+
+module.exports.parseImage = parseImage;
+
+</wxs>
+
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 536rpx;
+  z-index: -10;
+
+
+}
+</style>
+<template>
+
+  <div>
+    <van-dialog
+      use-slot
+      title="退款申请"
+      :show="isShow"
+      show-cancel-button
+      bind:close="onClose"
+      bind:cancel="onClose"
+      bind:confirm="onConfirm"
+      :asyncClose="true"
+    >
+
+      <van-card
+        :num="item.goodsCount"
+        :price="item.goodsCount * item.goods.goodsPrice"
+        :desc="item.goods.goodsAlias"
+        :title="item.goods.goodsName"
+        :thumb="filters.parseImage(item.goods.goodsFaceImg)"
+      >
+
+      </van-card>
+
+
+
+    </van-dialog>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import eventHub from '../../common/eventHub'
+import appManager from '../../appManager'
+
+wepy.component({
+  store,
+  props: {
+
+    item: {}
+  },
+  hooks: {},
+
+  data: {
+    isShow: false
+  },
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine
+    })
+  },
+  events: {},
+
+  methods: {
+    ...mapActions([
+    ]),
+
+    onConfirm(event) {
+
+    },
+
+    onClose() {
+      this.isShow = false
+    }
+
+  },
+
+  ready() {
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

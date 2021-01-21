@@ -19,22 +19,24 @@ module.exports.parseImage = parseImage;
 
     <van-tabs active="{{ activeTab }}" bind:change="onChangeTab">
       <van-tab title="全部">
-        <order-list-body />
+        <order-list-body @reload="reload" />
       </van-tab>
       <van-tab title="待支付">
-        <order-list-body status="0" />
+        <order-list-body @reload="reload" status="0" />
       </van-tab>
       <van-tab title="待收货">
-        <order-list-body status="2" />
+        <order-list-body @reload="reload" status="2" />
       </van-tab>
       <van-tab title="交易完成">
-        <order-list-body status="3" />
+        <order-list-body @reload="reload" status="3" />
       </van-tab>
       <van-tab title="已取消">
-        <order-list-body status="1" />
+        <order-list-body @reload="reload" status="1" />
       </van-tab>
     </van-tabs>
 
+
+<!--    <dialog-refund />-->
 
   </div>
 
@@ -50,6 +52,7 @@ import appManager from '../../../appManager'
 import addressApis from '../../../apis/addressApis'
 import { userAddressPage } from '../../../store/constant/nav/home'
 import orderApis from '../../../apis/orderApis'
+import eventHub from '../../../common/eventHub'
 
 wepy.page({
   store,
@@ -75,30 +78,16 @@ wepy.page({
     onChangeTab(e) {
       this.activeTab = e.$wx.detail.index
     },
-    async init() {
-      // this.isInit = false
-      // const req = await orderApis.getOrderList()
-      //
-      // if (req.code === 200) {
-      //   this.records = req.rows
-      // }
-      //
-      // this.isInit = true
+    reload() {
+      eventHub.$emit('refreshOrderList')
     }
   },
-
   onLoad(options) {
-
     if (options.orderStatus) {
       this.activeTab = Number(options.orderStatus)
     }
   },
-
   ready() {
-    this.init()
-  },
-  onShow() {
-    this.init()
   }
 })
 </script>
@@ -108,7 +97,8 @@ navigationBarTitleText: '',
 
 usingComponents: {
 'order-list-body': '../../../components/mall/order/order-list-body',
-'order-detail-body': '../../../components/mall/order/order-detail-body'
+'order-detail-body': '../../../components/mall/order/order-detail-body',
+'dialog-refund': '../../../components/order/dialog-refund'
 }
 
 

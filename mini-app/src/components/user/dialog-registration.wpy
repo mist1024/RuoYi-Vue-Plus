@@ -94,7 +94,15 @@ wepy.component({
     isChecked: false
   },
 
-  computed: mapState(['user']),
+  // computed: mapState(['user']),
+
+  computed: {
+    ...mapState({
+      'user': state => state.user,
+      'hotSwitch': state => state.hotSwitch
+    })
+  },
+
   events: {},
 
   methods: {

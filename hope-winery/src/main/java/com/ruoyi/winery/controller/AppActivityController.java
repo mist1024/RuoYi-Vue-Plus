@@ -117,18 +117,26 @@ public class AppActivityController extends BaseController {
         return toAjax(iAppActivityService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
     }
 
+    /**
+     * 审核中接口
+     */
+    @GetMapping("/open/hotSwitch")
+    public AjaxResult openHotSwitch() {
+        return AjaxResult.success(true);
+    }
+
 
     /**
-     * 查询活动列表(开放)
+     * 首页跑马灯
      */
     @GetMapping("/open/notice")
     public AjaxResult openNotice() {
+//        String notice =
+//                "手机尾号4707的用户购买了「山之语·赤霞珠干红葡萄酒」,　" +
+//                "手机尾号5266的用户购买了「2021辛丑牛年纪念酒」" +
+//                "手机尾号3062的用户购买了「留世传奇红葡萄酒」";
 
-
-        String notice =
-                "手机尾号4707的用户购买了「山之语·赤霞珠干红葡萄酒」,　" +
-                "手机尾号5266的用户购买了「2021辛丑牛年纪念酒」" +
-                "手机尾号3062的用户购买了「留世传奇红葡萄酒」";
+        String notice = "客服热线请致电：17395097925";
         return AjaxResult.success(notice);
     }
 

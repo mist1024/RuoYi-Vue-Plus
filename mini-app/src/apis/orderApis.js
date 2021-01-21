@@ -30,6 +30,13 @@ class OrderApis {
     })
   }
 
+  editOrder(data) {
+    return request.put({
+      url: baseUrl + 'winery/order',
+      data: data
+    })
+  }
+
   getOrderDetailList(data) {
     return request.get({
       url: baseUrl + 'winery/detail/list',

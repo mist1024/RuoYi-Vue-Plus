@@ -30,6 +30,12 @@ class MallApis {
     })
   }
 
+  getHotSwitch() {
+    return request.get({
+      url: baseUrl + 'winery/activity/open/hotSwitch'
+    })
+  }
+
   getNotice() {
     return request.get({
       url: baseUrl + 'winery/activity/open/notice'
