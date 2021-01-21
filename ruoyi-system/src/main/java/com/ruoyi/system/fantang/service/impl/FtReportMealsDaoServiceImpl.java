@@ -1,5 +1,7 @@
 package com.ruoyi.system.fantang.service.impl;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
@@ -85,16 +87,44 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
         // 如果是首次结算
         if (flag1ReportMealsDao == null) {
 
-            // 获取最近一条报餐
+            // 获取第一条报餐数据
             QueryWrapper<FtReportMealsDao> flag0Wrapper = new QueryWrapper<>();
             flag0Wrapper.eq("patient_id", patientId);
-            flag0Wrapper.eq("settlement_flag", 1);
-            flag0Wrapper.orderByDesc("settlement_at");
-            flag0Wrapper.last("limit 0");
+            flag0Wrapper.orderByAsc("dining_at");
+            flag0Wrapper.last("limit 1");
 
             return this.baseMapper.selectOne(flag0Wrapper);
         }
 
         return flag1ReportMealsDao;
+    }
+
+    @Override
+    public List<FtReportMealsDao> listNutrition(FtReportMealsDao ftReportMealsDao) {
+
+        List<FtReportMealsDao> list;
+
+        Date today = new Date();
+
+        if (ftReportMealsDao.getStatisticsType() == null) {
+            list = this.baseMapper.listAllNutrition(ftReportMealsDao);
+        } else {
+            if (ftReportMealsDao.getStatisticsType() == 1) {
+                ftReportMealsDao.setBeginOfDay(DateUtil.beginOfDay(today));
+                ftReportMealsDao.setEndOfDay(DateUtil.endOfDay(today));
+            } else {
+                DateTime tomorrow = DateUtil.offsetDay(today, 1);
+                ftReportMealsDao.setBeginOfDay(DateUtil.beginOfDay(tomorrow));
+                ftReportMealsDao.setEndOfDay(DateUtil.endOfDay(tomorrow));
+            }
+            list = this.baseMapper.listAllNutrition(ftReportMealsDao);
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<FtReportMealsDao> listAllNutrition(FtReportMealsDao ftReportMealsDao) {
+        return this.baseMapper.listAllNutrition(ftReportMealsDao);
     }
 }

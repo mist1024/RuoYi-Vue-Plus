@@ -159,7 +159,9 @@ export default {
     };
   },
   created() {
-    this.getList();
+    // this.getList();
+    this.total = 0;
+    this.loading = false;
     this.getDicts("ft_book_type").then(response => {
       this.typeOptions = response.data;
     });

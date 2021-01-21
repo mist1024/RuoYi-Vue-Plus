@@ -33,7 +33,7 @@ public class FtReportMealsDao implements Serializable {
 
 
     /**
-     * $column.columnComment
+     * id
      */
     @TableId(value = "id")
     private Long id;
@@ -86,18 +86,33 @@ public class FtReportMealsDao implements Serializable {
 
     private String settlementBy;
 
+    /**
+     * 住院号
+     */
     @TableField(exist = false)
     private String hospitalId;
 
+    /**
+     * 科室 id
+     */
     @TableField(exist = false)
     private String departId;
 
+    /**
+     * 科室名
+     */
     @TableField(exist = false)
     private String departName;
 
+    /**
+     * 床号
+     */
     @TableField(exist = false)
     private String bedId;
 
+    /**
+     * 病人姓名
+     */
     @TableField(exist = false)
     private String name;
 
@@ -136,6 +151,33 @@ public class FtReportMealsDao implements Serializable {
 
     @TableField(exist = false)
     private Integer total;
-    
+
     private Boolean openFlag;
+
+    @TableField(exist = false)
+    private Integer statisticsType;
+
+    /**
+     * 营养餐名称
+     */
+    @TableField(exist = false)
+    private String nutritionName;
+
+    @TableField(exist = false)
+    private Integer cateringUsage;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date diningAt;
+
+    /**
+     * 用餐开始时间
+     */
+    @TableField(exist = false)
+    private Date beginOfDay;
+
+    /**
+     * 用餐结束时间
+     */
+    @TableField(exist = false)
+    private Date endOfDay;
 }

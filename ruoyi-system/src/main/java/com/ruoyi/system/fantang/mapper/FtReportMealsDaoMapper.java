@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.mapper;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsPriceEntity;
@@ -37,4 +38,8 @@ public interface FtReportMealsDaoMapper extends BaseMapper<FtReportMealsDao> {
      */
     @Select("SELECT a.patient_id,sum(a.price) as dinner_total_price , sum(a.nutrition_food_price ) as nutrition_total_price , sum(a.total_price) as sum_total_price FROM ft_report_meals a where a.patient_id = #{patientId} and a.create_at BETWEEN #{lastBillingDate} AND #{selectBillingDate}")
     ReportMealsPriceEntity sumTotalPrice(@Param("patientId") Long patientId, @Param("lastBillingDate") Date lastBillingDate, @Param("selectBillingDate") Date selectBillingDate);
+
+    List<FtReportMealsDao> listNutrition(@Param("beginOfDay") DateTime beginOfDay, @Param("endOfDay") DateTime endOfDay, FtReportMealsDao ftReportMealsDao);
+
+    List<FtReportMealsDao> listAllNutrition(FtReportMealsDao ftReportMealsDao);
 }

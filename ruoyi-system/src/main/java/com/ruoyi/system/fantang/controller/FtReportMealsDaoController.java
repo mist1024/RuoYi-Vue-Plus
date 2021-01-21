@@ -3,7 +3,6 @@ package com.ruoyi.system.fantang.controller;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -45,7 +44,7 @@ public class FtReportMealsDaoController extends BaseController {
     public AjaxResult getLastSettlementDate(@PathVariable("patientId") Long patientId) {
 
         // 获取最近一次已结算的报餐记录，如果首次结算则返回
-        FtReportMealsDao reportMealsDao =  iFtReportMealsDaoService.getLastReportMeals(patientId);
+        FtReportMealsDao reportMealsDao = iFtReportMealsDaoService.getLastReportMeals(patientId);
 
         Date createAt = reportMealsDao.getCreateAt();
         Date settlementAt = reportMealsDao.getSettlementAt();
@@ -122,6 +121,14 @@ public class FtReportMealsDaoController extends BaseController {
         }
         List<FtReportMealsDao> list = iFtReportMealsDaoService.list(lqw);
         return getDataTable(list);
+    }
+
+    @GetMapping("/listStatistics")
+    public TableDataInfo listStatistics(FtReportMealsDao ftReportMealsDao) {
+
+        startPage();
+
+        return getDataTable(iFtReportMealsDaoService.listNutrition(ftReportMealsDao));
     }
 
     @PreAuthorize("@ss.hasPermi('fantang:meals:list')")

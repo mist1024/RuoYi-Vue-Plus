@@ -495,6 +495,10 @@ export default {
       // console.log("selectBillingDate", this.formAddNewSettlement.selectBillingDate)
 
       dateSpan = sDate2 - sDate1;
+
+      console.log("sdate2-------", sDate2);
+      console.log("sdate1-------", sDate1);
+
       if (dateSpan < 0) {
         this.msgError("你现在的结算日期小于上一次上次结算 / 用餐日期");
       } else {
@@ -625,9 +629,9 @@ export default {
         refund: null
       };
       this.formAddNewSettlement = {
-        selectBillingDate:null,
-        payType:null,
-        netPeceipt:null,
+        selectBillingDate: null,
+        payType: null,
+        netPeceipt: null,
       };
 
       this.resetForm("form");
