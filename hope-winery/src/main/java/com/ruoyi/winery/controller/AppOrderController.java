@@ -89,7 +89,7 @@ public class AppOrderController extends BaseController {
         if (StringUtils.isNotBlank(appOrder.getPostName())) {
             lqw.eq(AppOrder::getPostName, appOrder.getPostName());
         }
-        if (StringUtils.isNotBlank(appOrder.getPostMoible())) {
+        if (StringUtils.isNotBlank(appOrder.getPostMobile())) {
             lqw.eq(AppOrder::getPostName, appOrder.getPostName());
         }
         if (StringUtils.isNotBlank(appOrder.getPostRegion())) {
@@ -180,7 +180,7 @@ public class AppOrderController extends BaseController {
             return AjaxResult.error("请校验地址信息");
         }
 
-        appOrder.setPostMoible(address.getMobile());
+        appOrder.setPostMobile(address.getMobile());
         appOrder.setPostName(address.getName());
         appOrder.setPostRegion(address.getRegion());
         appOrder.setPostAddress(address.getAddress());

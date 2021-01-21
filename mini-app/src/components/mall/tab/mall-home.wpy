@@ -177,15 +177,17 @@ module.exports.parseImage = parseImage;
       <!--                 @tap="onNavItem(navDefine.HOME_BANNER2)" />-->
 
 
-      <div v-for="(item, index) in records">
-        <div style="margin: 22px 2px 12px 2px; display: flex; align-items: center;">
+      <div v-for="(item, index) in records" style="margin: 22px 2px 0px 2px; ">
+
+
+        <div v-if="item.type" style="display: flex; align-items: center;margin-bottom: 5px;">
           <van-image :src="imageDefine.HOME_WINE_LAB" height="16px" width="5px" />
           <span style="margin:0px 5px;font-weight: bold;"> {{item.type === 1 ? '每日精选' : '热门活动'}}</span>
         </div>
 
 
         <van-image width="100%" :height="item.imageHeight + 'px'" :src="filters.parseImage(item.image)"
-                   @tap="onWebItem(item)" />
+                   @tap="onWebItem(item)"  />
       </div>
 
       <!--      <div class="column-record-item" v-for="(item, index) in columnRecord" @tap="onNavItem(navDefine.HOME_BANNER2)">-->

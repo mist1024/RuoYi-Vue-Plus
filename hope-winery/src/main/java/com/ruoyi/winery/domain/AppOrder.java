@@ -53,7 +53,7 @@ private static final long serialVersionUID=1L;
 
     /** 收货人姓名 */
     @Excel(name = "收货人电话号码")
-    private String postMoible;
+    private String postMobile;
 
     /** 收货人姓名 */
     @Excel(name = "收货人地区")

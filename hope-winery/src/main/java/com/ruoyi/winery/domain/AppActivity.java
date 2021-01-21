@@ -41,7 +41,7 @@ private static final long serialVersionUID=1L;
     private String url;
 
     /** 1每日精选2热门活动 */
-    @Excel(name = "1每日精选2热门活动")
+    @Excel(name = "0无1每日精选2热门活动")
     private Integer type;
 
     /** 图片 */
@@ -63,4 +63,9 @@ private static final long serialVersionUID=1L;
 
     /** 更新时间 */
     private Date updateTime;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }

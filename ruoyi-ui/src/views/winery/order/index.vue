@@ -19,15 +19,25 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="收货地址ID" prop="addressId">
+      <el-form-item label="收货人" prop="postName">
         <el-input
-          v-model="queryParams.addressId"
-          placeholder="请输入收货地址ID"
+          v-model="queryParams.postName"
+          placeholder="请输入收货人"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="收货人手机号码" prop="postMobile">
+        <el-input
+          v-model="queryParams.postMobile"
+          placeholder="请输入收货人手机号码"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+
       <el-form-item label="总金额" prop="totalFee">
         <el-input
           v-model="queryParams.totalFee"
@@ -119,7 +129,10 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="订单ID" align="center" prop="id" v-if="false"/>
       <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="收货地址ID" align="center" prop="addressId" />
+      <el-table-column label="收货人" align="center" prop="postUser" />
+      <el-table-column label="收货电话" align="center" prop="postMobile" />
+      <el-table-column label="收货人省市区" align="center" prop="postRegion" />
+      <el-table-column label="收货人地址" align="center" prop="postAddress" />
       <el-table-column label="总金额" align="center" prop="totalFee" />
       <el-table-column label="运单号" align="center" prop="transportNo" />
       <el-table-column label="订单状态" align="center" prop="status" />
@@ -173,8 +186,17 @@
         <el-form-item label="用户ID" prop="userId">
           <el-input v-model="form.userId" placeholder="请输入用户ID" />
         </el-form-item>
-        <el-form-item label="收货地址ID" prop="addressId">
-          <el-input v-model="form.addressId" placeholder="请输入收货地址ID" />
+        <el-form-item label="收货人" prop="postName">
+          <el-input v-model="form.postName" placeholder="请输入收货地址" />
+        </el-form-item>
+        <el-form-item label="收货电话" prop="postMobile">
+          <el-input v-model="form.postMobile" placeholder="请输入收货地址" />
+        </el-form-item>
+        <el-form-item label="收货省市区" prop="postRegion">
+          <el-input v-model="form.postRegion" placeholder="请输入收货省市区" />
+        </el-form-item>
+        <el-form-item label="收货地址" prop="postAddress">
+          <el-input v-model="form.postAddress" placeholder="请输入收货地址" />
         </el-form-item>
         <el-form-item label="总金额" prop="totalFee">
           <el-input v-model="form.totalFee" placeholder="请输入总金额" />
@@ -250,6 +272,10 @@ export default {
         addressId: undefined,
         totalFee: undefined,
         transportNo: undefined,
+        postName: undefined,
+        postMobile: undefined,
+        postRegion: undefined,
+        postAddress: undefined,
         status: undefined,
         payTime: undefined,
         cancelTime: undefined,
@@ -299,6 +325,10 @@ export default {
         addressId: undefined,
         totalFee: undefined,
         transportNo: undefined,
+        postName: undefined,
+        postMobile: undefined,
+        postRegion: undefined,
+        postAddress: undefined,
         status: 0,
         payTime: undefined,
         remark: undefined,

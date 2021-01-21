@@ -167,7 +167,6 @@ wepy.page({
       'userAddress': state => state.userAddress
     })
   },
-
   methods: {
     bindRegionChange(e) {
       this.form.region = e.$wx.detail.value
@@ -247,7 +246,6 @@ wepy.page({
       })
       return
     }
-
     this.form.mobile = this.user.mobile
   },
 

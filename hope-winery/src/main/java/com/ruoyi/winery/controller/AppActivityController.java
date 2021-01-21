@@ -61,6 +61,7 @@ public class AppActivityController extends BaseController {
         if (appActivity.getImageHeight() != null){
             lqw.eq(AppActivity::getImageHeight ,appActivity.getImageHeight());
         }
+        lqw.orderByAsc(AppActivity::getSort);
         List<AppActivity> list = iAppActivityService.list(lqw);
         return getDataTable(list);
     }
@@ -138,6 +139,7 @@ public class AppActivityController extends BaseController {
         if (appActivity.getImageHeight() != null){
             lqw.eq(AppActivity::getImageHeight ,appActivity.getImageHeight());
         }
+        lqw.orderByAsc(AppActivity::getSort);
         List<AppActivity> list = iAppActivityService.list(lqw);
         return getDataTable(list);
     }
