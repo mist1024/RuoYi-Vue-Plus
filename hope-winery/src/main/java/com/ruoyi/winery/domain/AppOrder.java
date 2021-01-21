@@ -47,9 +47,21 @@ private static final long serialVersionUID=1L;
     @Excel(name = "用户ID")
     private Long userId;
 
-    /** 收货地址ID */
-    @Excel(name = "收货地址ID")
-    private String addressId;
+    /** 收货人姓名 */
+    @Excel(name = "收货人姓名")
+    private String postName;
+
+    /** 收货人姓名 */
+    @Excel(name = "收货人电话号码")
+    private String postMoible;
+
+    /** 收货人姓名 */
+    @Excel(name = "收货人地区")
+    private String postRegion;
+
+    /** 收货人姓名 */
+    @Excel(name = "收货人地址")
+    private String postAddress;
 
     /** 支付参数 */
     @Excel(name = "支付参数")
@@ -95,4 +107,7 @@ private static final long serialVersionUID=1L;
 
     @TableField(exist = false)
     private List<AppOrderDetail> orderDetailList;
+
+    @TableField(exist = false)
+    private String addressId;
 }

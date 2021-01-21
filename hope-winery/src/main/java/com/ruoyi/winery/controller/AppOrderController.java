@@ -23,10 +23,12 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.winery.domain.AppOrder;
 import com.ruoyi.winery.domain.AppOrderDetail;
+import com.ruoyi.winery.domain.AppUserAddress;
 import com.ruoyi.winery.domain.goods.GoodsMain;
 import com.ruoyi.winery.domain.winery.WineryOrders;
 import com.ruoyi.winery.service.IAppOrderDetailService;
 import com.ruoyi.winery.service.IAppOrderService;
+import com.ruoyi.winery.service.IAppUserAddressService;
 import com.ruoyi.winery.service.IGoodsMainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,9 @@ public class AppOrderController extends BaseController {
     @Autowired
     private IAppOrderDetailService detailService;
 
+    @Autowired
+    private IAppUserAddressService addressService;
+
     /**
      * 查询订单列表
      */
@@ -81,8 +86,17 @@ public class AppOrderController extends BaseController {
         if (appOrder.getUserId() != null) {
             lqw.eq(AppOrder::getUserId, appOrder.getUserId());
         }
-        if (StringUtils.isNotBlank(appOrder.getAddressId())) {
-            lqw.eq(AppOrder::getAddressId, appOrder.getAddressId());
+        if (StringUtils.isNotBlank(appOrder.getPostName())) {
+            lqw.eq(AppOrder::getPostName, appOrder.getPostName());
+        }
+        if (StringUtils.isNotBlank(appOrder.getPostMoible())) {
+            lqw.eq(AppOrder::getPostName, appOrder.getPostName());
+        }
+        if (StringUtils.isNotBlank(appOrder.getPostRegion())) {
+            lqw.eq(AppOrder::getPostName, appOrder.getPostName());
+        }
+        if (StringUtils.isNotBlank(appOrder.getPostAddress())) {
+            lqw.eq(AppOrder::getPostName, appOrder.getPostName());
         }
         if (StringUtils.isNotBlank(appOrder.getPayMsg())) {
             lqw.eq(AppOrder::getPayMsg, appOrder.getPayMsg());
@@ -158,6 +172,19 @@ public class AppOrderController extends BaseController {
         String username = getUsername();
         Long deptId = getDeptId();
         String id = System.currentTimeMillis() + RandomUtil.randomNumbers(6);
+
+
+        AppUserAddress address = addressService.getById(appOrder.getAddressId());
+
+        if (address == null) {
+            return AjaxResult.error("请校验地址信息");
+        }
+
+        appOrder.setPostMoible(address.getMobile());
+        appOrder.setPostName(address.getName());
+        appOrder.setPostRegion(address.getRegion());
+        appOrder.setPostAddress(address.getAddress());
+
         appOrder.setId(id);
         appOrder.setDeptId(getDeptId());
         appOrder.setUserId(userId);
