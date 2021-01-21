@@ -3,7 +3,7 @@
 imageName="mall"
 
 echo "==========打包========="
-mvn clean package -Dmaven.test.skip=true
+mvn clean package -P prod -Dmaven.test.skip=true
 echo "==========上传服务器========="
 scp ruoyi-admin/target/ruoyi-admin.jar root@192.144.217.65:/root/mall/
 scp Dockerfile root@192.144.217.65:/root/mall/

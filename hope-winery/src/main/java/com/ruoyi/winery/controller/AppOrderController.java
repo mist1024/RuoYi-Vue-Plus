@@ -117,6 +117,11 @@ public class AppOrderController extends BaseController {
             lqw.eq(AppOrder::getCancelTime, appOrder.getCancelTime());
         }
         lqw.orderByDesc(AppOrder::getCreateTime);
+
+        if (isMiniUser()) {
+            lqw.eq(AppOrder::getUserId, getLoginUser().getUser().getUserId());
+        }
+
         List<AppOrder> list = iAppOrderService.list(lqw);
         for (AppOrder order : list) {
             LambdaQueryWrapper<AppOrderDetail> wrapper = new LambdaQueryWrapper<AppOrderDetail>();

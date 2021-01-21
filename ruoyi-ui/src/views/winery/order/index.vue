@@ -129,10 +129,12 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="订单ID" align="center" prop="id" v-if="false"/>
       <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="收货人" align="center" prop="postUser" />
-      <el-table-column label="收货电话" align="center" prop="postMobile" />
       <el-table-column label="收货人省市区" align="center" prop="postRegion" />
       <el-table-column label="收货人地址" align="center" prop="postAddress" />
+      <el-table-column label="收货电话" align="center" prop="postMobile" />
+      <el-table-column label="收货人" align="center" prop="postName" />
+
+
       <el-table-column label="总金额" align="center" prop="totalFee" />
       <el-table-column label="运单号" align="center" prop="transportNo" />
       <el-table-column label="订单状态" align="center" prop="status" />

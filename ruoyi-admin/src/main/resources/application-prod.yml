@@ -58,13 +58,14 @@ spring:
     # redis 配置
     redis:
         # 地址
-        host: 175.24.17.162
+        host: 172.21.0.15
         # 端口，默认为6379
         port: 6379
         # 密码
-        password: 26616494
+        password: Hopesoft
         # 连接超时时间
         timeout: 10s
+        database: 5
         lettuce:
             pool:
                 # 连接池中的最小空闲连接

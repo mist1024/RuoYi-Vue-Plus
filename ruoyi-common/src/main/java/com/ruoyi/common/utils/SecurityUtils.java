@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -94,6 +95,35 @@ public class SecurityUtils {
             return getLoginUser().getUser().getDeptId();
         } catch (Exception e) {
             throw new CustomException("获取用户部门信息异常", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+
+    /**
+     * 如果是小程序用户
+     **/
+    public static Boolean isMiniUser() {
+        try {
+            return getLoginUser().getUsername().contains("mini-");
+        } catch (Exception e) {
+            throw new CustomException("获取用户来源异常", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    /**
+     * 获取小程序openId
+     **/
+    public static String getMiniOpenId() {
+        try {
+            if (isMiniUser()) {
+                return getLoginUser().getUsername().split("-")[1];
+            } else {
+                return StrUtil.EMPTY;
+            }
+
+
+        } catch (Exception e) {
+            throw new CustomException("获取用户来源异常", HttpStatus.UNAUTHORIZED);
         }
     }
 }
