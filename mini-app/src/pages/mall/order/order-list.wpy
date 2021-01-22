@@ -36,7 +36,7 @@ module.exports.parseImage = parseImage;
     </van-tabs>
 
 
-<!--    <dialog-refund />-->
+    <dialog-refund @reload="reload" />
 
   </div>
 
@@ -80,6 +80,9 @@ wepy.page({
     },
     reload() {
       eventHub.$emit('refreshOrderList')
+    },
+    showRefund() {
+      eventHub.$emit('onShowRefund')
     }
   },
   onLoad(options) {

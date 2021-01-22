@@ -48,7 +48,7 @@
       </el-form-item>
       <el-form-item label="明细状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择明细状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option label="请选择字典生成" value=""/>
         </el-select>
       </el-form-item>
       <el-form-item label="统一退单号" prop="refundNo">
@@ -62,10 +62,10 @@
       </el-form-item>
       <el-form-item label="退款时间" prop="refundTime">
         <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.refundTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择退款时间">
+                        v-model="queryParams.refundTime"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择退款时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -82,7 +82,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['winery:detail:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -92,7 +93,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['winery:detail:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -102,7 +104,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['winery:detail:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -111,21 +114,27 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['winery:detail:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="detailList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="明细ID" align="center" prop="id" v-if="false"/>
-      <el-table-column label="部门ID" align="center" prop="deptId" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="订单ID" align="center" prop="orderId" />
-      <el-table-column label="商品ID" align="center" prop="goodsId" />
-      <el-table-column label="商品数量" align="center" prop="goodsCount" />
-      <el-table-column label="明细状态" align="center" prop="status" />
-      <el-table-column label="统一退单号" align="center" prop="refundNo" />
+      <el-table-column label="部门ID" align="center" prop="deptId"/>
+      <el-table-column label="用户ID" align="center" prop="userId"/>
+      <el-table-column label="订单ID" align="center" prop="orderId"/>
+      <el-table-column label="商品ID" align="center" prop="goodsId"/>
+      <el-table-column label="退款时间" align="center" prop="goods" width="180">
+        <template slot-scope="scope">
+          <span>{{ goods.goodsName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="商品数量" align="center" prop="goodsCount"/>
+      <el-table-column label="明细状态" align="center" prop="status" :formatter="statusFormat"/>
+      <el-table-column label="统一退单号" align="center" prop="refundNo"/>
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.refundTime, '{y}-{m}-{d}') }}</span>
@@ -133,20 +142,32 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleRefund(scope.row)"
+            v-hasPermi="['winery:detail:refund\n']"
+          >退款
+          </el-button>
+
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['winery:detail:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['winery:detail:remove']"
-          >删除</el-button>
+          >修改
+          </el-button>
+<!--          <el-button-->
+<!--            size="mini"-->
+<!--            type="text"-->
+<!--            icon="el-icon-delete"-->
+<!--            @click="handleDelete(scope.row)"-->
+<!--            v-hasPermi="['winery:detail:remove']"-->
+<!--          >删除-->
+<!--          </el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -163,19 +184,19 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入部门ID" />
+          <el-input v-model="form.deptId" placeholder="请输入部门ID"/>
         </el-form-item>
         <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户ID" />
+          <el-input v-model="form.userId" placeholder="请输入用户ID"/>
         </el-form-item>
         <el-form-item label="订单ID" prop="orderId">
-          <el-input v-model="form.orderId" placeholder="请输入订单ID" />
+          <el-input v-model="form.orderId" placeholder="请输入订单ID"/>
         </el-form-item>
         <el-form-item label="商品ID" prop="goodsId">
-          <el-input v-model="form.goodsId" placeholder="请输入商品ID" />
+          <el-input v-model="form.goodsId" placeholder="请输入商品ID"/>
         </el-form-item>
         <el-form-item label="商品数量" prop="goodsCount">
-          <el-input v-model="form.goodsCount" placeholder="请输入商品数量" />
+          <el-input v-model="form.goodsCount" placeholder="请输入商品数量"/>
         </el-form-item>
         <el-form-item label="明细状态">
           <el-radio-group v-model="form.status">
@@ -183,14 +204,14 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="统一退单号" prop="refundNo">
-          <el-input v-model="form.refundNo" placeholder="请输入统一退单号" />
+          <el-input v-model="form.refundNo" placeholder="请输入统一退单号"/>
         </el-form-item>
         <el-form-item label="退款时间" prop="refundTime">
           <el-date-picker clearable size="small" style="width: 200px"
-            v-model="form.refundTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择退款时间">
+                          v-model="form.refundTime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="选择退款时间">
           </el-date-picker>
         </el-form-item>
       </el-form>
@@ -203,12 +224,11 @@
 </template>
 
 <script>
-import { listDetail, getDetail, delDetail, addDetail, updateDetail, exportDetail } from "@/api/winery/detail";
+import {listDetail, getDetail, delDetail, addDetail, updateDetail, exportDetail, refund} from "@/api/winery/detail";
 
 export default {
   name: "Detail",
-  components: {
-  },
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -225,6 +245,8 @@ export default {
       total: 0,
       // 订单明细表格数据
       detailList: [],
+      // 退款状态字典
+      statusOptions: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -247,28 +269,31 @@ export default {
       // 表单校验
       rules: {
         userId: [
-          { required: true, message: "用户ID不能为空", trigger: "blur" }
+          {required: true, message: "用户ID不能为空", trigger: "blur"}
         ],
         orderId: [
-          { required: true, message: "订单ID不能为空", trigger: "blur" }
+          {required: true, message: "订单ID不能为空", trigger: "blur"}
         ],
         goodsId: [
-          { required: true, message: "商品ID不能为空", trigger: "blur" }
+          {required: true, message: "商品ID不能为空", trigger: "blur"}
         ],
         status: [
-          { required: true, message: "明细状态不能为空", trigger: "blur" }
+          {required: true, message: "明细状态不能为空", trigger: "blur"}
         ],
         createTime: [
-          { required: true, message: "创建时间不能为空", trigger: "blur" }
+          {required: true, message: "创建时间不能为空", trigger: "blur"}
         ],
         updateTime: [
-          { required: true, message: "更新时间不能为空", trigger: "blur" }
+          {required: true, message: "更新时间不能为空", trigger: "blur"}
         ]
       }
     };
   },
   created() {
     this.getList();
+    this.getDicts("refund_status").then(response => {
+      this.statusOptions = response.data;
+    });
   },
   methods: {
     /** 查询订单明细列表 */
@@ -279,6 +304,12 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+
+
+    // 状态字典翻译
+    statusFormat(row, column) {
+      return this.selectDictLabel(this.statusOptions, row.status);
     },
     // 取消按钮
     cancel() {
@@ -315,7 +346,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -332,6 +363,18 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改订单明细";
+      });
+    },
+
+    /** 退款操作 */
+    handleRefund(row) {
+      this.reset();
+      const id = row.id || this.ids
+      refund(id).then(response => {
+        this.msgSuccess(response.msg);
+        if (response.code === 200) {
+          this.getList();
+        }
       });
     },
     /** 提交按钮 */
@@ -358,28 +401,28 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除订单明细编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delDetail(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delDetail(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有订单明细数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportDetail(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return exportDetail(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     }
   }
 };

@@ -150,12 +150,18 @@ wepy.page({
       this.pageIndex = index
     },
 
-    init() {
-      mallApis.getHotSwitch().then(r => {
-        store.state.hotSwitch = r.data
+    async init() {
+      wx.showLoading({ title: '正在连接...', mask: true })
+      const r = await mallApis.getHotSwitch()
 
+      if (r && r.code === 200) {
+        store.state.hotSwitch = r.data
+        wx.hideLoading()
         appManager.login()
-      })
+        return
+      }
+
+      await this.init()
     }
 
   },

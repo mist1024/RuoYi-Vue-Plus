@@ -185,7 +185,7 @@ wepy.component({
 
     onRefund(item) {
       // 申请退款
-      appManager.showToast('即将开放:如需联系退款请拨打客服热线17395097925')
+      eventHub.$emit('onShowRefund', item)
     },
     onDetail(item) {
       appManager.navigateTo(goodsDetailPage + '?id=' + item.goods.id)

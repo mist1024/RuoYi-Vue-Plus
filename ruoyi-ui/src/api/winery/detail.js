@@ -51,3 +51,11 @@ export function exportDetail(query) {
     params: query
   })
 }
+
+// 操作退款
+export function refund(id) {
+  return request({
+    url: '/winery/detail/refund/' + id,
+    method: 'post'
+  })
+}

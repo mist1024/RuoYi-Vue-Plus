@@ -119,7 +119,7 @@ wepy.component({
       console.log('userInfo:', store.state.user.userInfo)
 
       if (!this.isChecked) {
-        appManager.showToast('请确认xxxx协议.')
+        appManager.showToast('请同意并遵守紫色名片《隐私政策》以及《用户条款》.')
         return false
       }
       if (!this.user.mobile) {

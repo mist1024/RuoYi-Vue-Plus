@@ -24,9 +24,10 @@ class OrderApis {
     })
   }
 
-  refundOrder(id) {
+  requestRefund(data) {
     return request.post({
-      url: baseUrl + 'winery/detail/refund/' + id
+      url: baseUrl + 'winery/detail/requestRefund',
+      data: data
     })
   }
 

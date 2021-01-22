@@ -4,7 +4,6 @@ return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
 }
 
 
-
 module.exports.parseImage = parseImage;
 
 </wxs>
@@ -15,9 +14,33 @@ module.exports.parseImage = parseImage;
   width: 100%;
   height: 536rpx;
   z-index: -10;
-
-
 }
+
+.cell-item {
+  margin-left: 22px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.cell-input {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input {
+    margin-left: 10px;
+    border: #dddddd solid 1px;
+    border-radius: 8px;
+    padding: 5px 10px;
+    width: 320rpx;
+  }
+}
+
+
+
+
 </style>
 <template>
 
@@ -31,6 +54,7 @@ module.exports.parseImage = parseImage;
       bind:cancel="onClose"
       bind:confirm="onConfirm"
       :asyncClose="true"
+
     >
 
       <van-card
@@ -41,9 +65,49 @@ module.exports.parseImage = parseImage;
         :thumb="filters.parseImage(item.goods.goodsFaceImg)"
       >
 
+        <view slot="footer" style="display: flex;align-items: center;padding:10px;">
+          <span style="font-size: 14px;">如需联系可致电客服热线17395097925</span>
+          <van-radio-group value="{{ refundReason }}" bind:change="onChangeRefundReason">
+            <div style="display: flex;margin: 5px;flex-direction: column;">
+              <div class="cell-item" v-for="(type,index) in reasonType">
+                <div v-if="index === 4" class="cell-input">
+                  <van-radio name="其他" checked-color="#AC1630">其他<van-radio/>
+                  <input
+                    v-model="text"
+                    clearable
+                    placeholder="请输入退款理由"
+                  />
+                </div>
+                <div v-else>
+                  <van-radio name="{{type}}" checked-color="#AC1630">{{type}}</van-radio>
+                </div>
+              </div>
+            </div>
+          </van-radio-group>
+        </view>
+
+
       </van-card>
 
 
+
+      <van-radio-group value="{{ refundReason }}" bind:change="onChangeRefundReason">
+        <div style="display: flex;margin: 5px;flex-direction: column;">
+          <div class="cell-item" v-for="(item,index) in reasonTypes">
+            <div v-if="index === 4" class="cell-input">
+              <van-radio name="{{item}}" checked-color="#AC1630" />
+              <input
+                v-model="text"
+                clearable
+                placeholder="请输入退款理由"
+              />
+            </div>
+            <div v-else>
+              <van-radio name="{{item}}" checked-color="#AC1630">{{item}}</van-radio>
+            </div>
+          </div>
+        </div>
+      </van-radio-group>
 
     </van-dialog>
   </div>
@@ -56,17 +120,18 @@ import store from '@/store'
 import { mapActions, mapState } from '@wepy/x'
 import eventHub from '../../common/eventHub'
 import appManager from '../../appManager'
+import orderApis from '../../apis/orderApis'
 
 wepy.component({
   store,
-  props: {
-
-    item: {}
-  },
   hooks: {},
 
   data: {
-    isShow: false
+    isShow: false,
+    item: {},
+    refundReason: '',
+    reasonTypes: ['买错，不想要了', '发错货', '商品损坏/包装脏污', '商品与介绍不符', '其他'],
+    text: ''
   },
   computed: {
     ...mapState({
@@ -76,11 +141,26 @@ wepy.component({
   events: {},
 
   methods: {
-    ...mapActions([
-    ]),
+    ...mapActions([]),
+
+    onChangeRefundReason(e) {
+      this.refundReason = e.$wx.detail
+    },
 
     onConfirm(event) {
-
+      let refundReason = this.refundReason === '其他' ? this.text : this.refundReason
+      if (!refundReason) {
+        appManager.showToast('请输入您的退款理由.')
+        return
+      }
+      let data = {
+        id: this.item.id,
+        refundReason: refundReason
+      }
+      orderApis.requestRefund(data).then(r => {
+        this.$emit('reload')
+        this.isShow = false
+      })
     },
 
     onClose() {
@@ -90,6 +170,11 @@ wepy.component({
   },
 
   ready() {
+    eventHub.$on('onShowRefund', (...args) => {
+      console.log('onShowRefund:', args[0])
+      this.item = args[0]
+      this.isShow = true
+    })
   }
 
 })

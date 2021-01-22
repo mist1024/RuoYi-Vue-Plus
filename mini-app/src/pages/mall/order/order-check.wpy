@@ -188,6 +188,7 @@ wepy.page({
         wx.hideLoading()
 
         if (r.code !== 200) {
+          appManager.showToast(r.msg)
           return
         }
 
