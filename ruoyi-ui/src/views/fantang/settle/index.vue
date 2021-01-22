@@ -603,17 +603,6 @@ export default {
           this.leaveForm.prepayment = response.prepayment.prepaid;
         }
 
-        this.leaveForm.settlementDays = response.reportMeals.days;
-        this.open = true;
-        this.leaveForm.hospitalId = row.hospitalId;
-        this.leaveForm.name = row.name;
-        this.leaveForm.departName = row.departName;
-        this.leaveForm.bedId = row.bedId;
-        this.leaveForm.patientId = row.patientId;
-        this.leaveForm.price = row.price;
-        this.leaveForm.netPeceipt = null;
-        this.leaveForm.userName = this.userName;
-
         showAllMealsWithNoPay(row.patientId).then(response => {
           console.log(response);
           this.mealsList = response.data.reportMealsList;
@@ -631,6 +620,17 @@ export default {
             this.formAddNewSettlement.netPeceipt = this.sumTotalPrice;
           }
         })
+
+        this.leaveForm.settlementDays = response.reportMeals.days;
+        this.open = true;
+        this.leaveForm.hospitalId = row.hospitalId;
+        this.leaveForm.name = row.name;
+        this.leaveForm.departName = row.departName;
+        this.leaveForm.bedId = row.bedId;
+        this.leaveForm.patientId = row.patientId;
+        this.leaveForm.price = row.price;
+        this.leaveForm.netPeceipt = null;
+        this.leaveForm.userName = this.userName;
       });
     },
 
