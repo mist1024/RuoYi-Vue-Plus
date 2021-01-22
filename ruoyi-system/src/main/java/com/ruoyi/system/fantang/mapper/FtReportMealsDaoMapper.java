@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsPriceEntity;
+import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -42,4 +43,12 @@ public interface FtReportMealsDaoMapper extends BaseMapper<FtReportMealsDao> {
     List<FtReportMealsDao> listNutrition(@Param("beginOfDay") DateTime beginOfDay, @Param("endOfDay") DateTime endOfDay, FtReportMealsDao ftReportMealsDao);
 
     List<FtReportMealsDao> listAllNutrition(FtReportMealsDao ftReportMealsDao);
+
+    @Select("SELECT a.type, a.foods,  count(a.foods) as count, b.depart_id,c.depart_name\n" +
+            "from ft_report_meals a \n" +
+            "LEFT JOIN ft_patient b on a.patient_id  = b.patient_id\n" +
+            "LEFT JOIN ft_depart c on b.depart_id =  c.depart_id \n" +
+            "where b.depart_id = #{departId} and a.dining_at BETWEEN #{beginOfDay} and #{endOfDay}\n" +
+            "GROUP BY a.type, foods")
+    List<FtReportMealVo> getStatisticsFoods(@Param("departId") Integer departId, @Param("beginOfDay") DateTime beginOfDay, @Param("endOfDay") DateTime endOfDay);
 }
