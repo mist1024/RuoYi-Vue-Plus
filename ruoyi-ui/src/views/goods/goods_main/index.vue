@@ -2,13 +2,13 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
 
-      <el-form-item label="商品类型" prop="goodsType">
-        <el-select v-model="queryParams.deptId" placeholder="请选择商品商户" clearable size="small">
+      <el-form-item label="商户" prop="goodsType">
+        <el-select v-model="queryParams.deptId" placeholder="请选择商户" clearable size="small">
           <el-option
-            v-for="dict in goodsTypeOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in deptOptions"
+            :key="dict.deptId"
+            :label="dict.deptName"
+            :value="dict.deptId"
           />
         </el-select>
       </el-form-item>
@@ -371,10 +371,7 @@ export default {
       if (this.deptOptions.length < 1) {
         return ''
       }
-
       const dept = this.deptOptions.filter(x => x.deptId === row.deptId)[0]
-
-
       return dept.deptName
     },
     /** 查询商品信息列表 */
