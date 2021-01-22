@@ -24,15 +24,15 @@ class MallApis {
     })
   }
 
-  getActivityList() {
-    return request.get({
-      url: baseUrl + 'winery/activity/open/list'
-    })
-  }
-
   getHotSwitch() {
     return request.get({
       url: baseUrl + 'winery/activity/open/hotSwitch'
+    })
+  }
+
+  getActivityList() {
+    return request.get({
+      url: baseUrl + 'winery/activity/open/list'
     })
   }
 

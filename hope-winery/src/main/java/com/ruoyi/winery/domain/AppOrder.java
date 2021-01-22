@@ -39,10 +39,6 @@ private static final long serialVersionUID=1L;
     @TableId(value = "id", type = IdType.INPUT)
     private String id;
 
-    /** 部门ID */
-    @Excel(name = "部门ID")
-    private Long deptId;
-
     /** 用户ID */
     @Excel(name = "用户ID")
     private Long userId;

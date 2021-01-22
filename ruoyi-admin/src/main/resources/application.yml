@@ -210,9 +210,12 @@ wxmini:
 #  secret: 94ee42c0899a6ceccf353e1e729c50d4 # 宁夏通
   secret: dc55bc1729090bdff9b63e1a5f0d03b2 # 紫色名片
 
-  mchId: 1486984962
-  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
-  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+#  mchId: 1486984962
+  mchId: 1605949156
+#  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
+  mchKey: 2e7fe280d91ded48798365961db89951
+#  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+  keyPath: "classpath:/cert/apiclient_cert1605949156.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
 
   subAppId: #服务商模式下的子商户公众账号ID
   subMchId: #服务商模式下的子商户号

@@ -1,14 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="部门ID" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入部门ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="商户" prop="goodsType">
+        <el-select v-model="queryParams.deptId" placeholder="请选择商户" clearable size="small">
+          <el-option
+            v-for="dict in deptOptions"
+            :key="dict.deptId"
+            :label="dict.deptName"
+            :value="dict.deptId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="用户ID" prop="userId">
         <el-input
@@ -127,7 +128,8 @@
 
     <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="订单ID" align="center" prop="id" v-if="false"/>
+      <el-table-column label="订单ID" align="center" prop="id"/>
+      <el-table-column label="商户名称" align="center" prop="deptId" :formatter="deptFormat" width="100px"/>
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="收货人省市区" align="center" prop="postRegion" />
       <el-table-column label="收货人地址" align="center" prop="postAddress" />
@@ -241,9 +243,11 @@
 
 <script>
 import { listOrder, getOrder, delOrder, addOrder, updateOrder, exportOrder } from "@/api/winery/order";
+import {CommonMixin} from "@/mixin/common";
 
 export default {
   name: "Order",
+  mixins: [CommonMixin],
   components: {
   },
   data() {

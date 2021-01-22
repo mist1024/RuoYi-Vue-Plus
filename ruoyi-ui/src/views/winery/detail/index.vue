@@ -1,15 +1,18 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="部门ID" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入部门ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="商户" prop="deptId">
+        <el-select v-model="queryParams.deptId" placeholder="请选择商户" clearable size="small">
+          <el-option
+            v-for="dict in deptOptions"
+            :key="dict.deptId"
+            :label="dict.deptName"
+            :value="dict.deptId"
+          />
+        </el-select>
       </el-form-item>
+
+
       <el-form-item label="用户ID" prop="userId">
         <el-input
           v-model="queryParams.userId"
@@ -126,13 +129,23 @@
       <el-table-column label="部门ID" align="center" prop="deptId"/>
       <el-table-column label="用户ID" align="center" prop="userId"/>
       <el-table-column label="订单ID" align="center" prop="orderId"/>
-      <el-table-column label="商品ID" align="center" prop="goodsId"/>
-      <el-table-column label="退款时间" align="center" prop="goods" width="180">
+      <el-table-column label="商品名称" align="center" prop="goods" width="180">
         <template slot-scope="scope">
-          <span>{{ goods.goodsName }}</span>
+          <span>{{ scope.row.goods.goodsName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="商品单价" align="center" prop="goods" width="180">
+        <template slot-scope="scope">
+          <span>{{ scope.row.goods.goodsPrice }}</span>
         </template>
       </el-table-column>
       <el-table-column label="商品数量" align="center" prop="goodsCount"/>
+      <el-table-column label="合计金额" align="center" prop="goods" width="180">
+        <template slot-scope="scope">
+          <span>{{ scope.row.goods.goodsPrice * scope.row.goodsCount }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="明细状态" align="center" prop="status" :formatter="statusFormat"/>
       <el-table-column label="统一退单号" align="center" prop="refundNo"/>
       <el-table-column label="退款时间" align="center" prop="refundTime" width="180">
@@ -160,14 +173,14 @@
             v-hasPermi="['winery:detail:edit']"
           >修改
           </el-button>
-<!--          <el-button-->
-<!--            size="mini"-->
-<!--            type="text"-->
-<!--            icon="el-icon-delete"-->
-<!--            @click="handleDelete(scope.row)"-->
-<!--            v-hasPermi="['winery:detail:remove']"-->
-<!--          >删除-->
-<!--          </el-button>-->
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-delete"-->
+          <!--            @click="handleDelete(scope.row)"-->
+          <!--            v-hasPermi="['winery:detail:remove']"-->
+          <!--          >删除-->
+          <!--          </el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -225,10 +238,12 @@
 
 <script>
 import {listDetail, getDetail, delDetail, addDetail, updateDetail, exportDetail, refund} from "@/api/winery/detail";
+import {CommonMixin} from "@/mixin/common";
 
 export default {
   name: "Detail",
   components: {},
+  mixins: [CommonMixin],
   data() {
     return {
       // 遮罩层
@@ -305,8 +320,6 @@ export default {
         this.loading = false;
       });
     },
-
-
     // 状态字典翻译
     statusFormat(row, column) {
       return this.selectDictLabel(this.statusOptions, row.status);

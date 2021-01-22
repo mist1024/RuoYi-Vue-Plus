@@ -80,9 +80,6 @@ public class AppOrderController extends BaseController {
     public TableDataInfo list(AppOrder appOrder) {
         startPage();
         LambdaQueryWrapper<AppOrder> lqw = Wrappers.lambdaQuery(appOrder);
-        if (appOrder.getDeptId() != null) {
-            lqw.eq(AppOrder::getDeptId, appOrder.getDeptId());
-        }
         if (appOrder.getUserId() != null) {
             lqw.eq(AppOrder::getUserId, appOrder.getUserId());
         }
@@ -175,7 +172,7 @@ public class AppOrderController extends BaseController {
     public AjaxResult add(@RequestBody AppOrder appOrder, HttpServletRequest req) {
         Long userId = getLoginUser().getUser().getUserId();
         String username = getUsername();
-        Long deptId = getDeptId();
+
         String id = System.currentTimeMillis() + RandomUtil.randomNumbers(6);
 
 
@@ -191,7 +188,6 @@ public class AppOrderController extends BaseController {
         appOrder.setPostAddress(address.getAddress());
 
         appOrder.setId(id);
-        appOrder.setDeptId(getDeptId());
         appOrder.setUserId(userId);
 
         // 计算总金额
@@ -201,7 +197,8 @@ public class AppOrderController extends BaseController {
             GoodsMain goods = goodsMainService.getById(detail.getGoodsId());
             detail.setUserId(userId);
             detail.setOrderId(id);
-            detail.setDeptId(deptId);
+            // 使用产品对应酒庄id
+            detail.setDeptId(goods.getDeptId());
             detail.setStatus(0);
             detailService.save(detail);
             totalFee += (goods.getGoodsPrice().multiply(new BigDecimal(100)).intValue() * detail.getGoodsCount());

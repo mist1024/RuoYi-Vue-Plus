@@ -254,13 +254,14 @@ import {
 import UploadImage from '@/components/UploadImage/index'
 import UploadImageMultiple from '@/components/UploadImageMultiple/index'
 
-import CommonMixin from "@/mixin/common";
+
 import Editor from '@/components/Editor/index';
 import {listSpec} from "@/api/goods/goods_spec";
 import {getDept, listDept} from "@/api/system/dept";
 import {selectDictLabel} from "@/utils/ruoyi";
 import * as settings from "@/settings";
 import {imageBaseUrl} from "@/settings";
+import {CommonMixin} from "@/mixin/common";
 
 export default {
   name: "GoodsMain",
@@ -341,11 +342,7 @@ export default {
       this.goodsTypeOptions = response.data;
     });
 
-    listDept().then(r => {
 
-      this.deptOptions = r.data.filter(x => x.parentId === 300)
-
-    })
   },
   methods: {
     inputGoodsFaceImg(fileName) {
@@ -363,16 +360,6 @@ export default {
     // 商品类型字典翻译
     goodsTypeFormat(row, column) {
       return this.selectDictLabel(this.goodsTypeOptions, row.goodsType);
-    },
-
-    // 商户类型字典翻译
-    deptFormat(row, column) {
-
-      if (this.deptOptions.length < 1) {
-        return ''
-      }
-      const dept = this.deptOptions.filter(x => x.deptId === row.deptId)[0]
-      return dept.deptName
     },
     /** 查询商品信息列表 */
     getList() {
