@@ -168,6 +168,12 @@ wepy.page({
   },
 
   ready() {
+    wx.getSystemInfo({
+      success (res) {
+        store.state.statusBarHeight = res.statusBarHeight
+      }
+    })
+
     this.init()
     // eventHub.$emit('onShowDialogRegist')
     // appManager.login()

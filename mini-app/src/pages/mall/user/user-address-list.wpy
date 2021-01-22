@@ -35,7 +35,7 @@
   <nav-bar title="地址管理" />
 
 
-  <div class="container" style="margin-top:66px;">
+  <div class="container" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
 
     <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
     <view wx:else>
@@ -121,7 +121,8 @@ wepy.page({
       'imageDefine': state => state.imageDefine,
       'user': state => state.user,
       'navDefine': state => state.navDefine,
-      'userAddress': state => state.userAddress
+      'userAddress': state => state.userAddress,
+      'statusBarHeight': state => state.statusBarHeight
     })
   },
 

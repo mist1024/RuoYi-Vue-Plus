@@ -14,7 +14,7 @@ module.exports.parseImage = parseImage;
   <nav-bar title="我的订单" />
 
 
-  <div style="width: 100%;margin-top:66px;">
+  <div style="width: 100%;" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
 
 
     <van-tabs active="{{ activeTab }}" bind:change="onChangeTab">
@@ -69,7 +69,8 @@ wepy.page({
       'imageDefine': state => state.imageDefine,
       'user': state => state.user,
       'navDefine': state => state.navDefine,
-      'userAddress': state => state.userAddress
+      'userAddress': state => state.userAddress,
+      'statusBarHeight': state => state.statusBarHeight
     })
   },
 

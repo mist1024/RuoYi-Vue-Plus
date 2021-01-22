@@ -21,7 +21,7 @@ module.exports.parseImage = parseImage;
 
     <van-loading v-if="!goodsItem" style="margin-top: 200px;" />
 
-    <div v-else style="margin-top:66px;margin-bottom: 80px; width: 100%;">
+    <div v-else style="margin-bottom: 80px; width: 100%;" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
 
       <swiper indicator-dots="true" autoplay="true" interval="3000" style="height: 750rpx;">
         <block v-for="(item,index) in goodsImages" wx:key="index">
@@ -124,7 +124,8 @@ wepy.page({
 
     ...mapState({
       'order': state => state.order,
-      'shoppingCar': state => state.shoppingCar
+      'shoppingCar': state => state.shoppingCar,
+      'statusBarHeight': state => state.statusBarHeight
     }),
     goodsImages() {
       if (!this.goodsItem || !this.goodsItem.goodsImg) {

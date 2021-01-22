@@ -35,14 +35,16 @@ module.exports.parseImage = parseImage;
     <view wx:else>
 
 
-      <div v-if="!currentAddress" style="display: flex;flex-direction: column;align-items: center;width: 100%;margin-top: 86px;">
+      <div v-if="!currentAddress" style="display: flex;flex-direction: column;align-items: center;width: 100%;"
+           :style=" { 'margin-top': (statusBarHeight + 66) + 'px' }">
         <van-empty description="您还没有添加收货地址" />
         <div style="width: 600rpx;">
           <van-button round type="info" size="large" @tap="onAdd">点击添加</van-button>
         </div>
       </div>
 
-      <div v-else class="fream" style="margin: 86px 15px 20px 15px;" >
+      <div v-else class="fream" style="margin-left: 15px;margin-right: 15px;margin-bottom: 20px;"
+           :style=" { 'margin-top' : (statusBarHeight + 66) + 'px' }">
 
         <div style="display: flex; justify-content: space-between;">
           <van-icon name="home-o" size="60rpx" />
@@ -134,7 +136,8 @@ wepy.page({
       'user': state => state.user,
       'navDefine': state => state.navDefine,
       'userAddress': state => state.userAddress,
-      'order': state => state.order
+      'order': state => state.order,
+      'statusBarHeight': state => state.statusBarHeight
     }),
     totalPrice() {
       let result = 0.0

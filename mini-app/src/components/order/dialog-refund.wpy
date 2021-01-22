@@ -71,7 +71,7 @@ module.exports.parseImage = parseImage;
             <div style="display: flex;margin: 5px;flex-direction: column;">
               <div class="cell-item" v-for="(type,index) in reasonType">
                 <div v-if="index === 4" class="cell-input">
-                  <van-radio name="其他" checked-color="#AC1630">其他<van-radio/>
+                  <van-radio name="其他" checked-color="#AC1630">其他</van-radio>
                   <input
                     v-model="text"
                     clearable
@@ -95,7 +95,7 @@ module.exports.parseImage = parseImage;
         <div style="display: flex;margin: 5px;flex-direction: column;">
           <div class="cell-item" v-for="(item,index) in reasonTypes">
             <div v-if="index === 4" class="cell-input">
-              <van-radio name="{{item}}" checked-color="#AC1630" />
+              <van-radio name="{{item}}" checked-color="#AC1630" > </van-radio>
               <input
                 v-model="text"
                 clearable

@@ -14,7 +14,7 @@ module.exports.parseImage = parseImage;
   <nav-bar title="我的购物车" />
 
 
-  <div style="width: 100%;margin-top:66px;">
+  <div style="width: 100%;" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
 
     <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
     <view wx:else>
@@ -104,7 +104,8 @@ wepy.page({
       'user': state => state.user,
       'navDefine': state => state.navDefine,
       'userAddress': state => state.userAddress,
-      'shoppingCar': state => state.shoppingCar
+      'shoppingCar': state => state.shoppingCar,
+      'statusBarHeight': state => state.statusBarHeight
 
     }),
     totalPrice() {

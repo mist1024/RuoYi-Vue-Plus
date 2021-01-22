@@ -48,7 +48,7 @@ input {
 <template>
 
   <nav-bar :title="title" />
-  <div class="container">
+  <div class="container" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
 
 
     <div class="address-item">
@@ -164,7 +164,8 @@ wepy.page({
       'imageDefine': state => state.imageDefine,
       'user': state => state.user,
       'navDefine': state => state.navDefine,
-      'userAddress': state => state.userAddress
+      'userAddress': state => state.userAddress,
+      'statusBarHeight': state => state.statusBarHeight
     })
   },
   methods: {

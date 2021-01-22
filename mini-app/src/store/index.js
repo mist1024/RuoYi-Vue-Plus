@@ -19,6 +19,7 @@ export default new Vuex.Store({
       currWebUrl: ''
 
     },
+    statusBarHeight: 20,
     // 热开关
     hotSwitch: false,
     // 订单
@@ -29,7 +30,7 @@ export default new Vuex.Store({
     imageDefine,
     navDefine,
     wineryDefine,
-    userAddress
+    userAddress,
   },
   mutations: {
 
