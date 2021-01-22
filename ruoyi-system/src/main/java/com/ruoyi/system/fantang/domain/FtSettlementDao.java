@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.domain;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -98,4 +99,14 @@ public class FtSettlementDao implements Serializable {
 
     @TableField(exist = false)
     private String name;
+
+    @TableField(exist = false)
+    private String beginOfDay;
+
+    @TableField(exist = false)
+    private String endOfDay;
+
+    private Long invoiceId;
+
+    private Boolean invoiceFlag;
 }

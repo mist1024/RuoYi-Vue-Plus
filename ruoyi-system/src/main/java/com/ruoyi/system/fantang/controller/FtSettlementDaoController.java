@@ -39,26 +39,6 @@ public class FtSettlementDaoController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(FtSettlementDao ftSettlementDao) {
         startPage();
-        LambdaQueryWrapper<FtSettlementDao> lqw = Wrappers.lambdaQuery(ftSettlementDao);
-        if (ftSettlementDao.getSettleAt() != null) {
-            lqw.eq(FtSettlementDao::getSettleAt, ftSettlementDao.getSettleAt());
-        }
-        if (ftSettlementDao.getPrice() != null) {
-            lqw.eq(FtSettlementDao::getPrice, ftSettlementDao.getPrice());
-        }
-        if (ftSettlementDao.getPayable() != null) {
-            lqw.eq(FtSettlementDao::getPayable, ftSettlementDao.getPayable());
-        }
-        if (ftSettlementDao.getReceipts() != null) {
-            lqw.eq(FtSettlementDao::getReceipts, ftSettlementDao.getReceipts());
-        }
-        if (StringUtils.isNotBlank(ftSettlementDao.getType())) {
-            lqw.eq(FtSettlementDao::getType, ftSettlementDao.getType());
-        }
-        if (ftSettlementDao.getRefund() != null) {
-            lqw.eq(FtSettlementDao::getRefund, ftSettlementDao.getRefund());
-        }
-//        List<FtSettlementDao> list = iFtSettlementDaoService.list(lqw);
         List<FtSettlementDao> list = iFtSettlementDaoService.listWithPatient(ftSettlementDao);
         return getDataTable(list);
     }

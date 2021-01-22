@@ -11,11 +11,14 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtInvoiceDao;
 import com.ruoyi.system.fantang.domain.FtReturnDao;
+import com.ruoyi.system.fantang.domain.FtSettlementDao;
 import com.ruoyi.system.fantang.service.IFtInvoiceDaoService;
 import com.ruoyi.system.fantang.service.IFtReturnDaoService;
+import com.ruoyi.system.fantang.service.IFtSettlementDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -36,7 +39,7 @@ public class FtInvoiceDaoController extends BaseController {
 
     private final IFtInvoiceDaoService iFtInvoiceDaoService;
 
-    private final IFtReturnDaoService iFtReturnDaoService;
+    private final IFtSettlementDaoService settSettlementDaoService;
 
     /**
      * 查询财务收费开票列表
@@ -108,8 +111,8 @@ public class FtInvoiceDaoController extends BaseController {
     }
 
     @PostMapping("/addToInvoice")
+    @Transactional
     public AjaxResult addToInvoice(@RequestBody JSONObject params) {
-        System.out.println(params);
 
         // 应收
         BigDecimal payable = params.getBigDecimal("payable");
@@ -136,13 +139,14 @@ public class FtInvoiceDaoController extends BaseController {
         invoiceDao.setInvoiceName(invoiceName);
         invoiceDao.setTaxId(taxId);
         invoiceDao.setInvoiceType(invoiceType);
+        invoiceDao.setInvoiceAmount(receipts);
         iFtInvoiceDaoService.save(invoiceDao);
-//
-//        if (invoiceType == 2) {
-//            FtReturnDao ftReturnDao = new FtReturnDao();
-//            ftReturnDao.setInvoiceId(invoiceDao.getId());
-//            iFtReturnDaoService.save(ftReturnDao);
-//        }
+
+        FtSettlementDao settlementDao = new FtSettlementDao();
+        settlementDao.setSettleId(params.getLong("settleId"));
+        settlementDao.setInvoiceId(invoiceDao.getId());
+        settlementDao.setInvoiceFlag(true);
+        settSettlementDaoService.updateById(settlementDao);
 
         return AjaxResult.success("已开票");
     }
