@@ -7,6 +7,7 @@
 <template>
   <van-nav-bar
     bind:click-left="onBack"
+    fixed
     border="{{false}}"
     z-index="100"
     custom-style="background:#AC1630;color:#FFF;"

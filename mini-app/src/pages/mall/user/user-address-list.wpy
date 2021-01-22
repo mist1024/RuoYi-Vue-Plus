@@ -35,7 +35,7 @@
   <nav-bar title="地址管理" />
 
 
-  <div class="container" style="margin: 15px;">
+  <div class="container" style="margin-top:66px;">
 
     <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
     <view wx:else>
@@ -88,7 +88,7 @@
 
 
       <div style="margin-top: 20px;">
-        <van-button round type="info" size="large" @tap="onAdd">+ 新建收获地址</van-button>
+        <van-button round type="info" size="large" @tap="onAdd">+ 新建收货地址</van-button>
       </div>
 
     </view>

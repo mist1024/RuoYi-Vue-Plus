@@ -14,7 +14,7 @@ module.exports.parseImage = parseImage;
   <nav-bar title="退款记录" />
 
 
-  <div style="width: 100%;">
+  <div style="width: 100%;margin-top:66px;">
 
 
     <van-tabs active="{{ activeTab }}" bind:change="onChangeTab">

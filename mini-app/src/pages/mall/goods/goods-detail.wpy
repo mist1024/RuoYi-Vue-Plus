@@ -19,9 +19,9 @@ module.exports.parseImage = parseImage;
   <div class="container">
 
 
-    <van-loading v-if="!goodsItem" style="margin-top: 20px;" />
+    <van-loading v-if="!goodsItem" style="margin-top: 200px;" />
 
-    <div v-else style="margin-bottom: 80px; width: 100%;">
+    <div v-else style="margin-top:66px;margin-bottom: 80px; width: 100%;">
 
       <swiper indicator-dots="true" autoplay="true" interval="3000" style="height: 750rpx;">
         <block v-for="(item,index) in goodsImages" wx:key="index">

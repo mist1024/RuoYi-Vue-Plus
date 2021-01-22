@@ -101,9 +101,13 @@ module.exports.parseImage = parseImage;
           </div>
         </van-col>
         <van-col offset="1" span="7" v-if="hotSwitch">
-          <van-button round style="height: 25px;" size="small" plain color="#AC1630" @tap="onShoppingCar">
+          <van-button v-if="user.token" round style="height: 25px;" size="small" plain color="#AC1630"
+                      @tap="onShoppingCar">
             <van-icon name="shopping-cart-o" color="#AC1630" />
             <span style="margin-left: 5px;color: #333333;">购物车</span>
+          </van-button>
+          <van-button v-else round style="height: 25px;" size="small" plain color="#AC1630" @tap="onShoppingCar">
+            <span style="margin-left: 5px;color: #333333;">点击登录</span>
           </van-button>
         </van-col>
       </van-row>
@@ -187,7 +191,7 @@ module.exports.parseImage = parseImage;
 
 
         <van-image width="100%" :height="item.imageHeight + 'px'" :src="filters.parseImage(item.image)"
-                   @tap="onWebItem(item)"  />
+                   @tap="onWebItem(item)" />
       </div>
 
       <!--      <div class="column-record-item" v-for="(item, index) in columnRecord" @tap="onNavItem(navDefine.HOME_BANNER2)">-->

@@ -69,8 +69,8 @@ module.exports.parseImage = parseImage;
 
 
   <nav-bar :title="newItem.newsTitle" />
-  <div class="container">
-    <van-loading v-if="!newItem" style="margin-top: 20px;" />
+  <div class="container" style="margin-top: 66px;">
+    <van-loading v-if="!newItem" style="margin-top: 136px;" />
 
     <div v-else style="margin-bottom: 80px;">
       <div style="margin: 10px 15px;display: flex;flex-direction: column;">

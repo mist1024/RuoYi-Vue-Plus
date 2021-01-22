@@ -2,6 +2,7 @@ import store from '@/store'
 import eventHub from './common/eventHub'
 import userApis from './apis/userApis'
 import { webViewPage } from './store/constant/nav/pages'
+import Dialog from './vant/dialog/dialog'
 
 class AppManager {
   login(callBack) {
@@ -89,9 +90,12 @@ class AppManager {
   navigateTo(path) {
     console.log('path:', path)
 
+    if (path === 'customer') {
+      this.showDialog('温馨提示', '客服热线：17395097925')
+    }
 
     if (!store.state.user.token) {
-      eventHub.$emit('onShowDialogUserInfo')
+      eventHub.$emit('onShowDialogRegist')
       return
     }
 
@@ -113,6 +117,16 @@ class AppManager {
     store.state.currWebUrl = url
 
     this.navigateTo(webViewPage)
+  }
+
+
+  showDialog(title,msg) {
+    Dialog.alert({
+      title: title,
+      message: msg,
+    }).then(() => {
+      // on close
+    })
   }
 }
 

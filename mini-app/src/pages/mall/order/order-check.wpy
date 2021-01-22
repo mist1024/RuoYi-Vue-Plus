@@ -7,7 +7,7 @@ page {
 
   border-radius: 25px;
   width: 660rpx;
-  margin-top: 20px;
+
   background-color: white;
   //box-shadow: 4px 4px 10px #eeeeee;
   padding: 10px 10px 10px 10px;
@@ -29,20 +29,20 @@ module.exports.parseImage = parseImage;
   <nav-bar title="确认订单" />
 
 
-  <div class="" style="width: 100%;margin:15px;">
+  <div class="" style="width: 100%;margin-top:66px;">
 
-    <van-loading v-if="!isInit" style="margin-top: 20px;justify-content: center;"></van-loading>
+    <van-loading v-if="!isInit" style="margin-top: 200px;justify-content: center;"></van-loading>
     <view wx:else>
 
 
-      <div v-if="!currentAddress" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+      <div v-if="!currentAddress" style="display: flex;flex-direction: column;align-items: center;width: 100%;margin-top: 66px;">
         <van-empty description="您还没有添加收货地址" />
         <div style="width: 600rpx;">
           <van-button round type="info" size="large" @tap="onAdd">点击添加</van-button>
         </div>
       </div>
 
-      <div v-else class="fream" >
+      <div v-else class="fream" style="margin: 60px 15px 20px 15px;" >
 
         <div style="display: flex; justify-content: space-between;">
           <van-icon name="home-o" size="60rpx" />
@@ -68,7 +68,7 @@ module.exports.parseImage = parseImage;
       </div>
 
 
-      <div class="fream">
+      <div class="fream" style="margin: 20px 15px 20px 15px;">
 
         <van-card
 

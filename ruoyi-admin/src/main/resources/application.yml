@@ -206,11 +206,9 @@ tencent-cos:
 #微信小程序支付配置
 wxmini:
 #  appId: wx76ec015fc31a1946 # 宁夏通
-    appId: wx4306452d346f783d # 紫色名片
+  appId: wx4306452d346f783d # 紫色名片
 #  secret: 94ee42c0899a6ceccf353e1e729c50d4 # 宁夏通
-    secret: dc55bc1729090bdff9b63e1a5f0d03b2 # 紫色名片
-
-
+  secret: dc55bc1729090bdff9b63e1a5f0d03b2 # 紫色名片
 
   mchId: 1486984962
   mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8

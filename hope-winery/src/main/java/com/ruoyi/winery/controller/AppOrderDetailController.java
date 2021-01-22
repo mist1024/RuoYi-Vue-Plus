@@ -41,6 +41,8 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 import static com.ruoyi.common.core.domain.AjaxResult.error;
+import static com.ruoyi.common.utils.SecurityUtils.getLoginUser;
+import static com.ruoyi.common.utils.SecurityUtils.isMiniUser;
 
 /**
  * 订单明细Controller
@@ -96,6 +98,12 @@ public class AppOrderDetailController extends BaseController {
         if (appOrderDetail.getRefundTime() != null) {
             lqw.eq(AppOrderDetail::getRefundTime, appOrderDetail.getRefundTime());
         }
+
+        if (isMiniUser()) {
+            lqw.eq(AppOrderDetail::getUserId, getLoginUser().getUser().getUserId());
+        }
+
+
         lqw.orderByDesc(AppOrderDetail::getCreateTime);
         List<AppOrderDetail> list = iAppOrderDetailService.list(lqw);
         for (AppOrderDetail detail : list) {

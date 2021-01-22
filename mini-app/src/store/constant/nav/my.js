@@ -28,26 +28,23 @@ export const myMenuList2 = [
     name: '退款管理',
     icon: imgbaseUrl + '/my/tool_2.png',
     path: orderDetailListPage
-  }, {
-    name: '隐私政策',
-    icon: imgbaseUrl + '/my/tool_3.png',
-    path: newsDetailPage + '?id=' + 'a1e5ec18ae13036d14c94bf0e5d11756'
   }
 ]
 
 export const myMenuList3 = [
   {
-    name: '关注',
-    icon: imgbaseUrl + 'doctor.png',
-    path: ''
+    name: '客服热线',
+    icon: imgbaseUrl + '/my/more_1.png',
+    path: 'customer'
   },
   {
-    name: '在线客服',
-    icon: imgbaseUrl + 'doctor.png',
-    path: ''
-  }, {
-    name: '条款政策',
-    icon: imgbaseUrl + 'doctor.png',
-    path: ''
+    name: '隐私政策',
+    icon: imgbaseUrl + '/my/more_2.png',
+    path: newsDetailPage + '?id=' + 'a1e5ec18ae13036d14c94bf0e5d11756'
+  },
+  {
+    name: '服务条款',
+    icon: imgbaseUrl + '/my/more_3.png',
+    path: newsDetailPage + '?id=' + 'fb4109a4020b2a2a9d1172f66d043897'
   }
 ]

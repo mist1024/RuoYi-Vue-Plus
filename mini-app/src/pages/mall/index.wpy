@@ -95,6 +95,7 @@ module.exports.getTime = getTime;
   <mall-bbs v-else-if="pageIndex === 2" @changeTab="changeTab" />
   <mall-my v-else-if="pageIndex === 3" />
   <dialog-registration />
+  <van-dialog id="van-dialog" />
 
 
 </template>
@@ -139,7 +140,7 @@ wepy.page({
     },
     onChange(event) {
       if (!this.user.token) {
-        eventHub.$emit('onShowDialogUserInfo')
+        eventHub.$emit('onShowDialogRegist')
         return
       }
       this.pageIndex = event.$wx.detail
@@ -168,6 +169,7 @@ wepy.page({
 
   ready() {
     this.init()
+    // eventHub.$emit('onShowDialogRegist')
     // appManager.login()
   },
   onShow() {
