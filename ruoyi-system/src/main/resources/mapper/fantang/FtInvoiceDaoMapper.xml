@@ -18,6 +18,7 @@
         <result property="invoiceName" column="invoice_name"/>
         <result property="taxId" column="tax_id"/>
         <result property="invoiceType" column="invoice_type"/>
+        <result property="invoiceAmount" column="invoice_amount"/>
     </resultMap>
 
 
