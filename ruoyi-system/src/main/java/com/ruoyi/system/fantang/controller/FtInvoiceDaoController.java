@@ -41,6 +41,8 @@ public class FtInvoiceDaoController extends BaseController {
 
     private final IFtSettlementDaoService settSettlementDaoService;
 
+    private final IFtReturnDaoService ftReturnDaoService;
+
     /**
      * 查询财务收费开票列表
      */
@@ -126,7 +128,7 @@ public class FtInvoiceDaoController extends BaseController {
         String invoiceName = params.getString("invoiceName");
         // 税号
         String taxId = params.getString("taxId");
-        // 开票类型
+        // 跟踪回款
         Integer invoiceType = params.getInteger("invoiceType");
         // 开票金额
         BigDecimal invoiceAmount = params.getBigDecimal("invoiceAmount");
@@ -143,6 +145,16 @@ public class FtInvoiceDaoController extends BaseController {
         invoiceDao.setInvoiceType(invoiceType);
         invoiceDao.setInvoiceAmount(invoiceAmount);
         iFtInvoiceDaoService.save(invoiceDao);
+
+        // 跟踪回款
+        if (invoiceType == 2) {
+            FtReturnDao ftReturnDao = new FtReturnDao();
+            ftReturnDao.setInvoiceId(invoiceDao.getId());
+            ftReturnDao.setReturnAt(new Date());
+            ftReturnDao.setReturnFlag(0);
+
+            ftReturnDaoService.save(ftReturnDao);
+        }
 
         FtSettlementDao settlementDao = new FtSettlementDao();
         settlementDao.setSettleId(params.getLong("settleId"));

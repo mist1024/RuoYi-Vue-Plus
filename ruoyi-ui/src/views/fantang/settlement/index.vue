@@ -308,7 +308,7 @@ export default {
           {required: true, message: "开票金额不能为空", trigger: "blur"},
           {
             required: true,
-            pattern: "/(^0\\.[1-9]\\d?$)|(^0\\.\\d[1-9]?$)|(^[1-9]\\d{0,7}(\\.\\d{0,2})?$)/",
+            pattern: "",
             message: "请输入正确的开票金额",
             trigger: "blur"
           }
