@@ -117,6 +117,7 @@ module.exports.parseImage = parseImage;
         mode="link"
         background="#ddd"
         color="#333"
+        speed="25"
         style="margin-top: 16px;"
       >
         <van-image slot="left-icon" :src="imageDefine.HOME_NOTICE_ICON" width="18px" height="19px"
