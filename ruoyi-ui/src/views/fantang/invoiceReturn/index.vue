@@ -413,7 +413,7 @@
       <el-table-column label="发票号" align="center" prop="invoiceNum"/>
       <el-table-column label="税号" align="center" prop="taxId"/>
       <el-table-column label="收款方式" align="center" prop="collectionType"/>
-      <el-table-column label="开票类型" align="center" prop="invoiceType" :formatter="formatInvoiceType"/>
+      <el-table-column label="回款跟踪" align="center" prop="invoiceType" :formatter="formatInvoiceType"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -500,9 +500,9 @@ export default {
   methods: {
     formatInvoiceType(row) {
       if (row.invoiceType === 1 || row.invoiceType === "1") {
-        return "开票"
+        return "完成"
       } else {
-        return "挂账"
+        return "未完成"
       }
     },
     /** 查询财务收费开票列表 */

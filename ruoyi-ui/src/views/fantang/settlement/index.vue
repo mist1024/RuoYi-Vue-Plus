@@ -188,13 +188,7 @@
 </template>
 
 <script>
-import {
-  addSettlement,
-  delSettlement,
-  exportSettlement,
-  getSettlement,
-  listSettlement
-} from "../../../api/fantang/settlement";
+import {delSettlement, exportSettlement, getSettlement, listSettlement} from "../../../api/fantang/settlement";
 import {addToInvoice} from "../../../api/fantang/invoice";
 
 export default {
@@ -442,19 +436,12 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.settleId != null) {
-            addToInvoice(this.form).then(response => {
-              this.msgSuccess("已开票");
-              this.open = false;
-              this.getList();
-            })
-          } else {
-            addSettlement(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
-          }
+          addToInvoice(this.form).then(response => {
+            this.msgSuccess("已开票");
+            this.open = false;
+            this.combinationOpen = false;
+            this.getList();
+          })
         }
       });
     },
