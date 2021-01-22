@@ -14,6 +14,13 @@ export function getLastBillingDateByPatientId(patientId) {
   })
 }
 
+// 查看该病人所有已用餐未结算的记录
+export function showAllMealsWithNoPay(patientId) {
+  return request({
+    url: '/fantang/settle/showAllMealsWithNoPay/' + patientId,
+    method: 'get'
+  })
+}
 
 
 // 查询结算报列表

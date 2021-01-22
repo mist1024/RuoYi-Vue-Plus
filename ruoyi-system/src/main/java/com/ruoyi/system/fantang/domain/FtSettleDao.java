@@ -106,4 +106,14 @@ public class FtSettleDao implements Serializable {
     @TableField(exist = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date selectBillingDate;
+
+    /**
+     * 开票标志
+     */
+    private Boolean invoiceFlag;
+
+    /**
+     * 发票 id
+     */
+    private Long invoiceId;
 }

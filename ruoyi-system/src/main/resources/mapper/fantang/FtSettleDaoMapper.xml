@@ -16,6 +16,8 @@
         <result property="type" column="type"/>
         <result property="flag" column="flag"/>
         <result property="refund" column="refund"/>
+        <result property="invoiceId" column="invoice_id"/>
+        <result property="invoiceFlag" column="invoice_flag"/>
     </resultMap>
 
 

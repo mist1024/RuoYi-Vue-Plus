@@ -79,4 +79,9 @@ private static final long serialVersionUID=1L;
      * 开票类型
      */
     private Integer invoiceType;
+
+    /**
+     * 开票金额
+     */
+    private BigDecimal invoiceAmount;
 }
