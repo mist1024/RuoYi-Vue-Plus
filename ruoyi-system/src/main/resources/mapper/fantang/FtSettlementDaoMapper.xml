@@ -16,6 +16,8 @@
         <result property="type" column="type"/>
         <result property="flag" column="flag"/>
         <result property="refund" column="refund"/>
+        <result property="invoiceId" column="invoice_id"/>
+        <result property="invoiceFlag" column="invoice_flag"/>
     </resultMap>
 
     <select id="listWithPatient" resultType="com.ruoyi.system.fantang.domain.FtSettlementDao">
@@ -24,8 +26,10 @@
         FROM ft_settle a
         LEFT JOIN ft_patient b ON b.patient_id = a.patient_id
         <where>
-            <if test="settleAt != null and settleAt !=''">and a.settle_at = #{settleAt}</if>
+            <if test="beginOfDay != null and beginOfDay !=''">settle_at BETWEEN #{beginOfDay}</if>
+            <if test="endOfDay != null and endOfDay !=''">AND #{endOfDay}</if>
             <if test="type != null and type !=''">and a.type = #{type}</if>
+            <if test="invoiceFlag != null and invoiceFlag !=''">and a.invoice_flag = #{invoiceFlag}</if>
         </where>
 
     </select>

@@ -9,24 +9,6 @@
                         placeholder="选择结算日期">
         </el-date-picker>
       </el-form-item>
-      <!--      <el-form-item label="应收" prop="payable">-->
-      <!--        <el-input-->
-      <!--          v-model="queryParams.payable"-->
-      <!--          placeholder="请输入应收"-->
-      <!--          clearable-->
-      <!--          size="small"-->
-      <!--          @keyup.enter.native="handleQuery"-->
-      <!--        />-->
-      <!--      </el-form-item>-->
-      <!--      <el-form-item label="实收" prop="receipts">-->
-      <!--        <el-input-->
-      <!--          v-model="queryParams.receipts"-->
-      <!--          placeholder="请输入实收"-->
-      <!--          clearable-->
-      <!--          size="small"-->
-      <!--          @keyup.enter.native="handleQuery"-->
-      <!--        />-->
-      <!--      </el-form-item>-->
       <el-form-item label="结算类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择结算类型" clearable size="small">
           <el-option
@@ -37,15 +19,16 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <!--      <el-form-item label="退款总额" prop="refund">-->
-      <!--        <el-input-->
-      <!--          v-model="queryParams.refund"-->
-      <!--          placeholder="请输入退款总额"-->
-      <!--          clearable-->
-      <!--          size="small"-->
-      <!--          @keyup.enter.native="handleQuery"-->
-      <!--        />-->
-      <!--      </el-form-item>-->
+      <el-form-item label="已开票" prop="invoiceFlag">
+        <el-select v-model="queryParams.invoiceFlag" placeholder="请选择已开票" clearable size="small">
+          <el-option
+              v-for="item in invoiceFlagOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -53,36 +36,15 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button-->
-      <!--          type="primary"-->
-      <!--          icon="el-icon-plus"-->
-      <!--          size="mini"-->
-      <!--          @click="handleAdd"-->
-      <!--          v-hasPermi="['fantang:settlement:add']"-->
-      <!--        >新增-->
-      <!--        </el-button>-->
-      <!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
             type="success"
             icon="el-icon-edit"
             size="mini"
-            :disabled="single"
-            @click="handleUpdate"
-            v-hasPermi="['fantang:settlement:edit']"
-        >开票
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="mini"
             :disabled="multiple"
-            @click="handleDelete"
-            v-hasPermi="['fantang:settlement:remove']"
-        >删除
+            @click=""
+            v-hasPermi="['fantang:settlement:edit']"
+        >组合开票
         </el-button>
       </el-col>
       <el-col :span="1.5">
@@ -110,6 +72,7 @@
           <span>{{ parseTime(scope.row.settleAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="已开票" align="center" prop="invoiceFlag" :formatter="formatInvoiceFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -118,15 +81,8 @@
               icon="el-icon-edit"
               @click="handleUpdate(scope.row)"
               v-hasPermi="['fantang:settlement:edit']"
+              v-if="!scope.row.invoiceFlag"
           >开票
-          </el-button>
-          <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['fantang:settlement:remove']"
-          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -143,12 +99,6 @@
     <!-- 添加或修改结算管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <!--        <el-form-item label="记录清单" prop="list">-->
-        <!--          <el-input v-model="form.list" placeholder="请输入记录清单" />-->
-        <!--        </el-form-item>-->
-        <!--        <el-form-item label="结算总价" prop="price">-->
-        <!--          <el-input v-model="form.price" placeholder="请输入结算总价" />-->
-        <!--        </el-form-item>-->
         <el-form-item label="应收" prop="payable">
           <el-input v-model="form.payable" placeholder="请输入应收" :disabled="true"/>
         </el-form-item>
@@ -177,9 +127,6 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <!--        <el-form-item label="退款总额" prop="refund">-->
-        <!--          <el-input v-model="form.refund" placeholder="请输入退款总额"/>-->
-        <!--        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -190,8 +137,13 @@
 </template>
 
 <script>
-import {addSettlement, delSettlement, exportSettlement, listSettlement} from "@/api/fantang/settlement";
-import {getSettlement} from "../../../api/fantang/settlement";
+import {
+  addSettlement,
+  delSettlement,
+  exportSettlement,
+  getSettlement,
+  listSettlement
+} from "../../../api/fantang/settlement";
 import {addToInvoice} from "../../../api/fantang/invoice";
 
 export default {
@@ -205,6 +157,13 @@ export default {
       }, {
         value: 2,
         label: '挂账'
+      }],
+      invoiceFlagOptions: [{
+        value: true,
+        label: '是'
+      }, {
+        value: false,
+        label: '否'
       }],
       typeOptions: [{
         value: '现金',
@@ -249,7 +208,8 @@ export default {
         payable: undefined,
         receipts: undefined,
         type: undefined,
-        refund: undefined
+        refund: undefined,
+        invoiceFlag: undefined,
       },
       // 表单参数
       form: {},
@@ -292,10 +252,18 @@ export default {
     this.getList();
   },
   methods: {
+    formatInvoiceFlag(row) {
+      if (row.invoiceFlag === true) {
+        return '是';
+      } else {
+        return '否';
+      }
+    },
     /** 查询结算管理列表 */
     getList() {
       this.loading = true;
       listSettlement(this.queryParams).then(response => {
+        console.log(response)
         this.settlementList = response.rows;
         this.total = response.total;
         this.loading = false;
