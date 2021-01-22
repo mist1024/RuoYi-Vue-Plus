@@ -622,7 +622,6 @@ export default {
         })
 
         this.leaveForm.settlementDays = response.reportMeals.days;
-        this.open = true;
         this.leaveForm.hospitalId = row.hospitalId;
         this.leaveForm.name = row.name;
         this.leaveForm.departName = row.departName;
@@ -631,6 +630,7 @@ export default {
         this.leaveForm.price = row.price;
         this.leaveForm.netPeceipt = null;
         this.leaveForm.userName = this.userName;
+        this.open = true;
       });
     },
 

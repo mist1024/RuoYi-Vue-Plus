@@ -19,8 +19,8 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="已开票" prop="invoiceFlag">
-        <el-select v-model="queryParams.invoiceFlag" placeholder="请选择已开票" clearable size="small">
+      <el-form-item label="是否已开票" prop="invoiceFlag" label-width="83px">
+        <el-select v-model="queryParams.invoiceFlag" placeholder="请选择是否已开票" clearable size="small">
           <el-option
               v-for="item in invoiceFlagOptions"
               :key="item.value"
@@ -42,7 +42,7 @@
             icon="el-icon-edit"
             size="mini"
             :disabled="multiple"
-            @click=""
+            @click="handleCombination"
             v-hasPermi="['fantang:settlement:edit']"
         >组合开票
         </el-button>
@@ -72,7 +72,7 @@
           <span>{{ parseTime(scope.row.settleAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="已开票" align="center" prop="invoiceFlag" :formatter="formatInvoiceFlag"/>
+      <el-table-column label="是否已开票" align="center" prop="invoiceFlag" :formatter="formatInvoiceFlag"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -108,6 +108,9 @@
         <el-form-item label="结算类型" prop="type">
           <el-input v-model="form.type" placeholder="请输入结算类型" :disabled="true"/>
         </el-form-item>
+        <el-form-item label="开票金额" prop="invoiceAmount">
+          <el-input v-model="form.invoiceAmount" placeholder="请输入开票金额"/>
+        </el-form-item>
         <el-form-item label="发票名" prop="invoiceName">
           <el-input v-model="form.invoiceName" placeholder="请输入发票名"/>
         </el-form-item>
@@ -117,8 +120,46 @@
         <el-form-item label="发票号" prop="invoiceNum">
           <el-input v-model="form.invoiceNum" placeholder="请输入发票号"/>
         </el-form-item>
-        <el-form-item label="开票类型" prop="invoiceType">
-          <el-select v-model="form.invoiceType" placeholder="请选择开票类型">
+        <el-form-item label="跟踪回款" prop="invoiceType" label-width="80px">
+          <el-select v-model="form.invoiceType" placeholder="请选择跟踪回款">
+            <el-option
+                v-for="item in invoiceTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 组合开票对话框 -->
+    <el-dialog title="组合开票" :visible.sync="combinationOpen" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="应收" prop="payable">
+          <el-input v-model="form.payable" placeholder="请输入应收" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="实收" prop="receipts">
+          <el-input v-model="form.receipts" placeholder="请输入实收" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="开票金额" prop="invoiceAmount">
+          <el-input v-model="form.invoiceAmount" placeholder="请输入开票金额"/>
+        </el-form-item>
+        <el-form-item label="发票名" prop="invoiceName">
+          <el-input v-model="form.invoiceName" placeholder="请输入发票名"/>
+        </el-form-item>
+        <el-form-item label="税号" prop="taxId">
+          <el-input v-model="form.taxId" placeholder="请输入税号"/>
+        </el-form-item>
+        <el-form-item label="发票号" prop="invoiceNum">
+          <el-input v-model="form.invoiceNum" placeholder="请输入发票号"/>
+        </el-form-item>
+        <el-form-item label="跟踪回款" prop="invoiceType">
+          <el-select v-model="form.invoiceType" placeholder="请选择跟踪回款">
             <el-option
                 v-for="item in invoiceTypeOptions"
                 :key="item.value"
@@ -153,10 +194,10 @@ export default {
     return {
       invoiceTypeOptions: [{
         value: 1,
-        label: '开票'
+        label: '仅开票'
       }, {
         value: 2,
-        label: '挂账'
+        label: '开票并跟踪回款'
       }],
       invoiceFlagOptions: [{
         value: true,
@@ -185,6 +226,12 @@ export default {
       loading: true,
       // 选中数组
       ids: [],
+      invoiceFlags: [],
+      isErrFlag: [],
+      // 组合结算总价
+      settleTotalPrice: 0,
+      // 组合结算实收
+      settleTotalReceipts: 0,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -199,6 +246,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示组合开票弹出层
+      combinationOpen: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -245,6 +294,15 @@ export default {
         invoiceType: [
           {required: true, message: "开票类型不能为空", trigger: "blur"}
         ],
+        invoiceAmount: [
+          {required: true, message: "开票金额不能为空", trigger: "blur"},
+          {
+            required: true,
+            pattern: "/(^0\\.[1-9]\\d?$)|(^0\\.\\d[1-9]?$)|(^[1-9]\\d{0,7}(\\.\\d{0,2})?$)/",
+            message: "请输入正确的开票金额",
+            trigger: "blur"
+          }
+        ],
       }
     };
   },
@@ -252,6 +310,25 @@ export default {
     this.getList();
   },
   methods: {
+    // 组合开票
+    handleCombination(row) {
+      this.reset();
+      const id = row.id || this.ids;
+      console.log("id----------", id);
+      this.isErrFlag = false;
+      for (let i = 0; i < this.invoiceFlags.length; i++) {
+        if (this.invoiceFlags[i] === true) {
+          this.msgError("已开票的结算记录不能再次开票")
+          this.isErrFlag = true;
+          break;
+        }
+      }
+      if (!this.isErrFlag) {
+        this.combinationOpen = true;
+        this.form.receipts = this.settleTotalReceipts;
+        this.form.payable = this.settleTotalPrice;
+      }
+    },
     formatInvoiceFlag(row) {
       if (row.invoiceFlag === true) {
         return '是';
@@ -263,16 +340,15 @@ export default {
     getList() {
       this.loading = true;
       listSettlement(this.queryParams).then(response => {
-        console.log(response)
         this.settlementList = response.rows;
         this.total = response.total;
         this.loading = false;
-        console.log(response.rows)
       });
     },
     // 取消按钮
     cancel() {
       this.open = false;
+      this.combinationOpen = false;
       this.reset();
     },
     // 表单重置
@@ -293,6 +369,7 @@ export default {
         taxId: undefined,
         invoiceNum: undefined,
         invoiceType: undefined,
+        invoiceAmount: undefined,
       };
       this.resetForm("form");
     },
@@ -311,6 +388,22 @@ export default {
       this.ids = selection.map(item => item.settleId)
       this.single = selection.length !== 1
       this.multiple = !selection.length
+
+      // 是否开票标志数组
+      this.invoiceFlags = selection.map(item => item.invoiceFlag)
+      console.log(this.invoiceFlags)
+
+      // 清空组合结算总价
+      this.settleTotalPrice = 0;
+      selection.map(item => item.payable).forEach(item => {
+        this.settleTotalPrice += item;
+      })
+
+      // 清空组合结算实收
+      this.settleTotalReceipts = 0;
+      selection.map(item => item.receipts).forEach(item => {
+        this.settleTotalReceipts += item;
+      })
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -322,11 +415,17 @@ export default {
     handleUpdate(row) {
       this.reset();
       const settleId = row.settleId || this.ids
-      console.log(row)
       getSettlement(settleId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "开票";
+
+        // 跟踪回款逻辑判断
+        // if (this.form.payable === this.form.receipts && this.form.receipts > 0) {
+        //   this.form.invoiceType = 1
+        // } else if (this.form.receipts === 0) {
+        //   this.form.invoiceType = 2
+        // }
       });
     },
     /** 提交按钮 */
