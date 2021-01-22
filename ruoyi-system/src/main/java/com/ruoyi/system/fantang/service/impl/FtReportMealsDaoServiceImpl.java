@@ -74,6 +74,11 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     }
 
     @Override
+    public ReportMealsPriceEntity sumAllTotalPrice(Long patientId) {
+        return this.baseMapper.sumAllTotalPrice(patientId);
+    }
+
+    @Override
     public FtReportMealsDao getLastReportMeals(Long patientId) {
 
         // 获取最近一条已用餐结算的报餐记录

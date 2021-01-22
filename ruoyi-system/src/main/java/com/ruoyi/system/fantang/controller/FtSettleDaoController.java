@@ -75,7 +75,27 @@ public class FtSettleDaoController extends BaseController {
 
         ReportMealsPriceEntity reportMealsPrice = iFtReportMealsDaoService.sumTotalPrice(patientId, lastBillingDate, selectBillingDate);
 
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>(2);
+        data.put("reportMealsList", reportMealsList);
+        data.put("reportMealsPrice", reportMealsPrice);
+
+        return AjaxResult.success(data);
+    }
+
+    @GetMapping("/showAllMealsWithNoPay/{patientId}")
+    public AjaxResult showAllMealsWithNoPay(@PathVariable Long patientId) {
+
+        // 查找该病人所有已用餐未结算记录
+        QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
+        wrapper.eq("patient_id", patientId);
+        wrapper.eq("dining_flag",0);
+        wrapper.eq("settlement_flag",0);
+
+        List<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.list(wrapper);
+
+        ReportMealsPriceEntity reportMealsPrice = iFtReportMealsDaoService.sumAllTotalPrice(patientId);
+
+        Map<String, Object> data = new HashMap<>(2);
         data.put("reportMealsList", reportMealsList);
         data.put("reportMealsPrice", reportMealsPrice);
 
