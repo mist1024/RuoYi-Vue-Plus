@@ -105,8 +105,8 @@
         <el-form-item label="实收" prop="receipts">
           <el-input v-model="form.receipts" placeholder="请输入实收" :disabled="true"/>
         </el-form-item>
-        <el-form-item label="结算类型" prop="type">
-          <el-input v-model="form.type" placeholder="请输入结算类型" :disabled="true"/>
+        <el-form-item label="收款方式" prop="type">
+          <el-input v-model="form.type" placeholder="请输入收款方式" :disabled="true"/>
         </el-form-item>
         <el-form-item label="开票金额" prop="invoiceAmount">
           <el-input v-model="form.invoiceAmount" placeholder="请输入开票金额"/>
@@ -145,6 +145,16 @@
         </el-form-item>
         <el-form-item label="实收" prop="receipts">
           <el-input v-model="form.receipts" placeholder="请输入实收" :disabled="true"/>
+        </el-form-item>
+        <el-form-item label="收款方式" prop="type">
+          <el-select v-model="form.type" placeholder="请选择收款方式">
+            <el-option
+                v-for="item in typeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="开票金额" prop="invoiceAmount">
           <el-input v-model="form.invoiceAmount" placeholder="请输入开票金额"/>

@@ -128,6 +128,8 @@ public class FtInvoiceDaoController extends BaseController {
         String taxId = params.getString("taxId");
         // 开票类型
         Integer invoiceType = params.getInteger("invoiceType");
+        // 开票金额
+        BigDecimal invoiceAmount = params.getBigDecimal("invoiceAmount");
 
         FtInvoiceDao invoiceDao = new FtInvoiceDao();
         Date today = new Date();
@@ -139,7 +141,7 @@ public class FtInvoiceDaoController extends BaseController {
         invoiceDao.setInvoiceName(invoiceName);
         invoiceDao.setTaxId(taxId);
         invoiceDao.setInvoiceType(invoiceType);
-        invoiceDao.setInvoiceAmount(receipts);
+        invoiceDao.setInvoiceAmount(invoiceAmount);
         iFtInvoiceDaoService.save(invoiceDao);
 
         FtSettlementDao settlementDao = new FtSettlementDao();
