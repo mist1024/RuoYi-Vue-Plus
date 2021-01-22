@@ -574,7 +574,7 @@ public class ClientController extends BaseController {
         DinnerTypeUtils.DinnerType dinnerType = DinnerTypeUtils.getInstance(iFtConfigDaoService).getDinnerType();
         System.out.println(request);
         if (dinnerType == DinnerTypeUtils.DinnerType.notMatch) {
-            log.info("data : {} ", request);
+            log.info("未到用餐时间人脸记录 : {} ", request);
             return request.toJSONString();
         }
 
@@ -590,6 +590,7 @@ public class ClientController extends BaseController {
             return "该人脸识别设备已失效";
         }
 
+        log.info("用餐时人脸记录 : {} ", info);
         // 是否有该员工
         FtStaffInfoDao staffInfoDao = staffInfoDaoService.inStaff(personId);
 
