@@ -37,19 +37,6 @@ public class FtReportMealVo extends FtReportMealsDao {
 
     private String departCode;
 
-//    private Date createAt;
-//
-//    private Integer type;
-//
-//    private Long patientId;
-//
-//    private String createBy;
-//
-//    private String foods;
-//
-//    private float price;
-//
-//    private Integer settlementFlag;
-//
+    private Integer count;
 
 }

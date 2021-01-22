@@ -134,4 +134,10 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     public List<FtReportMealsDao> listAllNutrition(FtReportMealsDao ftReportMealsDao) {
         return this.baseMapper.listAllNutrition(ftReportMealsDao);
     }
+
+    @Override
+    public List<FtReportMealVo> getStatisticsFoods(Integer departId, Date day) {
+        return this.baseMapper.getStatisticsFoods(departId, DateUtil.beginOfDay(day), DateUtil.endOfDay(day));
+
+    }
 }

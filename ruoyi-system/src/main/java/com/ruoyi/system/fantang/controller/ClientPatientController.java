@@ -10,6 +10,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.fantang.domain.*;
 import com.ruoyi.system.fantang.service.*;
 import com.ruoyi.system.fantang.vo.FtPatientVo;
+import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -202,6 +203,18 @@ public class ClientPatientController extends BaseController {
 
         List<FtOrderDao> list = iFtFoodDemandDaoService.getStatisticsOfMonth(day);
 
+        return AjaxResult.success(list);
+    }
+
+    /**
+     * 按照用餐类型统计指定日期的各菜品数量
+     * @author 陈智兴
+     * @param day:查询日期
+     * @return
+     */
+    @GetMapping("/getStatisticsFoods")
+    public AjaxResult getStatisticsFoods(@RequestParam("departId") Integer departId,  @RequestParam("date") Date day) {
+        List<FtReportMealVo> list = iFtReportMealsDaoService.getStatisticsFoods(departId, day);
         return AjaxResult.success(list);
     }
 }
