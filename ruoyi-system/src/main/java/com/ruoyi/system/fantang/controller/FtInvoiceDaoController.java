@@ -175,7 +175,18 @@ public class FtInvoiceDaoController extends BaseController {
 
         }
 
-
         return AjaxResult.success("已开票");
+    }
+
+    @PutMapping("/finish/{id}")
+    public AjaxResult finish(@PathVariable Long id){
+
+        FtInvoiceDao invoiceDao = new FtInvoiceDao();
+        invoiceDao.setId(id);
+        invoiceDao.setInvoiceType(1);
+
+        iFtInvoiceDaoService.updateById(invoiceDao);
+
+        return AjaxResult.success("已结束跟踪");
     }
 }

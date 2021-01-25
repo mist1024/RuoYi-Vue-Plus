@@ -81,6 +81,15 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-edit"
+            @click="handleFinish(scope.row)"
+            v-hasPermi="['fantang:invoice:edit']"
+            v-if="returnFlag(scope.row)"
+          >结束跟踪
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-view"
             @click="handleView(scope.row)"
             v-hasPermi="['fantang:invoice:edit']"
@@ -274,11 +283,96 @@
         </el-table-column>
       </el-table>
     </el-dialog>
+
+    <!-- 结束跟踪弹出层 -->
+    <el-dialog :title="title" :visible.sync="finishOpen" width="700px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="应收" prop="payable">
+              <el-input v-model="form.payable" placeholder="请输入应收" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="实收" prop="receipts">
+              <el-input v-model="form.receipts" placeholder="请输入实收" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="开票金额" prop="invoiceAmount">
+              <el-input v-model="form.invoiceAmount" placeholder="请输入开票金额" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="10">
+          <el-col :span="24">
+            <el-form-item label="发票名" prop="invoiceName">
+              <el-input v-model="form.invoiceName" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="发票号" prop="invoiceNum">
+              <el-input v-model="form.invoiceNum" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="税号" prop="taxId">
+              <el-input v-model="form.taxId" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="收款方式" prop="collectionType">
+              <el-input v-model="form.collectionType" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="回款跟踪" prop="invoiceType">
+              <el-select v-model="form.invoiceType" :disabled="true">
+                <el-option
+                  v-for="item in invoiceTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFinish">结束跟踪</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+      <el-table :data="returnManageList">
+        <el-table-column label="id" align="center" prop="id" v-if="false"/>
+        <el-table-column label="回款时间" align="center" prop="returnAt" width="180">
+        </el-table-column>
+        <el-table-column label="回款金额" align="center" prop="returnPrice"/>
+        <el-table-column label="待付金额" align="center" prop="balancePrice"/>
+        <el-table-column label="凭证图片" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.isUrl"
+              size="mini"
+              type="text"
+              icon="el-icon-view"
+              @click="handleViewPic(scope.row)"
+            >预览
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {delInvoice, exportInvoice, getInvoice, listInvoice} from "../../../api/fantang/invoice";
+import {delInvoice, exportInvoice, finish, getInvoice, listInvoice} from "../../../api/fantang/invoice";
 import UploadImage from '../../../components/UploadImage';
 import {addToReturn, getReturnByInvoice} from "../../../api/fantang/returnManage";
 
@@ -289,7 +383,7 @@ export default {
   },
   data() {
     return {
-      collectionTypeOptions:[{
+      collectionTypeOptions: [{
         value: '现金',
         label: '现金'
       }, {
@@ -334,12 +428,14 @@ export default {
       open: false,
       // 查看详情弹出层
       viewOpen: false,
+      // 结束跟踪弹出层
+      finishOpen: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        invoiceNum:undefined,
-        invoiceName:undefined,
+        invoiceNum: undefined,
+        invoiceName: undefined,
         // invoiceType:2,
       },
       // 表单参数
@@ -381,6 +477,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false;
+      this.finishOpen = false;
       this.reset();
     },
     // 表单重置
@@ -437,7 +534,36 @@ export default {
       getInvoice(id).then(response => {
         this.form = response.data;
         this.viewOpen = true;
-        this.title = "回款登记";
+        this.title = "发票详情";
+      });
+
+      getReturnByInvoice(id).then(response => {
+        this.returnManageList = response.rows.map(item => {
+          if (item.voucherUrl === null) {
+            item.isUrl = false;
+            return item;
+          } else {
+            item.isUrl = true;
+            return item;
+          }
+        });
+
+        if (this.returnManageList.length > 0) {
+          let ret = this.returnManageList.reduce((x, y) => {
+            y.returnPrice = x.returnPrice + y.returnPrice;
+            return y;
+          })
+          this.form.receipts = ret.returnPrice;
+        }
+      })
+    },
+    handleFinish(row) {
+      this.reset();
+      const id = row.id || this.ids
+      getInvoice(id).then(response => {
+        this.form = response.data;
+        this.finishOpen = true;
+        this.title = "结束跟踪";
       });
 
       getReturnByInvoice(id).then(response => {
@@ -505,6 +631,14 @@ export default {
 
         }
       });
+    },
+    submitFinish() {
+      console.log(this.form);
+      finish(this.form.id).then(response => {
+        this.msgSuccess("已结束跟踪")
+        this.finishOpen = false;
+        this.getList();
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {
