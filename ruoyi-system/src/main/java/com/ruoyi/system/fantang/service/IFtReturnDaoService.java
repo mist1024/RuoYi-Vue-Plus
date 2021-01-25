@@ -8,7 +8,7 @@ import java.util.List;
  * 回款登记Service接口
  *
  * @author ft
- * @date 2021-01-04
+ * @date 2021-01-25
  */
 public interface IFtReturnDaoService extends IService<FtReturnDao> {
 
@@ -16,4 +16,6 @@ public interface IFtReturnDaoService extends IService<FtReturnDao> {
      * 查询列表
      */
     List<FtReturnDao> queryList(FtReturnDao ftReturnDao);
+
+    FtReturnDao selectLastReturn(Long id);
 }

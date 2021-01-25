@@ -343,6 +343,7 @@ export default {
     /** 查询结算管理列表 */
     getList() {
       this.loading = true;
+      console.log(this.queryParams);
       listSettlement(this.queryParams).then(response => {
         this.settlementList = response.rows;
         this.total = response.total;

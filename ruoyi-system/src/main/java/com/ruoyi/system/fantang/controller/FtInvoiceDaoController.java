@@ -10,7 +10,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtInvoiceDao;
-import com.ruoyi.system.fantang.domain.FtReturnDao;
 import com.ruoyi.system.fantang.domain.FtSettlementDao;
 import com.ruoyi.system.fantang.service.IFtInvoiceDaoService;
 import com.ruoyi.system.fantang.service.IFtReturnDaoService;
@@ -147,14 +146,13 @@ public class FtInvoiceDaoController extends BaseController {
         iFtInvoiceDaoService.save(invoiceDao);
 
         // 跟踪回款
-        if (invoiceType == 2) {
-            FtReturnDao ftReturnDao = new FtReturnDao();
-            ftReturnDao.setInvoiceId(invoiceDao.getId());
-            ftReturnDao.setReturnAt(new Date());
-            ftReturnDao.setReturnFlag(0);
-
-            ftReturnDaoService.save(ftReturnDao);
-        }
+//        if (invoiceType == 2) {
+//            FtReturnDao ftReturnDao = new FtReturnDao();
+//            ftReturnDao.setInvoiceId(invoiceDao.getId());
+//            ftReturnDao.setReturnFlag(0);
+//
+//            ftReturnDaoService.save(ftReturnDao);
+//        }
 
         FtSettlementDao settlementDao = new FtSettlementDao();
         settlementDao.setSettleId(params.getLong("settleId"));

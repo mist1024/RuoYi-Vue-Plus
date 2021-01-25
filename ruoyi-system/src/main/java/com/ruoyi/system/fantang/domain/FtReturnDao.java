@@ -21,7 +21,7 @@ import java.math.BigDecimal;
  * 回款登记对象 ft_return
  * 
  * @author ft
- * @date 2021-01-04
+ * @date 2021-01-25
  */
 @Data
 @ToString
