@@ -96,6 +96,8 @@ public class AppDiscussController extends BaseController {
             list.get(i).setChildren(children);
 
         }
+
+        System.out.println(123);
         return getDataTable(list);
     }
 
