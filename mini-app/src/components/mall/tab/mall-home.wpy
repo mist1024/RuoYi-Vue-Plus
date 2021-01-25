@@ -152,15 +152,15 @@ module.exports.parseImage = parseImage;
       </van-row>
 
 
-      <div class="grid-body" v-if="hotSwitch">
-        <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
-          <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">
+<!--      <div class="grid-body" v-if="hotSwitch">-->
+<!--        <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">-->
+<!--          <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">-->
 
-            <van-image width="68rpx" height="68rpx" :src="item.icon" />
-            <span style="font-size: 12px;font-weight: bold;">{{item.name}} </span>
-          </van-grid-item>
-        </van-grid>
-      </div>
+<!--            <van-image width="68rpx" height="68rpx" :src="item.icon" />-->
+<!--            <span style="font-size: 12px;font-weight: bold;">{{item.name}} </span>-->
+<!--          </van-grid-item>-->
+<!--        </van-grid>-->
+<!--      </div>-->
 
 
       <!--      <div style="margin: 22px 2px 12px 2px; display: flex; align-items: center;">-->
