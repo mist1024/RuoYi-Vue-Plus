@@ -1,6 +1,18 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+
+      <el-form-item label="商户" prop="goodsType">
+        <el-select v-model="queryParams.deptId" placeholder="请选择商户" clearable size="small">
+          <el-option
+            v-for="dict in deptOptions"
+            :key="dict.deptId"
+            :label="dict.deptName"
+            :value="dict.deptId"
+          />
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="商品名称" prop="goodsName">
         <el-input
           v-model="queryParams.goodsName"
@@ -94,8 +106,13 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="商品ID" align="center" prop="id" v-if="false"/>
       <el-table-column label="商品名称" align="center" prop="goodsName"/>
+      <el-table-column label="商户名称" align="center" prop="deptId" :formatter="deptFormat" width="100px"/>
+      <el-table-column label="排序" align="center" prop="sort"/>
       <el-table-column label="商品简称" align="center" prop="goodsAlias"/>
+      <el-table-column label="商品价格" align="center" prop="goodsPrice"/>
+      <el-table-column label="商品库存" align="center" prop="goodsStock"/>
       <el-table-column label="商品类型" align="center" prop="goodsType" :formatter="goodsTypeFormat" width="100px"/>
+
       <!--      <el-table-column label="关联规格" align="center" prop="goodsSpec"/>-->
       <!--      <el-table-column label="商品说明" align="center" prop="goodsDesc"/>-->
       <el-table-column label="商品封面" align="center" prop="goodsFaceImg">
@@ -146,39 +163,68 @@
     <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 
+        <el-form-item label="商户" prop="deptId">
+          <el-select v-model="form.deptId" placeholder="请选择商户">
+            <el-option
+              v-for="dict in deptOptions"
+              :key="dict.deptId"
+              :label="dict.deptName"
+              :value="dict.deptId"
+            />
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="商品名称" prop="goodsName">
           <el-input v-model="form.goodsName" placeholder="请输入商品名称"/>
         </el-form-item>
         <el-form-item label="商品简称" prop="goodsAlias">
           <el-input v-model="form.goodsAlias" placeholder="请输入商品简称"/>
         </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input type="number" v-model="form.sort" placeholder="请输入排序(升序)"/>
+        </el-form-item>
+
+        <el-form-item label="商品价格" prop="goodsPrice">
+          <el-input type="number" v-model="form.goodsPrice" placeholder="请输入商品价格"/>
+        </el-form-item>
+
+        <el-form-item label="库存" prop="goodsStock">
+          <el-input type="number" v-model="form.goodsStock" placeholder="请输入商品库存"/>
+        </el-form-item>
         <el-form-item label="商品封面" prop="goodsFaceImg">
           <upload-image :value="form.goodsFaceImg" @input="inputGoodsFaceImg"/>
           <!--          <el-input v-model="form.goodsFaceImg" placeholder="请输入商品封面" />-->
         </el-form-item>
         <el-form-item label="商品图片" prop="goodsImg">
-          <upload-image-multiple :value="form.goodsImg" @input="inputGoodsImg"/>
+          <upload-image-multiple id="multipleImg" ref="multipleImg" :value="form.goodsImg" @input="inputGoodsImg"/>
           <!--          <el-input v-model="form.goodsImg" placeholder="请输入商品图片"/>-->
         </el-form-item>
         <el-form-item label="状态" prop="state">
 
           <el-radio-group v-model="form.state">
-            <el-radio v-for="(dict, index) in stateOptions" :key="index" :label="parseInt(dict.dictValue)">{{dict.dictLabel}}</el-radio>
+            <el-radio v-for="(dict, index) in stateOptions" :key="index" :label="parseInt(dict.dictValue)">
+              {{dict.dictLabel}}
+            </el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="商品类型" prop="goodsType">
           <el-select v-model="form.goodsType" placeholder="请选择商品类型">
-            <el-option label="请选择字典生成" value=""/>
+            <el-option
+              v-for="dict in goodsTypeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item label="关联规格" prop="goodsSpec">
-          <!--          <el-input v-model="form.goodsSpec" type="textarea" placeholder="请输入内容"/>-->
-          <el-transfer v-model="selectedSpecData" :data="specData" filterable
-                       :titles="['商品列表','已关联商品']"
-                       :button-texts="['取消关联', '关联商品']"
-                       @change="handleChangeSpec"
-          ></el-transfer>
-        </el-form-item>
+        <!--        <el-form-item label="关联规格" prop="goodsSpec">-->
+        <!--          &lt;!&ndash;          <el-input v-model="form.goodsSpec" type="textarea" placeholder="请输入内容"/>&ndash;&gt;-->
+        <!--          <el-transfer v-model="selectedSpecData" :data="specData" filterable-->
+        <!--                       :titles="['商品列表','已关联商品']"-->
+        <!--                       :button-texts="['取消关联', '关联商品']"-->
+        <!--                       @change="handleChangeSpec"-->
+        <!--          ></el-transfer>-->
+        <!--        </el-form-item>-->
         <el-form-item label="商品说明" prop="goodsDesc">
           <!--          <el-input v-model="form.goodsDesc" placeholder="请输入商品说明"/>-->
           <editor :value="form.goodsDesc" :height="400" :min-height="400" @on-change="onChangeGoodsDesc"/>
@@ -208,10 +254,14 @@ import {
 import UploadImage from '@/components/UploadImage/index'
 import UploadImageMultiple from '@/components/UploadImageMultiple/index'
 
-import CommonMixin from "@/mixin/common";
+
 import Editor from '@/components/Editor/index';
 import {listSpec} from "@/api/goods/goods_spec";
-import {getDictName} from "@/utils/utils";
+import {getDept, listDept} from "@/api/system/dept";
+import {selectDictLabel} from "@/utils/ruoyi";
+import * as settings from "@/settings";
+import {imageBaseUrl} from "@/settings";
+import {CommonMixin} from "@/mixin/common";
 
 export default {
   name: "GoodsMain",
@@ -246,6 +296,8 @@ export default {
       stateOptions: [],
       // 商品类型字典
       goodsTypeOptions: [],
+      // 商户类型字典
+      deptOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -257,7 +309,11 @@ export default {
         goodsDesc: undefined,
         goodsFaceImg: undefined,
         goodsImg: undefined,
-        state: undefined
+        goodsPrice: undefined,
+        goodsStock: undefined,
+        deptId: undefined,
+        state: undefined,
+        sort: undefined
       },
       // 表单参数
       form: {},
@@ -273,7 +329,7 @@ export default {
   },
   filters: {
     getStateName(value, options) {
-      return getDictName(value, options)
+      return selectDictLabel(options, value);
     }
   },
   created() {
@@ -285,6 +341,8 @@ export default {
     this.getDicts("goods_type").then(response => {
       this.goodsTypeOptions = response.data;
     });
+
+
   },
   methods: {
     inputGoodsFaceImg(fileName) {
@@ -321,18 +379,23 @@ export default {
     reset() {
       this.form = {
         id: undefined,
+        deptId: undefined,
         goodsName: undefined,
         goodsAlias: undefined,
         goodsType: undefined,
         goodsSpec: undefined,
+        goodsStock: undefined,
         goodsDesc: undefined,
         goodsFaceImg: undefined,
         goodsImg: undefined,
+        goodsPrice: undefined,
         createBy: undefined,
         createTime: undefined,
         updateBy: undefined,
         updateTime: undefined,
-        remark: undefined
+        state: 0,
+        remark: undefined,
+        sort: 10
       };
       this.resetForm("form");
     },
@@ -366,6 +429,33 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "修改商品信息";
+
+
+        this.$nextTick(() => {
+
+          const imageList = this.form.goodsImg.split(',')
+
+          const fileList = []
+          this.$refs.multipleImg.setFileList(fileList)
+
+          imageList.forEach(x => {
+            fileList.push({
+              name: x,
+              url: imageBaseUrl + x,
+              response: {
+                msg: "操作成功",
+                fileName: x,
+                code: 200,
+                url: imageBaseUrl + x,
+              }
+            })
+          })
+
+
+          this.$refs.multipleImg.setFileList(fileList)
+
+        })
+
 
         listSpec({
           pageNum: 1,

@@ -1,0 +1,260 @@
+<style lang="less">
+page {
+  background-color: #eeeeee;
+}
+
+.fream {
+  border-radius: 25px;
+  width: 660rpx;
+  margin-top: 20px;
+  background-color: white;
+  //box-shadow: 4px 4px 10px #eeeeee;
+  padding: 10px 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.van-card {
+  background-color: #ffffff !important;
+}
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+const parseOrderStatus = (status) => {
+
+let result = '未知状态'
+switch(status) {
+case 0:
+result = '未支付'
+break
+case 1:
+result = '已取消'
+break
+case 2:
+result = '已支付'
+break
+case 3:
+result = '待收货'
+break
+case 4:
+result = '交易完成'
+break
+default:
+break
+
+}
+return result
+}
+
+const parseOrderDetailStatus = (status) => {
+
+let result = '未知状态'
+switch(status) {
+case 0:
+result = '未退款'
+break
+case 1:
+result = '退款申请'
+break
+case 2:
+result = '退款中'
+break
+case 3:
+result = '退款成功'
+break
+default:
+break
+
+}
+return result
+}
+
+
+module.exports.parseImage = parseImage;
+module.exports.parseOrderStatus = parseOrderStatus;
+module.exports.parseOrderDetailStatus = parseOrderDetailStatus;
+</wxs>
+<template>
+
+
+  <div style="width: 100%;">
+
+    <van-loading wx:if="{{ !isInit }}"
+                 style="margin-top: 20px; display: flex;align-items: center;flex-direction: column;"></van-loading>
+    <view class="" style="margin: 10px;" wx:else>
+
+
+      <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+        <van-empty description="暂无订单" />
+      </div>
+
+
+      <div class="fream" v-for="(row,index) in records">
+        <span
+          style="display: flex;justify-content: flex-end;margin-right: 10px;font-size: 14px; color: #AC1630;">{{filters.parseOrderStatus(row.status)}}</span>
+        <div v-for="(item,index) in row.orderDetailList" style="width: 100%;">
+
+          <van-card
+            :num="item.goodsCount"
+            :price="item.goodsCount * item.goods.goodsPrice"
+            :desc="item.goods.goodsAlias"
+            :title="item.goods.goodsName"
+            :thumb="filters.parseImage(item.goods.goodsFaceImg)"
+          >
+            <view slot="footer" style="display: flex; flex-direction: column;text-align: left;">
+
+
+              <div style="display:flex;align-items: center;width: 100%; justify-content: flex-end;">
+
+                <van-tag v-if="item.status !== 0" color="#ffe1e1" text-color="#ad0000">
+                  {{filters.parseOrderDetailStatus(item.status)}}
+                </van-tag>
+                <van-button v-else-if="(row.status === 2 || row.status === 4) && item.status === 0" size="mini" plain
+                            @tap="onRefund(item)">申请退款
+                </van-button>
+                <van-button size="mini" plain @tap="onDetail(item)" style="margin-left: 10px;">商品详情</van-button>
+              </div>
+            </view>
+          </van-card>
+        </div>
+        <div style="padding: 15px;">
+          <div style="display: flex;margin-top: 10px;align-items: center;width: 100%;">
+            <span style="color: #333; font-size: 13px;">收货人:{{row.postName}}</span> <span
+            style="margin-left: 5px; color: #999999; font-size: 12px;">{{row.postMobile}}</span>
+          </div>
+
+          <div
+            style="display: flex;margin-top: 5px;align-items: center;width: 100%;flex-wrap: wrap;">
+              <span style="color: #333; font-size: 13px;">
+                收货地址:{{row.postRegion}}{{row.postAddress}}
+              </span>
+          </div>
+        </div>
+        <div v-if="row.status === 0">
+          <van-divider />
+          <div style="float: right;margin-right: 16px;display: flex;">
+            <van-button size="mini" plain @tap="onPay(row)">继续支付</van-button>
+            <van-button size="mini" plain @tap="onCancel(row)" style="margin-left: 10px;">取消订单</van-button>
+          </div>
+        </div>
+      </div>
+    </view>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import appManager from '../../../appManager'
+
+import orderApis from '../../../apis/orderApis'
+import { goodsDetailPage } from '../../../store/constant/nav/pages'
+import eventHub from '../../../common/eventHub'
+
+wepy.component({
+  store,
+  hooks: {},
+  props: {
+    status: ''
+
+  },
+  data: {
+    records: [],
+    isInit: false
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress
+    })
+  },
+
+  methods: {
+
+    onRefund(item) {
+      // 申请退款
+      eventHub.$emit('onShowRefund', item)
+    },
+    onDetail(item) {
+      appManager.navigateTo(goodsDetailPage + '?id=' + item.goods.id)
+    },
+    onCancel(item) {
+      let data = {
+        id: item.id,
+        status: 1
+      }
+      orderApis.editOrder(data).then(r => {
+        appManager.showToast(r.msg)
+        this.$emit('reload')
+      })
+    },
+    onPay(item) {
+      let self = this
+      console.log(item)
+      let payData = JSON.parse(item.payMsg)
+      wx.requestPayment({
+        appId: payData.appId,
+        timeStamp: payData.timeStamp,
+        nonceStr: payData.nonceStr,
+        package: payData.packageValue,
+        signType: payData.signType,
+        paySign: payData.paySign,
+        success: function(res) {
+          wx.showLoading({ title: '正在获取订单信息.', mask: true })
+          setTimeout(() => {
+            wx.hideLoading()
+            self.init()
+          }, 3000)
+        },
+        fail: function(res) {
+          appManager.showToast('支付失败.')
+        }
+      })
+    },
+    async init() {
+      this.isInit = false
+
+      let data
+      if (this.status) {
+        data = {
+          status: this.status
+        }
+      }
+      const req = await orderApis.getOrderList(data)
+
+      if (req.code === 200) {
+        this.records = req.rows
+      }
+
+      this.isInit = true
+    }
+  },
+
+  ready() {
+    eventHub.$on('refreshOrderList', (...args) => {
+      this.init()
+    })
+    this.init()
+  },
+  onShow() {
+    this.init()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

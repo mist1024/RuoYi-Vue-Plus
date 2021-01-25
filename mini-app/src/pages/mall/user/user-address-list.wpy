@@ -1,0 +1,186 @@
+<style lang="less">
+
+
+.address-item {
+
+  border-radius: 25px;
+  width: 660rpx;
+  margin-top: 20px;
+  background-color: white;
+  //box-shadow: 4px 4px 10px #eeeeee;
+  padding: 10px 10px 0px 10px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+
+.van-field__label--disabled {
+
+  color: #333333 !important;
+
+}
+
+.van-field__label {
+  color: #333333 !important;
+}
+
+.van-field__input--disabled {
+  color: #333333 !important;
+}
+
+
+</style>
+<template>
+
+  <nav-bar title="地址管理" />
+
+
+  <div class="container" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
+
+    <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px;"></van-loading>
+    <view wx:else>
+
+
+      <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+        <van-empty description="您还没有添加收货地址" />
+<!--        <div style="width: 600rpx;">-->
+<!--          <van-button round type="info" size="large" @tap="onAdd">点击添加</van-button>-->
+<!--        </div>-->
+      </div>
+
+      <div v-for="(item,index) in records" class="address-item"
+           :style="{  border: item.isDefault === 1 ? '#AC1630 1px solid' : '#eeeeee 1px solid'}" @tap="onSelect(item)">
+        <van-field
+          label="收货人姓名"
+          :value="item.name"
+          disabled
+          bind:change="onChangeAddress"
+          use-button-slot
+        />
+        <van-field
+          label="手机号码"
+          :value="item.mobile"
+          disabled
+        />
+        <van-field
+          label="地址(省市区)"
+          :value="item.region"
+          disabled
+        />
+        <van-field
+          label="详细地址"
+          :value="item.address"
+          type="textarea"
+          autosize
+          disabled
+        />
+
+        <div style="display: flex; justify-content:flex-end;margin: 10px;">
+          <van-button round v-if="item.isDefault !== 1 && !isSelectMode" color="#98002E" size="small" type="info" plain
+                      @tap="onSetDefault(item)">设为默认
+          </van-button>
+          <van-button round size="small" color="#98002E" type="info" plain style="margin-left: 20px;"
+                      @tap="onEdit(item)">编辑
+          </van-button>
+        </div>
+
+      </div>
+
+
+      <div style="margin-top: 20px;">
+        <van-button round type="info" size="large" @tap="onAdd">+ 新建收货地址</van-button>
+      </div>
+
+    </view>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import appManager from '../../../appManager'
+import addressApis from '../../../apis/addressApis'
+import { userAddressPage } from '../../../store/constant/nav/home'
+
+wepy.page({
+  store,
+  hooks: {},
+  data: {
+    records: [],
+    isInit: false,
+    isSelectMode: false
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress,
+      'statusBarHeight': state => state.statusBarHeight
+    })
+  },
+
+  methods: {
+
+    onSetDefault(item) {
+      item.isDefault = 1
+
+      addressApis.editAddress(item).then(r => {
+        this.init()
+      })
+    },
+    onEdit(item) {
+      appManager.navigateTo(userAddressPage + '?id=' + item.id)
+    },
+    onAdd() {
+      appManager.navigateTo(userAddressPage)
+    },
+    onSelect(item) {
+      if (!this.isSelectMode) {
+        return
+      }
+
+      item.isDefault = 1
+
+      addressApis.editAddress(item).then(r => {
+        this.navBack()
+      })
+    },
+    async init() {
+      this.isInit = false
+      const req = await addressApis.getAddressList()
+
+      if (req.code === 200) {
+        this.records = req.rows
+      }
+
+      this.isInit = true
+    }
+  },
+
+  onLoad(options) {
+    if (options.isSelectMode) {
+      this.isSelectMode = true
+    }
+  },
+
+  ready() {
+    this.init()
+  },
+
+  onShow() {
+    this.init()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

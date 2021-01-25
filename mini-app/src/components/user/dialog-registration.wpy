@@ -1,0 +1,207 @@
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 536rpx;
+  z-index: -10;
+
+
+}
+
+</style>
+<template>
+
+  <div>
+    <van-dialog
+      use-slot
+      title="新用户注册"
+      :show="isShow"
+      show-cancel-button
+      bind:close="onClose"
+      bind:cancel="onClose"
+      confirm-button-open-type="getUserInfo"
+      bind:getuserinfo="getUserInfo"
+      :asyncClose="true"
+
+    >
+      <van-field
+        label="手机号:"
+        title-width="60px"
+        value="{{ user.mobile }}"
+        center
+        clearable
+        readonly
+        placeholder="请实名授权获取手机号"
+        border="{{ false }}"
+        use-button-slot
+      >
+        <van-button slot="button" size="small" plain type="info" color="#AC1630" open-type="getPhoneNumber"
+                    bind:getphonenumber="onGetMobile">授权
+        </van-button>
+      </van-field>
+
+      <!--      <van-divider customStyle="font-size: 18px; margin: 5px 5px;" />-->
+
+      <!--      <van-field-->
+      <!--        label="昵称:"-->
+      <!--        title-width="60px"-->
+      <!--        value="{{ user.userInfo.nickName }}"-->
+      <!--        center-->
+      <!--        clearable-->
+      <!--        readonly-->
+      <!--        placeholder="请点击授权获取您的微信信息"-->
+      <!--        border="{{ false }}"-->
+      <!--        use-button-slot-->
+      <!--      >-->
+      <!--        <van-button slot="button" size="small" plain type="info" open-type="getUserInfo"-->
+      <!--                    bind:getuserinfo="getUserInfo">获取昵称-->
+      <!--        </van-button>-->
+      <!--      </van-field>-->
+
+      <view style="margin:10px;display: flex;">
+        <van-checkbox :value="isChecked" shape="square" bind:change="onChangeCheak" checked-color="#AC1630"
+        />
+
+        <span style="font-size: 13px;color: #AC1630;margin-left: 5px;">我同意并遵守紫色名片
+          <span style="color: cornflowerblue;" @tap="onTapPrivacy">《隐私政策》 </span>及
+          <span style="color: cornflowerblue;" @tap="onTapAgreement">《用户条款》 </span>
+          的全部内容</span>
+      </view>
+
+    </van-dialog>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import eventHub from '../../common/eventHub'
+import appManager from '../../appManager'
+import userApis from '../../apis/userApis'
+import { newsDetailPage } from '../../store/constant/nav/pages'
+
+wepy.component({
+  store,
+  props: {},
+  hooks: {},
+
+  data: {
+    that: this,
+    isShow: false,
+    model: {},
+    isChecked: false
+  },
+
+  // computed: mapState(['user']),
+
+  computed: {
+    ...mapState({
+      'user': state => state.user,
+      'hotSwitch': state => state.hotSwitch
+    })
+  },
+
+  events: {},
+
+  methods: {
+    ...mapActions([
+      'setUserAction',
+      'setUserInfoAction',
+      'setMobileAction',
+      'setTokenAction'
+    ]),
+
+    getUserInfo(event) {
+      console.log('getUserInfo:', event.$wx.detail)
+      this.setUserInfoAction(event.$wx.detail.userInfo)
+      console.log('userInfo:', store.state.user.userInfo)
+
+      if (!this.isChecked) {
+        appManager.showToast('请同意并遵守紫色名片《隐私政策》以及《用户条款》.')
+        return false
+      }
+      if (!this.user.mobile) {
+        appManager.showToast('请授权获取手机号码.')
+        return false
+      }
+      if (!this.user.userInfo) {
+        appManager.showToast('请授权获取用户昵称.')
+        return false
+      }
+
+      let self = this
+      userApis.registrationByMini(this.user).then(r => {
+        if (r.code === 200) {
+          appManager.showToast('注册成功!')
+          self.isShow = false
+          self.setTokenAction(r.token)
+        } else {
+          appManager.showToast(r.msg)
+        }
+      }).catch(e => {
+        appManager.showToast('注册失败!')
+      })
+    },
+    async onGetMobile(e) {
+      console.log(e.$wx.detail)
+      wx.showLoading({ title: '获取中...', mask: true })
+      try {
+        let rsp = await userApis.sendMobile({
+          openid: appManager.getOpenid(),
+          detail: e.$wx.detail
+        })
+
+        if (rsp.code === 200) {
+          this.setMobileAction(rsp.data.mobile)
+        } else {
+          appManager.showToast('服务器连接异常.')
+        }
+      } catch (e) {
+        appManager.showToast('服务器连接异常.')
+      } finally {
+        wx.hideLoading()
+      }
+    },
+    onChangeCheak(e) {
+      this.isChecked = e.$wx.detail
+    },
+    onClose() {
+      this.isShow = false
+    },
+    onTapAgreement() {
+      wx.navigateTo({
+        url: newsDetailPage + '?id=' + 'fb4109a4020b2a2a9d1172f66d043897'
+      })
+    },
+    onTapPrivacy() {
+      wx.navigateTo({
+        url: newsDetailPage + '?id=' + 'a1e5ec18ae13036d14c94bf0e5d11756'
+      })
+    }
+
+  },
+
+  ready() {
+    // 获取系统信息
+    let self = this
+    wx.getSystemInfo({
+      success(res) {
+        self.model = res.model
+      }
+    })
+
+    this.page = this
+    eventHub.$on('onShowDialogRegist', (...args) => {
+      this.isShow = true
+    })
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

@@ -1,5 +1,6 @@
-FROM java:8-alpine
-WORKDIR /app
+FROM openjdk:8-jre-alpine
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+##安装字体
+RUN apk --no-cache add ttf-dejavu
 COPY ruoyi-admin.jar /app/app.jar
-ENTRYPOINT ["java","-Duser.timezone=Asia/Shanghai -Xms512M -Xmx512M -XX:PermSize=256M -XX:MaxPermSize=512M -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDateStamps  -XX:+PrintGCDetails -XX:NewRatio=1 -XX:SurvivorRatio=30 -XX:+UseParallelGC -XX:+UseParallelOldGC","-jar","/app/app.jar"]
-
+ENTRYPOINT ["java","-Duser.timezone=GMT+08","-jar","/app/app.jar"]

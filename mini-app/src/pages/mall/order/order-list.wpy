@@ -1,0 +1,110 @@
+<style lang="less">
+
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+<template>
+
+  <nav-bar title="我的订单" />
+
+
+  <div style="width: 100%;" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
+
+
+    <van-tabs active="{{ activeTab }}" bind:change="onChangeTab">
+      <van-tab title="全部">
+        <order-list-body @reload="reload" />
+      </van-tab>
+      <van-tab title="待支付">
+        <order-list-body @reload="reload" status="0" />
+      </van-tab>
+      <van-tab title="待收货">
+        <order-list-body @reload="reload" status="2" />
+      </van-tab>
+      <van-tab title="交易完成">
+        <order-list-body @reload="reload" status="3" />
+      </van-tab>
+      <van-tab title="已取消">
+        <order-list-body @reload="reload" status="1" />
+      </van-tab>
+    </van-tabs>
+
+
+    <dialog-refund @reload="reload" />
+
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import appManager from '../../../appManager'
+import addressApis from '../../../apis/addressApis'
+import { userAddressPage } from '../../../store/constant/nav/home'
+import orderApis from '../../../apis/orderApis'
+import eventHub from '../../../common/eventHub'
+
+wepy.page({
+  store,
+  hooks: {},
+  data: {
+    activeTab: 0,
+    records: [],
+    isInit: false
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress,
+      'statusBarHeight': state => state.statusBarHeight
+    })
+  },
+
+  methods: {
+
+    onChangeTab(e) {
+      this.activeTab = e.$wx.detail.index
+    },
+    reload() {
+      eventHub.$emit('refreshOrderList')
+    },
+    showRefund() {
+      eventHub.$emit('onShowRefund')
+    }
+  },
+  onLoad(options) {
+    if (options.orderStatus) {
+      this.activeTab = Number(options.orderStatus)
+    }
+  },
+  ready() {
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+
+usingComponents: {
+'order-list-body': '../../../components/mall/order/order-list-body',
+'order-detail-body': '../../../components/mall/order/order-detail-body',
+'dialog-refund': '../../../components/order/dialog-refund'
+}
+
+
+}
+</config>

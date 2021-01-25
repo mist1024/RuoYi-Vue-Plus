@@ -1,0 +1,170 @@
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+
+
+<template>
+
+  <van-nav-bar
+    title="福利购"
+  />
+  <view class="" style="margin: 10px 16px 80px 16px;">
+
+
+    <van-image class="banner" :src="imageDefine.SHOPPING_BANNER" width="686rpx"
+               height="96px" />
+
+    <div style="margin-top: 20px;">
+
+      <van-row gutter="20">
+        <van-col span="8" style="font-weight: bold;font-size: 20px;">精选推荐</van-col>
+        <van-col offset="10" span="6">
+          <div @tap="onShppingCar">
+            <van-icon name="shopping-cart-o" color="#940D46" />
+            <span style="margin-left: 5px;">购物车</span>
+          </div>
+        </van-col>
+      </van-row>
+    </div>
+
+
+    <div style="display: flex;flex-wrap: wrap;margin-bottom: 10px;">
+      <div class="filter-button" v-for="(item,index) in filterButtons">
+        <van-button round size="small" :color="currentFilter.dictLabel === item.dictLabel ? '#940D46' : '#940D46' "
+                    :plain="currentFilter.dictLabel === item.dictLabel ? false : true" @tap="onFilterBtn(item)">
+          {{item.dictLabel}}
+        </van-button>
+      </div>
+    </div>
+
+
+    <view v-for="(item, index) in records" :key="index"
+          style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;background-color: white;">
+      <van-card
+        :title="item.goodsName"
+
+        :price="item.goodsPrice"
+        :thumb="filters.parseImage(item.goodsFaceImg)"
+        @tap="onItem(item)"
+      >
+        <view slot="num" style="display: flex; justify-content: space-between;align-items: center;">
+
+          <span style="color: #999;">{{item.goodsAlias}}</span>
+          <van-image :src="imageDefine.LIST_BAG" width="30px" height="30px" />
+        </view>
+
+      </van-card>
+
+
+    </view>
+
+    <div style="margin-top: 100px;" />
+  </view>
+</template>
+
+<script>
+
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import appManager from '../../../appManager'
+import mallApis from '../../../apis/mallApis'
+import defaultMix from '../../../mixins/defaultMix'
+import { goodsDetailPage } from '../../../store/constant/nav/pages'
+import xiao4rApis from '../../../apis/xiao4rApis'
+import { navDefine } from '../../../store/constant/navDefine'
+
+wepy.component({
+  store,
+  hooks: {},
+  // mixins: [ defaultMix ],
+  data: {
+    active: 0,
+    records: [],
+    currentFilter: {
+      dictLabel: '全部'
+    },
+    filterButtons: []
+
+  },
+
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine
+    })
+  },
+
+  methods: {
+
+    onItem(item) {
+      appManager.navigateTo(goodsDetailPage + `?id=${item.id}`)
+    },
+
+    onShppingCar() {
+      appManager.navigateTo(navDefine.SHOPPING_CAR_LIST)
+    },
+
+    onFilterBtn(item) {
+      this.currentFilter = item
+      this.init(false)
+    },
+    async init(isFirst = true) {
+      this.isInit = false
+
+      if (isFirst) {
+        const dict = await xiao4rApis.getDicts('goods_type')
+
+        this.filterButtons = dict.data
+      }
+
+      let body = {}
+
+      if (this.currentFilter.dictLabel !== '全部') {
+        body.goodsType = this.currentFilter.dictValue
+      }
+
+      const req = await mallApis.getGoodsList(body)
+
+      this.records = req.rows
+
+      this.isInit = true
+    }
+  },
+
+  ready() {
+    this.init()
+  }
+})
+</script>
+<config>
+{
+}
+</config>
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 536rpx;
+  z-index: -10;
+}
+
+.banner {
+  border: #eeeeee 1px solid;
+  border-radius: 25px;
+  margin-top: 15px;
+
+}
+
+.filter-button {
+  margin-top: 10px;
+  margin-right: 10px;
+
+}
+
+
+</style>

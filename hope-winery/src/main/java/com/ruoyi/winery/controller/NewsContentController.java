@@ -28,6 +28,9 @@ import com.ruoyi.winery.service.INewsContentService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
+import static com.ruoyi.common.utils.SecurityUtils.getDeptId;
+import static com.ruoyi.common.utils.SecurityUtils.getUsername;
+
 /**
  * 新闻资讯Controller
  *
@@ -49,8 +52,8 @@ public class NewsContentController extends BaseController {
     public TableDataInfo list(UsernamePasswordAuthenticationToken token, NewsContent newsContent) {
         startPage();
         LambdaQueryWrapper<NewsContent> lqw = Wrappers.lambdaQuery(newsContent);
-        lqw.eq(NewsContent::getDeptId, getDeptId(token));
 
+        lqw.eq(NewsContent::getDeptId, getDeptId());
 
         if (StringUtils.isNotBlank(newsContent.getNewsTitle())) {
             lqw.eq(NewsContent::getNewsTitle, newsContent.getNewsTitle());
@@ -100,7 +103,8 @@ public class NewsContentController extends BaseController {
     @Log(title = "新闻资讯", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody NewsContent newsContent) {
-        newsContent.setDeptId(getDeptId(token));
+        newsContent.setDeptId(getDeptId());
+        newsContent.setCreateBy(getUsername());
         return toAjax(iNewsContentService.save(newsContent) ? 1 : 0);
     }
 
@@ -111,6 +115,7 @@ public class NewsContentController extends BaseController {
     @Log(title = "新闻资讯", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody NewsContent newsContent) {
+        newsContent.setUpdateBy(getUsername());
         return toAjax(iNewsContentService.updateById(newsContent) ? 1 : 0);
     }
 
@@ -122,5 +127,13 @@ public class NewsContentController extends BaseController {
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(iNewsContentService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    }
+
+    /**
+     * 获取新闻资讯详细信息
+     */
+    @GetMapping(value = "/open/{id}")
+    public AjaxResult getOpenInfo(@PathVariable("id") String id) {
+        return AjaxResult.success(iNewsContentService.getById(id));
     }
 }

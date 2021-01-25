@@ -1,0 +1,169 @@
+<style lang="less">
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+
+}
+.buttonColor {
+  background: #AC1630;
+  color: #fff;
+}
+
+.buttonColor-cancel {
+  background: #fff;
+  color: #333;
+}
+
+.background-color {
+  background: #AC1630;
+}
+
+.cell-title {
+  padding: 10px 16px;
+  font-weight: bold;
+}
+
+.cell {
+  margin-top: 10px;
+}
+
+
+.boom {
+  background-color: #F0F1F2;
+  width: 100%;
+  height: 15px;
+}
+
+.fxc{
+  display: flex;
+  flex-direction: column;
+}
+
+</style>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from './common/eventHub'
+import vuex from '@wepy/x'
+
+wepy.use(vuex)
+
+wepy.app({
+  hooks: {
+    // App 级别 hook，对整个 App 生效
+    // 同时存在 Page hook 和 App hook 时，优先执行 Page hook，返回值再交由 App hook 处
+    'before-setData': function(dirty) {
+      console.log('setData dirty: ', dirty)
+      return dirty
+    }
+  },
+  globalData: {
+    userInfo: null
+  },
+
+  onLaunch() {
+    // this.testAsync()
+    eventHub.$on('app-launch', (...args) => {
+      console.log('app-launch event emitted, the params are:')
+      console.log(args)
+    })
+  },
+
+  methods: {
+
+    // sleep(s) {
+    //   return new Promise((resolve, reject) => {
+    //     setTimeout(() => {
+    //       resolve('promise resolved')
+    //     }, s * 1000)
+    //   })
+    // },
+
+    // async testAsync() {
+    //   let d = await this.sleep(3)
+    //   console.log(d)
+    // }
+  }
+})
+</script>
+<config>
+{
+pages: [
+'pages/mall/index',
+'pages/index',
+'pages/form1',
+'pages/form2',
+'pages/form3',
+'pages/form4',
+'pages/form5',
+'pages/form6',
+
+'pages/mall/goods/goods-detail',
+'pages/mall/user/user-address',
+'pages/mall/user/user-address-list',
+'pages/mall/order/order-list',
+'pages/mall/order/order-detail-list',
+'pages/mall/order/order-check',
+'pages/mall/shopping-car/shopping-car-list',
+'pages/news/news-detail',
+'pages/winery/winery-detail',
+'pages/winery/winery-list',
+'pages/webView/web'
+
+],
+navigateToMiniProgramAppIdList: [
+'wx88736d7d39e2eda6'
+],
+window: {
+backgroundTextStyle: 'light',
+navigationBarBackgroundColor: '#fff',
+navigationBarTitleText: 'WeChat',
+navigationBarTextStyle: 'white',
+navigationStyle: 'custom',
+backgroundColor: '#222222'
+},
+usingComponents: {
+'nav-bar': './components/nav-bar',
+'van-button': './vant/button/index',
+'van-divider': './vant/divider/index',
+'van-field': './vant/field/index',
+'van-radio': './vant/radio/index',
+'van-radio-group': './vant/radio-group/index',
+'van-checkbox': './vant/checkbox/index',
+'van-checkbox-group': './vant/checkbox-group/index',
+'van-cell': './vant/cell/index',
+'van-cell-group': './vant/cell-group/index',
+'van-datetime-picker': './vant/datetime-picker/index',
+'van-nav-bar': './vant/nav-bar/index',
+'van-icon': './vant/icon/index',
+'van-steps': './vant/steps/index',
+'van-row': './vant/row/index',
+'van-col': './vant/col/index',
+'van-col': './vant/col/index',
+'van-tabbar': './vant/tabbar/index',
+'van-tabbar-item': './vant/tabbar-item/index',
+'van-card': './vant/card/index',
+'van-popup': './vant/popup/index',
+'van-stepper': './vant/stepper/index',
+'van-submit-bar': './vant/submit-bar/index',
+'van-panel': './vant/panel/index',
+"van-grid": "./vant/grid/index",
+"van-grid-item": "./vant/grid-item/index",
+"van-dialog": "./vant/dialog/index",
+"van-image": "./vant/image/index",
+"van-loading": "./vant/loading/index",
+"van-empty": "./vant/empty/index",
+"van-notice-bar": "./vant/notice-bar/index",
+"van-tabs": "./vant/tabs/index",
+"van-tab": "./vant/tab/index",
+"van-submit-bar": "./vant/submit-bar/index",
+"van-tag": "./vant/tag/index",
+
+"van-area": "./vant/area/index"
+}
+}
+</config>

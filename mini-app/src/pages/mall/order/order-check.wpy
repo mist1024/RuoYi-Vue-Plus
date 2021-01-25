@@ -1,0 +1,240 @@
+<style lang="less">
+page {
+  background-color: #eeeeee;
+}
+
+.fream {
+
+  border-radius: 25px;
+  width: 660rpx;
+
+  background-color: white;
+  //box-shadow: 4px 4px 10px #eeeeee;
+  padding: 10px 10px 10px 10px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+<template>
+
+  <nav-bar title="确认订单" />
+
+
+  <div class="" style="width: 100%;margin-top:66px;">
+
+    <van-loading v-if="!isInit" style="margin-top: 200px;justify-content: center;"></van-loading>
+    <view wx:else>
+
+
+      <div v-if="!currentAddress" style="display: flex;flex-direction: column;align-items: center;width: 100%;"
+           :style=" { 'margin-top': (statusBarHeight + 66) + 'px' }">
+        <van-empty description="您还没有添加收货地址" />
+        <div style="width: 600rpx;">
+          <van-button round type="info" size="large" @tap="onAdd">点击添加</van-button>
+        </div>
+      </div>
+
+      <div v-else class="fream" style="margin-left: 15px;margin-right: 15px;margin-bottom: 20px;"
+           :style=" { 'margin-top' : (statusBarHeight + 66) + 'px' }">
+
+        <div style="display: flex; justify-content: space-between;">
+          <van-icon name="home-o" size="60rpx" />
+          <div style="display: flex;flex-direction: column;">
+            <div style="display: flex;align-items: center;">
+              <span style="font-size: 16px;font-weight: bold;">{{currentAddress.name}}</span>
+              <span style="color: #999;font-size: 12px;margin-left: 10px;">{{currentAddress.mobile}}</span>
+            </div>
+            <div style="display: flex; flex-direction: column; font-size: 14px; width: 500rpx;margin-top: 10px;">
+              <span>{{currentAddress.region}}</span>
+              <span style="margin-top: 5px;">{{currentAddress.address}}</span>
+            </div>
+          </div>
+          <van-icon name="arrow" @tap="onSelectAddress" />
+        </div>
+
+        <div style="display: flex; justify-content:flex-end;margin: 10px;">
+          <van-button round size="small" color="#98002E" type="info" plain style="margin-left: 20px;"
+                      @tap="onEditAddress()">编辑
+          </van-button>
+        </div>
+
+      </div>
+
+
+      <div class="fream" style="margin: 20px 15px 20px 15px;">
+
+        <van-card
+
+          v-for="(item,index) in order.orderDetailList"
+          :title="item.goodsName"
+          :desc="item.specDesc"
+          :price="item.goodsPrice"
+          :thumb="filters.parseImage(item.goodsFaceImg)"
+        >
+          <view slot="num" style="display: flex;justify-content: flex-end;align-items: center;">
+            <span style="font-size: 15px;margin-right: 5px;">数量:</span>
+            <van-stepper id="{{item.goodsId}}" name="{{item.goodsId}}" value="{{item.goodsCount}}"
+                         @change="onGoodsCount" />
+          </view>
+
+        </van-card>
+
+      </div>
+
+      <van-submit-bar
+        :price="totalPrice"
+        button-text="提交订单"
+        bind:submit="onSubmit"
+        :tip="false"
+      >
+        <!--    <view slot="tip">您的收货地址不支持同城送,-->
+        <!--      <text>修改地址</text>-->
+        <!--    </view>-->
+      </van-submit-bar>
+    </view>
+
+  </div>
+
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import appManager from '../../../appManager'
+import addressApis from '../../../apis/addressApis'
+import { userAddressPage } from '../../../store/constant/nav/home'
+import orderApis from '../../../apis/orderApis'
+import { navDefine } from '../../../store/constant/navDefine'
+import { userAddressListPage } from '../../../store/constant/nav/pages'
+
+wepy.page({
+  store,
+  hooks: {},
+  data: {
+    currentAddress: null,
+    order: null,
+    isInit: false
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress,
+      'order': state => state.order,
+      'statusBarHeight': state => state.statusBarHeight
+    }),
+    totalPrice() {
+      let result = 0.0
+      this.order.orderDetailList.forEach(x => {
+        result += (x.goodsPrice * x.goodsCount)
+      })
+      return result * 100
+    }
+  },
+
+  methods: {
+    ...mapActions([
+      'setOrderAction'
+    ]),
+    onAdd() {
+      appManager.navigateTo(userAddressPage)
+    },
+    async init() {
+      this.isInit = false
+
+      const addressRsp = await addressApis.getAddressList()
+
+      this.isInit = true
+
+      if (addressRsp.code === 200 && addressRsp.rows.length > 0) {
+        this.currentAddress = addressRsp.rows.filter(x => x.isDefault)[0]
+
+        this.order.addressId = this.currentAddress.id
+        this.setOrderAction(this.order)
+      }
+    },
+
+    onSelectAddress() {
+      appManager.navigateTo(userAddressListPage + '?isSelectMode=true')
+    },
+    onEditAddress() {
+      appManager.navigateTo(userAddressPage + '?id=' + this.currentAddress.id)
+    },
+
+    onGoodsCount(e) {
+      this.order.orderDetailList.filter(x => x.goodsId === e.target.id)[0].goodsCount = e.$wx.detail
+    },
+
+    onSubmit() {
+      if (!this.order.addressId) {
+        appManager.showToast('请选择收货地址.')
+        return
+      }
+
+      orderApis.createOrder(this.order).then(r => {
+        wx.hideLoading()
+
+        if (r.code !== 200) {
+          appManager.showToast(r.msg)
+          return
+        }
+
+        let payData = r.data
+        wx.requestPayment({
+          appId: payData.appId,
+          timeStamp: payData.timeStamp,
+          nonceStr: payData.nonceStr,
+          package: payData.packageValue,
+          signType: payData.signType,
+          paySign: payData.paySign,
+          success: function(res) {
+            wx.showLoading({ title: '正在获取订单信息.', mask: true })
+            setTimeout(() => {
+              wx.hideLoading()
+              appManager.navigateTo(navDefine.ORDER_LIST_PAGE)
+            }, 3000)
+          },
+          fail: function(res) {
+            appManager.showToast('支付失败.')
+          }
+        })
+      }).catch(e => {
+        wx.hideLoading()
+      })
+    }
+  },
+
+  ready() {
+    this.init()
+  },
+  onShow() {
+    this.init()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+
+usingComponents: {
+}
+
+
+}
+</config>

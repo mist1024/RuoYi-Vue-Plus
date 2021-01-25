@@ -1,0 +1,163 @@
+<style lang="less">
+
+
+.header-image {
+  width: 100%;
+  height: 273px;
+  z-index: -1;
+  position: absolute;
+  top: 0;
+}
+
+.user-info {
+  margin-top: 130px;
+  margin-left: 20px;
+  margin-right: 20px;
+  display: flex;
+}
+
+.user-info-msg {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  justify-content: center;
+  color: white;
+}
+
+.header-grid-body-top {
+
+  padding: 20px;
+  border: transparent 1px solid;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  width: 620rpx;
+  margin-top: 20px;
+  box-shadow: 4px 4px 10px #eeeeee;
+  background-color: orange;
+}
+
+.header-grid-body-bottom {
+  border: transparent 1px solid;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  width: 660rpx;
+  background-color: #ffffff;
+  box-shadow: 4px 4px 10px #eeeeee;
+  padding: 10px 10px 0px 10px;
+  font-weight: bold;
+}
+
+.grid-body {
+  border: #fff 1px solid;
+  border-radius: 20px;
+  width: 660rpx;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 4px 4px 10px #eeeeee;
+  padding: 10px 10px 0px 10px;
+  font-weight: bold;
+}
+
+</style>
+<template>
+
+  <image class="header-image" :src="imageDefine.MY_HEADER"  />
+
+
+  <div class="container" style="margin: 10px 10px 80px 10px;">
+
+    <div class="user-info">
+      <van-image round width="120rpx" height="120rpx" :src="user.userInfo.avatarUrl" />
+      <div class="user-info-msg">
+        <span style="font-size: 18px;font-weight: bold;">{{user.userInfo.nickName}}</span>
+        <span style="font-size: 12px;">{{user.mobile}}</span>
+      </div>
+    </div>
+
+<!--    <div class="header-grid-body-top">-->
+<!--      <div style="display: flex;">-->
+<!--        <span>{{user.userInfo.nickName}} </span>-->
+<!--        <van-tag round type="primary">标签</van-tag>-->
+
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="header-grid-body-bottom">-->
+<!--      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">-->
+<!--        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU1" @tap="onNavItem(item)">-->
+<!--          <van-image round width="90rpx" height="90rpx" :src="item.icon" />-->
+<!--          <span style="margin-top: 10px;">{{item.name}} </span>-->
+<!--        </van-grid-item>-->
+<!--      </van-grid>-->
+<!--    </div>-->
+
+    <div class="grid-body">
+      <span style="margin:25px 10px 15px 10px;font-weight: bold;">我的订单</span>
+      <van-divider />
+      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
+        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU1" @tap="onNavItem(item)">
+          <van-image width="48rpx" height="48rpx" :src="item.icon" />
+          <span style="margin-top: 10px;">{{item.name}} </span>
+        </van-grid-item>
+      </van-grid>
+    </div>
+
+    <div class="grid-body">
+      <span style="margin:25px 10px 15px 10px;font-weight: bold;">常用功能</span>
+      <van-divider />
+      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
+        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU2" @tap="onNavItem(item)">
+          <van-image width="48rpx" height="48rpx" :src="item.icon" />
+          <span style="margin-top: 10px;">{{item.name}} </span>
+        </van-grid-item>
+      </van-grid>
+    </div>
+
+    <div class="grid-body">
+      <span style="margin:25px 10px 15px 10px;font-weight: bold;">其他</span>
+      <van-divider />
+      <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">
+        <van-grid-item use-slot v-for=" (item, index) in navDefine.MY_MENU3" @tap="onNavItem(item)">
+          <van-image width="48rpx" height="48rpx" :src="item.icon" />
+          <span style="margin-top: 10px;">{{item.name}} </span>
+        </van-grid-item>
+      </van-grid>
+    </div>
+
+    <div style="margin-top: 100px;" />
+
+  </div>
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+
+wepy.component({
+  store,
+  hooks: {},
+  data: {
+    active: 0
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine
+    })
+  },
+
+  methods: {},
+
+  ready() {
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

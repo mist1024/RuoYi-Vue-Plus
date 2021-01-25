@@ -1,0 +1,251 @@
+<style lang="less">
+
+img {
+  width: 100%;
+  display: block;
+}
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+<template>
+
+  <nav-bar title="商品详情" />
+  <div class="container">
+
+
+    <van-loading v-if="!goodsItem" style="margin-top: 200px;" />
+
+    <div v-else style="margin-bottom: 80px; width: 100%;" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
+
+      <swiper indicator-dots="true" autoplay="true" interval="3000" style="height: 750rpx;">
+        <block v-for="(item,index) in goodsImages" wx:key="index">
+          <swiper-item>
+            <view class="swiper-item">
+              <image :src="filters.parseImage(item)" style="width: 100%;height: 750rpx;" mode="aspectFit" />
+            </view>
+          </swiper-item>
+        </block>
+      </swiper>
+
+      <div style="padding: 10px;display:flex;flex-direction: column;width: 100%;">
+        <span style="color: #333; font-size: 16px;font-weight: bold;">{{goodsItem.goodsName}}</span>
+        <span style="color: #999; font-size: 14px;margin-top: 3px;">{{goodsItem.goodsAlias}}</span>
+      </div>
+      <van-cell title="立即下单" is-link @tap="onShowSpec" />
+
+      <div style="margin: 10px 15px;">
+        <span>商品详情</span>
+        <div style="margin-top: 10px;width:100%;">
+          <rich-text :nodes="goodsItem.goodsDesc" />
+
+        </div>
+      </div>
+
+
+      <van-popup
+        :show="isShowSpec"
+        closeable
+        position="bottom"
+        custom-style="height: 240px"
+        bind:close="onCloseSpec"
+      >
+        <van-card
+          :title="goodsItem.goodsName"
+          :desc="goodsItem.specDesc"
+          :price="goodsItem.goodsPrice"
+          :thumb="filters.parseImage(goodsItem.goodsFaceImg)"
+        >
+          <view slot="num" style="float:right;">
+            <!--            <div>{{'已优惠¥xx元'}}</div>-->
+          </view>
+
+        </van-card>
+
+        <van-divider />
+
+        <van-row>
+          <van-col offset="1" span="8">
+            <div style="display: flex; flex-direction: column;">
+              <span>购买数量</span>
+              <span style="font-size: 12px; color: #cccccc;">剩余:{{goodsItem.goodsStock}}</span>
+            </div>
+          </van-col>
+          <van-col offset="7" span="8">
+            <van-stepper :value="count" bind:change="onChangeCount" />
+          </van-col>
+        </van-row>
+
+        <van-button round type="danger" size="small" style="float:right;margin-top:10px;margin-right: 10px;"
+                    @tap="onSubmit">下一步
+        </van-button>
+
+      </van-popup>
+
+      <van-goods-action>
+        <van-goods-action-icon icon="cart-o" text="购物车" :info="shoppingCar.length" @tap="onShppingCar" />
+        <van-goods-action-icon icon="shop-o" text="酒庄" @tap="onWinery" />
+        <van-goods-action-button color="#be99ff" text="加入购物车" type="warning" @tap="onShowSpec('shoppingCar')" />
+        <van-goods-action-button color="#7232dd" text="立即购买" @tap="onShowSpec('order')" />
+      </van-goods-action>
+    </div>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import mallApis from '../../../apis/mallApis'
+import { navDefine } from '../../../store/constant/navDefine'
+import appManager from '../../../appManager'
+
+import { shoppingCarList, wineryDetailPage } from '../../../store/constant/nav/pages'
+
+wepy.page({
+  store,
+  hooks: {},
+
+  data: {
+    isShowSpec: false,
+    count: 1,
+    goodsItem: null,
+    goodsSpec: null,
+    submitMode: 'order'
+  },
+
+  computed: {
+
+    ...mapState({
+      'order': state => state.order,
+      'shoppingCar': state => state.shoppingCar,
+      'statusBarHeight': state => state.statusBarHeight
+    }),
+    goodsImages() {
+      if (!this.goodsItem || !this.goodsItem.goodsImg) {
+        return []
+      }
+
+      return this.goodsItem.goodsImg.split(',')
+    }
+
+  },
+
+  methods: {
+    ...mapActions([
+      'setOrderAction',
+      'setShoppingCarAction'
+    ]),
+    handleViewTap() {
+      console.log('handleVieTap clicked')
+    },
+    tap() {
+
+    },
+
+    onShowSpec(mode) {
+      this.isShowSpec = true
+      this.submitMode = mode
+    },
+    onCloseSpec() {
+      this.isShowSpec = false
+    },
+    onChangeCount(e) {
+      console.log(e)
+      this.count = e.$wx.detail
+    },
+
+    callAppLaunch() {
+    },
+    async init(id) {
+      const goodsReq = await mallApis.getGoodsById(id)
+      this.goodsItem = goodsReq.data
+      // const ids = this.goodsItem.goodsSpec.split(',')
+      // console.log(ids)
+      // const goodsSpecReq = await mallApis.getGoodsSpecByIds(ids)
+
+      // this.goodsSpec = goodsSpecReq.rows[0]
+    },
+
+    onSubmit() {
+      const item = this.goodsItem
+
+      let orderItem = {
+        goodsId: item.id,
+        goodsName: item.goodsName,
+        goodsType: item.goodsType,
+        goodsSpec: item.goodsSpec,
+        goodsFaceImg: item.goodsFaceImg,
+        goodsPrice: item.goodsPrice,
+        goodsCount: this.count
+      }
+
+      this.isShowSpec = false
+
+      switch (this.submitMode) {
+        case 'order':
+
+          this.nextOrder(orderItem)
+          break
+
+        case 'shoppingCar':
+          this.addShoppingCar(orderItem)
+          break
+      }
+    },
+
+    nextOrder(item) {
+      console.log('订单:', item)
+
+      let order = {
+        addressId: '',
+        orderDetailList: [],
+        remark: ''
+      }
+
+      order.orderDetailList.push(item)
+
+      this.setOrderAction(order)
+
+      appManager.navigateTo(navDefine.ORDER_CHECK)
+    },
+    addShoppingCar(item) {
+      this.shoppingCar.push(item)
+      this.setShoppingCarAction(this.shoppingCar)
+    },
+    onWinery() {
+      // appManager.showToast('建设中')
+
+      appManager.navigateTo(wineryDetailPage + '?deptId=' + this.goodsItem.deptId)
+
+    },
+    onShppingCar() {
+      appManager.navigateTo(shoppingCarList)
+    }
+  },
+
+  onLoad(options) {
+    this.init(options.id)
+  },
+  onShow() {
+    console.log(this.order)
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+usingComponents: {
+"van-goods-action": "../../../vant/goods-action/index",
+"van-goods-action-icon": "../../../vant/goods-action-icon/index",
+"van-goods-action-button": "../../../vant/goods-action-button/index"
+}
+}
+</config>

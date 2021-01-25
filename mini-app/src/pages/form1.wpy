@@ -1,0 +1,267 @@
+<style lang="less">
+
+
+.header {
+  width: 100%;
+  height: 100rpx;
+  display: flex;
+}
+
+input {
+
+  margin: 12px 15px;
+  font-size: 14px;
+}
+
+.cell-input {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 15px;
+}
+
+.cell-item {
+  margin-left: 22px;
+  margin-top: 12px;
+  width: 300rpx;
+}
+
+
+</style>
+<template>
+  <nav-bar />
+  <div class="header background-color">
+
+    <span style="font-size: 26px;margin: 0px 0 0 15px;color: #FFF;">酒庄基础信息填写</span>
+  </div>
+  <div style="margin-top: 32px;">
+    <div>
+      <span class="cell-title">绑定手机号</span>
+      <van-field
+        value="{{ wineryForm.mobile }}"
+        center
+        clearable
+        readonly
+        placeholder="请点击授权获取手机号"
+        border="{{ false }}"
+        use-button-slot
+      >
+        <van-button slot="button" size="small" plain type="info" open-type="getPhoneNumber"
+                    bindgetphonenumber="onGetMobile">授权
+        </van-button>
+      </van-field>
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+    <div class="cell">
+      <span class="cell-title">酒庄全称</span>
+      <input
+        v-model="wineryForm.wineryName"
+        center
+        clearable
+        placeholder="请输入酒庄全称"
+        style="color: #AC1630;"
+      />
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+    <div class="cell">
+      <span class="cell-title">酒庄成立时间</span>
+      <picker mode="date" v-model="wineryForm.date" end="{{maxDate}}" bindchange="bindDateChange">
+        <van-field
+          value="{{ wineryForm.buildTime }}"
+          center
+          clearable
+          readonly
+          placeholder="请选择"
+          border="{{ false }}"
+        />
+      </picker>
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+
+
+    <div class="cell">
+      <span class="cell-title">酒庄地址（省市区）</span>
+
+      <picker mode="region" v-model="wineryForm.region" bindchange="bindRegionChange">
+        <van-field
+          value="{{ wineryForm.region }}"
+          center
+          clearable
+          readonly
+          placeholder="请选择"
+          border="{{ false }}"
+        />
+      </picker>
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+    <div class="cell">
+      <span class="cell-title">酒庄地址（详细）</span>
+      <input
+        v-model="wineryForm.address"
+        center
+        clearable
+        placeholder="请输入酒庄地址"
+
+      />
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+    <div class="cell">
+      <span class="cell-title">酒庄总面积</span>
+      <div class="cell-input">
+        <input
+          v-model="wineryForm.wineryArea"
+          type="number"
+          center
+          clearable
+          placeholder="请输入酒庄总面积"
+          use-button-slot
+        />
+        <span slot="button" size="small">亩</span>
+      </div>
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+    <div class="cell">
+      <span class="cell-title">建筑总面积</span>
+      <div class="cell-input">
+        <input
+          v-model="wineryForm.buildArea"
+          type="number"
+          center
+          clearable
+          placeholder="请输入建筑总面积"
+
+          use-button-slot
+        />
+        <span slot="button" size="small">平方米</span>
+      </div>
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+
+    <div style="margin-top: 10px;padding-bottom: 20px;">
+      <span class="cell-title">酒庄现状</span>
+      <van-radio-group value="{{ wineryForm.wineryStatus }}" bind:change="onChangeWineryStatus">
+
+        <div style="display: flex;margin: 5px;flex-wrap: wrap;">
+          <div class="cell-item" v-for="(item,index) in wineryStatusType">
+            <van-radio class="cell2-radio" name="{{item}}" checked-color="#AC3016">{{item}}</van-radio>
+          </div>
+        </div>
+      </van-radio-group>
+    </div>
+    <div class="boom" />
+
+    <div style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+      <button class="buttonColor" style="width: 686rpx;" @tap="onNext()">下一步</button>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapState, mapActions } from '@wepy/x'
+import appManager from '../appManager'
+import userApis from '../apis/userApis'
+
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    'before-setData': function(dirty) {
+      if (Math.random() < 0.2) {
+        console.log('setData canceled')
+        return false // Cancel setData
+      }
+      dirty.time = +new Date()
+      return dirty
+    }
+  },
+
+  data: {
+    form: store.state.wineryForm,
+    wineryStatusType: ['已建成投产', '在建已投产', '在建未投产', '已停产']
+  },
+
+  computed: mapState(['wineryForm']),
+
+  methods: {
+    ...mapActions([
+      'setWineryFormAction'
+    ]),
+    bindDateChange(event) {
+      this.wineryForm.buildTime = event.$wx.detail.value
+    },
+    bindRegionChange(event) {
+      this.wineryForm.region = event.$wx.detail.value
+    },
+    onChangeWineryStatus(e) {
+      this.wineryForm.wineryStatus = e.$wx.detail
+    },
+    async onGetMobile(e) {
+      wx.showLoading({ title: '获取中...', mask: true })
+      try {
+        let rsp = await userApis.sendMobile({
+          openid: appManager.getOpenid(),
+          detail: e.$wx.detail
+        })
+
+        if (rsp.code === 200) {
+          this.wineryForm.mobile = rsp.data.mobile
+        }
+        appManager.showToast(rsp.msg)
+      } catch (e) {
+        appManager.showToast('服务器连接异常,请联系管理员.')
+      } finally {
+        wx.hideLoading()
+      }
+    },
+
+    onNext() {
+      console.log(this.form)
+
+      if (!this.wineryForm.mobile) {
+        appManager.showToast('请授权获取您的手机号')
+        return
+      }
+
+      if (!this.wineryForm.wineryName) {
+        appManager.showToast('请输入您的酒庄名称')
+        return
+      }
+
+      if (!this.wineryForm.buildTime) {
+        appManager.showToast('请输入您的酒庄成立时间')
+        return
+      }
+
+      if (!this.wineryForm.address) {
+        appManager.showToast('请输入您的酒庄地址')
+        return
+      }
+
+      if (!this.wineryForm.wineryArea) {
+        appManager.showToast('请输入您的酒庄总面积')
+        return
+      }
+
+      if (!this.wineryForm.buildArea) {
+        appManager.showToast('请输入您的建筑总面积')
+        return
+      }
+
+      // this.setFormAction(this.form)
+      appManager.navigateTo('form2')
+    }
+  },
+
+  created() {
+    let self = this
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

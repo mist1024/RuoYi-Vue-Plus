@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.winery.mapper.AppOrderMapper">
+    
+    <resultMap type="AppOrder" id="AppOrderResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="addressId"    column="address_id"    />
+        <result property="payMsg"    column="pay_msg"    />
+        <result property="totalFee"    column="total_fee"    />
+        <result property="transportNo"    column="transport_no"    />
+        <result property="status"    column="status"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="cancelTime"    column="cancel_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <collection  property="orderDetailList" column="order_id"  javaType="java.util.List"  resultMap="AppOrderDetailResult" />
+    </resultMap>
+
+
+</mapper>

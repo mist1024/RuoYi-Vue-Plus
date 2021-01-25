@@ -1,0 +1,374 @@
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 150rpx;
+  display: flex;
+  justify-content: center;
+}
+
+
+.cell-full-area {
+  border: #ddd 1px solid;
+  border-radius: 8px;
+  width: 620rpx;
+  padding: 16px;
+  margin: 11px 15px;
+  display: flex;
+}
+
+.cell1 {
+  flex: 1;
+  display: flex;
+}
+
+.cell1-input {
+  width: 215rpx;
+}
+
+.cell2-radio {
+  margin-left: 22px;
+}
+
+.cell3-cheakbox {
+  margin-top: 10px;
+  text-align: center;
+  flex: 0 0 30%;
+  width: 200rpx;
+}
+
+.cell3-cheakbox-checked {
+  margin-top: 10px;
+  text-align: center;
+  flex: 1;
+  width: 100%;
+}
+
+
+.cell3-input-line {
+  flex: 1;
+  display: flex;
+  font-size: 14px;
+  text-align: center;
+  align-items: center;
+  margin-left: 15px;
+  margin-top: 5px;
+}
+
+.cell3-input {
+  width: 96rpx;
+  border: #ddd 1px solid;
+  background: #FAFAFA;
+  margin: 5px;
+}
+
+</style>
+<template>
+  <nav-bar />
+  <div class="header background-color">
+
+    <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/step1.png" style="width:612rpx; height:120rpx;" />
+  </div>
+  <div style="margin-top: 32px;">
+    <div>
+      <span class="cell-title">种植总面积</span>
+      <div class="cell-full-area">
+        <div class="cell1">
+          <input class="cell1-input" v-model="wineryForm.plantArea" type="number" placeholder="请输入" />
+          <span>亩</span>
+        </div>
+        <div class="cell1">
+          <input class="cell1-input" v-model="wineryForm.plantWeight" type="number" placeholder="请输入" />
+          <span>斤</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="boom" />
+
+    <div style="margin-top: 10px;padding-bottom: 20px;">
+      <span class="cell-title">土壤类型</span>
+      <van-radio-group value="{{ wineryForm.soilType }}" bind:change="onChangeSoilType">
+        <div style="display: flex;margin-top: 22px;">
+          <van-radio v-for="(item,index) in soilTypes" class="cell2-radio" name="{{item}}" checked-color="#AC1630">
+            {{item}}
+          </van-radio>
+        </div>
+      </van-radio-group>
+    </div>
+    <div class="boom" />
+
+    <div style="margin-top: 10px;padding-bottom: 10px">
+      <span class="cell-title">红葡萄品种</span>
+      <van-checkbox-group value="{{ wineryForm.redVariety.checked }}" bind:change="onChangeRedVariety">
+        <div style="display: flex;flex-direction: column;">
+          <div v-for="(item,index) in wineryForm.redVariety.params">
+            <div v-if="item.isChecked" style="margin-top: 5px;margin-bottom: 5px;">
+              <div style="margin-left:20px;">
+                <van-checkbox name="{{item.name}}" checked-color="#AC1630">{{item.name}}</van-checkbox>
+              </div>
+              <div class="cell3-input-line">
+                <span>种地</span>
+                <input class="cell3-input" v-model="item.msg.area" type="number" placeholder="请输入" />
+                <span>亩树龄</span>
+                <input class="cell3-input" v-model="item.msg.treeOld" type="number" placeholder="请输入" />
+                <span>年,最大树龄</span>
+                <input class="cell3-input" v-model="item.msg.treeMaxOld" type="number" placeholder="请输入" />
+                <span>年</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex;margin: 5px 15px;flex-wrap: wrap;">
+          <div v-for="(item,index) in wineryForm.redVariety.params">
+            <div v-if="!item.isChecked" class="cell3-cheakbox">
+              <van-checkbox name="{{item.name}}" checked-color="#AC1630">{{item.name}}</van-checkbox>
+            </div>
+          </div>
+        </div>
+      </van-checkbox-group>
+    </div>
+    <div class="boom" />
+
+
+    <div style="margin-top: 10px;padding-bottom: 10px">
+      <span class="cell-title">白葡萄品种</span>
+      <van-checkbox-group value="{{ wineryForm.whiteVariety.checked }}" bind:change="onChangeWhiteVariety">
+        <div style="display: flex;flex-direction: column;">
+          <div v-for="(item,index) in wineryForm.whiteVariety.params">
+            <div v-if="item.isChecked" style="margin-top: 10px;margin-bottom: 5px;">
+              <div style="margin-left:20px;">
+                <van-checkbox name="{{item.name}}" checked-color="#AC1630">{{item.name}}</van-checkbox>
+              </div>
+              <div class="cell3-input-line">
+                <span>种地</span>
+                <input class="cell3-input" v-model="item.msg.area" type="number" placeholder="请输入" />
+                <span>亩树龄</span>
+                <input class="cell3-input" v-model="item.msg.treeOld" type="number" placeholder="请输入" />
+                <span>年,最大树龄</span>
+                <input class="cell3-input" v-model="item.msg.treeMaxOld" type="number" placeholder="请输入" />
+                <span>年</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex;margin: 5px 15px;flex-wrap: wrap;">
+          <div v-for="(item,index) in wineryForm.whiteVariety.params">
+            <div v-if="!item.isChecked" class="cell3-cheakbox">
+              <van-checkbox name="{{item.name}}" checked-color="#AC1630">{{item.name}}</van-checkbox>
+            </div>
+          </div>
+        </div>
+      </van-checkbox-group>
+    </div>
+    <div class="boom" />
+
+
+    <div style="margin-top: 10px;padding-bottom: 20px;">
+      <span class="cell-title">主要灌溉方式</span>
+      <van-radio-group value="{{ wineryForm.irrigationType }}" bind:change="onChangeIrrigationType">
+        <div style="display: flex;margin-top: 22px;">
+          <van-radio v-for="(item,index) in irrigationTypes" class="cell2-radio" name="{{item}}"
+                     checked-color="#AC1630">
+            {{item}}
+          </van-radio>
+        </div>
+      </van-radio-group>
+    </div>
+    <div class="boom" />
+
+
+    <div style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+      <button class="buttonColor-cancel" style="width: 326rpx;" @tap="onBack()">上一步</button>
+      <button class="buttonColor" style="width: 326rpx;" @tap="onNext()">下一步</button>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapActions,mapState } from '@wepy/x'
+import appManager from '../appManager'
+import xiao4rApis from '../apis/xiao4rApis'
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    // 'before-setData': function(dirty) {
+    //   if (Math.random() < 0.2) {
+    //     console.log('setData canceled')
+    //     return false // Cancel setData
+    //   }
+    //   dirty.time = +new Date()
+    //   return dirty
+    // }
+  },
+
+  data: {
+    soilTypes: [
+      '沙石', '砾石', '石灰岩', '混合'
+    ],
+    irrigationTypes: ['漫灌', '喷灌', '滴灌'],
+    redVarieties: [
+      '赤霞珠',
+      '梅洛',
+      '品丽珠',
+      '黑皮诺',
+      '西拉',
+      '歌海娜',
+      '桑娇维塞',
+      '内比奥罗',
+      '丹魄',
+      '马尔贝克',
+      '其他'
+    ],
+    whiteVarieties: [
+      '霞多丽',
+      '长相思',
+      '雷司令',
+      '灰皮诺',
+      '赛美蓉',
+      '琼瑶浆',
+      '其他'
+    ]
+
+  },
+
+  computed: mapState(['wineryForm']),
+
+  watch: {},
+
+  methods: {
+    ...mapActions([
+      'setFormAction'
+    ]),
+
+    onChangeSoilType(e) {
+      this.wineryForm.soilType = e.$wx.detail
+    },
+
+    onChangeIrrigationType(e) {
+      this.wineryForm.irrigationType = e.$wx.detail
+    },
+
+    onChangeRedVariety(e) {
+      this.wineryForm.redVariety.checked = e.$wx.detail
+      this.changeItem(this.wineryForm.redVariety.checked, this.wineryForm.redVariety.params)
+    },
+
+    onChangeWhiteVariety(e) {
+      console.log(e)
+      this.wineryForm.whiteVariety.checked = e.$wx.detail
+      this.changeItem(this.wineryForm.whiteVariety.checked, this.wineryForm.whiteVariety.params)
+    },
+
+    changeItem(types, items) {
+      for (let i = 0; i < items.length; i++) {
+        let isChecked = false
+        for (let j = 0; j < types.length; j++) {
+          // console.log(types[j])
+          // console.log(items[i].name)
+          if (types[j] === items[i].name) {
+            isChecked = true
+            break
+          }
+        }
+
+        items[i].isChecked = isChecked
+        if (!items[i].isChecked) {
+          items[i].msg = {
+            area: '',
+            treeOld: '',
+            treeMaxOld: ''
+          }
+        }
+      }
+    },
+    initVariety(types, fromList) {
+      for (let i = 0; i < types.length; i++) {
+        fromList.push({
+          name: types[i],
+          isChecked: false,
+          msg: {
+            area: '',
+            treeOld: '',
+            treeMaxOld: ''
+          }
+        })
+      }
+    },
+    onNext() {
+      if (!this.wineryForm.plantArea) {
+        appManager.showToast('请输入种植面积！')
+        return
+      }
+
+      if (!this.wineryForm.plantWeight) {
+        appManager.showToast('请输入产量！')
+        return
+      }
+
+      let error = this.checkVariety(this.wineryForm.redVariety)
+      if (error) {
+        appManager.showToast('请检查红葡萄信息:' + error)
+        return
+      }
+
+      error = this.checkVariety(this.wineryForm.whiteVariety)
+      if (error) {
+        appManager.showToast('请检查白葡萄信息:' + error)
+        return
+      }
+
+      // this.setFormAction(this.form)
+      appManager.navigateTo('form4')
+    },
+    onBack() {
+      // this.setFormAction(this.form)
+      wx.navigateBack()
+    },
+
+    checkVariety(variety) {
+      let errorMsg = ''
+      let isChecked = false
+
+      for (let i = 0; i < variety.params.length; i++) {
+        let item = variety.params[i]
+        if (item.isChecked) {
+          isChecked = true
+
+          if (!item.msg.area || !item.msg.treeOld || !item.msg.treeMaxOld) {
+            errorMsg = '请完善' + item.name + '品种信息!'
+          }
+        }
+      }
+
+      if (!isChecked) {
+        errorMsg = '请选择葡萄品种!'
+      }
+
+      return errorMsg
+    }
+
+  },
+
+  created() {
+
+    if (this.wineryForm.redVariety.params.length < 1) {
+      this.initVariety(this.redVarieties, this.wineryForm.redVariety.params)
+    }
+    if (this.wineryForm.whiteVariety.params.length < 1) {
+      this.initVariety(this.whiteVarieties, this.wineryForm.whiteVariety.params)
+    }
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

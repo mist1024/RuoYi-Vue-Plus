@@ -1,0 +1,215 @@
+<style lang="less">
+page {
+  //background-color: #eeeeee;
+
+}
+
+
+.bg {
+  z-index: -1;
+  height: 100%;
+  position: fixed;
+  width: 200rpx;
+  background-color: #AC1630;
+}
+
+.winery-item {
+
+  width: 654rpx;
+  //height: 60px;
+
+  margin-bottom: 20px;
+  box-shadow: 4px 4px 10px #cccccc;
+  border: #ffffff 1px solid;
+  border-radius: 20px;
+
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.winery-item-icon {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: white;
+  box-shadow: 4px 4px 10px #cccccc;
+  margin-top: 93px;
+  margin-left: 50rpx;
+  border: #ffffff 1px solid;
+  border-radius: 50%;
+  z-index: 99;
+}
+
+.winery-item-arrow {
+
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  background-color: white;
+  box-shadow: 4px 4px 10px #cccccc;
+  margin-top: 18.5px;
+  margin-left: 500rpx;
+  border: #ffffff 1px solid;
+  border-radius: 50%;
+
+}
+
+.banner {
+  margin-top: 200px;
+  border-top: 1px solid white;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  text-align: left;
+  background-color: white;
+  height: 20px;
+  width: 100%;
+  z-index: 1;
+
+}
+
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+const parseAwards = (value) => {
+if (!value) {
+return []
+}
+
+return value.split(',')
+}
+
+module.exports.parseImage = parseImage;
+module.exports.parseAwards = parseAwards;
+</wxs>
+<template>
+
+
+  <nav-bar title="酒庄介绍" />
+  <!--  <div class="bg" />-->
+  <div class="container" style="width: 100%;" :style=" { 'margin-top' : (statusBarHeight + 46  ) + 'px' }">
+
+    <image :src="imageDefine.WINERY_HEADER" style="width:100%;height:218px;position: absolute;" />
+    <div class="banner" />
+
+    <div class="container" style="margin: 20px;">
+      <div style="display: flex;flex-direction: column;">
+        <span style="font-size: 22px;color: #98002E;font-weight: bold;">贺兰山东麓葡萄酒</span>
+        <span style="font-size: 14px;color: #333;margin-top: 10px;">贺兰山东麓位于北纬37度至39度之间，是种植葡萄的最佳地带，全年日照达3000小时且年降水量不超过200毫升，同时贺兰山东麓戈壁滩上的砂土富含丰富的矿物质。日照、土壤、水分、海拔和纬度都有助于种植葡萄，这些天然的馈赠让贺兰山东麓葡萄酒香气浓郁、纯正，口感圆润、协调。</span>
+        <span style="font-size: 16px;color: #333;margin-top: 24px;font-weight: bold;">
+          酒庄列表({{records.length}})
+        </span>
+      </div>
+
+      <div style="display: flex;margin-top: 10px;" v-for="(item,index) in records" @tap="onTap(item)">
+        <div class="winery-item-icon">
+          <van-image style="margin-top: 5px;" round width="50px" height="50px" :src="filters.parseImage(item.avatar)" />
+        </div>
+
+        <div class="winery-item">
+          <van-image :src="filters.parseImage(item.faceImage)" width="100%" height="128px" />
+          <div style="margin-left: 20px;margin-top:35px;display: flex;align-items: center;">
+            <span style="font-size: 20px;font-weight: bold;width: 120px;">{{item.mchName}}</span>
+            <span style="color: #999;font-size: 12px;width: 160px;margin-left: 8px;">{{item.subtitle}}</span>
+          </div>
+
+
+          <div style="margin: 19px 15px 15px 8px;">
+
+
+            <van-tag v-for="(awardItem,index) in filters.parseAwards(item.award)"
+                     :color="index === 0 ? '#F8F4E8' : '#EDF4FA' " :text-color="index === 0 ? '#CCA049' : '#828E99'"
+                     style="margin-right: 8px;">{{awardItem}}
+            </van-tag>
+          </div>
+        </div>
+
+
+        <!--        <div class="winery-item-arrow">-->
+        <!--          <van-icon name="arrow" />-->
+        <!--        </div>-->
+      </div>
+
+    </div>
+
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../mixins/defaultMix'
+import merchanApis from '../../apis/merchanApis'
+import appManager from '../../appManager'
+import { wineryDetailPage } from '../../store/constant/nav/pages'
+
+wepy.page({
+  store,
+  hooks: {},
+
+  mixins: [defaultMix],
+  data: {
+    pageIndex: 0,
+    records: []
+  },
+
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'userInfo': state => state.user.userInfo,
+      'wineryDefine': state => state.wineryDefine,
+      'statusBarHeight': state => state.statusBarHeight
+    })
+  },
+
+  methods: {
+    ...mapActions([
+      'setUserAction'
+    ]),
+    handleViewTap() {
+      console.log('handleVieTap clicked')
+    },
+    onTap(item) {
+      appManager.navigateTo(wineryDetailPage + '?id=' + item.id)
+    },
+    onBack() {
+      wx.navigateBack()
+    },
+    async init(id) {
+
+    }
+
+  },
+
+  onLoad(options) {
+    merchanApis.getMerchantList().then(r => {
+      this.records = r.rows
+    })
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+usingComponents: {
+
+}
+}
+</config>

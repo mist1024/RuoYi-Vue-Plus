@@ -1,0 +1,123 @@
+<template>
+
+
+  <view style="padding: 0 10px 110px 0;background: #fafafa;">
+    <van-checkbox-group :value="selectedList" bind:change="onChangeSelect">
+      <view v-for="(item, index) in list" :key="index"
+            style="margin-top: 10px;border: #fafafa 1px solid; border-radius: 10px;">
+        <van-card
+          :price="item.price/100"
+          desc="描述信息"
+          title="商品标题"
+          nun="n"
+        >
+          <view slot="thumb">
+            <div style="display: inline-flex;align-items: center;margin-top: 12px;">
+              <van-checkbox :name="item.id" />
+              <image class="van-card__thumb"
+                     src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=751441608,3469454349&fm=15&gp=0.jpg" />
+            </div>
+          </view>
+        </van-card>
+      </view>
+    </van-checkbox-group>
+
+    <van-submit-bar
+      :price="price"
+      button-text="提交订单"
+      bind:submit="onSubmit"
+      button-class="submit-btn"
+    >
+      <van-checkbox style="margin-top:5px;" :value="isAllSelect" bind:change="onAllSelect">全选</van-checkbox>
+    </van-submit-bar>
+
+    <div style="margin-top: 100px;" />
+  </view>
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions } from '@wepy/x'
+
+wepy.component({
+  store,
+  hooks: {},
+
+  data: {
+    active: 0,
+    checked: false,
+    list: [],
+    selectedList: [],
+    isAllSelect: false,
+    price: 10000
+  },
+
+  computed: {
+  },
+
+  methods: {
+
+    onChangeSelect(e) {
+      this.selectedList = e.$wx.detail
+      this.isAllSelect = this.selectedList.length === this.list.length
+    },
+    onAllSelect(e) {
+      this.isAllSelect = e.$wx.detail
+      if (this.isAllSelect) {
+        this.selectedList = this.list.map(x => x.id)
+      } else {
+        this.selectedList = []
+      }
+    },
+    onSubmit() {
+      // 订单提交
+    }
+  },
+
+  ready() {
+    for (let i = 0; i < 15; i++) {
+      this.list.push(
+        {
+          id: i + '',
+          name: '商品',
+          price: 599
+        })
+    }
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: '',
+usingComponents: {
+},
+styleIsolation: 'shared',
+addGlobalClass: true,
+
+}
+</config>
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 536rpx;
+  z-index: -10;
+}
+
+.van-card__thumb {
+  position: relative;
+  -webkit-flex: none;
+  flex: none;
+  width: 66px;
+  height: 66px;
+  margin-left: 8px;
+}
+
+
+.submit-btn {
+
+  border-radius: 20px !important;
+  border: #AC1630 1px solid !important;
+}
+</style>

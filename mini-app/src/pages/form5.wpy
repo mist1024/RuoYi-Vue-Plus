@@ -1,0 +1,242 @@
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 150rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.cell-input {
+  margin-left: 10px;
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input {
+    border: #dddddd solid 1px;
+    border-radius: 8px;
+    padding: 5px;
+    width: 572rpx;
+    margin-right: 10px;
+  }
+}
+
+.cell-item {
+  margin-left: 22px;
+  margin-top: 12px;
+  width: 300rpx;
+}
+
+.cell-item2 {
+  margin-left: 12px;
+  margin-top: 12px;
+}
+
+
+</style>
+<template>
+  <nav-bar />
+  <div class="header background-color">
+    <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/step3.png" style="width:612rpx; height:120rpx;" />
+  </div>
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">年产量</span>
+    <div class="cell-input">
+      <input class="input" v-model="wineryForm.annualOutput" type="digit" placeholder="请输入" />
+      <span>万瓶</span>
+    </div>
+  </div>
+
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">现有库存</span>
+    <div class="cell-input">
+      <input class="input" v-model="wineryForm.stock" type="digit" placeholder="请输入" />
+      <span>万瓶</span>
+    </div>
+  </div>
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">橡木桶数量</span>
+    <div class="cell-input">
+      <input class="input" v-model="wineryForm.bucketCount" type="number" placeholder="请输入" />
+      <span>　个</span>
+    </div>
+  </div>
+
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">主要产品定价</span>
+    <van-checkbox-group value="{{ wineryForm.mainPrice }}" bind:change="onChangeMainPrice">
+      <div style="display: flex;margin: 5px;flex-wrap: wrap;">
+        <div class="cell-item" v-for="(item,index) in mainPriceType">
+          <van-checkbox name="{{item}}" checked-color="#AC1630">{{item}}</van-checkbox>
+        </div>
+      </div>
+    </van-checkbox-group>
+  </div>
+
+
+  <div class="boom" />
+
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title">销售方式</span>
+    <van-checkbox-group value="{{ wineryForm.salesMode }}" bind:change="onChangeSalesMode">
+      <div style="display: flex;margin: 5px;flex-wrap: wrap;">
+        <div class="cell-item2" v-for="(item,index) in salesModeType">
+          <van-checkbox name="{{item}}" checked-color="#AC1630">{{item}}</van-checkbox>
+        </div>
+      </div>
+    </van-checkbox-group>
+  </div>
+  <div class="boom" />
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <div style="display: flex;align-items: center;">
+      <span class="cell-title">获奖信息</span>
+      <span style="font-size: 12px;">(选填)</span>
+    </div>
+    <van-checkbox-group value="{{ wineryForm.awards }}" bind:change="onChangeAwards">
+      <div style="display: flex;margin: 5px 5px;flex-wrap: wrap;">
+        <div class="cell-item2" v-for="(item,index) in awardType">
+          <van-checkbox name="{{item}}" checked-color="#AC1630">{{item}}</van-checkbox>
+        </div>
+      </div>
+    </van-checkbox-group>
+
+    <div style="display: flex;align-items: center;">
+      <span class="cell-title">其他奖项</span>
+    </div>
+    <div style="margin: 10px;border: #ddd 1px solid; border-radius: 8px;padding: 5px;">
+
+      <textarea
+        v-model="wineryForm.awardInformation "
+        auto-height="{{false}}"
+        clearable
+        autosize
+      />
+    </div>
+
+  </div>
+  <div class="boom" />
+
+
+  <div style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+    <button class="buttonColor-cancel" style="width: 326rpx;" @tap="onBack()">上一步</button>
+    <button class="buttonColor" style="width: 326rpx;" @tap="onNext()">下一步</button>
+  </div>
+
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapState } from '@wepy/x'
+import appManager from '../appManager'
+import xiao4rApis from '../apis/xiao4rApis'
+import validateUtils from '../js/utils/validateUtils'
+
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    // 'before-setData': function(dirty) {
+    //   if (Math.random() < 0.2) {
+    //     console.log('setData canceled')
+    //     return false // Cancel setData
+    //   }
+    //   dirty.time = +new Date()
+    //   return dirty
+    // }
+  },
+
+  data: {
+    mainPriceType:
+      ['100以下', '100～199', '200～299', '300～399', '400～499', '500～599', '600～699', '700～799', '800～899', '900～999', '1000或以上'],
+    salesModeType: ['自销', '渠道代理', '包销', '网销'],
+    awardType: [
+      '2017柏林葡萄酒大奖赛',
+      '2017年第24届布鲁塞尔葡萄酒大赛',
+      '第六届宁夏贺兰山东麓国际葡萄酒博览会',
+      '2018柏林葡萄酒大奖赛',
+      '2018第25届布鲁塞尔葡萄酒大赛',
+      '2018Decanter（品醇客）世界葡萄酒大赛',
+      '2019柏林葡萄酒大奖赛',
+      '2019Decanter（品醇客）世界葡萄酒大赛',
+      '2019第26届布鲁塞尔葡萄酒大赛',
+      '第八届宁夏贺兰山东麓国际葡萄酒博览会',
+      '2020柏林葡萄酒大奖赛',
+      '2020第27届布鲁塞尔葡萄酒大赛',
+      '第九届宁夏贺兰山东麓国际葡萄酒博览会'
+    ]
+
+  },
+
+  computed: mapState(['wineryForm']),
+
+  watch: {},
+
+  methods: {
+
+    onChangeMainPrice(e) {
+      this.wineryForm.mainPrice = e.$wx.detail
+    },
+    onChangeSalesMode(e) {
+      this.wineryForm.salesMode = e.$wx.detail
+    },
+
+    onChangeAwards(e) {
+
+      console.log(e.$wx.detail)
+      this.wineryForm.awards = e.$wx.detail
+    },
+
+    onNext() {
+      if (!validateUtils.isIntOrDecimal(this.wineryForm.annualOutput)) {
+        appManager.showToast('请输入正确的年产量!')
+        return
+      }
+
+      if (!validateUtils.isIntOrDecimal(this.wineryForm.stock)) {
+        appManager.showToast('请输入正确的当前库存!')
+        return
+      }
+
+      if (!this.wineryForm.bucketCount) {
+        appManager.showToast('请输入橡木桶数量!')
+        return
+      }
+
+      if (this.wineryForm.mainPrice.length < 1) {
+        appManager.showToast('请选择主要产品定价!')
+        return
+      }
+
+      if (this.wineryForm.salesMode.length < 1) {
+        appManager.showToast('请选择销售方式!')
+        return
+      }
+
+      appManager.navigateTo('form6')
+    },
+    onBack() {
+      wx.navigateBack()
+    }
+
+  },
+
+  created() {
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

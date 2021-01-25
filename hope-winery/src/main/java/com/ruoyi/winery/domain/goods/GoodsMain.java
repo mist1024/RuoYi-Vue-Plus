@@ -56,6 +56,9 @@ private static final long serialVersionUID=1L;
     @Excel(name = "关联规格")
     private String goodsSpec;
 
+    @Excel(name = "库存")
+    private String goodsStock;
+
     /** 商品说明 */
     @Excel(name = "商品说明")
     private String goodsDesc;
@@ -67,6 +70,10 @@ private static final long serialVersionUID=1L;
     /** 商品图片 */
     @Excel(name = "商品图片")
     private String goodsImg;
+
+    /** 商品图片 */
+    @Excel(name = "商品价格")
+    private BigDecimal goodsPrice;
 
     /** 创建者 */
     private String createBy;
@@ -88,4 +95,10 @@ private static final long serialVersionUID=1L;
      * 状态
      */
     private Integer state;
+
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }

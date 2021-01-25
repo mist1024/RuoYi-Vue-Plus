@@ -1,0 +1,139 @@
+<style lang="less">
+
+page {
+  background-color: #F0F1F2;
+}
+
+.header {
+  width: 100%;
+  height: 320px;
+  display: flex;
+}
+
+.header-cell {
+  margin: 15px 15px 0 15px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-title {
+  width: 260rpx;
+}
+
+.header-value {
+  width: 420rpx;
+}
+
+.fream {
+  position: absolute;
+  top: 265px;
+  left: 0;
+  right: 0;
+  margin: 0 auto 0 auto;
+  background: white;
+  width: 610rpx;
+  height: 638rpx;
+  border: white 1px solid;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+}
+
+.step-point {
+  z-index: 99;
+  background: white;
+  color: #AC1630;
+}
+
+
+</style>
+<template>
+
+  <nav-bar />
+
+  <div class="header background-color">
+
+    <div style="font-size: 15px;font-weight: lighter;color: #FFF;  width: 100%;">
+      <div class="header-cell">
+        <span class="header-title">酒庄名称：</span>
+        <span class="header-value">{{wineryForm.wineryName}}</span>
+      </div>
+      <div class="header-cell">
+        <span class="header-title">酒庄面积：</span>
+        <span class="header-value">{{wineryForm.wineryArea}}亩</span>
+      </div>
+      <div class="header-cell">
+        <span class="header-title">酒庄成立时间：</span>
+        <span class="header-value">{{wineryForm.buildTime}}</span>
+      </div>
+      <div class="header-cell">
+        <span class="header-title">酒庄地址：</span>
+        <span class="header-value">{{wineryForm.region}}  {{wineryForm.address}} </span>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="fream">
+
+    <div style="width: 558rpx; text-align: left; flex-direction: column;display: flex;">
+      <sapn style="color: #333;font-size: 20px;font-weight: bold;">填报指南</sapn>
+      <sapn style="color: #999; font-size: 14px;">您好，仅需三步即可完成自主填报</sapn>
+    </div>
+    <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/step.png" style="width: 558rpx;margin-top: 16px;" />
+
+  </div>
+  <div style="display: flex;align-items: center; width: 100%;margin: 520rpx 0 25px 0;">
+    <button class="buttonColor" style="width: 686rpx;" @tap="onNext()">下一步</button>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapState } from '@wepy/x'
+import appManager from '../appManager'
+
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    'before-setData': function(dirty) {
+      if (Math.random() < 0.2) {
+        console.log('setData canceled')
+        return false // Cancel setData
+      }
+      dirty.time = +new Date()
+      return dirty
+    }
+  },
+
+  data: {
+
+  },
+
+  computed: mapState(['wineryForm']),
+
+  methods: {
+    onNext() {
+      appManager.navigateTo('form3')
+    }
+  },
+
+  created() {
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

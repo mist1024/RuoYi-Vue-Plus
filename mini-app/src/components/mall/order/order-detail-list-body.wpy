@@ -1,0 +1,171 @@
+<style lang="less">
+page {
+  background-color: #eeeeee;
+}
+
+.fream {
+  border-radius: 25px;
+  width: 660rpx;
+  margin-top: 20px;
+  background-color: white;
+  //box-shadow: 4px 4px 10px #eeeeee;
+  padding: 10px 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.van-card {
+  background-color: #ffffff !important;
+}
+
+</style>
+
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+const parseOrderStatus = (status) => {
+
+let result = '未知状态'
+switch(status) {
+case 0:
+result = '未支付'
+break
+case 1:
+result = '已取消'
+break
+case 2:
+result = '已支付'
+break
+case 3:
+result = '待收货'
+break
+case 4:
+result = '交易完成'
+break
+default:
+break
+
+}
+
+return result
+
+
+
+}
+
+module.exports.parseImage = parseImage;
+module.exports.parseOrderStatus = parseOrderStatus;
+</wxs>
+<template>
+
+
+  <div style="width: 100%;">
+
+    <van-loading wx:if="{{ !isInit }}" style="margin-top: 20px; display: flex;align-items: center;flex-direction: column;"></van-loading>
+    <view class="" style="margin: 10px;" wx:else>
+
+
+      <div v-if="records.length < 1" style="display: flex;flex-direction: column;align-items: center;width: 100%;">
+        <van-empty description="暂无订单" />
+      </div>
+
+
+      <div class="fream" v-for="(item,index) in records" >
+
+          <van-card
+            :num="item.goodsCount"
+            :price="item.goodsCount * item.goods.goodsPrice"
+            :desc="item.goods.goodsAlias"
+            :title="item.goods.goodsName"
+            :thumb="filters.parseImage(item.goods.goodsFaceImg)"
+          >
+            <view slot="footer">
+<!--              <van-button v-if="row.status === 2 || row.status === 4" size="mini" plain @tap="onRefund(item)">申请退款</van-button>-->
+<!--              <van-button size="mini" plain @tap="onDetail(item)" style="margin-left: 10px;">查看详情</van-button>-->
+            </view>
+          </van-card>
+
+      </div>
+    </view>
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import appManager from '../../../appManager'
+
+import orderApis from '../../../apis/orderApis'
+import { goodsDetailPage } from '../../../store/constant/nav/pages'
+
+wepy.component({
+  store,
+  hooks: {},
+  props: {
+    status: ''
+
+  },
+  data: {
+    records: [],
+    isInit: false
+
+  },
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'userAddress': state => state.userAddress
+    })
+  },
+
+  methods: {
+
+    onRefund(item) {
+      // 申请退款
+      // orderApis.refundOrder(item.id)
+    },
+    onDetail(item) {
+      // appManager.navigateTo(goodsDetailPage + '?id=' + item.goods.id)
+
+    },
+    async init() {
+      this.isInit = false
+
+      let data
+      if (this.status) {
+        data = {
+          status: this.status
+        }
+      }
+      const req = await orderApis.getOrderDetailList(data)
+
+      if (req.code === 200) {
+        this.records = req.rows
+      }
+
+      this.isInit = true
+    }
+  },
+
+  ready() {
+    console.log('ready')
+    this.init()
+  },
+  onShow() {
+    console.log('onShow')
+    this.init()
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

@@ -56,15 +56,15 @@ spring:
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
-  profiles: 
+  profiles:
     active: @profiles.active@
   # 文件上传
   servlet:
-     multipart:
-       # 单个文件大小
-       max-file-size:  10MB
-       # 设置总上传的文件大小
-       max-request-size:  20MB
+    multipart:
+      # 单个文件大小
+      max-file-size: 20MB
+      # 设置总上传的文件大小
+      max-request-size: 20MB
   # 服务模块
   devtools:
     restart:
@@ -73,13 +73,13 @@ spring:
 
 # token配置
 token:
-    # 令牌自定义标识
-    header: Authorization
-    # 令牌密钥
-    secret: abcdefghijklmnopqrstuvwxyz
-    # 令牌有效期（默认30分钟）
-#    expireTime: 30
-    expireTime: 300
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  #    expireTime: 30
+  expireTime: 300
 
 # MyBatis配置
 # https://baomidou.com/config/
@@ -170,11 +170,11 @@ mybatis-plus:
       selectStrategy: NOT_NULL
 
 # PageHelper分页插件
-pagehelper: 
+pagehelper:
   helperDialect: mysql
   reasonable: true
   supportMethodsArguments: true
-  params: count=countSql 
+  params: count=countSql
 
 # Swagger配置
 swagger:
@@ -184,7 +184,7 @@ swagger:
   pathMapping: /dev-api
 
 # 防止XSS攻击
-xss: 
+xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
@@ -192,20 +192,7 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
-#微信小程序支付配置
-wxmini:
-  appId: wx76ec015fc31a1946 #微信公众号或者小程序等的appid 必填
-  mchId: 1486984962
-  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
-  notifyUrl: http://41.mxl530.top:8087/zhongyihis/wxnotify
-  subAppId: #服务商模式下的子商户公众账号ID
-  subMchId: #服务商模式下的子商户号
-  tradeType: JSAPI  #交易类型
-  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
-  secret: 94ee42c0899a6ceccf353e1e729c50d4 #微信小程序的Secret
-  token: xiao4r #微信小程序消息服务器配置的token
-  aesKey: jNXajd2sQSMYQNg3rcdMF9HraUJxXF0iswgdMxVik9W #微信小程序消息服务器配置的EncodingAESKey
-  msgDataFormat: JSON
+
 
 # cos存储配置
 tencent-cos:
@@ -214,3 +201,27 @@ tencent-cos:
   secretId: AKIDovztW8x0DpQnunSw2uXUDhw3IH0fQC75
   secretKey: rCH8tOfjX5XjegYBXfkZWc2E75nJq9Dx
   region: ap-beijing
+
+
+#微信小程序支付配置
+wxmini:
+#  appId: wx76ec015fc31a1946 # 宁夏通
+  appId: wx4306452d346f783d # 紫色名片
+#  secret: 94ee42c0899a6ceccf353e1e729c50d4 # 宁夏通
+  secret: dc55bc1729090bdff9b63e1a5f0d03b2 # 紫色名片
+
+#  mchId: 1486984962
+  mchId: 1605949156
+#  mchKey: 82aZ9Tb6eu5W2HdXKQWZU2SztU8w8nJ8
+  mchKey: 2e7fe280d91ded48798365961db89951
+#  keyPath: "classpath:/cert/apiclient_cert1486984962.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+  keyPath: "classpath:/cert/apiclient_cert1605949156.p12" # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+
+  subAppId: #服务商模式下的子商户公众账号ID
+  subMchId: #服务商模式下的子商户号
+  tradeType: JSAPI  #交易类型
+
+
+  token: xiao4r #微信小程序消息服务器配置的token
+  aesKey: jNXajd2sQSMYQNg3rcdMF9HraUJxXF0iswgdMxVik9W #微信小程序消息服务器配置的EncodingAESKey
+  msgDataFormat: JSON

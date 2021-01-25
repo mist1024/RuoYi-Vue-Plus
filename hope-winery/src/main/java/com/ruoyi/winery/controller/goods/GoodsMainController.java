@@ -1,12 +1,19 @@
 package com.ruoyi.winery.controller.goods;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import java.util.List;
 import java.util.Arrays;
 
+import com.itextpdf.styledxmlparser.jsoup.Jsoup;
+import com.itextpdf.styledxmlparser.jsoup.nodes.Document;
+import com.itextpdf.styledxmlparser.jsoup.nodes.Element;
+import com.itextpdf.styledxmlparser.jsoup.select.Elements;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.winery.utils.RichTextUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +35,8 @@ import com.ruoyi.winery.service.IGoodsMainService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
+import static com.ruoyi.common.utils.SecurityUtils.*;
+
 /**
  * 商品信息Controller
  *
@@ -46,11 +55,15 @@ public class GoodsMainController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('goods:goods_main:list')")
     @GetMapping("/list")
-    public TableDataInfo list(UsernamePasswordAuthenticationToken token, GoodsMain goodsMain) {
+    public TableDataInfo list(GoodsMain goodsMain) {
         startPage();
         LambdaQueryWrapper<GoodsMain> lqw = Wrappers.lambdaQuery(goodsMain);
 
-        lqw.eq(GoodsMain::getDeptId, getDeptId(token));
+
+        // 不是系统管理员且不是小程序用户的时候仅能看到自己部门的
+        lqw.eq(!isAdmin() && !getUsername().contains("mini-"),
+                GoodsMain::getDeptId, getDeptId());
+
 
         if (StringUtils.isNotBlank(goodsMain.getGoodsName())) {
             lqw.like(GoodsMain::getGoodsName, goodsMain.getGoodsName());
@@ -73,6 +86,13 @@ public class GoodsMainController extends BaseController {
         if (StringUtils.isNotBlank(goodsMain.getGoodsImg())) {
             lqw.eq(GoodsMain::getGoodsImg, goodsMain.getGoodsImg());
         }
+
+        if (isMiniUser()) {
+            lqw.eq(GoodsMain::getState,  1);
+        }
+
+        lqw.orderByAsc(GoodsMain::getSort);
+
         List<GoodsMain> list = iWineryGoodsService.list(lqw);
         return getDataTable(list);
     }
@@ -106,7 +126,13 @@ public class GoodsMainController extends BaseController {
     @Log(title = "商品信息", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(UsernamePasswordAuthenticationToken token, @RequestBody GoodsMain goodsMain) {
-        goodsMain.setDeptId(getDeptId(token));
+//        goodsMain.setDeptId(getDeptId());
+        goodsMain.setCreateBy(getUsername());
+        String richText = goodsMain.getGoodsDesc();
+        if (richText != null && StringUtils.isNotEmpty(richText)) {
+            Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");
+            goodsMain.setGoodsDesc(doc.body().children().toString());
+        }
         return toAjax(iWineryGoodsService.save(goodsMain) ? 1 : 0);
     }
 
@@ -117,6 +143,12 @@ public class GoodsMainController extends BaseController {
     @Log(title = "商品信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody GoodsMain goodsMain) {
+        goodsMain.setUpdateBy(getUsername());
+        String richText = goodsMain.getGoodsDesc();
+        if (richText != null && StringUtils.isNotEmpty(richText)) {
+            Document doc = RichTextUtil.setImgStyle(richText, "width: 100%");
+            goodsMain.setGoodsDesc(doc.body().children().toString());
+        }
         return toAjax(iWineryGoodsService.updateById(goodsMain) ? 1 : 0);
     }
 

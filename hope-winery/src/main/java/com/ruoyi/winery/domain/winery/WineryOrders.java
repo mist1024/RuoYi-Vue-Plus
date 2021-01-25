@@ -50,7 +50,7 @@ public class WineryOrders implements Serializable {
      * 商品ID
      */
     @Excel(name = "商品ID")
-    private Long goodsId;
+    private String goodsId;
 
     /**
      * 商品简称
@@ -81,6 +81,35 @@ public class WineryOrders implements Serializable {
      */
     @Excel(name = "商品基准单价")
     private BigDecimal goodsPrice;
+
+    /**
+     * 统一订单号
+     */
+    @Excel(name = "统一订单号")
+    private String outTradeNo;
+
+    /**
+     * 统一退款号
+     */
+    @Excel(name = "统一退款号")
+    private String outRefundNo;
+
+    /**
+     * 支付参数
+     */
+    private String payMsg;
+
+    /**
+     * 取消时间
+     */
+    @Excel(name = "取消时间")
+    private Date cancelTime;
+
+    /**
+     * 退款时间
+     */
+    @Excel(name = "退款时间")
+    private Date refundTime;
 
     /**
      * 商品数量

@@ -1,0 +1,206 @@
+<style lang="less">
+
+.header {
+  width: 100%;
+  height: 150rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.cell-input {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input {
+    margin-left: 10px;
+    border: #dddddd solid 1px;
+    border-radius: 8px;
+    padding: 5px 10px;
+    width: 480rpx;
+  }
+}
+
+input {
+  margin-left: 8px;
+  padding: 5px 10px;
+  width: 480rpx;
+}
+
+.cell-item {
+  margin-left: 22px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+}
+
+
+
+
+</style>
+<template>
+  <nav-bar />
+  <div class="header background-color">
+    <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/step4.png" style="width:612rpx; height:120rpx;" />
+  </div>
+
+  <div
+    style="margin-top: 32px;margin-bottom: 20px;display: flex;justify-content: center;flex-direction: column;align-items: center;">
+    <image src="https://www.xiao4r.com/xiao4rstatic/hope_wine/success.png" style="width:110rpx; height:110rpx;" />
+    <span style="color:#333;margin-top: 24px;">填报完成</span>
+    <span style="color: #999;margin-top: 8px;font-size: 13px;">感谢您的填报，还有最后一步！</span>
+  </div>
+  <div class="boom" />
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <div class="cell">
+      <span class="cell-title">姓名</span>
+      <input
+        v-model="wineryForm.personName"
+        center
+        clearable
+        placeholder="请输入您的姓名"
+      />
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+  </div>
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <div class="cell">
+      <span class="cell-title">联系邮箱</span>
+      <input
+        v-model="wineryForm.email"
+        center
+        clearable
+        placeholder="请输入您的联系邮箱"
+      />
+      <van-divider customStyle="margin: 0 5px;" />
+    </div>
+  </div>
+  <div class="boom" />
+
+
+  <div style="margin-top: 10px;padding-bottom: 20px;">
+    <span class="cell-title" style="color: #AC1630;">贺兰山产区红酒传播语征集</span>
+    <van-radio-group value="{{ wineryForm.slogan }}" bind:change="onChangeSlogan">
+      <div style="display: flex;margin: 5px;flex-direction: column;">
+        <div class="cell-item" v-for="(item,index) in sloganType">
+          <div v-if="index === 4" class="cell-input">
+            <van-radio name="{{item}}" checked-color="#AC1630" />
+            <input
+              v-model="slogan"
+              clearable
+              placeholder="请输入您的口号"
+            />
+          </div>
+          <div v-else>
+            <van-radio name="{{item}}" checked-color="#AC1630">{{item}}</van-radio>
+          </div>
+        </div>
+      </div>
+    </van-radio-group>
+  </div>
+
+
+  <div class="boom" />
+
+
+  <div style="display: flex;align-items: center; width: 100%;margin: 25px 0 25px 0;">
+    <button class="buttonColor-cancel" style="width: 326rpx;" @tap="onBack()">上一步</button>
+    <button class="buttonColor" style="width: 326rpx;" @tap="onNext()">提交上报</button>
+  </div>
+
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import eventHub from '../common/eventHub'
+import store from '../store'
+import { mapState } from '@wepy/x'
+import appManager from '../appManager'
+import xiao4rApis from '../apis/xiao4rApis'
+import validateUtils from '../js/utils/validateUtils'
+
+wepy.page({
+  store,
+  hooks: {
+    // Page 级别 hook, 只对当前 Page 的 setData 生效。
+    // 'before-setData': function(dirty) {
+    //   if (Math.random() < 0.2) {
+    //     console.log('setData canceled')
+    //     return false // Cancel setData
+    //   }
+    //   dirty.time = +new Date()
+    //   return dirty
+    // }
+  },
+
+  data: {
+    form: {},
+    sloganType: ['葡萄酒·贺兰山', '葡萄酒之乡·神奇贺兰山', '中国葡萄酒·当然贺兰山', '中国葡萄酒·要喝贺兰山','其他'],
+    slogan: ''
+
+  },
+
+  computed: mapState(['wineryForm']),
+
+  watch: {},
+
+  methods: {
+
+    onChangeSlogan(e) {
+      this.wineryForm.slogan = e.$wx.detail
+    },
+
+    async onNext() {
+      if (!this.wineryForm.personName) {
+        appManager.showToast('请输入您的姓名!')
+        return
+      }
+
+      if (!validateUtils.isEmail(this.wineryForm.email)) {
+        appManager.showToast('请正确输入您的邮箱!')
+        return
+      }
+
+      let form = this.wineryForm
+      if (this.wineryForm.slogan === '其他') {
+        form.slogan = this.slogan
+      }
+      form.openid = appManager.getOpenid()
+
+      wx.showLoading({ title: '正在提交...', mask: true })
+
+      try {
+        let rsp = await xiao4rApis.postForm(form)
+        if (rsp.code === 200) {
+          appManager.showToast('提交成功!')
+          wx.reLaunch({ url: 'index' })
+        } else {
+          appManager.showToast('提交失败.' + rsp.msg)
+        }
+      } catch (e) {
+        appManager.showToast('提交失败.', e)
+
+      } finally {
+        wx.hideLoading()
+      }
+    },
+    onBack() {
+      wx.navigateBack()
+    }
+
+  },
+
+  created() {
+  }
+
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>

@@ -96,19 +96,4 @@ public class BaseController
         return StringUtils.format("redirect:{}", url);
     }
 
-
-    /**
-     * 获取部门Id
-     * @param token
-     * @return
-     */
-    public Long getDeptId(UsernamePasswordAuthenticationToken token) {
-        JSONObject json = (JSONObject) JSONUtil.parse(token.getPrincipal());
-
-        Long deptId = json.getJSONObject("user")
-                .getJSONObject("dept")
-                .getLong("deptId");
-
-        return deptId;
-    }
 }

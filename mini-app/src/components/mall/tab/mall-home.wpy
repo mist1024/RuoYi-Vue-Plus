@@ -1,0 +1,282 @@
+<style lang="less">
+
+
+.header-image {
+  width: 100%;
+  height: 210px;
+  z-index: -1;
+  position: absolute;
+  top: 0;
+
+}
+
+.user-banner {
+  margin-top: 190px;
+  border-top: 1px solid #F5F6F7;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  text-align: left;
+  background-color: #F5F6F7;
+  height: 20px;
+  width: 100%;
+  z-index: 1;
+}
+
+.menu-desc {
+  border: #fff 1px solid;
+  border-radius: 20px;
+  width: 270rpx;
+  height: 42px;
+  box-shadow: 4px 4px 10px #cccccc;
+  background-color: #ffffff;
+  padding: 16px;
+  display: flex;
+
+  font-weight: bold;
+}
+
+.grid-body {
+  border: #fff 1px solid;
+  border-radius: 20px;
+  width: 100%;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 4px 4px 10px #eeeeee;
+}
+
+.menu-desc-text {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #999;
+  display: flex;
+}
+
+.grid-item {
+  background-color: #eeeeee;
+}
+
+.column-record-item {
+  border: transparent 1px solid;
+  border-radius: 20px;
+  box-shadow: 4px 4px 10px #cccccc;
+
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.column-record-item-text {
+  font-size: 20px;
+
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+</style>
+<wxs module="filters" lang="babel">
+const parseImage = (imageKey) => {
+return 'https://winery-1257413599.cos.ap-beijing.myqcloud.com/' + imageKey
+}
+module.exports.parseImage = parseImage;
+</wxs>
+
+<template>
+  <div class="container">
+    <image class="header-image" :src="navDefine.HOME_HEADER.image" />
+    <div class="user-banner" />
+
+
+    <view style="margin: 0px 16px;display: flex;flex-direction: column;">
+      <van-row>
+        <van-col offset="1" span="4">
+          <van-image round width="96rpx" height="96rpx" :src="user.userInfo.avatarUrl" />
+        </van-col>
+        <van-col offset="1" span="10">
+          <div class="fxc" style="display: flex;flex-direction: column;">
+            <span style="font-size: 19px;font-weight: bold;">{{user.userInfo.nickName}}</span>
+            <span style="font-size: 11px;color: #999999;">{{user.mobile}}</span>
+          </div>
+        </van-col>
+        <van-col offset="1" span="7" v-if="hotSwitch">
+          <van-button v-if="user.token" round style="height: 25px;" size="small" plain color="#AC1630"
+                      @tap="onShoppingCar">
+            <van-icon name="shopping-cart-o" color="#AC1630" />
+            <span style="margin-left: 5px;color: #333333;">购物车</span>
+          </van-button>
+          <van-button v-else round style="height: 25px;" size="small" plain color="#AC1630" @tap="onShoppingCar">
+            <span style="margin-left: 5px;color: #333333;">点击登录</span>
+          </van-button>
+        </van-col>
+      </van-row>
+
+      <van-notice-bar
+        :text="notice"
+        mode="link"
+        background="#ddd"
+        color="#333"
+        speed="25"
+        style="margin-top: 16px;"
+      >
+        <van-image slot="left-icon" :src="imageDefine.HOME_NOTICE_ICON" width="18px" height="19px"
+                   style="margin-top: 5px;margin-left: 5px" />
+      </van-notice-bar>
+
+
+      <van-row style="margin-top: 20px;" v-if="hotSwitch">
+        <van-col span="11">
+
+
+          <div class="menu-desc" @tap="onNavItem(navDefine.HOME_MENU1)">
+            <div class="fxc">
+              <span style="font-size: 16px;">酒庄介绍</span>
+              <span class="menu-desc-text">完美酿造工艺</span>
+            </div>
+            <van-image style="margin-left: 10px;" width="40px" height="40px" :src="navDefine.HOME_MENU1.image" />
+          </div>
+        </van-col>
+
+
+        <van-col offset="1" span="11">
+          <div class="menu-desc" @tap="onBuy()">
+            <div class="fxc">
+              <span style="font-size: 16px;">购买庄酒</span>
+              <span class="menu-desc-text">限量年份套装</span>
+            </div>
+            <van-image style="margin-left: 10px;" width="40px" height="40px" :src="navDefine.HOME_MENU2.image" />
+          </div>
+
+        </van-col>
+
+      </van-row>
+
+
+<!--      <div class="grid-body" v-if="hotSwitch">-->
+<!--        <van-grid column-num="3" border="{{ false }}" style="margin-top: 15px;">-->
+<!--          <van-grid-item use-slot v-for=" (item, index) in navDefine.HOME_MENU_LIST" @tap="onNavItem(item)">-->
+
+<!--            <van-image width="68rpx" height="68rpx" :src="item.icon" />-->
+<!--            <span style="font-size: 12px;font-weight: bold;">{{item.name}} </span>-->
+<!--          </van-grid-item>-->
+<!--        </van-grid>-->
+<!--      </div>-->
+
+
+      <!--      <div style="margin: 22px 2px 12px 2px; display: flex; align-items: center;">-->
+      <!--        <van-image :src="imageDefine.HOME_WINE_LAB" height="16px" width="5px" />-->
+      <!--        <span style="margin:0px 5px;font-weight: bold;">热门活动</span>-->
+      <!--      </div>-->
+
+      <!--      <van-image width="100%" height="96px" :src="navDefine.HOME_BANNER1.image"-->
+      <!--                 @tap="onNavItem(navDefine.HOME_BANNER1)" />-->
+
+
+      <!--      <div style="margin: 22px 2px 12px 2px; display: flex; align-items: center;">-->
+      <!--        <van-image :src="imageDefine.HOME_WINE_LAB" height="16px" width="5px" />-->
+      <!--        <span style="margin:0px 5px;font-weight: bold;">每日精选</span>-->
+      <!--      </div>-->
+
+      <!--      <van-image width="100%" height="128px" :src="navDefine.HOME_BANNER2.image"-->
+      <!--                 @tap="onNavItem(navDefine.HOME_BANNER2)" />-->
+
+
+      <div v-for="(item, index) in records" style="margin: 22px 2px 0px 2px; ">
+
+
+        <div v-if="item.type !== 0" style="display: flex; align-items: center;margin-bottom: 5px;">
+          <van-image :src="imageDefine.HOME_WINE_LAB" height="16px" width="5px" />
+          <span style="margin:0px 5px;font-weight: bold;"> {{item.type === 1 ? '每日精选' : '热门活动'}}</span>
+        </div>
+
+
+        <van-image width="100%" :height="item.imageHeight + 'px'" :src="filters.parseImage(item.image)"
+                   @tap="onWebItem(item)" />
+      </div>
+
+      <!--      <div class="column-record-item" v-for="(item, index) in columnRecord" @tap="onNavItem(navDefine.HOME_BANNER2)">-->
+      <!--        <van-image width="100%" height="128px" :src="navDefine.HOME_BANNER2.image" />-->
+      <!--        <div class="column-record-item-text">-->
+      <!--          <span>{{item.title}} </span>-->
+      <!--          <span style="font-size: 12px;font-weight: normal;">{{item.createTime}} </span>-->
+      <!--        </div>-->
+
+      <!--      </div>-->
+
+      <div style="margin-top: 100px;" />
+    </view>
+
+  </div>
+
+</template>
+
+<script>
+import wepy from '@wepy/core'
+import store from '@/store'
+import { mapActions, mapState } from '@wepy/x'
+import defaultMix from '../../../mixins/defaultMix'
+import orderApis from '../../../apis/orderApis'
+import appManager from '../../../appManager'
+import { navDefine } from '../../../store/constant/navDefine'
+import xiao4rApis from '../../../apis/xiao4rApis'
+import { webViewPage } from '../../../store/constant/nav/pages'
+import mallApis from '../../../apis/mallApis'
+
+wepy.component({
+  store,
+  hooks: {},
+
+  data: {
+    columnRecord: [
+      {
+        title: '标题标题标题标题标题',
+        createTime: '2000-11-11',
+        image: 'https://www.xiao4r.com/xiao4rstatic/img/doctor.png'
+      }
+    ],
+    records: [],
+    notice: ''
+
+  },
+
+  mixins: [defaultMix],
+  computed: {
+    ...mapState({
+      'imageDefine': state => state.imageDefine,
+      'user': state => state.user,
+      'navDefine': state => state.navDefine,
+      'hotSwitch': state => state.hotSwitch
+    })
+  },
+
+  methods: {
+
+    onBuy() {
+      this.$emit('changeTab', 1)
+    },
+
+    onShoppingCar() {
+      appManager.navigateTo(navDefine.SHOPPING_CAR_LIST)
+    },
+    onWebItem(item) {
+      appManager.navWeb(item.url)
+    }
+
+  },
+
+  ready() {
+    mallApis.getActivityList().then(r => {
+      this.records = r.rows
+    })
+
+    mallApis.getNotice().then(r => {
+      this.notice = r.msg
+    })
+  }
+})
+</script>
+<config>
+{
+navigationBarTitleText: ''
+}
+</config>
