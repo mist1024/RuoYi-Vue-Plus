@@ -1,6 +1,44 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="发票名" prop="invoiceName">
+        <el-input
+          v-model="queryParams.invoiceName"
+          placeholder="请输入发票名"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="发票号" prop="invoiceNum">
+        <el-input
+          v-model="queryParams.invoiceNum"
+          placeholder="请输入发票号"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="收款方式" prop="collectionType">
+        <el-select v-model="queryParams.collectionType" placeholder="请选择收款方式" clearable size="small">
+          <el-option
+            v-for="item in collectionTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="回款跟踪" prop="invoiceType">
+        <el-select v-model="queryParams.invoiceType" placeholder="请选择回款跟踪" clearable size="small">
+          <el-option
+            v-for="item in invoiceTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -251,6 +289,22 @@ export default {
   },
   data() {
     return {
+      collectionTypeOptions:[{
+        value: '现金',
+        label: '现金'
+      }, {
+        value: '预付款冲减',
+        label: '预付款冲减'
+      }, {
+        value: '银行汇款',
+        label: '银行汇款'
+      }, {
+        value: '在线支付',
+        label: '在线支付'
+      }, {
+        value: '挂账',
+        label: '挂账'
+      }],
       // 回款记录
       returnManageList: [],
       invoiceTypeOptions: [{
@@ -284,6 +338,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        invoiceNum:undefined,
+        invoiceName:undefined,
         // invoiceType:2,
       },
       // 表单参数
