@@ -110,7 +110,6 @@
         <template slot-scope="scope">
           <el-image :src="scope.row.newsImage|getImageForKey" style="width: 60px; height: 60px"/>
         </template>
-
       </el-table-column>
       <el-table-column label="新闻类型" align="center" prop="newsType" :formatter="newsTypeFormat"/>
       <el-table-column label="状态" align="center" prop="state" :formatter="stateFormat" width="100px">

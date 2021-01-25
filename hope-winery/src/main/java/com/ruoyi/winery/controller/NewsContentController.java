@@ -49,8 +49,8 @@ public class NewsContentController extends BaseController {
     public TableDataInfo list(UsernamePasswordAuthenticationToken token, NewsContent newsContent) {
         startPage();
         LambdaQueryWrapper<NewsContent> lqw = Wrappers.lambdaQuery(newsContent);
-
         lqw.eq(NewsContent::getDeptId, getDeptId(token));
+
 
         if (StringUtils.isNotBlank(newsContent.getNewsTitle())) {
             lqw.eq(NewsContent::getNewsTitle, newsContent.getNewsTitle());

@@ -1,6 +1,9 @@
 package com.ruoyi.winery.domain.appdiscuss;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,7 +14,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+
 import java.util.Date;
+import java.util.List;
+
 
 /**
  * app评论对象 app_discuss
@@ -54,14 +60,6 @@ private static final long serialVersionUID=1L;
     @Excel(name = "数据状态，ON为数据启用，OFF为数据停用但仍在前端显示，DEL对数据用户来说已经删除")
     private Integer state;
 
-    /** 创建数据的用户id */
-    @Excel(name = "创建数据的用户id")
-    private String createUser;
-
-    /** 修改数据的用户id */
-    @Excel(name = "修改数据的用户id")
-    private String updateUser;
-
     /** 回复评论的id */
     @Excel(name = "回复评论的id")
     private String appDiscussReplyId;
@@ -101,4 +99,14 @@ private static final long serialVersionUID=1L;
     /** 评论回复人 */
     @Excel(name = "评论回复人")
     private String appDiscussReplyUser;
+
+
+    /** 一级评论 */
+    @Excel(name = "评论回复人")
+    @TableField(exist = false)
+    private List<AppDiscuss> children;
+
+
+
+
 }

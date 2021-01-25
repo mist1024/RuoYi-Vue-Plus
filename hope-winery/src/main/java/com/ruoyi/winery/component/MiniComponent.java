@@ -27,7 +27,6 @@ import com.ruoyi.winery.config.wx.WxMiniProperties;
 import com.ruoyi.winery.domain.winery.WineryMauser;
 import com.ruoyi.winery.service.IWineryMauserService;
 
-import com.sun.tools.javac.util.List;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;

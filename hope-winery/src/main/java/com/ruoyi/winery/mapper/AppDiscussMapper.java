@@ -1,7 +1,10 @@
 package com.ruoyi.winery.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.winery.domain.appdiscuss.AppDiscuss;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * app评论Mapper接口
@@ -11,4 +14,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AppDiscussMapper extends BaseMapper<AppDiscuss> {
 
+
+    Integer replyNum(String num);
+
+    Integer select(LambdaQueryWrapper<AppDiscuss> wrapper);
+
+    void update(AppDiscuss appDiscuss);
 }

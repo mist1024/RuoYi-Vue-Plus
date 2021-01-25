@@ -51,3 +51,20 @@ export function exportDiscuss(query) {
     params: query
   })
 }
+
+// 批量通过
+export function passDiscuss(id,state) {
+  return request({
+    url: `/app/discuss/edit_state/${id}`,
+    method: 'put',
+    data:state
+  })
+}
+// 评论回复功能
+export function replyDiscuss() {
+  return request({
+    url: '/app/discuss/reply',
+    method: 'get',
+  })
+}
+
