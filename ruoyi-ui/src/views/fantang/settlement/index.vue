@@ -12,20 +12,20 @@
       <el-form-item label="结算类型" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择结算类型" clearable size="small">
           <el-option
-              v-for="item in typeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+            v-for="item in typeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="是否已开票" prop="invoiceFlag" label-width="83px">
         <el-select v-model="queryParams.invoiceFlag" placeholder="请选择是否已开票" clearable size="small">
           <el-option
-              v-for="item in invoiceFlagOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+            v-for="item in invoiceFlagOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -38,22 +38,22 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-            type="success"
-            icon="el-icon-edit"
-            size="mini"
-            :disabled="multiple"
-            @click="handleCombination"
-            v-hasPermi="['fantang:settlement:edit']"
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="multiple"
+          @click="handleCombination"
+          v-hasPermi="['fantang:settlement:edit']"
         >组合开票
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-            type="warning"
-            icon="el-icon-download"
-            size="mini"
-            @click="handleExport"
-            v-hasPermi="['fantang:settlement:export']"
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['fantang:settlement:export']"
         >导出
         </el-button>
       </el-col>
@@ -76,12 +76,12 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleUpdate(scope.row)"
-              v-hasPermi="['fantang:settlement:edit']"
-              v-if="!scope.row.invoiceFlag"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['fantang:settlement:edit']"
+            v-if="!scope.row.invoiceFlag"
           >开票
           </el-button>
         </template>
@@ -89,11 +89,11 @@
     </el-table>
 
     <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getList"
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
     />
 
     <!-- 添加或修改结算管理对话框 -->
@@ -123,10 +123,10 @@
         <el-form-item label="跟踪回款" prop="invoiceType" label-width="80px">
           <el-select v-model="form.invoiceType" placeholder="请选择跟踪回款">
             <el-option
-                v-for="item in invoiceTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+              v-for="item in invoiceTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -149,10 +149,10 @@
         <el-form-item label="收款方式" prop="type">
           <el-select v-model="form.type" placeholder="请选择收款方式">
             <el-option
-                v-for="item in typeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -171,10 +171,10 @@
         <el-form-item label="跟踪回款" prop="invoiceType">
           <el-select v-model="form.invoiceType" placeholder="请选择跟踪回款">
             <el-option
-                v-for="item in invoiceTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+              v-for="item in invoiceTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -204,11 +204,14 @@ export default {
         label: '开票并跟踪回款'
       }],
       invoiceFlagOptions: [{
-        value: true,
+        value: 1,
         label: '是'
       }, {
-        value: false,
+        value: 0,
         label: '否'
+      }, {
+        value: 2,
+        label: '全部'
       }],
       typeOptions: [{
         value: '现金',
@@ -262,7 +265,7 @@ export default {
         receipts: undefined,
         type: undefined,
         refund: undefined,
-        invoiceFlag: undefined,
+        invoiceFlag: 2,
       },
       // 表单参数
       form: {},
@@ -334,7 +337,7 @@ export default {
       }
     },
     formatInvoiceFlag(row) {
-      if (row.invoiceFlag === true) {
+      if (row.invoiceFlag === 1 || row.invoiceFlag === '1') {
         return '是';
       } else {
         return '否';

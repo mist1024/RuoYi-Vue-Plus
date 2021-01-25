@@ -145,19 +145,10 @@ public class FtInvoiceDaoController extends BaseController {
         invoiceDao.setInvoiceAmount(invoiceAmount);
         iFtInvoiceDaoService.save(invoiceDao);
 
-        // 跟踪回款
-//        if (invoiceType == 2) {
-//            FtReturnDao ftReturnDao = new FtReturnDao();
-//            ftReturnDao.setInvoiceId(invoiceDao.getId());
-//            ftReturnDao.setReturnFlag(0);
-//
-//            ftReturnDaoService.save(ftReturnDao);
-//        }
-
         FtSettlementDao settlementDao = new FtSettlementDao();
         settlementDao.setSettleId(params.getLong("settleId"));
         settlementDao.setInvoiceId(invoiceDao.getId());
-        settlementDao.setInvoiceFlag(true);
+        settlementDao.setInvoiceFlag(1);
         settSettlementDaoService.updateById(settlementDao);
 
         return AjaxResult.success("已开票");

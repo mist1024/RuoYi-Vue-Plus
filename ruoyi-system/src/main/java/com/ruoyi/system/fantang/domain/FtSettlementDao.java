@@ -108,5 +108,5 @@ public class FtSettlementDao implements Serializable {
 
     private Long invoiceId;
 
-    private Boolean invoiceFlag;
+    private Integer invoiceFlag;
 }

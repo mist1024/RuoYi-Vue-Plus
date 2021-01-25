@@ -29,7 +29,7 @@
             <if test="beginOfDay != null and beginOfDay !=''">settle_at BETWEEN #{beginOfDay}</if>
             <if test="endOfDay != null and endOfDay !=''">AND #{endOfDay}</if>
             <if test="type != null and type !=''">and a.type = #{type}</if>
-            <if test="invoiceFlag != null and invoiceFlag !=''">and a.invoice_flag = #{invoiceFlag}</if>
+            <if test="invoiceFlag != 2">and a.invoice_flag = #{invoiceFlag}</if>
         </where>
 
     </select>
