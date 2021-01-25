@@ -37,7 +37,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['fantang:invoice:edit']"
+            v-if="returnFlag(scope.row)"
           >回款登记
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleView(scope.row)"
+            v-hasPermi="['fantang:invoice:edit']"
+          >查看详情
           </el-button>
         </template>
       </el-table-column>
@@ -51,7 +60,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改财务收费开票对话框 -->
+    <!-- 回款登记弹出层 -->
     <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row :gutter="10">
@@ -129,13 +138,102 @@
       </div>
       <el-table :data="returnManageList">
         <el-table-column label="id" align="center" prop="id" v-if="false"/>
-        <el-table-column label="回款时间" align="center" prop="returnAt" width="180">
+        <el-table-column label="回款时间" align="center" prop="returnAt" width="180"/>
+        <el-table-column label="回款金额" align="center" prop="returnPrice"/>
+        <el-table-column label="待付金额" align="center" prop="balancePrice"/>
+        <el-table-column label="凭证图片" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <span>{{ parseTime(scope.row.returnAt, '{y}-{m}-{d} {h}:{m}:{s}') }}</span>
+            <el-button
+              v-if="scope.row.isUrl"
+              size="mini"
+              type="text"
+              icon="el-icon-view"
+              @click="handleViewPic(scope.row)"
+            >预览
+            </el-button>
           </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+
+    <!-- 查看详情弹出层 -->
+    <el-dialog :title="title" :visible.sync="viewOpen" width="700px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-row :gutter="10">
+          <el-col :span="8">
+            <el-form-item label="应收" prop="payable">
+              <el-input v-model="form.payable" placeholder="请输入应收" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="实收" prop="receipts">
+              <el-input v-model="form.receipts" placeholder="请输入实收" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="开票金额" prop="invoiceAmount">
+              <el-input v-model="form.invoiceAmount" placeholder="请输入开票金额" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="10">
+          <el-col :span="24">
+            <el-form-item label="发票名" prop="invoiceName">
+              <el-input v-model="form.invoiceName" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="发票号" prop="invoiceNum">
+              <el-input v-model="form.invoiceNum" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="税号" prop="taxId">
+              <el-input v-model="form.taxId" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="收款方式" prop="collectionType">
+              <el-input v-model="form.collectionType" :disabled="true"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="回款跟踪" prop="invoiceType">
+              <el-select v-model="form.invoiceType" :disabled="true">
+                <el-option
+                  v-for="item in invoiceTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <el-table :data="returnManageList">
+        <el-table-column label="id" align="center" prop="id" v-if="false"/>
+        <el-table-column label="回款时间" align="center" prop="returnAt" width="180">
         </el-table-column>
         <el-table-column label="回款金额" align="center" prop="returnPrice"/>
         <el-table-column label="待付金额" align="center" prop="balancePrice"/>
+        <el-table-column label="凭证图片" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.isUrl"
+              size="mini"
+              type="text"
+              icon="el-icon-view"
+              @click="handleViewPic(scope.row)"
+            >预览
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-dialog>
   </div>
@@ -180,6 +278,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 查看详情弹出层
+      viewOpen: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -220,7 +320,6 @@ export default {
         this.invoiceList = response.rows;
         this.total = response.total;
         this.loading = false;
-        console.log(response.rows);
       });
     },
     // 取消按钮
@@ -271,6 +370,43 @@ export default {
       this.open = true;
       this.title = "添加财务收费开票";
     },
+    // 查看凭证图片
+    handleViewPic(row) {
+      window.open(row.voucherUrl, '_blank')
+    },
+    /** 查看按钮 */
+    handleView(row) {
+      this.reset();
+      const id = row.id || this.ids
+      getInvoice(id).then(response => {
+        this.form = response.data;
+        this.viewOpen = true;
+        this.title = "回款登记";
+      });
+
+      getReturnByInvoice(id).then(response => {
+        this.returnManageList = response.rows.map(item => {
+          if (item.voucherUrl === null) {
+            item.isUrl = false;
+            return item;
+          } else {
+            item.isUrl = true;
+            return item;
+          }
+        });
+
+        if (this.returnManageList.length > 0) {
+          let ret = this.returnManageList.reduce((x, y) => {
+            y.returnPrice = x.returnPrice + y.returnPrice;
+            return y;
+          })
+          this.form.receipts = ret.returnPrice;
+        }
+      })
+    },
+    returnFlag(row) {
+      return row.invoiceType === 2;
+    },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
@@ -279,11 +415,26 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "回款登记";
-        console.log(response.data)
       });
 
       getReturnByInvoice(id).then(response => {
-        this.returnManageList = response.rows;
+        this.returnManageList = response.rows.map(item => {
+          if (item.voucherUrl === null) {
+            item.isUrl = false;
+            return item;
+          } else {
+            item.isUrl = true;
+            return item;
+          }
+        });
+
+        if (this.returnManageList.length > 0) {
+          let ret = this.returnManageList.reduce((x, y) => {
+            y.returnPrice = x.returnPrice + y.returnPrice;
+            return y;
+          })
+          this.form.receipts = ret.returnPrice;
+        }
       })
     },
     /** 提交按钮 */
