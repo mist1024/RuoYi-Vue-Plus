@@ -334,6 +334,7 @@ export default {
         this.combinationOpen = true;
         this.form.receipts = this.settleTotalReceipts;
         this.form.payable = this.settleTotalPrice;
+        this.form.settleIds = id;
       }
     },
     formatInvoiceFlag(row) {
@@ -378,6 +379,7 @@ export default {
         invoiceNum: undefined,
         invoiceType: undefined,
         invoiceAmount: undefined,
+        settleIds: undefined,
       };
       this.resetForm("form");
     },

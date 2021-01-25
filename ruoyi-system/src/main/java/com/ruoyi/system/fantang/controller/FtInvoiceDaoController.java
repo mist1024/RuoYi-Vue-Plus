@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,10 +18,12 @@ import com.ruoyi.system.fantang.service.IFtSettlementDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -112,7 +115,7 @@ public class FtInvoiceDaoController extends BaseController {
     }
 
     @PostMapping("/addToInvoice")
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AjaxResult addToInvoice(@RequestBody JSONObject params) {
 
         // 应收
@@ -131,7 +134,7 @@ public class FtInvoiceDaoController extends BaseController {
         Integer invoiceType = params.getInteger("invoiceType");
         // 开票金额
         BigDecimal invoiceAmount = params.getBigDecimal("invoiceAmount");
-
+        
         FtInvoiceDao invoiceDao = new FtInvoiceDao();
         Date today = new Date();
         invoiceDao.setCreateAt(today);
@@ -145,11 +148,33 @@ public class FtInvoiceDaoController extends BaseController {
         invoiceDao.setInvoiceAmount(invoiceAmount);
         iFtInvoiceDaoService.save(invoiceDao);
 
+        // 结算 ids
+        JSONArray settleIds = params.getJSONArray("settleIds");
+
+        if (settleIds!=null){
+
+            List<Long> ids = JSONObject.parseArray(settleIds.toString(), Long.class);
+
+            List<FtSettlementDao> settleList = new ArrayList<>();
+            for (Long id : ids) {
+                FtSettlementDao settlementDao = new FtSettlementDao();
+                settlementDao.setSettleId(id);
+                settlementDao.setInvoiceId(invoiceDao.getId());
+                settlementDao.setInvoiceFlag(1);
+                settleList.add(settlementDao);
+            }
+
+            settSettlementDaoService.updateBatchById(settleList);
+        }else {
+
         FtSettlementDao settlementDao = new FtSettlementDao();
         settlementDao.setSettleId(params.getLong("settleId"));
         settlementDao.setInvoiceId(invoiceDao.getId());
         settlementDao.setInvoiceFlag(1);
         settSettlementDaoService.updateById(settlementDao);
+
+        }
+
 
         return AjaxResult.success("已开票");
     }
