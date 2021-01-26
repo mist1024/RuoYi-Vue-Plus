@@ -309,7 +309,7 @@ export default {
         this.loading = false;
         console.log("flag-----", response);
       });
-      listDepart(this.queryParams).then(response => {
+      listDepart().then(response => {
         this.departIdOptions = response.rows;
       })
     },
