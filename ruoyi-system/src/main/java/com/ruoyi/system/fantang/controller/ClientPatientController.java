@@ -2,6 +2,7 @@ package com.ruoyi.system.fantang.controller;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -33,7 +34,7 @@ public class ClientPatientController extends BaseController {
     private IFtDepartDaoService iFtDepartDaoService;
 
     @Autowired
-    private IFtReportMealsDaoService iFtReportMealsDaoService;
+    private IFtReportMealsDaoService reportMealsDaoService;
 
     @Autowired
     private IFtFoodDemandDaoService iFtFoodDemandDaoService;
@@ -123,7 +124,7 @@ public class ClientPatientController extends BaseController {
      */
     @PutMapping("/batchUpdateReportMeals")
     public AjaxResult batchUpdateReportMeals(@RequestBody List<FtReportMealsDao> reportMealsDaoList) {
-        return AjaxResult.success(iFtReportMealsDaoService.updateBatchById(reportMealsDaoList));
+        return AjaxResult.success(reportMealsDaoService.updateBatchById(reportMealsDaoList));
     }
 
     /**
@@ -131,7 +132,7 @@ public class ClientPatientController extends BaseController {
      */
     @PutMapping("/updateReportMeals")
     public AjaxResult updateReportMeals(@RequestBody FtReportMealsDao ftReportMealsDao) {
-        return AjaxResult.success(iFtReportMealsDaoService.updateById(ftReportMealsDao));
+        return AjaxResult.success(reportMealsDaoService.updateById(ftReportMealsDao));
     }
 
     /**
@@ -214,7 +215,20 @@ public class ClientPatientController extends BaseController {
      */
     @GetMapping("/getStatisticsFoods")
     public AjaxResult getStatisticsFoods(@RequestParam("departId") Integer departId,  @RequestParam("date") Date day) {
-        List<FtReportMealVo> list = iFtReportMealsDaoService.getStatisticsFoods(departId, day);
+        List<FtReportMealVo> list = reportMealsDaoService.getStatisticsFoods(departId, day);
         return AjaxResult.success(list);
+    }
+
+    @PostMapping("/tomorrowReport")
+    public AjaxResult tomorrowReport(@RequestBody JSONArray list){
+        System.out.println(list);
+        List<JSONObject> objects = list.toJavaList(JSONObject.class);
+        for (JSONObject object : objects) {
+            FtReportMealsDao dao = JSONObject.toJavaObject(object, FtReportMealsDao.class);
+            reportMealsDaoService.updateById(dao);
+        }
+
+        AjaxResult result = AjaxResult.success();
+        return result;
     }
 }
