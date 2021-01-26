@@ -6,16 +6,16 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql:///fantang?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
-        username: fantang
-        password: HdfzaPE8YbdWdjCw
+        url: jdbc:mysql:///fantang_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+        username: fantang_test
+        password: FcK2GcNhK54bLGM6
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
         enabled: true
-        url: jdbc:mysql://120.77.157.122:3306/gch?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-        username: gch
-        password: phJAccAEKaswNfK6
+        url: jdbc:mysql://8.129.41.210:3306/kaiping?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+        username: kaiping
+        password: awLjrADFYLzt2f3D
       # 初始连接数
       initialSize: 5
       # 最小连接池数量
@@ -62,7 +62,7 @@ spring:
     # 端口，默认为6379
     port: 6379
     # 数据库索引
-    database: 0
+    database: 2
     # 密码
     password:
     # 连接超时时间
