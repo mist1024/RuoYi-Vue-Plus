@@ -91,7 +91,7 @@ import {
   getStatisGetOrderOfWeek,
   listOrder,
   updateOrder
-} from "@/api/fantang/order";
+} from "../../../api/fantang/order";
 
 export default {
   name: "Order",

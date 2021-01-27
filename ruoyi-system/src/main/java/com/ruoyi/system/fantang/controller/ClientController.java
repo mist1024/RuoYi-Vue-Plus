@@ -547,6 +547,7 @@ public class ClientController extends BaseController {
         result.put("reports", orderDaoService.getStatisticsReportMealsOfTomorrow());
         result.put("staffs", orderDaoService.getStatisticsStaffOfTomorrow());
         result.put("stops", orderDaoService.getStopOrderOfTomorrow());
+        result.put("order",orderDaoService.statisGetOrderOfDate(DateUtil.offsetDay(new Date(), 1), 1, 100) );
 
         return result;
     }
