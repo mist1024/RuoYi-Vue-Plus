@@ -5,6 +5,7 @@ import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,4 +37,17 @@ public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
             "where FIND_IN_SET(f.food_id,d.foods)) as price, d.open_flag, 0, d.nutrition_food_id from ft_food_demand d " +
             "LEFT JOIN ft_patient p on p.patient_id = d.patient_id and p.off_flag = 0")
     public void insertTomorrowReportMeal();
+
+    @Update("UPDATE ft_report_meals set dining_flag =  1, dining_at = now() where type  = 1 and   create_at =CURDATE()")
+    Integer updateBreakfastDinnerFlag();
+
+    @Update("UPDATE ft_report_meals set dining_flag =  1, dining_at = now() where type  = 2 and   create_at =CURDATE()")
+    Integer updateLunchDinnerFlag();
+
+    @Update("UPDATE ft_report_meals set dining_flag =  1, dining_at = now() where type = 3  and   create_at =CURDATE()")
+    Integer updateDinnerDinnerFlag();
+
+    @Update("UPDATE ft_report_meals set dining_flag =  1, dining_at = now() where type = 4 and open_flag = 1  and   create_at =CURDATE()")
+    Integer updateAdditionDinnerFlag();
+
 }

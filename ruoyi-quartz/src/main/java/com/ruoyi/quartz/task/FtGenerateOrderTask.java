@@ -3,6 +3,7 @@ package com.ruoyi.quartz.task;
 import com.ruoyi.system.fantang.mapper.FtReportMealVoMapper;
 import com.ruoyi.system.fantang.service.impl.FtFoodDemandDaoServiceImpl;
 import com.ruoyi.system.fantang.service.impl.FtOrderDaoServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
  *
  * @author ruoyi
  */
+@Slf4j
 @Component("OrderingTask")
 public class FtGenerateOrderTask {
 
@@ -18,7 +20,7 @@ public class FtGenerateOrderTask {
     private FtFoodDemandDaoServiceImpl foodDemandDaoService;
 
     @Autowired
-    private FtReportMealVoMapper ftReportMealVoMapper;
+    private FtReportMealVoMapper reportMealVoMapper;
 
     @Autowired
     private FtOrderDaoServiceImpl orderDaoService;
@@ -30,7 +32,7 @@ public class FtGenerateOrderTask {
 
     public void GeneratePatientTomorrowReportMeal() {
         System.out.println("生成次日病患报餐记录");
-        ftReportMealVoMapper.insertTomorrowReportMeal();
+        reportMealVoMapper.insertTomorrowReportMeal();
     }
 
     // 生成次日员工订餐记录
@@ -38,4 +40,23 @@ public class FtGenerateOrderTask {
         System.out.println("生成次日员工订餐记录");
         orderDaoService.GenerateStaffTomorrowOrder();
     }
+
+    // 更新用餐状态为用餐状态，用餐前提前2小时关闭报餐数据修改
+    public void updateBreakfastDinnerFlag() {
+      log.info("更新早餐数:{}", reportMealVoMapper.updateBreakfastDinnerFlag());
+    }
+
+    // 更新用餐状态为用餐状态，用餐前提前2小时关闭报餐数据修改
+    public void updateLunchDinnerFlag() {
+        log.info("更新午餐数:{}", reportMealVoMapper.updateLunchDinnerFlag());
+    }
+
+    // 更新用餐状态为用餐状态，用餐前提前2小时关闭报餐数据修改
+    public void updateDinnerDinnerFlag() {
+        log.info("更新晚餐数:{}", reportMealVoMapper.updateDinnerDinnerFlag());
+
+        log.info("更新加餐数:{}", reportMealVoMapper.updateAdditionDinnerFlag());
+
+    }
+
 }

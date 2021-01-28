@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="对应发票id" prop="invoiceId">
+      <el-form-item label="发票号" prop="invoiceId">
         <el-input
           v-model="queryParams.invoiceId"
-          placeholder="请输入对应发票id"
+          placeholder="请输入对应发票号"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -27,37 +27,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="余额" prop="balancePrice">
-        <el-input
-          v-model="queryParams.balancePrice"
-          placeholder="请输入余额"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="操作员" prop="opera">
-        <el-input
-          v-model="queryParams.opera"
-          placeholder="请输入操作员"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="凭证的图片url" prop="voucherUrl">
-        <el-input
-          v-model="queryParams.voucherUrl"
-          placeholder="请输入凭证的图片url"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="是否完成回款标志" prop="returnFlag">
+      <el-form-item label="回款情况" prop="returnFlag">
         <el-input
           v-model="queryParams.returnFlag"
-          placeholder="请输入是否完成回款标志"
+          placeholder="请选择回款标志"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -114,17 +87,15 @@
     <el-table v-loading="loading" :data="returnManageList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" v-if="false"/>
-      <el-table-column label="对应发票id" align="center" prop="invoiceId" />
+      <el-table-column label="发票号" align="center" prop="invoiceId" />
       <el-table-column label="回款日期" align="center" prop="returnAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.returnAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="回款金额" align="center" prop="returnPrice" />
-      <el-table-column label="余额" align="center" prop="balancePrice" />
-      <el-table-column label="操作员" align="center" prop="opera" />
-      <el-table-column label="凭证的图片url" align="center" prop="voucherUrl" />
-      <el-table-column label="是否完成回款标志" align="center" prop="returnFlag" />
+      <el-table-column label="待收余款" align="center" prop="balancePrice" />
+      <el-table-column label="回款情况" align="center" prop="returnFlag" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -144,7 +115,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
