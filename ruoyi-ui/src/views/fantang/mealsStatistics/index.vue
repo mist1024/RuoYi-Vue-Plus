@@ -81,15 +81,16 @@
       <el-table-column label="姓名" align="center" prop="name"/>
       <el-table-column label="类型" align="center" prop="type" :formatter="formatToDinner"/>
       <el-table-column label="菜品" align="center" prop="foods"/>
-      <el-table-column label="加饭" align="center" prop="rice"/>
-      <el-table-column label="加菜" align="center" prop="vegetables"/>
-      <el-table-column label="加肉" align="center" prop="meat"/>
-      <el-table-column label="加蛋" align="center" prop="egg"/>
+      <el-table-column label="加饭" align="center" prop="rice" :formatter="formatToRice"/>
+      <el-table-column label="加菜" align="center" prop="vegetables" :formatter="formatToVegetables"/>
+      <el-table-column label="加肉" align="center" prop="meat" :formatter="formatToMeat"/>
+      <el-table-column label="加蛋" align="center" prop="egg" :formatter="formatToEgg"/>
       <el-table-column label="正餐价格" align="center" prop="price"/>
-      <el-table-column label="是否营养餐" align="center" prop="openFlag"/>
-      <el-table-column label="营养餐名称" align="center" prop="nutritionName"/>
-      <el-table-column label="营养餐方式" align="center" prop="isReplaceFood"/>
-      <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
+      <el-table-column label="是否配餐" align="center" prop="openFlag" :formatter="formatToOpenFlag"/>
+      <el-table-column label="是否报餐" align="center" prop="nutritionFoodFlag" :formatter="formatToNutritionFoodFlag"/>
+      <el-table-column label="营养餐名" align="center" prop="nutritionName" :formatter="formatToNutritionName"/>
+      <el-table-column label="方式" align="center" prop="isReplaceFood" :formatter="formatToReplace"/>
+      <el-table-column label="营养餐价" align="center" prop="nutritionFoodPrice" :formatter="formatToNutritionFoodPrice"/>
       <el-table-column label="总价" align="center" prop="totalPrice"/>
       <el-table-column label="报餐日期" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
@@ -261,6 +262,71 @@ export default {
         return '加餐';
       },
 
+    formatToRice(row) {
+      if(row.rice)
+        return '加饭';
+      else
+        return '-';
+    },
+    formatToMeat(row) {
+      if(row.meat)
+        return '加肉';
+      else
+        return '-';
+    },
+    formatToVegetables(row) {
+      if(row.vegetables)
+        return '加菜';
+      else
+        return '-';
+    },
+    formatToEgg(row) {
+      if(row.egg)
+        return row.egg;
+      else
+        return '-';
+    },
+
+    formatToOpenFlag(row) {
+      if(row.openFlag)
+        return '是';
+      else
+        return '-';
+    },
+    formatToReplace(row) {
+      if (row.openFlag) {
+        if(row.isReplaceFood)
+          return '替';
+        else
+          return '加';
+      } else
+        return '-';
+    },
+
+
+    formatToNutritionName(row) {
+      if (row.openFlag) {
+        return row.nutritionName;
+      } else
+        return '-';
+    },
+    formatToNutritionFoodPrice(row) {
+      if (row.openFlag) {
+        return row.nutritionFoodPrice;
+      } else
+        return '-';
+    },
+    formatToNutritionFoodFlag(row) {
+      if (row.openFlag) {
+        if(row.nutritionFoodFlag)
+          return '报';
+        else
+          return '停';
+      } else
+        return '-';
+
+    },
+
     /** 查询报餐管理列表 */
     getList() {
       this.loading = true;
@@ -268,6 +334,7 @@ export default {
         this.mealsList = response.rows;
         this.total = response.total;
         this.loading = false;
+        console.log(this.mealsList);
       });
     },
     // 取消按钮
