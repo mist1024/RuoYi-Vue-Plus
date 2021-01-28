@@ -219,6 +219,11 @@ public class ClientPatientController extends BaseController {
         return AjaxResult.success(list);
     }
 
+    /**
+     * 接收病患报餐数据，更新；生成报餐日志表
+     * @param list
+     * @return
+     */
     @PostMapping("/tomorrowReport")
     public AjaxResult tomorrowReport(@RequestBody JSONArray list){
         System.out.println(list);
