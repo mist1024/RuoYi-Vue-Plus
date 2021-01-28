@@ -40,5 +40,7 @@ public interface IFtReportMealsDaoService extends IService<FtReportMealsDao> {
     List<FtReportMealsDao> listAllNutrition(FtReportMealsDao ftReportMealsDao);
 
     List<FtReportMealVo> getStatisticsFoods(Integer departId, Date day);
+
+    List<FtReportMealVo> listPatientReportMeals(FtReportMealVo ftReportMealsDao);
 }
 

@@ -140,4 +140,9 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
         return this.baseMapper.getStatisticsFoods(departId, DateUtil.beginOfDay(day), DateUtil.endOfDay(day));
 
     }
+
+    @Override
+    public List<FtReportMealVo> listPatientReportMeals(FtReportMealVo ftReportMealsDao) {
+        return this.baseMapper.listPatientReportMeals(ftReportMealsDao);
+    }
 }

@@ -9,24 +9,10 @@
                         placeholder="选择报餐日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="报餐类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择报餐类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="报餐人" prop="createBy">
+      <el-form-item label="姓名" prop="name">
         <el-input
-          v-model="queryParams.createBy"
-          placeholder="请输入报餐人"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="总价" prop="price">
-        <el-input
-          v-model="queryParams.price"
-          placeholder="请输入总价"
+          v-model="queryParams.name"
+          placeholder="请输入姓名"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -86,16 +72,27 @@
 
     <el-table v-loading="loading" :data="mealsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="总价" align="center" prop="id" v-if="false"/>
+      <el-table-column label="科室" align="center" prop="departName"/>
+      <el-table-column label="住院号" align="center" prop="HospitalId"/>
+      <el-table-column label="床号" align="center" prop="bedId"/>
+      <el-table-column label="姓名" align="center" prop="name"/>
+      <el-table-column label="类型" align="center" prop="type" :formatter="formatToDinner"/>
+      <el-table-column label="菜品" align="center" prop="foods"/>
+      <el-table-column label="加饭" align="center" prop="rice"/>
+      <el-table-column label="加菜" align="center" prop="vegetables"/>
+      <el-table-column label="加肉" align="center" prop="meat"/>
+      <el-table-column label="加蛋" align="center" prop="egg"/>
+      <el-table-column label="正餐价格" align="center" prop="price"/>
+      <el-table-column label="是否营养餐" align="center" prop="openFlag"/>
+      <el-table-column label="营养餐名称" align="center" prop="nutritionName"/>
+      <el-table-column label="营养餐方式" align="center" prop="isReplaceFood"/>
+      <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
+      <el-table-column label="总价" align="center" prop="totalPrice"/>
       <el-table-column label="报餐日期" align="center" prop="createAt" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createAt, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="报餐类型" align="center" prop="type"/>
-      <el-table-column label="报餐人" align="center" prop="createBy"/>
-      <el-table-column label="订单列表" align="center" prop="foods"/>
-      <el-table-column label="总价" align="center" prop="price"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -161,7 +158,7 @@
 </template>
 
 <script>
-import {addMeals, delMeals, exportMeals, getMeals, listMeals, updateMeals} from "@/api/fantang/meals";
+import {addMeals, delMeals, exportMeals, getMeals, listMeals, updateMeals} from "../../../api/fantang/meals";
 
 export default {
   name: "Meals",
@@ -190,6 +187,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        name: null,
         createAt: null,
         type: null,
         createBy: null,
@@ -221,6 +219,19 @@ export default {
     this.getList();
   },
   methods: {
+
+    // 报餐类型字典翻译
+    formatToDinner(row) {
+      if (row.type === 1)
+        return '早餐';
+      if (row.type === 2)
+        return '午餐';
+      if (row.type === 3)
+        return '晚餐';
+      if (row.type === 4)
+        return '加餐';
+      },
+
     /** 查询报餐管理列表 */
     getList() {
       this.loading = true;

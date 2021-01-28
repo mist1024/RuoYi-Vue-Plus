@@ -117,5 +117,23 @@
             <if test="type != null">and a.type = #{type}</if>
         </where>
     </select>
+    <select id="listPatientReportMeals" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+        SELECT
+            a.*, b.`name`,
+            b.bed_id,
+            b.hospital_id,
+            c.depart_name
+        FROM
+            ft_report_meals a
+        LEFT JOIN ft_patient b ON a.patient_id = b.patient_id
+        LEFT JOIN ft_depart c ON b.depart_id = c.depart_id
+        <where>
+            <if test="name != null"> b.`name` like CONCAT('%',#{name},'%')</if>
+            <if test="bedId != null">and b.bed_id = #{bedId}</if>
+            <if test="departName != null">and b.depart_name = #{departName}</if>
+            <if test="beginOfDay != null">AND a.create_at BETWEEN #{beginOfDay}</if>
+            <if test="endOfDay != null">AND #{endOfDay}</if>
+        </where>
+    </select>
 
 </mapper>

@@ -40,7 +40,7 @@ export function listPayoff(query) {
 // 查询报餐管理列表
 export function listMeals(query) {
   return request({
-    url: '/fantang/meals/list',
+    url: '/fantang/meals/listPatientReportMeals',
     method: 'get',
     params: query
   })

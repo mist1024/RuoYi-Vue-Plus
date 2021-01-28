@@ -226,8 +226,8 @@ public class ClientPatientController extends BaseController {
      */
     @PostMapping("/tomorrowReport")
     public AjaxResult tomorrowReport(@RequestBody JSONArray list){
-        System.out.println(list);
         List<JSONObject> objects = list.toJavaList(JSONObject.class);
+        logger.info("送餐员报餐总数：{}", objects.size());
         for (JSONObject object : objects) {
             FtReportMealsDao dao = JSONObject.toJavaObject(object, FtReportMealsDao.class);
             reportMealsDaoService.updateById(dao);

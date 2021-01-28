@@ -9,6 +9,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
@@ -223,5 +224,21 @@ public class FtReportMealsDaoController extends BaseController {
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(iFtReportMealsDaoService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    }
+
+
+    @GetMapping("/listPatientReportMeals")
+    public TableDataInfo listPatientReportMeals(FtReportMealVo ftReportMealsDao) {
+        startPage();
+        Date createAt = ftReportMealsDao.getCreateAt();
+
+        if (createAt != null) {
+            ftReportMealsDao.setBeginOfDay(createAt);
+            ftReportMealsDao.setEndOfDay(createAt);
+        }
+
+        List<FtReportMealVo> list = iFtReportMealsDaoService.listPatientReportMeals(ftReportMealsDao);
+        return getDataTable(list);
+
     }
 }
