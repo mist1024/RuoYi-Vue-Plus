@@ -4,9 +4,12 @@
       <el-form-item label="报餐日期" prop="createAt">
         <el-date-picker clearable size="small" style="width: 200px"
                         v-model="queryParams.createAt"
+                        align="right"
                         type="date"
                         value-format="yyyy-MM-dd"
-                        placeholder="选择报餐日期">
+                        placeholder="选择报餐日期"
+                        @change="handleQuery"
+                        :picker-options="pickerOptions">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="姓名" prop="name">
@@ -165,6 +168,32 @@ export default {
   components: {},
   data() {
     return {
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+        shortcuts: [{
+          text: '今天',
+          onClick(picker) {
+            picker.$emit('pick', new Date());
+          }
+        }, {
+          text: '明天',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: '一周前',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', date);
+          }
+        }]
+      },
+
       // 遮罩层
       loading: true,
       // 选中数组
