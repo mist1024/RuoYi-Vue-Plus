@@ -260,42 +260,42 @@ export default {
         return '晚餐';
       if (row.type === 4)
         return '加餐';
-      },
+    },
 
     formatToRice(row) {
-      if(row.rice)
+      if (row.rice)
         return '加饭';
       else
         return '-';
     },
     formatToMeat(row) {
-      if(row.meat)
+      if (row.meat)
         return '加肉';
       else
         return '-';
     },
     formatToVegetables(row) {
-      if(row.vegetables)
+      if (row.vegetables)
         return '加菜';
       else
         return '-';
     },
     formatToEgg(row) {
-      if(row.egg)
+      if (row.egg)
         return row.egg;
       else
         return '-';
     },
 
     formatToOpenFlag(row) {
-      if(row.openFlag)
+      if (row.openFlag)
         return '是';
       else
         return '-';
     },
     formatToReplace(row) {
       if (row.openFlag) {
-        if(row.isReplaceFood)
+        if (row.isReplaceFood)
           return '替';
         else
           return '加';
@@ -318,7 +318,7 @@ export default {
     },
     formatToNutritionFoodFlag(row) {
       if (row.openFlag) {
-        if(row.nutritionFoodFlag)
+        if (row.nutritionFoodFlag)
           return '报';
         else
           return '停';

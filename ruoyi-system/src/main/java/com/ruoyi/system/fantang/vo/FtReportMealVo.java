@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.vo;
 
+import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +16,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @Accessors(chain = true)
 public class FtReportMealVo extends FtReportMealsDao {
@@ -31,6 +32,7 @@ public class FtReportMealVo extends FtReportMealsDao {
 
     private String bedId;
 
+    @Excel(name = "部门名称")
     private String departName;
 
     private String hospitalId;

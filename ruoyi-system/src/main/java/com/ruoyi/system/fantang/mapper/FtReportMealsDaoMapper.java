@@ -56,5 +56,5 @@ public interface FtReportMealsDaoMapper extends BaseMapper<FtReportMealsDao> {
     ReportMealsPriceEntity sumAllTotalPrice(@Param("patientId") Long patientId);
 
     // SELECT a.*, b.`name` , b.bed_id, b.hospital_id, c.depart_name from ft_report_meals a LEFT JOIN ft_patient b on a.patient_id = b.patient_id LEFT JOIN ft_depart c on b.depart_id  =c.depart_id where a.patient_id in  (7) and a.create_at = CURDATE() + 1
-    List<FtReportMealVo> listPatientReportMeals(FtReportMealVo ftReportMealsDao);
+    List<FtReportMealsDao> listPatientReportMeals(FtReportMealsDao ftReportMealsDao);
 }

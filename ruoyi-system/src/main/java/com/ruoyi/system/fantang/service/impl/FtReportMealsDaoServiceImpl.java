@@ -142,7 +142,7 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     }
 
     @Override
-    public List<FtReportMealVo> listPatientReportMeals(FtReportMealVo ftReportMealsDao) {
+    public List<FtReportMealsDao> listPatientReportMeals(FtReportMealsDao ftReportMealsDao) {
         return this.baseMapper.listPatientReportMeals(ftReportMealsDao);
     }
 }

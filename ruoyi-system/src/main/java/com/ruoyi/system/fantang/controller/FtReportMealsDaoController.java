@@ -169,10 +169,17 @@ public class FtReportMealsDaoController extends BaseController {
     @Log(title = "报餐管理", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(FtReportMealsDao ftReportMealsDao) {
-        LambdaQueryWrapper<FtReportMealsDao> lqw = new LambdaQueryWrapper<FtReportMealsDao>(ftReportMealsDao);
-        List<FtReportMealsDao> list = iFtReportMealsDaoService.list(lqw);
-        ExcelUtil<FtReportMealsDao> util = new ExcelUtil<FtReportMealsDao>(FtReportMealsDao.class);
-        return util.exportExcel(list, "meals");
+        Date createAt = ftReportMealsDao.getCreateAt();
+
+        if (createAt != null) {
+            ftReportMealsDao.setBeginOfDay(createAt);
+            ftReportMealsDao.setEndOfDay(createAt);
+        }
+
+        List<FtReportMealsDao> list = iFtReportMealsDaoService.listPatientReportMeals(ftReportMealsDao);
+
+        ExcelUtil<FtReportMealsDao> util = new ExcelUtil<>(FtReportMealsDao.class);
+        return util.exportExcel(list, "病患报餐统计");
     }
 
 
@@ -228,7 +235,7 @@ public class FtReportMealsDaoController extends BaseController {
 
 
     @GetMapping("/listPatientReportMeals")
-    public TableDataInfo listPatientReportMeals(FtReportMealVo ftReportMealsDao) {
+    public TableDataInfo listPatientReportMeals(FtReportMealsDao ftReportMealsDao) {
         startPage();
         Date createAt = ftReportMealsDao.getCreateAt();
 
@@ -237,7 +244,7 @@ public class FtReportMealsDaoController extends BaseController {
             ftReportMealsDao.setEndOfDay(createAt);
         }
 
-        List<FtReportMealVo> list = iFtReportMealsDaoService.listPatientReportMeals(ftReportMealsDao);
+        List<FtReportMealsDao> list = iFtReportMealsDaoService.listPatientReportMeals(ftReportMealsDao);
         return getDataTable(list);
 
     }
