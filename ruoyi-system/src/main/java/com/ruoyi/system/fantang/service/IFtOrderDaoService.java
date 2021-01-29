@@ -39,6 +39,8 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
 
     IPage<FtOrderDao> statisGetOrderOfDateByPerson(Date date, Integer pageNum, Integer pageSize);
 
+    List<FtOrderDao> statisOrderOfDateByPersonNoPage(Date date);
+
     IPage<FtOrderDao> statisGetOrderOfWeek(Date date, Integer pageNum, Integer pageSize);
 
     IPage<FtOrderDao> statisGetOrderOfWeekByPerson(Date date, Integer pageNum, Integer pageSize);
@@ -58,4 +60,8 @@ public interface IFtOrderDaoService extends IService<FtOrderDao> {
     List<FtStaffDemandDao> getStatisticsStaffOfTomorrow();
 
     List<FtStaffStopMealsDao> getStopOrderOfTomorrow();
+
+    List<FtOrderDao> statisOrderOfWeekByPersonNoPage(Date selectWeek);
+
+    List<FtOrderDao> statisOrderOfMonthByPersonNoPage(Date selectMonth);
 }

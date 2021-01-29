@@ -134,4 +134,17 @@ public interface FtOrderDaoMapper extends BaseMapper<FtOrderDao> {
             "\tc.depart_name,\n" +
             "\ta.type\n")
     List<FtStaffStopMealsDao> getStopOrderOfTomorrow();
+
+    @Select("SELECT\n" +
+            "\tc.depart_name,\n" +
+            "\tb.`name`, b.tel,\n" +
+            "\ta.* \n" +
+            "FROM\n" +
+            "\tft_order a\n" +
+            "\tLEFT JOIN ft_staff_info b ON b.staff_id = a.staff_id\n" +
+            "\tLEFT JOIN ft_depart c ON c.depart_id = b.depart_id \n" +
+            "WHERE\n" +
+            "\ta.order_date BETWEEN #{start} \n" +
+            "\tAND #{end}")
+    List<FtOrderDao> statisOrderOfDateByPersonNoPage( @Param("start") String start, @Param("end") String end);
 }

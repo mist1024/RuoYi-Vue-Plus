@@ -137,10 +137,28 @@ public class FtOrderDaoController extends BaseController {
         Integer pageSize = params.getInteger("pageSize");
 
         if (statisticsType == 1) {
-            return  AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDate(selectDay, pageNum, pageSize));
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDate(selectDay, pageNum, pageSize));
         } else {
             return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay, pageNum, pageSize));
         }
+    }
+
+    @PostMapping("/exportOrderOfDay")
+    public AjaxResult exportOrderOfDay(@RequestBody JSONObject params) {
+
+        Date selectDay = params.getDate("selectDay");
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        List<FtOrderDao> list;
+
+        if (statisticsType != 1) {
+            list = iFtOrderDaoService.statisOrderOfDateByPersonNoPage(selectDay);
+        } else {
+            list = null;
+        }
+
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<>(FtOrderDao.class);
+        return util.exportExcel(list, "员工用餐统计");
     }
 
     /**
@@ -162,6 +180,24 @@ public class FtOrderDaoController extends BaseController {
 
     }
 
+    @PostMapping("/exportOrderOfWeek")
+    public AjaxResult exportOrderOfWeek(@RequestBody JSONObject params) {
+
+        Date selectWeek = params.getDate("selectWeek");
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        List<FtOrderDao> list;
+
+        if (statisticsType != 1) {
+            list = iFtOrderDaoService.statisOrderOfWeekByPersonNoPage(selectWeek);
+        } else {
+            list = null;
+        }
+
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<>(FtOrderDao.class);
+        return util.exportExcel(list, "员工用餐统计");
+    }
+
     /**
      * 统计月报餐信息
      */
@@ -175,8 +211,27 @@ public class FtOrderDaoController extends BaseController {
 
         if (statisticsType == 1) {
             return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfMonth(selectMonth, pageNum, pageSize));
-        }else {
+        } else {
             return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth, pageNum, pageSize));
         }
+    }
+
+    @PostMapping("/exportOrderOfMonth")
+    public AjaxResult exportOrderOfMonth(@RequestBody JSONObject params){
+
+        Date selectMonth = params.getDate("selectMonth");
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        List<FtOrderDao> list;
+
+        if (statisticsType != 1) {
+            list = iFtOrderDaoService.statisOrderOfMonthByPersonNoPage(selectMonth);
+        } else {
+            list = null;
+        }
+
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<>(FtOrderDao.class);
+        return util.exportExcel(list, "员工用餐统计");
+
     }
 }

@@ -146,6 +146,11 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     }
 
     @Override
+    public List<FtOrderDao> statisOrderOfDateByPersonNoPage(Date date) {
+        return this.baseMapper.statisOrderOfDateByPersonNoPage(DateUtil.beginOfDay(date).toString(), DateUtil.endOfDay(date).toString());
+    }
+
+    @Override
     public IPage<FtOrderDao> statisGetOrderOfWeek(Date date, Integer pageNum, Integer pageSize) {
         Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
         return this.baseMapper.statisGetOrderOfDate(page, DateUtil.beginOfWeek(date).toString(), DateUtil.endOfWeek(date).toString());
@@ -225,5 +230,15 @@ public class FtOrderDaoServiceImpl extends ServiceImpl<FtOrderDaoMapper, FtOrder
     @Override
     public List<FtStaffStopMealsDao> getStopOrderOfTomorrow() {
         return this.baseMapper.getStopOrderOfTomorrow();
+    }
+
+    @Override
+    public List<FtOrderDao> statisOrderOfWeekByPersonNoPage(Date selectWeek) {
+        return this.baseMapper.statisOrderOfDateByPersonNoPage(DateUtil.beginOfWeek(selectWeek).toString(), DateUtil.endOfWeek(selectWeek).toString());
+    }
+
+    @Override
+    public List<FtOrderDao> statisOrderOfMonthByPersonNoPage(Date selectMonth) {
+        return this.baseMapper.statisOrderOfDateByPersonNoPage(DateUtil.beginOfMonth(selectMonth).toString(), DateUtil.endOfMonth(selectMonth).toString());
     }
 }

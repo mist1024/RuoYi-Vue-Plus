@@ -61,6 +61,33 @@ export function getStatisGetOrderOfDay(data) {
   })
 }
 
+// 导出日报餐信息
+export function exportOrderOfDay(data) {
+  return request({
+    url: '/fantang/order/exportOrderOfDay',
+    method: 'post',
+    data: data
+  })
+}
+
+// 导出周报餐信息
+export function exportOrderOfWeek(data) {
+  return request({
+    url: '/fantang/order/exportOrderOfWeek',
+    method: 'post',
+    data: data
+  })
+}
+
+// 导出月报餐信息
+export function exportOrderOfMonth(data) {
+  return request({
+    url: '/fantang/order/exportOrderOfMonth',
+    method: 'post',
+    data: data
+  })
+}
+
 // 周报餐信息
 export function getStatisGetOrderOfWeek(data) {
   return request({

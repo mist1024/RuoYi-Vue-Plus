@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
-import com.ruoyi.system.fantang.entity.BaseStaff;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -39,10 +38,25 @@ public class FtOrderDao implements Serializable {
     @TableId(value = "order_id")
     private Long orderId;
 
+    @TableField(exist = false)
+    @Excel(name = "部门名称")
+    private String departName;
+
+    /**
+     * 员工姓名
+     */
+    @TableField(exist = false)
+    @Excel(name = "员工姓名")
+    private String name;
+
+    @TableField(exist = false)
+    @Excel(name = "电话")
+    private String tel;
+
     /**
      * 订单类型
      */
-    @Excel(name = "订单类型")
+    @Excel(name = "订单类型", readConverterExp = "1=早餐,2=午餐,3=晚餐")
     private Integer orderType;
 
     @TableField(exist = false)
@@ -54,21 +68,14 @@ public class FtOrderDao implements Serializable {
     private Long staffId;
 
     /**
-     * 员工姓名
-     */
-    @TableField(exist = false)
-    private String name;
-
-    /**
      * 清单
      */
-    @Excel(name = "清单")
     private String orderList;
 
     /**
      * 总价
      */
-    @Excel(name = "总价")
+    @Excel(name = "价格")
     private BigDecimal totalPrice;
 
     /**
@@ -86,13 +93,11 @@ public class FtOrderDao implements Serializable {
     /**
      * 折扣
      */
-    @Excel(name = "折扣")
     private BigDecimal discount;
 
     /**
      * 实收
      */
-    @Excel(name = "实收")
     private BigDecimal receipts;
 
     /**
@@ -102,6 +107,11 @@ public class FtOrderDao implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createAt;
 
+    // 订用餐日期
+    @Excel(name = "订用餐日期", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date orderDate;
+
     /**
      * 创建人
      */
@@ -110,19 +120,16 @@ public class FtOrderDao implements Serializable {
     /**
      * 订单来源
      */
-    @Excel(name = "订单来源")
     private String orderSrc;
 
     /**
      * 订单现售
      */
-    @Excel(name = "订单现售")
     private BigDecimal currentPrice;
 
     /**
      * 支付方式
      */
-    @Excel(name = "支付方式")
     private Integer payType;
 
     /**
@@ -138,19 +145,19 @@ public class FtOrderDao implements Serializable {
     /**
      * 核销标志
      */
+    @Excel(name = "是否核销", readConverterExp = "0=否,1=是")
     private Integer writeOffFlag;
 
     /**
      * 核销时间
      */
-    @Excel(name = "核销时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "核销时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date writeOffAt;
 
     /**
      * 是否过期
      */
-    @Excel(name = "是否过期")
     private Integer isExpired;
 
     /**
@@ -158,14 +165,8 @@ public class FtOrderDao implements Serializable {
      */
     private Long deviceId;
 
-    // 订用餐日期
-    private Date orderDate;
-
     @TableField(exist = false)
     private Integer countOrder;
-
-    @TableField(exist = false)
-    private String departName;
 
     @TableField(exist = false)
     private Long departId;
@@ -173,6 +174,4 @@ public class FtOrderDao implements Serializable {
     @TableField(exist = false)
     private String staffName;
 
-    @TableField(exist = false)
-    private String tel;
 }

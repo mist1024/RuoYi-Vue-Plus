@@ -24,6 +24,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onDaySubmit">统计</el-button>
+        <el-button type="warning" @click="onDayExport">导出</el-button>
       </el-form-item>
     </el-form>
 
@@ -42,6 +43,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onWeekSubmit">统计</el-button>
+        <el-button type="warning" @click="onWeekExport">导出</el-button>
       </el-form-item>
     </el-form>
 
@@ -55,6 +57,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onMonthSubmit">统计</el-button>
+        <el-button type="warning" @click="onMonthExport">导出</el-button>
       </el-form-item>
       <el-form-item>
         <el-button @click="resetCount">重置</el-button>
@@ -85,6 +88,9 @@ import {
   addOrder,
   delOrder,
   exportOrder,
+  exportOrderOfDay,
+  exportOrderOfMonth,
+  exportOrderOfWeek,
   getOrder,
   getStatisGetOrderOfDay,
   getStatisGetOrderOfMonth,
@@ -210,6 +216,8 @@ export default {
         selectMonth: null
       }
       this.orderCountList = null
+
+      this.total = 0;
     },
     formatOrderType(row) {
       return this.selectDictLabel(this.typeOptions, row.orderType);
@@ -229,6 +237,20 @@ export default {
         })
       }
     },
+    onMonthExport() {
+      if (this.formMonth.statisticsType == null) {
+        this.msgError("请选择统计方式")
+      }
+      if (this.formMonth.selectMonth != null && this.formMonth.statisticsType != null && this.formMonth.statisticsType !== 1) {
+        console.log(this.formMonth)
+        this.queryParams.selectMonth = this.formMonth.selectMonth;
+        this.queryParams.statisticsType = this.formMonth.statisticsType;
+
+        exportOrderOfMonth(this.queryParams).then(response => {
+          this.download(response.msg);
+        })
+      }
+    },
     onWeekSubmit() {
       if (this.formWeek.statisticsType == null) {
         this.msgError("请选择统计方式")
@@ -242,6 +264,22 @@ export default {
           this.orderCountList = response.data.records;
           this.total = response.data.total;
           this.selectType = 2;
+        })
+      }
+    },
+    onWeekExport() {
+      if (this.formWeek.statisticsType == null) {
+        this.msgError("请选择统计方式")
+      } else if (this.formWeek.statisticsType === 1) {
+        this.msgError("请选择按人统计")
+      }
+
+      if (this.formWeek.selectWeek != null && this.formWeek.statisticsType != null && this.formWeek.statisticsType !== 1) {
+        console.log(this.formWeek)
+        this.queryParams.selectWeek = this.formWeek.selectWeek;
+        this.queryParams.statisticsType = this.formWeek.statisticsType;
+        exportOrderOfWeek(this.queryParams).then(response => {
+          this.download(response.msg);
         })
       }
     },
@@ -262,6 +300,22 @@ export default {
       }
     },
     /** 查询订单管理列表 */
+    onDayExport() {
+      if (this.formDay.statisticsType == null) {
+        this.msgError("请选择统计方式")
+      } else if (this.formDay.statisticsType === 1) {
+        this.msgError("请选择按人统计")
+      }
+
+      if (this.formDay.selectDay != null && this.formDay.statisticsType != null && this.formDay.statisticsType !== 1) {
+        console.log(this.formDay)
+        this.queryParams.selectDay = this.formDay.selectDay;
+        this.queryParams.statisticsType = this.formDay.statisticsType;
+        exportOrderOfDay(this.queryParams).then(response => {
+          this.download(response.msg);
+        })
+      }
+    },
     getList() {
       this.loading = false;
       listOrder(this.queryParams).then(response => {
