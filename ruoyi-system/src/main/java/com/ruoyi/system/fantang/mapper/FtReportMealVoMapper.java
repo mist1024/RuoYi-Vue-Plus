@@ -30,12 +30,13 @@ public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
 //    根据foods列表和ft_food 的价格，计算列表中菜单的总价
 //    select d.*, (select sum(price) from ft_food f where FIND_IN_SET(f.food_id,d.foods)) as price from ft_food_demand d
     // 根据病患配餐表，生成次日报餐记录，并通过ft_food 菜品价格计算菜单总价
-    @Insert("insert into ft_report_meals " +
-            "(create_at, type, patient_id, foods, settlement_flag, price, open_flag , nutrition_food_flag, nutrition_food_id) " +
-            "select date_add(now(), interval 1 day), d.type, d.patient_id , d.foods, 0 ,  " +
-            "(select sum(price) from ft_food f " +
-            "where FIND_IN_SET(f.food_id,d.foods)) as price, d.open_flag, 0, d.nutrition_food_id from ft_food_demand d " +
-            "LEFT JOIN ft_patient p on p.patient_id = d.patient_id and p.off_flag = 0")
+    @Insert("INSERT INTO ft_report_meals (create_at,type,patient_id,foods,settlement_flag,price,open_flag,nutrition_food_flag,nutrition_food_id,nutrition_food_price) " +
+            "SELECT date_add(now(), INTERVAL 1 DAY), d.type, d.patient_id, d.foods,0," +
+            "(SELECT sum(price) FROM ft_food f WHERE FIND_IN_SET(f.food_id, d.foods)) AS price," +
+            "d.open_flag,0,d.nutrition_food_id, e.price as nutrition_food_price" +
+            "FROM ft_food_demand d" +
+            "LEFT JOIN ft_patient p ON p.patient_id = d.patient_id AND p.off_flag = 0" +
+            "LEFT JOIN ft_nutrition_food e ON e.id = d.nutrition_food_id")
     public void insertTomorrowReportMeal();
 
     @Update("UPDATE ft_report_meals set dining_flag =  1, dining_at = now() where type  = 1 and   create_at =CURDATE()")
