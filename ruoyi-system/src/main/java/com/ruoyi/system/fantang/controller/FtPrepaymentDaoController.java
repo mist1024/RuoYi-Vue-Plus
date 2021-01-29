@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,6 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +67,7 @@ public class FtPrepaymentDaoController extends BaseController {
 //            return AjaxResult.error("无该记录");
 //        return AjaxResult.success("操作成功", dao);
         FtPrepaymentDao ftPrepaymentDao = iFtPrepaymentDaoService.getByPatientId(patientId);
-        if (ftPrepaymentDao == null){
+        if (ftPrepaymentDao == null) {
             return AjaxResult.error("无该记录");
         }
         return AjaxResult.success("操作成功", ftPrepaymentDao);
@@ -76,7 +84,7 @@ public class FtPrepaymentDaoController extends BaseController {
     // 查询所有已缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listPrepay")
-    public AjaxResult listPrepay(@RequestParam("pageNum")Integer pageNum, @RequestParam("pageSize")Integer pageSize) {
+    public AjaxResult listPrepay(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         return AjaxResult.success(iFtPrepaymentDaoService.listPrepay(pageNum, pageSize));
     }
 
@@ -176,5 +184,34 @@ public class FtPrepaymentDaoController extends BaseController {
     @DeleteMapping("/{prepaymentIds}")
     public AjaxResult remove(@PathVariable Long[] prepaymentIds) {
         return toAjax(iFtPrepaymentDaoService.removeByIds(Arrays.asList(prepaymentIds)) ? 1 : 0);
+    }
+
+    @GetMapping("/generateReceiptPdf")
+    public void generateReceiptPdf(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        //根据文件信息中文件名字 和 文件存储路径获取文件输入流
+        String realpath = "E:\\Dev\\jmfx_1\\fantang\\ruoyi-ui\\src\\assets\\images\\login-background.jpg";
+        //PDF文件地址
+        File file = new File(realpath);
+        if (file.exists()) {
+            byte[] data = null;
+            FileInputStream input=null;
+            try {
+                input= new FileInputStream(file);
+                data = new byte[input.available()];
+                input.read(data);
+                response.getOutputStream().write(data);
+            } catch (Exception e) {
+                System.out.println("pdf文件处理异常：" + e);
+            }finally{
+                try {
+                    if(input!=null){
+                        input.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

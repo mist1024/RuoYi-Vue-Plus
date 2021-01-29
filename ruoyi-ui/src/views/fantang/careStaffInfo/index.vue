@@ -179,7 +179,7 @@ import {
   updateNursingInfo,
 } from "@/api/fantang/staffInfo";
 import {listDepart} from "@/api/fantang/depart";
-import UploadImage from '@/components/UploadImage';
+import UploadImage from '../../../components/UploadImage';
 
 export default {
   name: "StaffInfo",

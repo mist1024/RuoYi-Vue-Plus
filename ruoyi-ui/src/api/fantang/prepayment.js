@@ -101,3 +101,11 @@ export function exportPrepayment(query) {
     params: query
   })
 }
+
+export function generateReceiptPdf(data) {
+  return request({
+    url: '/fantang/prepayment/generateReceiptPdf',
+    method: 'get',
+    data: data
+  })
+}
