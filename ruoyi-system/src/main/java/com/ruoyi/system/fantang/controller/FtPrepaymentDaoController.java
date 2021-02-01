@@ -5,29 +5,23 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.system.fantang.common.NumberToList;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
+import com.ruoyi.system.fantang.utils.PdfUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 收费管理Controller
@@ -186,32 +180,29 @@ public class FtPrepaymentDaoController extends BaseController {
         return toAjax(iFtPrepaymentDaoService.removeByIds(Arrays.asList(prepaymentIds)) ? 1 : 0);
     }
 
-    @GetMapping("/generateReceiptPdf")
-    public void generateReceiptPdf(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @PostMapping("/generateReceiptPdf")
+    public AjaxResult generateReceiptPdf(@RequestBody JSONObject params) {
+        Map<String, String> convert = NumberToList.convertTo(123.12F, "1");
+        System.out.println(convert);
 
-        //根据文件信息中文件名字 和 文件存储路径获取文件输入流
-        String realpath = "E:\\Dev\\jmfx_1\\fantang\\ruoyi-ui\\src\\assets\\images\\login-background.jpg";
-        //PDF文件地址
-        File file = new File(realpath);
-        if (file.exists()) {
-            byte[] data = null;
-            FileInputStream input=null;
-            try {
-                input= new FileInputStream(file);
-                data = new byte[input.available()];
-                input.read(data);
-                response.getOutputStream().write(data);
-            } catch (Exception e) {
-                System.out.println("pdf文件处理异常：" + e);
-            }finally{
-                try {
-                    if(input!=null){
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        // 模板路径
+        String templatePath = "F:\\pdfTemplate\\饭堂票据模板.pdf";
+
+        System.out.println(RuoYiConfig.getUploadPath());
+
+        // 生成的新文件路径
+        String outputPath = RuoYiConfig.getUploadPath() + "\\饭堂票据.pdf";
+
+        // 数据
+        Map<String, Object> values = new HashMap<>();
+
+        // 填入模板
+        PdfUtils.fillTemplate(templatePath, outputPath, values);
+
+        // 下载地址
+        String downloadPath = "profile/upload/饭堂票据.pdf";
+
+        return AjaxResult.success(downloadPath);
+
     }
 }

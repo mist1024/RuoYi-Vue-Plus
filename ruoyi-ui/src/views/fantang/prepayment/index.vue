@@ -252,11 +252,10 @@ export default {
 
     },
 
-    // 生产收据 pdf
+    // 生成收据 pdf
     handleGenerateReceiptPdf(row) {
-      console.log(row);
       generateReceiptPdf(row).then(response => {
-        // window.open("http://47.106.12.11:8080/prod-api/" + response.msg)
+        window.open("http://192.168.3.93:9001/dev-api/" + response.msg)
       })
       console.log(process.env);
     },
