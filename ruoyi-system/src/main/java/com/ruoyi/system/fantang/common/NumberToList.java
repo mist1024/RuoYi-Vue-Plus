@@ -2,6 +2,8 @@ package com.ruoyi.system.fantang.common;
 
 import java.util.*;
 
+import static org.apache.commons.lang3.StringUtils.split;
+
 public class NumberToList {
 
     public static Map<String, String> convertTo(float number, String  level) {
@@ -162,28 +164,38 @@ public class NumberToList {
     }
 
     public static String convertToHan(float number, String  level) {
-        Map<String, String> map = convertTo(number, level);
-        String han[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
-        String[] str = {"fen","jiao","yuan", "shi", "bai", "qian", "wan", "shiwan", "baiwan", "qianwan"};
+        String[] hanNumber = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
+        String[] han = { "佰", "拾", "万", "仟", "佰", "拾", "元", "角", "分"};
 
-
-        for (String key : map.keySet()) {
-            if (Objects.equals(map.get(key), " ")) {
-                map.put(key, "0");
-            } else if (Objects.equals(map.get(key), "¥")) {
-                map.put(key, "0");
-            }
+        StringBuilder builder = new StringBuilder();
+        String[] str = String.valueOf((long) (number * 100)).split("");
+        int i = 0;
+        for (String s : str) {
+            builder
+                    .append(hanNumber[Integer.parseInt(s)])
+                    .append(" ")
+                    .append(han[i]);
+            i++;
         }
+        return builder.toString();
 
-            return String.format("%s佰%s拾%s万%s仟%s佰%s拾%s元%s角%s分",
-                han[Integer.parseInt(map.get("baiwan"+level))],
-                han[Integer.parseInt(map.get("shiwan"+level))],
-                han[Integer.parseInt(map.get("wan"+level))],
-                han[Integer.parseInt(map.get("qian"+level))],
-                han[Integer.parseInt(map.get("bai"+level))],
-                han[Integer.parseInt(map.get("shi"+level))],
-                han[Integer.parseInt(map.get("yuan"+level))],
-                han[Integer.parseInt(map.get("jiao"+level))],
-                han[Integer.parseInt(map.get("fen"+level))]);
+//        for (String key : map.keySet()) {
+//            if (Objects.equals(map.get(key), " ")) {
+//                map.put(key, "0");
+//            } else if (Objects.equals(map.get(key), "¥")) {
+//                map.put(key, "0");
+//            }
+//        }
+//
+//            return String.format("%s佰%s拾%s万%s仟%s佰%s拾%s元%s角%s分",
+//                hanNumber[Integer.parseInt(map.get("baiwan"+level))],
+//                hanNumber[Integer.parseInt(map.get("shiwan"+level))],
+//                hanNumber[Integer.parseInt(map.get("wan"+level))],
+//                hanNumber[Integer.parseInt(map.get("qian"+level))],
+//                hanNumber[Integer.parseInt(map.get("bai"+level))],
+//                hanNumber[Integer.parseInt(map.get("shi"+level))],
+//                hanNumber[Integer.parseInt(map.get("yuan"+level))],
+//                hanNumber[Integer.parseInt(map.get("jiao"+level))],
+//                hanNumber[Integer.parseInt(map.get("fen"+level))]);
     }
 }
