@@ -160,4 +160,21 @@ public class NumberToList {
 
         return map;
     }
+
+    public static String convertToHan(float number, String  level) {
+        Map<String, String> map = convertTo(number, level);
+        String han[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
+        String[] str = {"fen","jiao","yuan", "shi", "bai", "qian", "wan", "shiwan", "baiwan", "qianwan"};
+        return String.format("%s仟%s佰%s拾%s万%s仟%s佰%s拾%s元%s角%s分",
+                han[Integer.parseInt(map.get("qianwan"))],
+                han[Integer.parseInt(map.get("baiwan"))],
+                han[Integer.parseInt(map.get("shiwan"))],
+                han[Integer.parseInt(map.get("wan"))],
+                han[Integer.parseInt(map.get("qian"))],
+                han[Integer.parseInt(map.get("bai"))],
+                han[Integer.parseInt(map.get("shi"))],
+                han[Integer.parseInt(map.get("yuan"))],
+                han[Integer.parseInt(map.get("jiao"))],
+                han[Integer.parseInt(map.get("fen"))]);
+    }
 }
