@@ -163,7 +163,7 @@ public class NumberToList {
         return map;
     }
 
-    public static String convertToHan(float number, String  level) {
+    public static String convertToHan(float number) {
         String[] hanNumber = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
         String[] han = { "佰", "拾", "万", "仟", "佰", "拾", "元", "角", "分"};
 

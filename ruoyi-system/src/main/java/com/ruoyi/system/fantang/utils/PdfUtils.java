@@ -105,7 +105,7 @@ public class PdfUtils {
 
         values.put("priceLite", "¥" + prepaid.toString());
 
-        String convertToHan = NumberToList.convertToHan(prepaidFloat, "1");
+        String convertToHan = NumberToList.convertToHan(prepaidFloat);
         values.put("priceBig", convertToHan);
 
         values.put("payee", "江门市第三人民医院");
