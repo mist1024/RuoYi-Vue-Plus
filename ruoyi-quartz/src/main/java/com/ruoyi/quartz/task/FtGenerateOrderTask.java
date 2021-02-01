@@ -27,17 +27,19 @@ public class FtGenerateOrderTask {
 
     public void GenerateOrderTask() {
         System.out.println("执行生成一条病患默认订餐配置记录");
+        log.info("执行生成一条病患默认订餐配置记录");
         foodDemandDaoService.GenerateOrderForNewPatient();
     }
 
     public void GeneratePatientTomorrowReportMeal() {
         System.out.println("生成次日病患报餐记录");
+        log.info("生成次日病患报餐记录");
         reportMealVoMapper.insertTomorrowReportMeal();
     }
 
     // 生成次日员工订餐记录
     public void GenerateStaffTomorrowOrder() {
-        System.out.println("生成次日员工订餐记录");
+        log.info("生成次日员工订餐记录");
         orderDaoService.GenerateStaffTomorrowOrder();
     }
 

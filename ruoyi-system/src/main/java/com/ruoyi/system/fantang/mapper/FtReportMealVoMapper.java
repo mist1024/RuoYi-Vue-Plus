@@ -33,9 +33,9 @@ public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
     @Insert("INSERT INTO ft_report_meals (create_at,type,patient_id,foods,settlement_flag,price,open_flag,nutrition_food_flag,nutrition_food_id,nutrition_food_price) " +
             "SELECT date_add(now(), INTERVAL 1 DAY), d.type, d.patient_id, d.foods,0," +
             "(SELECT sum(price) FROM ft_food f WHERE FIND_IN_SET(f.food_id, d.foods)) AS price," +
-            "d.open_flag,0,d.nutrition_food_id, e.price as nutrition_food_price" +
-            "FROM ft_food_demand d" +
-            "LEFT JOIN ft_patient p ON p.patient_id = d.patient_id AND p.off_flag = 0" +
+            "d.open_flag,0,d.nutrition_food_id, e.price as nutrition_food_price " +
+            "FROM ft_food_demand d " +
+            "LEFT JOIN ft_patient p ON p.patient_id = d.patient_id AND p.off_flag = 0 " +
             "LEFT JOIN ft_nutrition_food e ON e.id = d.nutrition_food_id")
     public void insertTomorrowReportMeal();
 

@@ -134,6 +134,7 @@
             <if test="beginOfDay != null">AND a.create_at BETWEEN #{beginOfDay}</if>
             <if test="endOfDay != null">AND #{endOfDay}</if>
         </where>
+        order by b.`name`
     </select>
 
 </mapper>

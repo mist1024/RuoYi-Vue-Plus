@@ -295,10 +295,14 @@ export default {
     },
     formatToReplace(row) {
       if (row.openFlag) {
-        if (row.isReplaceFood)
-          return '替';
-        else
-          return '加';
+        if(row.nutritionFoodFlag) {
+          if (row.isReplaceFood)
+            return '替';
+          else
+            return '加';
+        } else
+          return '-'
+
       } else
         return '-';
     },
@@ -306,6 +310,7 @@ export default {
 
     formatToNutritionName(row) {
       if (row.openFlag) {
+
         return row.nutritionName;
       } else
         return '-';
