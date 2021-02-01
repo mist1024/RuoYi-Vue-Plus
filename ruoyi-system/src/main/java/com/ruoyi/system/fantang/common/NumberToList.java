@@ -165,16 +165,25 @@ public class NumberToList {
         Map<String, String> map = convertTo(number, level);
         String han[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
         String[] str = {"fen","jiao","yuan", "shi", "bai", "qian", "wan", "shiwan", "baiwan", "qianwan"};
-        return String.format("%s仟%s佰%s拾%s万%s仟%s佰%s拾%s元%s角%s分",
-                han[Integer.parseInt(map.get("qianwan"))],
-                han[Integer.parseInt(map.get("baiwan"))],
-                han[Integer.parseInt(map.get("shiwan"))],
-                han[Integer.parseInt(map.get("wan"))],
-                han[Integer.parseInt(map.get("qian"))],
-                han[Integer.parseInt(map.get("bai"))],
-                han[Integer.parseInt(map.get("shi"))],
-                han[Integer.parseInt(map.get("yuan"))],
-                han[Integer.parseInt(map.get("jiao"))],
-                han[Integer.parseInt(map.get("fen"))]);
+
+
+        for (String key : map.keySet()) {
+            if (Objects.equals(map.get(key), " ")) {
+                map.put(key, "0");
+            } else if (Objects.equals(map.get(key), "¥")) {
+                map.put(key, "0");
+            }
+        }
+
+            return String.format("%s佰%s拾%s万%s仟%s佰%s拾%s元%s角%s分",
+                han[Integer.parseInt(map.get("baiwan"+level))],
+                han[Integer.parseInt(map.get("shiwan"+level))],
+                han[Integer.parseInt(map.get("wan"+level))],
+                han[Integer.parseInt(map.get("qian"+level))],
+                han[Integer.parseInt(map.get("bai"+level))],
+                han[Integer.parseInt(map.get("shi"+level))],
+                han[Integer.parseInt(map.get("yuan"+level))],
+                han[Integer.parseInt(map.get("jiao"+level))],
+                han[Integer.parseInt(map.get("fen"+level))]);
     }
 }
