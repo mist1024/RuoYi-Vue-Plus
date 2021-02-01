@@ -11,16 +11,17 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.system.fantang.common.NumberToList;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import com.ruoyi.system.fantang.utils.PdfUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.formula.functions.EDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -182,22 +183,20 @@ public class FtPrepaymentDaoController extends BaseController {
 
     @PostMapping("/generateReceiptPdf")
     public AjaxResult generateReceiptPdf(@RequestBody JSONObject params) {
-        Map<String, String> convert = NumberToList.convertTo(123.12F, "1");
-        System.out.println(convert);
+//        Map<String, String> convert = NumberToList.convertTo(123.12F, "1");
+//        System.out.println(convert);
+
+        System.out.println(params);
 
         // 模板路径
-        String templatePath = "F:\\pdfTemplate\\饭堂票据模板.pdf";
+        String templatePath = "F:\\pdfTemplate\\饭堂票据模板2.pdf";
 
         System.out.println(RuoYiConfig.getUploadPath());
 
         // 生成的新文件路径
         String outputPath = RuoYiConfig.getUploadPath() + "\\饭堂票据.pdf";
 
-        // 数据
-        Map<String, Object> values = new HashMap<>();
-
-        // 填入模板
-        PdfUtils.fillTemplate(templatePath, outputPath, values);
+        PdfUtils.generatePrepaymentPdf(templatePath, outputPath, params);
 
         // 下载地址
         String downloadPath = "profile/upload/饭堂票据.pdf";
