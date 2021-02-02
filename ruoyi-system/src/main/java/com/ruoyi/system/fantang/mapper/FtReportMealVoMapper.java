@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.vo.FtReportMealVo;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,16 @@ public interface FtReportMealVoMapper extends BaseMapper<FtReportMealVo> {
             "LEFT JOIN ft_patient p ON p.patient_id = d.patient_id AND p.off_flag = 0 " +
             "LEFT JOIN ft_nutrition_food e ON e.id = d.nutrition_food_id")
     public void insertTomorrowReportMeal();
+
+    // 为指定病患，生成次日报餐记录，并通过ft_food 菜品价格计算菜单总价
+    @Insert("INSERT INTO ft_report_meals (create_at,type,patient_id,foods,settlement_flag,price,open_flag,nutrition_food_flag,nutrition_food_id,nutrition_food_price) " +
+            "SELECT date_add(now(), INTERVAL 1 DAY), d.type, d.patient_id, d.foods,0," +
+            "(SELECT sum(price) FROM ft_food f WHERE FIND_IN_SET(f.food_id, d.foods)) AS price," +
+            "d.open_flag,0,d.nutrition_food_id, e.price as nutrition_food_price " +
+            "FROM ft_food_demand d where d.patient_id = #{patientId}" +
+            "LEFT JOIN ft_patient p ON p.patient_id = d.patient_id AND p.off_flag = 0 " +
+            "LEFT JOIN ft_nutrition_food e ON e.id = d.nutrition_food_id")
+    public void insertTomorrowReportMealByPatient(@Param("patientId") Long patientId);
 
     @Update("UPDATE ft_report_meals set dining_flag =  1, dining_at = now() where type  = 1 and   create_at =CURDATE()")
     Integer updateBreakfastDinnerFlag();

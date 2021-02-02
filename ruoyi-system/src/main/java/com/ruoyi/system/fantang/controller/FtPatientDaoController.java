@@ -13,6 +13,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtPatientDao;
 import com.ruoyi.system.fantang.service.IFtFoodDemandDaoService;
 import com.ruoyi.system.fantang.service.IFtPatientDaoService;
+import com.ruoyi.system.fantang.service.IFtReportMealsDaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +37,9 @@ public class FtPatientDaoController extends BaseController {
     private final IFtPatientDaoService iFtPatientDaoService;
 
     private final IFtFoodDemandDaoService iFtFoodDemandDaoService;
+
+    @Autowired
+    private IFtReportMealsDaoService reportMealsDaoService;
 
     /**
      * 查询病人管理列表
@@ -124,6 +128,7 @@ public class FtPatientDaoController extends BaseController {
         iFtPatientDaoService.save(ftPatientDao);
 
         iFtFoodDemandDaoService.GenerateOrderByPatientId(ftPatientDao.getPatientId());
+        reportMealsDaoService.insertTomorrowReportMealByPatient(ftPatientDao.getPatientId());
 
         return AjaxResult.success("已添加");
     }

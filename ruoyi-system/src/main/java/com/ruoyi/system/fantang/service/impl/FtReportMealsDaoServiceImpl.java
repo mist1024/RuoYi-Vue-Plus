@@ -145,4 +145,9 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     public List<FtReportMealsDao> listPatientReportMeals(FtReportMealsDao ftReportMealsDao) {
         return this.baseMapper.listPatientReportMeals(ftReportMealsDao);
     }
+
+    @Override
+    public void insertTomorrowReportMealByPatient(Long patientId) {
+        ftReportMealVoMapper.insertTomorrowReportMealByPatient(patientId);
+    }
 }
