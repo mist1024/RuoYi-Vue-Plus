@@ -150,16 +150,6 @@ public class NumberToList {
             }
         }
 
-//        flag = false;
-//        for (String s : str) {
-//            if (flag == false) {
-//                if (Objects.equals(map.get(s + level), " ")) {
-//                    flag = true;
-//                    map.put(s + level, "￥");
-//                }
-//            }
-//        }
-
         return map;
     }
 
@@ -169,33 +159,15 @@ public class NumberToList {
 
         StringBuilder builder = new StringBuilder();
         String[] str = String.valueOf((long) (number * 100)).split("");
-        int i = 0;
-        for (String s : str) {
+        int i = han.length - 1;
+        for (int j = str.length - 1; j >= 0 ; j--) {
             builder
-                    .append(hanNumber[Integer.parseInt(s)])
-                    .append(" ")
-                    .append(han[i]);
-            i++;
+                    .append(han[i])
+                    .append(hanNumber[Integer.parseInt(str[j])])
+                    .append(" ");
+            i--;
         }
-        return builder.toString();
+        return builder.reverse().toString();
 
-//        for (String key : map.keySet()) {
-//            if (Objects.equals(map.get(key), " ")) {
-//                map.put(key, "0");
-//            } else if (Objects.equals(map.get(key), "¥")) {
-//                map.put(key, "0");
-//            }
-//        }
-//
-//            return String.format("%s佰%s拾%s万%s仟%s佰%s拾%s元%s角%s分",
-//                hanNumber[Integer.parseInt(map.get("baiwan"+level))],
-//                hanNumber[Integer.parseInt(map.get("shiwan"+level))],
-//                hanNumber[Integer.parseInt(map.get("wan"+level))],
-//                hanNumber[Integer.parseInt(map.get("qian"+level))],
-//                hanNumber[Integer.parseInt(map.get("bai"+level))],
-//                hanNumber[Integer.parseInt(map.get("shi"+level))],
-//                hanNumber[Integer.parseInt(map.get("yuan"+level))],
-//                hanNumber[Integer.parseInt(map.get("jiao"+level))],
-//                hanNumber[Integer.parseInt(map.get("fen"+level))]);
     }
 }

@@ -183,15 +183,9 @@ public class FtPrepaymentDaoController extends BaseController {
 
     @PostMapping("/generateReceiptPdf")
     public AjaxResult generateReceiptPdf(@RequestBody JSONObject params) {
-//        Map<String, String> convert = NumberToList.convertTo(123.12F, "1");
-//        System.out.println(convert);
-
-        System.out.println(params);
 
         // 模板路径
         String templatePath = "F:\\pdfTemplate\\饭堂票据模板2.pdf";
-
-        System.out.println(RuoYiConfig.getUploadPath());
 
         // 生成的新文件路径
         String outputPath = RuoYiConfig.getUploadPath() + "\\饭堂票据.pdf";
