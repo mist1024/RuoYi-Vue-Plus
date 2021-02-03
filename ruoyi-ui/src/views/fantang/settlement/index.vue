@@ -231,6 +231,8 @@ export default {
       }],
       // 遮罩层
       loading: true,
+      // 过滤选定列中是否包含已经开发票的列
+      isContainInvoice: null,
       // 选中数组
       ids: [],
       invoiceFlags: [],
@@ -321,21 +323,23 @@ export default {
     handleCombination(row) {
       this.reset();
       const id = row.id || this.ids;
-      console.log("id----------", id);
       this.isErrFlag = false;
-      for (let i = 0; i < this.invoiceFlags.length; i++) {
-        if (this.invoiceFlags[i] === true) {
-          this.msgError("已开票的结算记录不能再次开票")
-          this.isErrFlag = true;
-          break;
-        }
-      }
-      if (!this.isErrFlag) {
+      // for (let i = 0; i < this.invoiceFlags.length; i++) {
+      //   if (this.invoiceFlags[i] === true) {
+      //     this.msgError("已开票的结算记录不能再次开票")
+      //     this.isErrFlag = true;
+      //     break;
+      //   }
+      // }
+      if (!this.isContainInvoice) {
+        this.msgError("已开票的结算记录不能再次开票");
+      } else {
         this.combinationOpen = true;
         this.form.receipts = this.settleTotalReceipts;
         this.form.payable = this.settleTotalPrice;
         this.form.settleIds = id;
       }
+
     },
     formatInvoiceFlag(row) {
       if (row.invoiceFlag === 1 || row.invoiceFlag === '1') {
@@ -395,13 +399,14 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.settleId)
+      this.ids = selection.map(item => item.settleId);
       this.single = selection.length !== 1
       this.multiple = !selection.length
 
       // 是否开票标志数组
       this.invoiceFlags = selection.map(item => item.invoiceFlag)
-      console.log(this.invoiceFlags)
+      this.isContainInvoice = this.invoiceFlags.filter(flag => flag === 1).length === 0;
+      console.log("this.invoiceFlags---", this.isContainInvoice);
 
       // 清空组合结算总价
       this.settleTotalPrice = 0;
