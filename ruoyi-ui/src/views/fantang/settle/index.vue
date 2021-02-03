@@ -306,7 +306,7 @@ import {
   showAllMealsWithNoPay,
   showMealsWithSelect
 } from "../../../api/fantang/settle";
-import {getLastSettlementDate, listAll, listMealsWithInSettle, listNoPay, listPayoff} from "@/api/fantang/meals";
+import {getLastSettlementDate, listAll, listMealsWithInSettle, listNoPay, listPayoff} from "../../../api/fantang/meals";
 import {getUserProfile} from "@/api/system/user";
 import {listDepart} from "@/api/fantang/depart";
 

@@ -466,12 +466,14 @@ public class ClientController extends BaseController {
             // 更新员工账户补贴余额
             BigDecimal nowBalance = balance.subtract(totalPrice);
             staffInfoDao.setBalance(nowBalance);
+            staffInfoDaoService.updateById(staffInfoDao);
 
             orderDaoService.save(orderDao);
 
             // 添加补贴流水记录
             FtStaffSubsidyDao staffSubsidyDao = new FtStaffSubsidyDao();
             staffSubsidyDao.setStaffId(orderDao.getStaffId());
+            staffSubsidyDao.setSubsidyType("餐费补贴");
             staffSubsidyDao.setIncomeType(2);
             staffSubsidyDao.setPrice(totalPrice);
             staffSubsidyDao.setConsumAt(today);
@@ -495,6 +497,9 @@ public class ClientController extends BaseController {
 
         // 当前订单信息
         FtOrderDao orderDao = orderDaoService.getById(orderId);
+        if (orderDao == null) {
+            AjaxResult.error("无效订单");
+        }
         // 更新订单信息
         orderDao.setPayFlag(2);
         orderDaoService.save(orderDao);
