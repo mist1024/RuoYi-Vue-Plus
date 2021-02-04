@@ -58,8 +58,9 @@ public class FtStaffInfoDaoController extends BaseController {
     }
 
     @GetMapping("/staffListWithDepart")
-    public AjaxResult staffListWithDepart(FtStaffInfoDao ftStaffInfoDao) {
-        return AjaxResult.success(iFtStaffInfoDaoService.selectStaffInfoWithDepart(ftStaffInfoDao));
+    public TableDataInfo staffListWithDepart(FtStaffInfoDao ftStaffInfoDao) {
+        startPage();
+        return getDataTable(iFtStaffInfoDaoService.selectStaffInfoWithDepart(ftStaffInfoDao));
     }
 
     /**

@@ -130,14 +130,6 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-
 
     <!--    补贴发放弹出层-->
     <el-dialog title="选择发放员工" :visible.sync="showPopupSubsidyGiveOut" width="1000px" align="center">
@@ -184,6 +176,7 @@
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.giveOutFlag"
+              @change="changeGiveoutFlag(scope.row.staffId, $event)"
               active-color="#13ce66"
               inactive-color="#ff4949"
               active-text="是"
@@ -192,6 +185,14 @@
           </template>
         </el-table-column>
       </el-table>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getAllStaffList"
+      />
+
       <br>
       <el-button type="primary" @click="submitGiveOut">发放补贴</el-button>
     </el-dialog>
@@ -232,15 +233,17 @@
 
 <script>
 import {addSubsidy, delSubsidy, exportSubsidy, getSubsidy, listSubsidy, updateSubsidy} from "@/api/fantang/subsidy";
-import {staffListWithDepart} from "@/api/fantang/staffInfo";
+import {staffListWithDepart} from "../../../api/fantang/staffInfo";
 import {listDepart} from "@/api/fantang/depart";
-import {submitGiveOutSubsidy} from "@/api/fantang/staffSubsidy";
+import {submitGiveOutSubsidy} from "../../../api/fantang/staffSubsidy";
 
 export default {
   name: "Subsidy",
   components: {},
   data() {
     return {
+      // 不发放补贴人员清单
+      noGiveoutList: [],
       giveOutDate: null,
       departOptions: [],
       staffData: [],
@@ -278,6 +281,8 @@ export default {
       // 收费弹出层查询参数
       giveOutQueryParams: {
         departId: null,
+        pageNum: 1,
+        pageSize: 10,
       },
       // 表单参数
       form: {},
@@ -304,6 +309,20 @@ export default {
     });
   },
   methods: {
+    changeGiveoutFlag(staffId, e) {
+      // console.log('row:', staffId, 'event:', e);
+      if (!e) {
+        if (this.noGiveoutList.find(item => item == staffId)) {
+         // console.log('find', staffId);
+        } else {
+          this.noGiveoutList.push(staffId)
+          // console.log('Notfind', staffId);
+        }
+      } else {
+        this.noGiveoutList = this.noGiveoutList.filter(item => item != staffId);
+      }
+      console.log('this.noGiveoutList',this.noGiveoutList.toString());
+    },
 
     filterDepart() {
       return row.tag === value;
@@ -311,7 +330,7 @@ export default {
 
     //  响应发放补贴按钮
     clickSubsidyGiveOut(row) {
-      this.getAllStaffList();
+      this.getAllStaffList(this.queryParams);
       this.showPopupSubsidyGiveOut = true;
       const subsidyId = row.subsidyId
       getSubsidy(subsidyId).then(response => {
@@ -337,12 +356,17 @@ export default {
     },
 
     getAllStaffList() {
-      staffListWithDepart().then(response => {
-        this.staffData = response.data;
+      staffListWithDepart(this.queryParams).then(response => {
+        this.staffData = response.rows;
+        this.staffData.forEach(item=> {
+          if (this.noGiveoutList.find(f=> f == item.staffId) ) {
+            item.giveOutFlag = false;
+          }
+        });
+        this.total = response.total;
         // for (let i = 0; i < this.staffData.length; i++) {
         //   this.staffData[i].giveOutFlag = true;
         // }
-        console.log('staffData-->', this.staffData);
       })
       listDepart().then(response => {
         this.departOptions = response.rows;
@@ -379,16 +403,18 @@ export default {
     },
 
     submitGiveOut() {
-      if (new Date() < this.giveOutDate) {
+      if (new Date() >= this.giveOutDate) {
+
         let giveOutSubmitData = {
           giveOutDate: this.giveOutDate,
-          staffData: this.staffData,
+          noGiveoutList: this.noGiveoutList,
           subsidy: this.form
         }
+        console.log('submitGiveOutSubsidy:',giveOutSubmitData.staffData)
 
         submitGiveOutSubsidy(giveOutSubmitData).then(res => {
           this.msgSuccess("发放成功")
-        })
+        });
       }else {
           this.msgError("发放日期不可小于当前日期")
       }
@@ -396,9 +422,10 @@ export default {
     },
 
     handleGiveOutQueryChange() {
-      // console.log("change")
+
       staffListWithDepart(this.giveOutQueryParams).then(response => {
-        this.staffData = response.data;
+        this.staffData = response.rows;
+        this.total = response.total;
         // for (let i = 0; i < this.staffData.length; i++) {
         //   this.staffData[i].giveOutFlag = true;
         // }

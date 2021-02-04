@@ -1,6 +1,7 @@
 package com.ruoyi.system.fantang.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -12,6 +13,8 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.fantang.domain.FtStaffInfoDao;
 import com.ruoyi.system.fantang.domain.FtStaffSubsidyDao;
 import com.ruoyi.system.fantang.domain.FtSubsidyDao;
+import com.ruoyi.system.fantang.mapper.FtStaffInfoDaoMapper;
+import com.ruoyi.system.fantang.service.IFtStaffInfoDaoService;
 import com.ruoyi.system.fantang.service.IFtStaffSubsidyDaoService;
 import com.ruoyi.system.fantang.vo.FtStaffSubsidyVo;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 补贴流水查看Controller
@@ -36,6 +36,8 @@ import java.util.List;
 public class FtStaffSubsidyDaoController extends BaseController {
 
     private final IFtStaffSubsidyDaoService iFtStaffSubsidyDaoService;
+
+    private final IFtStaffInfoDaoService staffInfoDaoService;
 
     /**
      * 查询补贴流水查看列表
@@ -120,8 +122,11 @@ public class FtStaffSubsidyDaoController extends BaseController {
     public AjaxResult submitGiveOutSubsidy(@RequestBody FtStaffSubsidyVo ftStaffSubsidyVo) {
 
         FtSubsidyDao subsidy = ftStaffSubsidyVo.getSubsidy();
-        List<FtStaffInfoDao> staffData = ftStaffSubsidyVo.getStaffData();
+        List<String> noGiveoutList = ftStaffSubsidyVo.getNoGiveoutList();
         Date giveOutDate = ftStaffSubsidyVo.getGiveOutDate();
+        QueryWrapper<FtStaffInfoDao> wrapper = new QueryWrapper<>();
+        wrapper.notIn("staff_id",noGiveoutList);
+        List<FtStaffInfoDao> staffData = staffInfoDaoService.list(wrapper);
 
         List<FtStaffSubsidyDao> ftStaffSubsidyDaoList = new ArrayList<>();
 

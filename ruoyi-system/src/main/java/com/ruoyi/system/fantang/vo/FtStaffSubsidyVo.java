@@ -20,4 +20,6 @@ public class FtStaffSubsidyVo {
 
     private FtSubsidyDao subsidy;
 
+    private List<String> noGiveoutList;
+
 }
