@@ -203,9 +203,9 @@
         <el-col :span="4">
           营养餐总价：{{ nutritionTotalPrice }}
         </el-col>
-      </el-row>
-      <el-row>
-        报餐总价：{{ sumTotalPrice }}
+        <el-col :span="4">
+          报餐总价：{{ sumTotalPrice }}
+        </el-col>
       </el-row>
       <el-table v-loading="loading" :data="mealsList">
         <el-table-column label="报餐日期" align="center" prop="createAt" width="180">
@@ -217,9 +217,18 @@
         <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
         <el-table-column label="报餐总价" align="center" prop="totalPrice"/>
       </el-table>
+      <pagination
+        v-show="totalDetails > 0"
+        :total="totalDetails"
+        :page.sync="formAddNewSettlement.pageNum"
+        :limit.sync="formAddNewSettlement.pageSize"
+        @pagination="popupShowMealsWithSelect"
+        background>
+      </pagination>
+
     </el-dialog>
 
-    <!--    出院结算弹出层对话框-->
+    <!--    查看详情弹出层对话框-->
     <el-dialog title="用餐详情" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="leaveForm" :model="leaveForm" :rules="rules" label-width="160px">
         <el-form-item label="住院号" prop="hospitalId">
@@ -293,6 +302,13 @@
         <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
         <el-table-column label="报餐总价" align="center" prop="totalPrice"/>
       </el-table>
+      <pagination
+        v-show="formShowAllMealsWithSelect.total>0"
+        :total="formShowAllMealsWithSelect.total"
+        :page.sync="formShowAllMealsWithSelect.pageNum"
+        :limit.sync="formShowAllMealsWithSelect.pageSize"
+        @pagination="popupShowAllMealsWithSelect"
+      />
     </el-dialog>
   </div>
 </template>
@@ -315,6 +331,16 @@ export default {
   components: {},
   data() {
     return {
+      // 弹出层查询详情计数器
+      totalDetails: 0,
+      // 查看详情弹出层数据
+      formShowAllMealsWithSelect: {
+        patientId: null,
+        pageNum: 1,
+        pageSize: 8,
+        total: 0
+      },
+
       payTypeOptions: [{
         value: 1,
         label: '现金'
@@ -394,6 +420,8 @@ export default {
         selectBillingDate: null,
         opera: null,
         payType: null,
+        pageNum: 1,
+        pageSize: 7,
       },
 
       // 结算类型字典
@@ -482,18 +510,56 @@ export default {
     this.getList();
   },
   methods: {
+    // 查看详情弹出层显示所有未付款数据列表分页
+    popupShowAllMealsWithSelect() {
+      showAllMealsWithNoPay(this.formShowAllMealsWithSelect).then(response => {
+        console.log(response);
+        this.mealsList = response.data.reportMealsList.records;
+        this.formShowAllMealsWithSelect.total = response.data.reportMealsList.total;
+
+        if (response.data.reportMealsPrice == null) {
+          this.dinnerTotalPrice = 0;
+          this.nutritionTotalPrice = 0;
+          this.sumTotalPrice = 0;
+        }
+
+        if (response.data.reportMealsPrice != null) {
+          this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
+          this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
+          this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
+          this.formAddNewSettlement.netPeceipt = this.sumTotalPrice;
+        }
+      })
+    },
+
+    // 收费弹出层所有根据时间范围未付费数据列表
+    popupShowMealsWithSelect() {
+      showMealsWithSelect(this.formAddNewSettlement).then(response => {
+        this.mealsList = response.data.reportMealsList.records;
+        this.totalDetails = response.data.reportMealsList.total;
+
+        if (response.data.reportMealsPrice == null) {
+          this.dinnerTotalPrice = 0;
+          this.nutritionTotalPrice = 0;
+          this.sumTotalPrice = 0;
+        }
+
+        if (response.data.reportMealsPrice != null) {
+          this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
+          this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
+          this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
+          this.formAddNewSettlement.netPeceipt = this.sumTotalPrice;
+        }
+      })
+    },
+
     // 变更结算日期计算
     changeBillingDate(value) {
       var dateSpan, iDays;
       let sDate1 = Date.parse(this.formAddNewSettlement.lastBillingDate);
       let sDate2 = Date.parse(value + ' 23:59:59');
-      console.log("lastBillingDate", this.formAddNewSettlement.lastBillingDate)
-      console.log("selectBillingDate", value);
 
       dateSpan = sDate2 - sDate1;
-
-      console.log("当前选择时间-------", sDate2);
-      console.log("最后结算时间-------", sDate1);
 
       if (dateSpan < 0) {
         this.msgError("你现在的结算日期小于上一次上次结算 / 首次用餐日期");
@@ -505,22 +571,7 @@ export default {
       }
 
       if (this.formAddNewSettlement.selectBillingDate != null) {
-        showMealsWithSelect(this.formAddNewSettlement).then(response => {
-          this.mealsList = response.data.reportMealsList;
-
-          if (response.data.reportMealsPrice == null) {
-            this.dinnerTotalPrice = 0;
-            this.nutritionTotalPrice = 0;
-            this.sumTotalPrice = 0;
-          }
-
-          if (response.data.reportMealsPrice != null) {
-            this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
-            this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
-            this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
-            this.formAddNewSettlement.netPeceipt = this.sumTotalPrice;
-          }
-        })
+        this.popupShowMealsWithSelect();
       } else {
         this.mealsList = null;
         this.dinnerTotalPrice = 0;
@@ -577,14 +628,14 @@ export default {
       });
     },
 
-    // 出院伙食费结算按钮
+    // 查看详情按钮
     clickAddLeaveSettlement(row) {
-
       // 清空数据
       this.mealsList = null;
       this.sumTotalPrice = 0;
       this.dinnerTotalPrice = 0;
       this.nutritionTotalPrice = 0;
+      this.formShowAllMealsWithSelect.patientId = row.patientId;
 
       // 获取上次结算日期/首次用餐日期
       getLastSettlementDate(row.patientId).then(response => {
@@ -603,23 +654,12 @@ export default {
           this.leaveForm.prepayment = response.prepayment.prepaid;
         }
 
-        showAllMealsWithNoPay(row.patientId).then(response => {
-          console.log(response);
-          this.mealsList = response.data.reportMealsList;
+        this.formShowAllMealsWithSelect.total = 0;
+        this.formShowAllMealsWithSelect.pageNum = 1;
+        this.formShowAllMealsWithSelect.pageSize = 8;
+        this.popupShowAllMealsWithSelect();
 
-          if (response.data.reportMealsPrice == null) {
-            this.dinnerTotalPrice = 0;
-            this.nutritionTotalPrice = 0;
-            this.sumTotalPrice = 0;
-          }
 
-          if (response.data.reportMealsPrice != null) {
-            this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
-            this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
-            this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
-            this.formAddNewSettlement.netPeceipt = this.sumTotalPrice;
-          }
-        })
 
         this.leaveForm.settlementDays = response.reportMeals.days;
         this.leaveForm.hospitalId = row.hospitalId;

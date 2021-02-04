@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
@@ -73,7 +74,9 @@ public class FtSettleDaoController extends BaseController {
                 .eq("patient_id", patientId)
                 .eq("dining_flag",1)
                 .between("dining_at", sdf.format(lastBillingDate), DateUtil.endOfDay(selectBillingDate));
-        List<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.list(reportMealsWrapper);
+        Integer pageNum = settlement.getPageNum();
+        Integer pageSize = settlement.getPageSize();
+        IPage<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.listPage(reportMealsWrapper, pageNum, pageSize);
 
         ReportMealsPriceEntity reportMealsPrice = iFtReportMealsDaoService.sumTotalPrice(patientId, DateUtil.beginOfDay(lastBillingDate), DateUtil.endOfDay(selectBillingDate));
 
@@ -84,17 +87,16 @@ public class FtSettleDaoController extends BaseController {
         return AjaxResult.success(data);
     }
 
-    @GetMapping("/showAllMealsWithNoPay/{patientId}")
-    public AjaxResult showAllMealsWithNoPay(@PathVariable Long patientId) {
+    @GetMapping("/showAllMealsWithNoPay")
+    public AjaxResult showAllMealsWithNoPay(@RequestParam("patientId") Long patientId, @RequestParam("pageNum") Integer pageNum,@RequestParam("pageSize") Integer pageSize) {
 
         // 查找该病人所有已用餐未结算记录
         QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
         wrapper.eq("patient_id", patientId);
-        wrapper.eq("dining_flag",0);
+        wrapper.eq("dining_flag",1);
         wrapper.eq("settlement_flag",0);
 
-        List<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.list(wrapper);
-
+        IPage<FtReportMealsDao> reportMealsList = iFtReportMealsDaoService.listPage(wrapper, pageNum, pageSize);
         ReportMealsPriceEntity reportMealsPrice = iFtReportMealsDaoService.sumAllTotalPrice(patientId);
 
         Map<String, Object> data = new HashMap<>(2);

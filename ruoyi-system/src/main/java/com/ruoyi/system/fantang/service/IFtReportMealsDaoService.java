@@ -1,5 +1,7 @@
 package com.ruoyi.system.fantang.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
@@ -44,5 +46,7 @@ public interface IFtReportMealsDaoService extends IService<FtReportMealsDao> {
     List<FtReportMealsDao> listPatientReportMeals(FtReportMealsDao ftReportMealsDao);
 
     void insertTomorrowReportMealByPatient(Long patientId);
+
+    IPage<FtReportMealsDao> listPage(QueryWrapper<FtReportMealsDao> reportMealsWrapper, Integer pageNum, Integer pageSize);
 }
 

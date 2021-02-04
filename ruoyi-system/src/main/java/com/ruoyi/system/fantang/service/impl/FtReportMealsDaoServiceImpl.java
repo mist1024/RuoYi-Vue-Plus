@@ -2,8 +2,12 @@ package com.ruoyi.system.fantang.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
 import com.ruoyi.system.fantang.domain.FtReportMealsDao;
 import com.ruoyi.system.fantang.entity.ReportMealsDayEntity;
 import com.ruoyi.system.fantang.entity.ReportMealsPriceEntity;
@@ -149,5 +153,13 @@ public class FtReportMealsDaoServiceImpl extends ServiceImpl<FtReportMealsDaoMap
     @Override
     public void insertTomorrowReportMealByPatient(Long patientId) {
         ftReportMealVoMapper.insertTomorrowReportMealByPatient(patientId);
+    }
+
+    @Override
+    public IPage<FtReportMealsDao> listPage(QueryWrapper<FtReportMealsDao> reportMealsWrapper, Integer pageNum, Integer pageSize) {
+        System.out.println(pageNum);
+        System.out.println(pageSize);
+        Page<FtReportMealsDao> page = new Page<>(pageNum, pageSize);
+        return this.baseMapper.selectPage(page, reportMealsWrapper);
     }
 }

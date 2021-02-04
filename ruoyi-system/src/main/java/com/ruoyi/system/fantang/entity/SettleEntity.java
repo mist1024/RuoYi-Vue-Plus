@@ -65,5 +65,7 @@ public class SettleEntity {
 
     // 付款方式
     private Integer payType;
-
+    // 分页信息
+    private Integer pageNum;
+    private Integer pageSize;
 }
