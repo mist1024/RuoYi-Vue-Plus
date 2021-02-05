@@ -14,4 +14,6 @@ import java.util.List;
 public interface IFtStaffSubsidyDaoService extends IService<FtStaffSubsidyDao> {
 
     Integer insertBatchStaffSubsidy(List<FtStaffSubsidyDao> ftStaffSubsidyDaoList);
+
+    void reBalance(String subsidyType, Integer maxBalance);
 }

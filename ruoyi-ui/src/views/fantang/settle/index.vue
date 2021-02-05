@@ -534,6 +534,7 @@ export default {
 
     // 收费弹出层所有根据时间范围未付费数据列表
     popupShowMealsWithSelect() {
+      console.log('this.formAddNewSettlement:',this.formAddNewSettlement);
       showMealsWithSelect(this.formAddNewSettlement).then(response => {
         this.mealsList = response.data.reportMealsList.records;
         this.totalDetails = response.data.reportMealsList.total;
@@ -571,6 +572,7 @@ export default {
       }
 
       if (this.formAddNewSettlement.selectBillingDate != null) {
+
         this.popupShowMealsWithSelect();
       } else {
         this.mealsList = null;
