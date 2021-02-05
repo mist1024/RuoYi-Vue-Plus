@@ -647,4 +647,13 @@ public class ClientController extends BaseController {
         return AjaxResult.success("已删除");
     }
 
+    @PostMapping("qrcode")
+    public AjaxResult qrcode(@RequestBody JSONObject params) {
+        Long staffId = params.getLong("staffId");
+        Long orderId = params.getLong("orderId");
+        System.out.println("staffId: " + staffId.toString());
+        System.out.println("orderId: " + orderId.toString());
+        return AjaxResult.success("二维码扫码成功");
+    }
+
 }
