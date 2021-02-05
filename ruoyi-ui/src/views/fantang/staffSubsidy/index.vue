@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="筛选类型" prop="incomeType">
-        <el-select v-model="queryParams.incomeType" placeholder="筛选类型" clearable size="small">
+        <el-select v-model="queryParams.incomeType" placeholder="筛选类型" clearable size="small" @change="changeIncomeType">
           <el-option
             v-for="item in incomeTypeOptions"
             :key="item.value"
@@ -213,6 +213,21 @@ export default {
     });
   },
   methods: {
+    changeIncomeType(e) {
+      this.queryParams.subsidyType = e;
+      this.getList();
+      console.log(e);
+      // 补贴发放类型
+      if (e === 1) {
+
+      } else if (e === 2) {
+        // 补贴消费类型
+
+      } else if (e === 3) {
+        // 补贴冲减类型
+
+      }
+    },
     /** 查询补贴流水查看列表 */
     getList() {
       this.loading = true;
