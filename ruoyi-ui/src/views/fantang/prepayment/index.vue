@@ -422,12 +422,18 @@ export default {
     handleUpdate(row) {
       this.reset();
       const prepaymentId = row.prepaymentId || this.ids
-      getPrepayment(prepaymentId).then(response => {
-        this.formAddPrepayment = response.data;
-        console.log(response.data)
-        this.open = true;
-        this.title = "出院结清";
+
+      this.open = true;
+      console.log('row:',row);
+      getPrepayment(row.prepaymentId).then(response =>{
+        console.log(response);
+        this.formAddPrepayment.hospitalId = row.hospitalId;
+        this.formAddPrepayment.name = row.name;
+        this.formAddPrepayment.collectAt = response.data.prepayment = response.data.collectAt;
+        this.formAddPrepayment.prepaid = response.data.prepaid;
+        this.formAddPrepayment.row = row;
       });
+
     },
     /** 提交按钮 */
     submitformAddPrepayment() {
