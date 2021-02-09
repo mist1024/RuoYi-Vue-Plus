@@ -59,7 +59,7 @@
             size="mini"
             type="text"
             icon="el-icon-s-claim"
-            @click="handleUpdate(scope.row)"
+            @click="clickSettle(scope.row)"
             v-hasPermi="['fantang:prepayment:remove']"
             v-if="scope.row.noPrepayment"
           >出院结清
@@ -95,7 +95,10 @@
     />
 
     <!-- 添加或修改收费管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px"
+               append-to-body
+               :close-on-click-modal="false"
+               :modal="true">
       <el-form ref="formAddPrepayment" :model="formAddPrepayment" :rules="rules" label-width="120px">
         <el-form-item label="住院号" prop="hospitalId">
           <el-autocomplete
@@ -130,9 +133,9 @@
                     placeholder="请输入预付费金额"
                     style="width: 250px"/>
         </el-form-item>
-        <el-form-item label="预付费时间" prop="prepaidAt">
+        <el-form-item label="预付费时间" prop="collectAt">
           <el-date-picker clearable size="small" style="width: 250px"
-                          v-model="formAddPrepayment.prepaidAt"
+                          v-model="formAddPrepayment.collectAt"
                           type="date"
                           value-format="yyyy-MM-dd"
                           readonly
@@ -142,7 +145,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitformAddPrepayment">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+        <el-button @click="cancel">关 闭</el-button>
+        <el-button @click="clickPrintSettle">打印收据</el-button>
       </div>
     </el-dialog>
   </div>
@@ -211,7 +215,13 @@ export default {
         name: null,
       },
       // 表单参数
-      formAddPrepayment: {},
+      formAddPrepayment: {
+        hospitalId: null,
+        name: null,
+        prepaid: null,
+        collectAt: null,
+        row: null
+      },
       // 表单校验
       rules: {
         prepaid: [
@@ -233,21 +243,39 @@ export default {
   },
 
   methods: {
+
+    clickPrintSettle() {
+      this.handleGenerateReceiptPdf(this.formAddPrepayment.row);
+    },
+
+    // 相应处理出院结清功能
+    clickSettle(row) {
+      this.open = true;
+      getPrepayment(row.prepaymentId).then(response =>{
+        console.log(response);
+        this.formAddPrepayment.hospitalId = row.hospitalId;
+        this.formAddPrepayment.name = row.name;
+        this.formAddPrepayment.collectAt = response.data.prepayment = response.data.collectAt;
+        this.formAddPrepayment.prepaid = response.data.prepaid;
+        this.formAddPrepayment.row = row;
+      });
+    },
     // 获取数据列表，跟进筛选条件不同获取不同类型的数据
     getList() {
       if (this.queryParams.settlementFlag === 0) {
         // 查询已交预付费信息
         listPrepay(this.queryParams).then(response => {
-          this.prepaymentList = response.data.records.map((item) => {
+          console.log(response);
+          this.prepaymentList = response.rows.map((item) => {
             console.log(item);
             item.noPrepayment = true;
             return item;
           });
-          this.total = response.data.total;
+          this.total = response.total;
           this.loading = false;
         })
       } else {
-        this.getDefaultNoPrepayment();
+        this.getDefaultNoPrepayment(this.queryParams);
       }
 
     },
@@ -291,7 +319,7 @@ export default {
     },
 
     buildSuggestionList() {
-      listNoPrepayment().then(response => {
+      listNoPrepayment(this.queryParams).then(response => {
         console.log("aaaaaaaaaaaaa", response);
         let prepaymentList = response.rows;
         this.suggestionList = prepaymentList.map(item => {

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.fantang.domain.FtPrepaymentDao;
 import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,11 +16,11 @@ import java.util.List;
  */
 public interface IFtPrepaymentDaoService extends IService<FtPrepaymentDao> {
 
-    List<FtPrepaymentVo> listNoPrepay();
+    List<FtPrepaymentVo> listNoPrepay(FtPrepaymentVo params);
 
-    IPage<FtPrepaymentVo> listPrepay(Integer pageNum, Integer pageSize);
+    List<FtPrepaymentVo> listPrepay(FtPrepaymentVo params);
 
-    List<FtPrepaymentVo> listAllPrepay();
+    List<FtPrepaymentVo> listAllPrepay(FtPrepaymentVo params);
 
     FtPrepaymentVo getCountById(Long patiendId);
 

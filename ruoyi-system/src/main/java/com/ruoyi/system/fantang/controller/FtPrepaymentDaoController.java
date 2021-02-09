@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -71,23 +72,30 @@ public class FtPrepaymentDaoController extends BaseController {
     // 查询所有待缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listNoPrepay")
-    public TableDataInfo listNoPrepay() {
+    public TableDataInfo listNoPrepay(FtPrepaymentVo params) {
         startPage();
-        return getDataTable(iFtPrepaymentDaoService.listNoPrepay());
+        return getDataTable(iFtPrepaymentDaoService.listNoPrepay(params));
     }
 
     // 查询所有已缴费列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listPrepay")
-    public AjaxResult listPrepay(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
-        return AjaxResult.success(iFtPrepaymentDaoService.listPrepay(pageNum, pageSize));
+    public TableDataInfo listPrepay(FtPrepaymentVo params) {
+        startPage();
+        if (params.getPrepaidAt() != null) {
+            Date date = DateUtil.parse(params.getPrepaidAt().toString());
+            params.setPrepaidAt(date);
+        }
+        return getDataTable(iFtPrepaymentDaoService.listPrepay(params));
     }
 
     // 查询所有已结算列表
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:list')")
     @GetMapping("/listAllPrepay")
-    public TableDataInfo listAllPrepay() {
-        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.listAllPrepay();
+    public TableDataInfo listAllPrepay(FtPrepaymentVo params) {
+        startPage();
+
+        List<FtPrepaymentVo> list = iFtPrepaymentDaoService.listAllPrepay(params);
         return getDataTable(list);
     }
 

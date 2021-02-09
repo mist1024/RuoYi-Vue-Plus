@@ -85,7 +85,7 @@ public class FtPrepaymentDao implements Serializable {
     /**
      * 预付费时间
      */
-    @Excel(name = "预付费时间", width = 30, dateFormat = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "预付费时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date prepaidAt;
 }

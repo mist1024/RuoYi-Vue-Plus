@@ -11,6 +11,7 @@ import com.ruoyi.system.fantang.mapper.FtPrepaymentDaoMapper;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,19 +24,18 @@ import java.util.List;
 public class FtPrepaymentDaoServiceImpl extends ServiceImpl<FtPrepaymentDaoMapper, FtPrepaymentDao> implements IFtPrepaymentDaoService {
 
     @Override
-    public List<FtPrepaymentVo> listNoPrepay() {
-        return this.baseMapper.listNoPrepay();
+    public List<FtPrepaymentVo> listNoPrepay(FtPrepaymentVo params) {
+        return this.baseMapper.listNoPrepay(params);
     }
 
     @Override
-    public IPage<FtPrepaymentVo> listPrepay(Integer pageNum, Integer pageSize) {
-        Page<FtOrderDao> page = new Page<>(pageNum, pageSize);
-        return this.baseMapper.listPrepay(page);
+    public List<FtPrepaymentVo> listPrepay(FtPrepaymentVo params) {
+        return this.baseMapper.listPrepay(params);
     }
 
     @Override
-    public List<FtPrepaymentVo> listAllPrepay() {
-        return this.baseMapper.listAllPrepay();
+    public List<FtPrepaymentVo> listAllPrepay(FtPrepaymentVo params) {
+        return this.baseMapper.listAllPrepay(params);
     }
 
     @Override
