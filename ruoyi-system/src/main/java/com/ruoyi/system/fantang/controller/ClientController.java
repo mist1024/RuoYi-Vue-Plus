@@ -1,13 +1,12 @@
 package com.ruoyi.system.fantang.controller;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.extra.ssh.JschRuntimeException;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.utils.sign.Base64;
 import com.ruoyi.system.fantang.common.DinnerTypeUtils;
 import com.ruoyi.system.fantang.domain.*;
 import com.ruoyi.system.fantang.service.*;
@@ -652,13 +651,13 @@ public class ClientController extends BaseController {
 
     @PostMapping("qrcode")
     public AjaxResult qrcode(@RequestBody JSONObject params) {
-        JSONObject data =(JSONObject)JSONObject.parse(Arrays.toString(Base64.decode(params.getString("data"))));
-        Long staffId = data.getLong("staffId");
-        Long orderId = data.getLong("orderId");
-        System.out.println("staffId: " + staffId.toString());
-        System.out.println("orderId: " + orderId.toString());
-        log.info("二维码：原始字串-{}；员工id：{}; 订单id：{}", data, staffId, orderId);
-        return AjaxResult.success("二维码扫码成功");
+        String data = params.getString("data");
+        JSONObject jsonData = JSONObject.parseObject(Base64.decodeStr(data));
+        Long staffId = jsonData.getLong("staffId");
+        Long orderId = jsonData.getLong("orderId");
+        String tel = jsonData.getString("tel");
+        log.info("二维码：原始字串-{}；员工id：{}; 订单id：{}", jsonData, staffId, orderId);
+        return AjaxResult.success(String.format("二维码：原始字串-%s；员工id：%d; 订单id：%d, 电话：%s", jsonData, staffId, orderId, tel));
     }
 
 }
