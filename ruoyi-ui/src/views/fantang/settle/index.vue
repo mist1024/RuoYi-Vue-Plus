@@ -218,8 +218,8 @@
         <el-table-column label="报餐总价" align="center" prop="totalPrice"/>
       </el-table>
       <pagination
-        v-show="totalDetails > 0"
-        :total="totalDetails"
+        v-show="formAddNewSettlement.total > 0"
+        :total="formAddNewSettlement.total"
         :page.sync="formAddNewSettlement.pageNum"
         :limit.sync="formAddNewSettlement.pageSize"
         @pagination="popupShowMealsWithSelect"
@@ -422,6 +422,7 @@ export default {
         payType: null,
         pageNum: 1,
         pageSize: 7,
+        total: 0,
       },
 
       // 结算类型字典
@@ -537,7 +538,7 @@ export default {
       console.log('this.formAddNewSettlement:',this.formAddNewSettlement);
       showMealsWithSelect(this.formAddNewSettlement).then(response => {
         this.mealsList = response.data.reportMealsList.records;
-        this.totalDetails = response.data.reportMealsList.total;
+        this.formAddNewSettlement.total = response.data.reportMealsList.total;
 
         if (response.data.reportMealsPrice == null) {
           this.dinnerTotalPrice = 0;
@@ -572,7 +573,9 @@ export default {
       }
 
       if (this.formAddNewSettlement.selectBillingDate != null) {
-
+        this.formAddNewSettlement.pageNum = 1;
+        this.formAddNewSettlement.pageSize = 7;
+        this.formAddNewSettlement.total = 0;
         this.popupShowMealsWithSelect();
       } else {
         this.mealsList = null;
@@ -598,8 +601,13 @@ export default {
       this.sumTotalPrice = 0;
       this.dinnerTotalPrice = 0;
       this.nutritionTotalPrice = 0;
+      this.formAddNewSettlement.selectBillingDate = null;
 
       getLastSettlementDate(row.patientId).then(response => {
+        this.formAddNewSettlement.pageNum = 1;
+        this.formAddNewSettlement.pageSize = 7;
+        this.formAddNewSettlement.total = 0;
+
         console.log("getLastBillingDateByPatientId-->", response);
         if (response.reportMeals.settlementAt === null) {
           this.lastBillFlag = false;
@@ -627,6 +635,9 @@ export default {
         this.formAddNewSettlement.price = row.price;
         this.formAddNewSettlement.netPeceipt = null;
         this.formAddNewSettlement.userName = this.userName;
+        this.formAddNewSettlement.pageNum = 1;
+        this.formAddNewSettlement.pageSize = 7;
+        this.formAddNewSettlement.total = 0;
       });
     },
 
