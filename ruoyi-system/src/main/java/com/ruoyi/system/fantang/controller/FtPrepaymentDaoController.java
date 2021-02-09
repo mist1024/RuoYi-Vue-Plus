@@ -17,13 +17,13 @@ import com.ruoyi.system.fantang.domain.FtPrepaymentVo;
 import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import com.ruoyi.system.fantang.utils.PdfUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.formula.functions.EDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 收费管理Controller
@@ -192,16 +192,19 @@ public class FtPrepaymentDaoController extends BaseController {
     @PostMapping("/generateReceiptPdf")
     public AjaxResult generateReceiptPdf(@RequestBody JSONObject params) {
 
+        String patientId = params.getString("patientId");
+
         // 模板路径
-        String templatePath = "F:\\pdfTemplate\\饭堂票据模板2.pdf";
+//        String templatePath = "F:\\pdfTemplate\\饭堂票据模板2.pdf";
+        String templatePath = "Z:\\程序开发\\项目测试\\三院饭堂\\饭堂收费票据模板.pdf";
 
         // 生成的新文件路径
-        String outputPath = RuoYiConfig.getUploadPath() + "\\饭堂票据.pdf";
+        String outputPath = RuoYiConfig.getUploadPath() + "\\饭堂票据" + patientId + ".pdf";
 
         PdfUtils.generatePrepaymentPdf(templatePath, outputPath, params);
 
         // 下载地址
-        String downloadPath = "profile/upload/饭堂票据.pdf";
+        String downloadPath = "profile/upload/饭堂票据" + patientId + ".pdf";
 
         return AjaxResult.success(downloadPath);
 
