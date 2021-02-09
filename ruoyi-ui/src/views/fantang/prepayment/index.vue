@@ -94,7 +94,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改收费管理对话框 -->
+    <!-- 出院结清收费管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px"
                append-to-body
                :close-on-click-modal="false"
@@ -144,11 +144,68 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitformAddPrepayment">确 定</el-button>
+        <el-button type="primary" @click="submitformAddPrepayment">收 费</el-button>
         <el-button @click="cancel">关 闭</el-button>
         <el-button @click="clickPrintSettle">打印收据</el-button>
       </div>
     </el-dialog>
+
+    <!-- 收费管理对话框 -->
+    <el-dialog :title="openChargeDialogTitle" :visible.sync="openChargeDialogFlag" width="500px"
+               append-to-body
+               :close-on-click-modal="false"
+               :modal="true">
+      <el-form ref="formAddPrepayment" :model="formAddPrepayment" :rules="rules" label-width="120px">
+        <el-form-item label="住院号" prop="hospitalId">
+          <el-autocomplete
+            popper-class="my-autocomplete"
+            v-model="formAddPrepayment.hospitalId"
+            :fetch-suggestions="querySearch"
+            placeholder="请输入住院号"
+            @select="handleSelect" style="width: 250px">
+            <i
+              class="el-icon-edit el-input__icon"
+              slot="suffix"
+              @click="handleIconClick">
+            </i>
+            <template slot-scope="{ item }" style="width: 300px">
+              <div class="name">{{ item.name }}</div>
+              <span class="addr">
+                {{ item.departName }}
+                <el-divider direction="vertical"></el-divider>
+                {{ item.bedId }}
+                <el-divider direction="vertical"></el-divider>
+                {{ item.value }}
+              </span>
+            </template>
+          </el-autocomplete>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="formAddPrepayment.name" style="width: 250px" readonly/>
+        </el-form-item>
+        <el-form-item label="预付费金额" prop="prepaid">
+          <el-input v-model="formAddPrepayment.prepaid"
+                    onKeypress="return(/[\d]/.test(String.fromCharCode(event.keyCode)))" type="number"
+                    placeholder="请输入预付费金额"
+                    style="width: 250px"/>
+        </el-form-item>
+        <el-form-item label="预付费时间" prop="collectAt">
+          <el-date-picker clearable size="small" style="width: 250px"
+                          v-model="formAddPrepayment.collectAt"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          readonly
+                          placeholder="选择预付费时间">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitformChangePrepayment">收 费</el-button>
+        <el-button @click="cancel">关 闭</el-button>
+        <el-button @click="clickPrintSettle">打印收据</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -169,6 +226,8 @@ export default {
   components: {},
   data() {
     return {
+      openChargeDialogTitle: null,
+      openChargeDialogFlag: false,
       // 权限相关的参数
       user: null,
       roleGroup: null,
@@ -418,23 +477,23 @@ export default {
       this.open = true;
       this.title = "添加收费管理";
     },
-    /** 修改按钮操作 */
+    /** 收费按钮操作 */
     handleUpdate(row) {
       this.reset();
       const prepaymentId = row.prepaymentId || this.ids
 
-      this.open = true;
       console.log('row:',row);
-      getPrepayment(row.prepaymentId).then(response =>{
-        console.log(response);
-        this.formAddPrepayment.hospitalId = row.hospitalId;
-        this.formAddPrepayment.name = row.name;
-        this.formAddPrepayment.collectAt = response.data.prepayment = response.data.collectAt;
-        this.formAddPrepayment.prepaid = response.data.prepaid;
-        this.formAddPrepayment.row = row;
-      });
+      this.formAddPrepayment.hospitalId = row.hospitalId;
+      this.formAddPrepayment.name = row.name;
+      this.formAddPrepayment.collectAt = new Date();
+      this.formAddPrepayment.prepaid = 700;
+      this.formAddPrepayment.row = row;
+      this.openChargeDialogFlag = true;
+    },
+    submitformChangePrepayment() {
 
     },
+
     /** 提交按钮 */
     submitformAddPrepayment() {
 
