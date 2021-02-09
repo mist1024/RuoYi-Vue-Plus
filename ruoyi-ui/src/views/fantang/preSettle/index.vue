@@ -89,7 +89,7 @@
               size="mini"
               type="text"
               icon="el-icon-edit"
-              @click="clickAddLeaveSettlement(scope.row)"
+              @click="clickListLeaveSettlement(scope.row)"
               v-hasPermi="['fantang:settle:AddLeaveSettlement']"
           >查看详情
           </el-button>
@@ -219,7 +219,7 @@
       </el-table>
     </el-dialog>
 
-    <!--    出院结算弹出层对话框-->
+    <!--    查看详情弹出层对话框-->
     <el-dialog title="用餐详情" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="leaveForm" :model="leaveForm" :rules="rules" label-width="160px">
         <el-form-item label="住院号" prop="hospitalId">
@@ -283,6 +283,8 @@
       <el-row>
         报餐总价：{{ sumTotalPrice }}
       </el-row>
+
+
       <el-table v-loading="loading" :data="mealsList">
         <el-table-column label="报餐日期" align="center" prop="createAt" width="180">
           <template slot-scope="scope">
@@ -293,6 +295,14 @@
         <el-table-column label="营养餐价格" align="center" prop="nutritionFoodPrice"/>
         <el-table-column label="报餐总价" align="center" prop="totalPrice"/>
       </el-table>
+
+      <pagination
+        v-show="queryLeaveForm.total>0"
+        :total="queryLeaveForm.total"
+        :page.sync="queryLeaveForm.pageNum"
+        :limit.sync="queryLeaveForm.pageSize"
+        @pagination="pagechangeLeaveForm"
+      />
     </el-dialog>
   </div>
 </template>
@@ -435,6 +445,12 @@ export default {
       // 表单参数
       form: {},
       leaveForm: {},
+      queryLeaveForm: {
+        patientId: null,
+        pageNum: 1,
+        pageSize: 7,
+        total: 0
+      },
       // 表单校验
       rules: {
         list: [
@@ -476,6 +492,27 @@ export default {
     this.getList();
   },
   methods: {
+    pagechangeLeaveForm() {
+      showAllMealsWithNoPay(this.queryLeaveForm).then(response => {
+        console.log(response);
+        this.mealsList = response.data.reportMealsList.records;
+        this.queryLeaveForm.total = response.data.reportMealsList.total;
+
+        if (response.data.reportMealsPrice == null) {
+          this.dinnerTotalPrice = 0;
+          this.nutritionTotalPrice = 0;
+          this.sumTotalPrice = 0;
+        }
+
+        if (response.data.reportMealsPrice != null) {
+          this.dinnerTotalPrice = response.data.reportMealsPrice.dinnerTotalPrice;
+          this.nutritionTotalPrice = response.data.reportMealsPrice.nutritionTotalPrice;
+          this.sumTotalPrice = response.data.reportMealsPrice.sumTotalPrice;
+          this.formAddNewSettlement.netPeceipt = this.sumTotalPrice;
+        }
+      })
+
+    },
     // 变更结算日期计算
     changeBillingDate(value) {
       var dateSpan, iDays;
@@ -571,9 +608,8 @@ export default {
       });
     },
 
-    // 出院伙食费结算按钮
-    clickAddLeaveSettlement(row) {
-
+    // 查看详情按钮，显示基本信息外，还列表显示所有记录
+    clickListLeaveSettlement(row) {
       // 清空数据
       this.mealsList = null;
       this.sumTotalPrice = 0;
@@ -597,9 +633,11 @@ export default {
           this.leaveForm.prepayment = response.prepayment.prepaid;
         }
 
-        showAllMealsWithNoPay(row.patientId).then(response => {
+        this.queryLeaveForm.patientId = row.patientId;
+        showAllMealsWithNoPay(this.queryLeaveForm).then(response => {
           console.log(response);
-          this.mealsList = response.data.reportMealsList;
+          this.mealsList = response.data.reportMealsList.records;
+          this.queryLeaveForm.total = response.data.reportMealsList.total;
 
           if (response.data.reportMealsPrice == null) {
             this.dinnerTotalPrice = 0;

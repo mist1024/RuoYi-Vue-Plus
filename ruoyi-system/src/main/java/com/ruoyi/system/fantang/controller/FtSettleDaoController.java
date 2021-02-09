@@ -88,7 +88,7 @@ public class FtSettleDaoController extends BaseController {
     }
 
     @GetMapping("/showAllMealsWithNoPay")
-    public AjaxResult showAllMealsWithNoPay(@RequestParam("patientId") Long patientId, @RequestParam("pageNum") Integer pageNum,@RequestParam("pageSize") Integer pageSize) {
+        public AjaxResult showAllMealsWithNoPay(@RequestParam("patientId") Long patientId, @RequestParam("pageNum") Integer pageNum,@RequestParam("pageSize") Integer pageSize) {
 
         // 查找该病人所有已用餐未结算记录
         QueryWrapper<FtReportMealsDao> wrapper = new QueryWrapper<>();
