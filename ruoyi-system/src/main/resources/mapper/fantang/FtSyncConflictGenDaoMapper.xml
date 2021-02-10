@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtSyncConflictGenDaoMapper">
+
+    <resultMap type="FtSyncConflictGenDao" id="FtSyncConflictGenDaoResult">
+        <result property="id" column="id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="name" column="name"/>
+        <result property="departName" column="depart_name"/>
+        <result property="bedId" column="bed_id"/>
+        <result property="oldHospitalId" column="old_hospital_id"/>
+        <result property="oldName" column="old_name"/>
+        <result property="oldDepartName" column="old_depart_name"/>
+        <result property="oldBedId" column="old_bed_id"/>
+        <result property="departId" column="depart_id"/>
+        <result property="oldDepartId" column="old_depart_id"/>
+        <result property="patientId" column="patient_id"/>
+        <result property="isSolve" column="is_solve"/>
+    </resultMap>
+
+
+</mapper>

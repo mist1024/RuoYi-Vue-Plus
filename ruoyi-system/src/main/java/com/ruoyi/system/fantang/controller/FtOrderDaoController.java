@@ -1,0 +1,237 @@
+package com.ruoyi.system.fantang.controller;
+
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.system.fantang.domain.FtOrderDao;
+import com.ruoyi.system.fantang.service.IFtOrderDaoService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 订单管理Controller
+ *
+ * @author ft
+ * @date 2020-11-19
+ */
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RestController
+@RequestMapping("/fantang/order")
+public class FtOrderDaoController extends BaseController {
+
+    private final IFtOrderDaoService iFtOrderDaoService;
+
+    /**
+     * 查询订单管理列表
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:order:list')")
+    @GetMapping("/list")
+    public TableDataInfo list(FtOrderDao ftOrderDao) {
+        startPage();
+        LambdaQueryWrapper<FtOrderDao> lqw = Wrappers.lambdaQuery(ftOrderDao);
+        if (ftOrderDao.getOrderType() != null) {
+            lqw.eq(FtOrderDao::getOrderType, ftOrderDao.getOrderType());
+        }
+        if (ftOrderDao.getTotalPrice() != null) {
+            lqw.eq(FtOrderDao::getTotalPrice, ftOrderDao.getTotalPrice());
+        }
+        if (ftOrderDao.getDiscount() != null) {
+            lqw.eq(FtOrderDao::getDiscount, ftOrderDao.getDiscount());
+        }
+        if (ftOrderDao.getReceipts() != null) {
+            lqw.eq(FtOrderDao::getReceipts, ftOrderDao.getReceipts());
+        }
+        if (ftOrderDao.getCreateAt() != null) {
+            lqw.eq(FtOrderDao::getCreateAt, ftOrderDao.getCreateAt());
+        }
+        if (StringUtils.isNotBlank(ftOrderDao.getOrderSrc())) {
+            lqw.eq(FtOrderDao::getOrderSrc, ftOrderDao.getOrderSrc());
+        }
+        if (ftOrderDao.getCurrentPrice() != null) {
+            lqw.eq(FtOrderDao::getCurrentPrice, ftOrderDao.getCurrentPrice());
+        }
+        if (ftOrderDao.getPayType() != null) {
+            lqw.eq(FtOrderDao::getPayType, ftOrderDao.getPayType());
+        }
+        if (ftOrderDao.getWriteOffAt() != null) {
+            lqw.eq(FtOrderDao::getWriteOffAt, ftOrderDao.getWriteOffAt());
+        }
+        List<FtOrderDao> list = iFtOrderDaoService.list(lqw);
+        return getDataTable(list);
+    }
+
+    /**
+     * 导出订单管理列表
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:order:export')")
+    @Log(title = "订单管理", businessType = BusinessType.EXPORT)
+    @GetMapping("/export")
+    public AjaxResult export(FtOrderDao ftOrderDao) {
+        LambdaQueryWrapper<FtOrderDao> lqw = new LambdaQueryWrapper<FtOrderDao>(ftOrderDao);
+        List<FtOrderDao> list = iFtOrderDaoService.list(lqw);
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<FtOrderDao>(FtOrderDao.class);
+        return util.exportExcel(list, "order");
+    }
+
+    /**
+     * 获取订单管理详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:order:query')")
+    @GetMapping(value = "/{orderId}")
+    public AjaxResult getInfo(@PathVariable("orderId") Long orderId) {
+        return AjaxResult.success(iFtOrderDaoService.getById(orderId));
+    }
+
+    /**
+     * 新增订单管理
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:order:add')")
+    @Log(title = "订单管理", businessType = BusinessType.INSERT)
+    @PostMapping
+    public AjaxResult add(@RequestBody FtOrderDao ftOrderDao) {
+        return toAjax(iFtOrderDaoService.save(ftOrderDao) ? 1 : 0);
+    }
+
+    /**
+     * 修改订单管理
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:order:edit')")
+    @Log(title = "订单管理", businessType = BusinessType.UPDATE)
+    @PutMapping
+    public AjaxResult edit(@RequestBody FtOrderDao ftOrderDao) {
+        return toAjax(iFtOrderDaoService.updateById(ftOrderDao) ? 1 : 0);
+    }
+
+    /**
+     * 删除订单管理
+     */
+    @PreAuthorize("@ss.hasPermi('fantang:order:remove')")
+    @Log(title = "订单管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{orderIds}")
+    public AjaxResult remove(@PathVariable Long[] orderIds) {
+        return toAjax(iFtOrderDaoService.removeByIds(Arrays.asList(orderIds)) ? 1 : 0);
+    }
+
+    /**
+     * 统计日报餐信息
+     */
+    @PostMapping("/getStatisGetOrderOfDay")
+    public AjaxResult getStatisGetOrderOfDay(@RequestBody JSONObject params) {
+
+        Date selectDay = params.getDate("selectDay");
+        Integer statisticsType = params.getInteger("statisticsType");
+        Integer pageNum = params.getInteger("pageNum");
+        Integer pageSize = params.getInteger("pageSize");
+
+        if (statisticsType == 1) {
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDate(selectDay, pageNum, pageSize));
+        } else {
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfDateByPerson(selectDay, pageNum, pageSize));
+        }
+    }
+
+    @PostMapping("/exportOrderOfDay")
+    public AjaxResult exportOrderOfDay(@RequestBody JSONObject params) {
+
+        Date selectDay = params.getDate("selectDay");
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        List<FtOrderDao> list;
+
+        if (statisticsType != 1) {
+            list = iFtOrderDaoService.statisOrderOfDateByPersonNoPage(selectDay);
+        } else {
+            list = null;
+        }
+
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<>(FtOrderDao.class);
+        return util.exportExcel(list, "员工用餐统计");
+    }
+
+    /**
+     * 统计周报餐信息
+     */
+    @PostMapping("/getStatisGetOrderOfWeek")
+    public AjaxResult getStatisGetOrderOfWeek(@RequestBody JSONObject params) {
+
+        Date selectWeek = params.getDate("selectWeek");
+        Integer statisticsType = params.getInteger("statisticsType");
+        Integer pageNum = params.getInteger("pageNum");
+        Integer pageSize = params.getInteger("pageSize");
+
+        if (statisticsType == 1) {
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfWeek(selectWeek, pageNum, pageSize));
+        } else {
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfWeekByPerson(selectWeek, pageNum, pageSize));
+        }
+
+    }
+
+    @PostMapping("/exportOrderOfWeek")
+    public AjaxResult exportOrderOfWeek(@RequestBody JSONObject params) {
+
+        Date selectWeek = params.getDate("selectWeek");
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        List<FtOrderDao> list;
+
+        if (statisticsType != 1) {
+            list = iFtOrderDaoService.statisOrderOfWeekByPersonNoPage(selectWeek);
+        } else {
+            list = null;
+        }
+
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<>(FtOrderDao.class);
+        return util.exportExcel(list, "员工用餐统计");
+    }
+
+    /**
+     * 统计月报餐信息
+     */
+    @PostMapping("/getStatisGetOrderOfMonth")
+    public AjaxResult getStatisGetOrderOfMonth(@RequestBody JSONObject params) {
+
+        Date selectMonth = params.getDate("selectMonth");
+        Integer statisticsType = params.getInteger("statisticsType");
+        Integer pageNum = params.getInteger("pageNum");
+        Integer pageSize = params.getInteger("pageSize");
+
+        if (statisticsType == 1) {
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfMonth(selectMonth, pageNum, pageSize));
+        } else {
+            return AjaxResult.success(iFtOrderDaoService.statisGetOrderOfMonthByPerson(selectMonth, pageNum, pageSize));
+        }
+    }
+
+    @PostMapping("/exportOrderOfMonth")
+    public AjaxResult exportOrderOfMonth(@RequestBody JSONObject params){
+
+        Date selectMonth = params.getDate("selectMonth");
+        Integer statisticsType = params.getInteger("statisticsType");
+
+        List<FtOrderDao> list;
+
+        if (statisticsType != 1) {
+            list = iFtOrderDaoService.statisOrderOfMonthByPersonNoPage(selectMonth);
+        } else {
+            list = null;
+        }
+
+        ExcelUtil<FtOrderDao> util = new ExcelUtil<>(FtOrderDao.class);
+        return util.exportExcel(list, "员工用餐统计");
+
+    }
+}

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtReportMealsDaoMapper">
+
+    <resultMap type="FtReportMealsDao" id="FtReportMealsDaoResult">
+        <result property="id" column="id"/>
+        <result property="createAt" column="create_at"/>
+        <result property="type" column="type"/>
+        <result property="patientId" column="patient_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="foods" column="foods"/>
+        <result property="price" column="price"/>
+        <result property="settlementFlag" column="settlement_flag"/>
+        <result property="settlementId" column="settlement_id"/>
+        <result property="settlementAt" column="settlement_at"/>
+        <result property="settlementBy" column="settlement_by"/>
+        <result property="nutritionFoodId" column="nutrition_food_id"/>
+        <result property="nutritionFoodFlag" column="nutrition_food_flag"/>
+        <result property="isReplaceFood" column="is_replace_food"/>
+        <result property="nutritionFoodPrice" column="nutrition_food_price"/>
+        <result property="totalPrice" column="total_price"/>
+        <result property="vegetables" column="vegetables"/>
+        <result property="meat" column="meat"/>
+        <result property="rice" column="rice"/>
+        <result property="egg" column="egg"/>
+        <result property="openFlag" column="open_flag"/>
+        <result property="diningAt" column="dining_at"/>
+        <result property="diningFlag" column="dining_flag"/>
+    </resultMap>
+
+    <select id="listMealsWithInSettle" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+        select sum(a.total_price ) as price, a.patient_id, b.hospital_id, b.bed_id, b.`name`, c.depart_name, c.depart_code
+        from ft_report_meals a
+        LEFT JOIN ft_patient b on a.patient_id = b.patient_id
+        LEFT JOIN ft_depart c on b.depart_id = c.depart_id
+        <where>
+            a.dining_flag = 1
+            AND b.off_flag = 0
+            <if test="hospitalId != null">and b.hospital_id = #{hospitalId}</if>
+            <if test="departId != null">and b.depart_id = #{departId}</if>
+            <if test="name != null and name !=''">and b.name = #{name}</if>
+            <if test="settlementFlag != null">and a.settlement_flag = #{settlementFlag}</if>
+        </where>
+        GROUP BY a.patient_id
+    </select>
+
+    <select id="listNutrition" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+        SELECT
+        a.patient_id,
+        a.type,
+        a.foods,
+        a.nutrition_food_price,
+        a.nutrition_food_id,
+        d.`name` AS nutrition_name,
+        a.nutrition_food_flag,
+        a.is_replace_food,
+        b.`name`,
+        b.depart_id,
+        b.hospital_id,
+        b.bed_id,
+        c.depart_name,
+        f.catering_usage
+        FROM
+        ft_report_meals a
+        LEFT JOIN ft_patient b ON a.patient_id = b.patient_id
+        LEFT JOIN ft_depart c ON b.depart_id = c.depart_id
+        LEFT JOIN ft_nutrition_food d ON a.nutrition_food_id = d.id
+        LEFT JOIN ft_catering f ON a.patient_id = f.patient_id
+        AND a.type = f.type
+        <where>
+            a.open_flag = 1
+            AND a.dining_at BETWEEN #{beginOfDay}
+            AND #{endOfDay}
+            <if test="cateringUsage != null">and f.catering_usage = #{cateringUsage}</if>
+            <if test="departId != null">and b.depart_id = #{departId}</if>
+            <if test="name != null">and b.`name` = #{name}</if>
+            <if test="nutritionFoodId != null">and a.nutrition_food_id = #{nutritionFoodId}</if>
+            <if test="type != null">and a.type = #{type}</if>
+        </where>
+    </select>
+
+    <select id="listAllNutrition" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+        SELECT
+        a.patient_id,
+        a.type,
+        a.foods,
+        a.dining_at,
+        a.nutrition_food_price,
+        a.nutrition_food_id,
+        d.`name` AS nutrition_name,
+        a.nutrition_food_flag,
+        a.is_replace_food,
+        b.`name`,
+        b.depart_id,
+        b.hospital_id,
+        b.bed_id,
+        c.depart_name,
+        f.catering_usage
+        FROM
+        ft_report_meals a
+        LEFT JOIN ft_patient b ON a.patient_id = b.patient_id
+        LEFT JOIN ft_depart c ON b.depart_id = c.depart_id
+        LEFT JOIN ft_nutrition_food d ON a.nutrition_food_id = d.id
+        LEFT JOIN ft_catering f ON a.patient_id = f.patient_id
+        AND a.type = f.type
+        <where>
+            a.open_flag = 1
+            <if test="beginOfDay != null">AND a.dining_at BETWEEN #{beginOfDay}</if>
+            <if test="endOfDay != null">AND #{endOfDay}</if>
+            <if test="cateringUsage != null">and f.catering_usage = #{cateringUsage}</if>
+            <if test="cateringUsage != null">and f.catering_usage = #{cateringUsage}</if>
+            <if test="departId != null">and b.depart_id = #{departId}</if>
+            <if test="name != null">and b.`name` = #{name}</if>
+            <if test="nutritionFoodId != null">and a.nutrition_food_id = #{nutritionFoodId}</if>
+            <if test="type != null">and a.type = #{type}</if>
+        </where>
+    </select>
+    <select id="listPatientReportMeals" resultType="com.ruoyi.system.fantang.domain.FtReportMealsDao">
+        SELECT
+            a.*, b.`name`,
+            b.bed_id,
+            b.hospital_id,
+            c.depart_name
+        FROM
+            ft_report_meals a
+        LEFT JOIN ft_patient b ON a.patient_id = b.patient_id
+        LEFT JOIN ft_depart c ON b.depart_id = c.depart_id
+        <where>
+            <if test="name != null"> b.`name` like CONCAT('%',#{name},'%')</if>
+            <if test="bedId != null">and b.bed_id = #{bedId}</if>
+            <if test="departName != null">and b.depart_name = #{departName}</if>
+            <if test="beginOfDay != null">AND a.create_at BETWEEN #{beginOfDay}</if>
+            <if test="endOfDay != null">AND #{endOfDay}</if>
+        </where>
+        order by b.`name`
+    </select>
+
+</mapper>

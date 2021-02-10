@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtDepartDaoMapper">
+    
+    <resultMap type="FtDepartDao" id="FtDepartDaoResult">
+        <result property="departId"    column="depart_id"    />
+        <result property="departName"    column="depart_name"    />
+        <result property="departCode"    column="depart_code"    />
+    </resultMap>
+
+
+</mapper>

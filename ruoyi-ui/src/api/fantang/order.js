@@ -1,0 +1,107 @@
+import request from '@/utils/request'
+
+// 查询订单管理列表
+export function listOrder(query) {
+  return request({
+    url: '/fantang/order/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询订单管理详细
+export function getOrder(orderId) {
+  return request({
+    url: '/fantang/order/' + orderId,
+    method: 'get'
+  })
+}
+
+// 新增订单管理
+export function addOrder(data) {
+  return request({
+    url: '/fantang/order',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改订单管理
+export function updateOrder(data) {
+  return request({
+    url: '/fantang/order',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除订单管理
+export function delOrder(orderId) {
+  return request({
+    url: '/fantang/order/' + orderId,
+    method: 'delete'
+  })
+}
+
+// 导出订单管理
+export function exportOrder(query) {
+  return request({
+    url: '/fantang/order/export',
+    method: 'get',
+    params: query
+  })
+}
+
+// 日报餐信息
+export function getStatisGetOrderOfDay(data) {
+  return request({
+    url: '/fantang/order/getStatisGetOrderOfDay',
+    method: 'post',
+    data: data
+  })
+}
+
+// 导出日报餐信息
+export function exportOrderOfDay(data) {
+  return request({
+    url: '/fantang/order/exportOrderOfDay',
+    method: 'post',
+    data: data
+  })
+}
+
+// 导出周报餐信息
+export function exportOrderOfWeek(data) {
+  return request({
+    url: '/fantang/order/exportOrderOfWeek',
+    method: 'post',
+    data: data
+  })
+}
+
+// 导出月报餐信息
+export function exportOrderOfMonth(data) {
+  return request({
+    url: '/fantang/order/exportOrderOfMonth',
+    method: 'post',
+    data: data
+  })
+}
+
+// 周报餐信息
+export function getStatisGetOrderOfWeek(data) {
+  return request({
+    url: '/fantang/order/getStatisGetOrderOfWeek',
+    method: 'post',
+    data: data
+  })
+}
+
+// 月报餐信息
+export function getStatisGetOrderOfMonth(data) {
+  return request({
+    url: '/fantang/order/getStatisGetOrderOfMonth',
+    method: 'post',
+    data: data
+  })
+}

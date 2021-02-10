@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.fantang.mapper.FtNotifyDaoMapper">
+    
+    <resultMap type="FtNotifyDao" id="FtNotifyDaoResult">
+        <result property="id"    column="id"    />
+        <result property="messageType"    column="message_type"    />
+        <result property="scope"    column="scope"    />
+        <result property="messageBody"    column="message_body"    />
+        <result property="createAt"    column="create_at"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="readFlag"    column="read_flag"    />
+    </resultMap>
+
+
+</mapper>

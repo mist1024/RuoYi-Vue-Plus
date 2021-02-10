@@ -1,5 +1,5 @@
 module.exports = {
-  title: '若依管理系统',
+  title: '食堂管理系统',
 
   /**
    * 侧边栏主题 深色主题theme-dark，浅色主题theme-light
@@ -14,7 +14,7 @@ module.exports = {
   /**
    * 是否显示 tagsView
    */
-  tagsView: true,
+  tagsView: false,
 
   /**
    * 是否固定头部
