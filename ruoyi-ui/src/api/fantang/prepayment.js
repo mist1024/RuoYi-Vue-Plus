@@ -109,3 +109,10 @@ export function generateReceiptPdf(data) {
     data: data
   })
 }
+
+export function leaveSettlePrepayment(prepaymentId) {
+  return request({
+    url: '/fantang/prepayment/leaveSettlePrepayment/' + prepaymentId,
+    method: 'put'
+  })
+}

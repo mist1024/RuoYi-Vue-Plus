@@ -3,7 +3,6 @@ package com.ruoyi.system.fantang.controller;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.config.RuoYiConfig;
@@ -22,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -64,10 +64,6 @@ public class FtPrepaymentDaoController extends BaseController {
      */
     @GetMapping("/getPrepaymentByPatientId/{patientId}")
     public AjaxResult getPrepaymentByPatientId(@PathVariable("patientId") Long patientId) {
-//        FtPrepaymentVo dao = iFtPrepaymentDaoService.getCountById(patientId);
-//        if (dao == null)
-//            return AjaxResult.error("无该记录");
-//        return AjaxResult.success("操作成功", dao);
         FtPrepaymentDao ftPrepaymentDao = iFtPrepaymentDaoService.getByPatientId(patientId);
         if (ftPrepaymentDao == null) {
             return AjaxResult.error("无该记录");
@@ -164,14 +160,9 @@ public class FtPrepaymentDaoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('fantang:prepayment:add')")
     @Log(title = "收费管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody FtPrepaymentVo ftPrepaymentDao) {
-
-        Long patientId = ftPrepaymentDao.getPatientId();
-        QueryWrapper<FtPrepaymentVo> wrapper = new QueryWrapper<>();
-        wrapper.eq("patient_id", patientId);
-
+    public AjaxResult add(@RequestBody FtPrepaymentDao ftPrepaymentDao) {
         ftPrepaymentDao.setCollectAt(new Date());
-        ftPrepaymentDao.setSettlementFlag(0L);
+
         return toAjax(iFtPrepaymentDaoService.save(ftPrepaymentDao) ? 1 : 0);
     }
 
@@ -195,6 +186,9 @@ public class FtPrepaymentDaoController extends BaseController {
         return toAjax(iFtPrepaymentDaoService.removeByIds(Arrays.asList(prepaymentIds)) ? 1 : 0);
     }
 
+    /**
+     * 生成 pdf 收据
+     */
     @PostMapping("/generateReceiptPdf")
     public AjaxResult generateReceiptPdf(@RequestBody JSONObject params) {
 
@@ -213,6 +207,21 @@ public class FtPrepaymentDaoController extends BaseController {
         String downloadPath = "profile/upload/饭堂票据" + patientId + ".pdf";
 
         return AjaxResult.success(fileWebUrl + downloadPath);
+    }
 
+    /**
+     * 出院结清
+     */
+    @PutMapping("/leaveSettlePrepayment/{prepaymentId}")
+    public AjaxResult leaveSettlePrepayment(@PathVariable Long prepaymentId){
+
+        FtPrepaymentDao prepaymentDao = new FtPrepaymentDao();
+        prepaymentDao.setPrepaymentId(prepaymentId);
+        prepaymentDao.setPrepaid(new BigDecimal(0));
+        prepaymentDao.setSettlementFlag(1);
+        prepaymentDao.setSettlementAt(new Date());
+
+        iFtPrepaymentDaoService.updateById(prepaymentDao);
+        return AjaxResult.success("已结清");
     }
 }
