@@ -1,5 +1,6 @@
 package com.ruoyi.system.fantang.controller;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -649,11 +651,13 @@ public class ClientController extends BaseController {
 
     @PostMapping("qrcode")
     public AjaxResult qrcode(@RequestBody JSONObject params) {
-        Long staffId = params.getLong("staffId");
-        Long orderId = params.getLong("orderId");
-        System.out.println("staffId: " + staffId.toString());
-        System.out.println("orderId: " + orderId.toString());
-        return AjaxResult.success("二维码扫码成功");
+        String data = params.getString("data");
+        JSONObject jsonData = JSONObject.parseObject(Base64.decodeStr(data));
+        Long staffId = jsonData.getLong("staffId");
+        Long orderId = jsonData.getLong("orderId");
+        String tel = jsonData.getString("tel");
+        log.info("二维码：原始字串-{}；员工id：{}; 订单id：{}", jsonData, staffId, orderId);
+        return AjaxResult.success(String.format("二维码：原始字串-%s；员工id：%d; 订单id：%d, 电话：%s", jsonData, staffId, orderId, tel));
     }
 
 }
