@@ -486,7 +486,6 @@ export default {
       this.formAddPrepayment.collectAt = null;
       this.formAddPrepayment.prepaidAt = null;
 
-      console.log("bbbbbbbbbb", this.formAddPrepayment);
       addPrepayment(this.formAddPrepayment).then(response => {
         this.msgSuccess("已收费")
         this.openChargeDialogFlag = false;
