@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "fantang.templatePath",
+      "type": "java.lang.String",
+      "description": "Description for spring.fantang.templatePath."
+    },
+    {
+      "name": "fantang.fileWebUrl",
+      "type": "java.lang.String",
+      "description": "Description for spring.fantang.fileWebUrl."
+    }
+  ]
+}

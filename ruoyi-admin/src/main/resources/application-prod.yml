@@ -77,3 +77,8 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+
+  # 饭堂配置参数
+fantang:
+  templatePath: /root/sanyuan/template/饭堂收费票据模板.pdf
+  fileWebUrl: http://8.135.81.183:8080/prod-api/

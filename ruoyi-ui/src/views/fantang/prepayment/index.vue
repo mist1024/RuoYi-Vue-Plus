@@ -283,7 +283,7 @@ export default {
     // 生成收据 pdf
     handleGenerateReceiptPdf(row) {
       generateReceiptPdf(row).then(response => {
-        window.open("http://192.168.3.93:9001/dev-api/" + response.msg)
+        window.open(response.msg)
       })
       console.log(process.env);
     },

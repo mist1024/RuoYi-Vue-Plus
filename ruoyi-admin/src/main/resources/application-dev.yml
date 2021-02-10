@@ -77,3 +77,7 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+
+fantang:
+  templatePath: Z:\\程序开发\\项目测试\\三院饭堂\\饭堂收费票据模板.pdf
+  fileWebUrl: http://127.0.0.1:9001/dev-api/

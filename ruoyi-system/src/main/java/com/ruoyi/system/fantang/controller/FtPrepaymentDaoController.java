@@ -18,6 +18,7 @@ import com.ruoyi.system.fantang.service.IFtPrepaymentDaoService;
 import com.ruoyi.system.fantang.utils.PdfUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,11 @@ public class FtPrepaymentDaoController extends BaseController {
 
     private final IFtPrepaymentDaoService iFtPrepaymentDaoService;
 
+    @Value("${fantang.templatePath}")
+    private String templatePath;
+
+    @Value("${fantang.fileWebUrl}")
+    private String fileWebUrl;
 
     @GetMapping("/getCountById/{patientId}")
     public AjaxResult getCountById(@PathVariable("patientId") Long patientId) {
@@ -196,7 +202,7 @@ public class FtPrepaymentDaoController extends BaseController {
 
         // 模板路径
 //        String templatePath = "F:\\pdfTemplate\\饭堂票据模板2.pdf";
-        String templatePath = "Z:\\程序开发\\项目测试\\三院饭堂\\饭堂收费票据模板.pdf";
+//        String templatePath = "Z:\\程序开发\\项目测试\\三院饭堂\\饭堂收费票据模板.pdf";
 
         // 生成的新文件路径
         String outputPath = RuoYiConfig.getUploadPath() + "\\饭堂票据" + patientId + ".pdf";
@@ -206,7 +212,7 @@ public class FtPrepaymentDaoController extends BaseController {
         // 下载地址
         String downloadPath = "profile/upload/饭堂票据" + patientId + ".pdf";
 
-        return AjaxResult.success(downloadPath);
+        return AjaxResult.success(fileWebUrl + downloadPath);
 
     }
 }
