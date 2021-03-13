@@ -1,1 +1,1 @@
-package com.ruoyi.demo.controller;
+package com.jiajiakang.demo.controller;

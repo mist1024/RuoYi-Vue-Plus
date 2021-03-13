@@ -1,1 +1,1 @@
-package com.ruoyi.demo.mapper;
+package com.jiajiakang.demo.mapper;

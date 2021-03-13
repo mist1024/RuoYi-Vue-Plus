@@ -1,1 +1,1 @@
-package com.ruoyi.demo.domain;
+package com.jiajiakang.demo.domain;

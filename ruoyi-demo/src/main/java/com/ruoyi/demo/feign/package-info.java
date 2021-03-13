@@ -1,1 +1,1 @@
-package com.ruoyi.demo.feign;
+package com.jiajiakang.demo.feign;
