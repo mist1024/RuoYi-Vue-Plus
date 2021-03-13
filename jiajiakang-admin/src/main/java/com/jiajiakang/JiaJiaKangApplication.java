@@ -18,6 +18,6 @@ public class JiaJiaKangApplication
     {
         System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(JiaJiaKangApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  ~~  若依启动成功   ~~   ლ(´ڡ`ლ)ﾞ");
+        System.out.println("(♥◠‿◠)ﾉﾞ  ~~  佳家康管理系统启动成功   ~~   ლ(´ڡ`ლ)ﾞ");
     }
 }

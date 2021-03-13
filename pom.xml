@@ -225,11 +225,11 @@
             </dependency>
 
             <!-- demo模块 -->
-<!--            <dependency>-->
-<!--                <groupId>com.jiajiakang</groupId>-->
-<!--                <artifactId>jiajiakang-demo</artifactId>-->
-<!--                <version>${jiajiakang.version}</version>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>com.jiajiakang</groupId>
+                <artifactId>jiajiakang-demo</artifactId>
+                <version>${jiajiakang.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -241,7 +241,7 @@
         <module>jiajiakang-quartz</module>
         <module>jiajiakang-generator</module>
         <module>jiajiakang-common</module>
-<!--        <module>jiajiakang-demo</module>-->
+        <module>jiajiakang-demo</module>
     </modules>
     <packaging>pom</packaging>
 
