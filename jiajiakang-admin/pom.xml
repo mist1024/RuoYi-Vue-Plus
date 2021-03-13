@@ -74,10 +74,10 @@
         </dependency>
 
         <!--  demo模块  -->
-        <dependency>
-            <groupId>com.jiajiakang</groupId>
-            <artifactId>jiajiakang-demo</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.jiajiakang</groupId>-->
+<!--            <artifactId>jiajiakang-demo</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 
