@@ -79,6 +79,7 @@ public class CaptchaController {
             capStr = lineCaptcha.getCode();
         } else if ("circle".equals(captchaCategory)) {
             circleCaptcha.setGenerator(codeGenerator);
+            circleCaptcha.createCode();
             capStr = circleCaptcha.getCode();
         } else if ("shear".equals(captchaCategory)) {
             shearCaptcha.setGenerator(codeGenerator);
