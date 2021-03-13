@@ -1,1 +1,1 @@
-package com.ruoyi.demo.feign.fallback;
+package com.jiajiakang.demo.feign.fallback;

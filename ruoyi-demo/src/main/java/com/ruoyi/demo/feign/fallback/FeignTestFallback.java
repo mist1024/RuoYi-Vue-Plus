@@ -1,7 +1,7 @@
-package com.ruoyi.demo.feign.fallback;
+package com.jiajiakang.demo.feign.fallback;
 
 
-import com.ruoyi.demo.feign.FeignTestService;
+import com.jiajiakang.demo.feign.FeignTestService;
 
 public class FeignTestFallback implements FeignTestService {
 
