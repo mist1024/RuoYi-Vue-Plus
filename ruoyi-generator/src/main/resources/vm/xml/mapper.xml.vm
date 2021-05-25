@@ -10,5 +10,55 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 #end
     </resultMap>
 
+#if($joinInfos)
+    <resultMap type="Map" id="JoinResult" extends="${ClassName}Result">
+#foreach ($joinInfo in $joinInfos)
+        <!-- ${joinInfo.joinTableLowerClassName} -->
+#foreach ($showField in $joinInfo.showFields)
+        <result property="${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}" column="${joinInfo.joinTable}_${showField.showField}"/>
+#end
+#end
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        select
+        <!-- 主表 ${tableName} 字段 -->
+#foreach ($column in $columns)
+        ${tableName}.${column.columnName} as ${column.columnName},
+#end
+
+#foreach ($joinInfo in $joinInfos)
+        <!-- 关联表 ${joinInfo.joinTableLowerClassName} 字段 -->
+#foreach ($showField in $joinInfo.showFields)
+        ${joinInfo.joinTable}.${showField.showField} as ${joinInfo.joinTable}_${showField.showField},
+#end
+#end
+        <!-- 最后的逗号没找到好办法去除，先手动去除 -->
+        from ${tableName}
+#foreach ($joinInfo in $joinInfos)
+        left join ${joinInfo.joinTable} on ${tableName}.${joinInfo.tableFkName} = ${joinInfo.joinTable}.${joinInfo.joinField}
+#end
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="JoinResult">
+        <include refid="Base_Column_List"></include>
+        where ${tableName}.${pkColumn.columnName} = #{id}
+    </select>
+
+    <select id="selectList" parameterType="Long" resultMap="JoinResult">
+        <include refid="Base_Column_List"></include>
+        <if test="ew.emptyOfWhere == false">
+            ${ew.customSqlSegment}
+        </if>
+    </select>
+
+    <select id="selectPage" parameterType="Long" resultMap="JoinResult">
+        <include refid="Base_Column_List"></include>
+        <if test="ew.emptyOfWhere == false">
+            ${ew.customSqlSegment}
+        </if>
+    </select>
+
+#end
 
 </mapper>

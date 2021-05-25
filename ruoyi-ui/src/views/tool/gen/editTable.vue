@@ -113,7 +113,7 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="生成信息" name="genInfo">
-        <gen-info-form ref="genInfo" :info="info" :tables="tables" :menus="menus"/>
+        <gen-info-form ref="genInfo" :info="info" :tables="tables" :menus="menus" :columns="columns"/>
       </el-tab-pane>
     </el-tabs>
     <el-form label-width="100px">

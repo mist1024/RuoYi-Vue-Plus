@@ -8,6 +8,7 @@
             <el-option label="单表（增删改查）" value="crud" />
             <el-option label="树表（增删改查）" value="tree" />
             <el-option label="主子表（增删改查）" value="sub" />
+            <el-option label="关联表（增删改查）" value="join" />
           </el-select>
         </el-form-item>
       </el-col>
@@ -211,6 +212,101 @@
         </el-form-item>
       </el-col>
     </el-row>
+
+    <el-row v-show="info.tplCategory == 'join'">
+      <h4 class="form-header">关联查询</h4>
+      <el-button type="primary" icon="el-icon-plus" size="mini" @click="addJoinInfo">新增</el-button>
+      <el-tooltip :content="info.tableName + ' left join 关联表 on 主表关联字段 = 子表关联字段'" placement="top">
+        <i class="el-icon-question"></i>
+      </el-tooltip>
+      <el-table :data="info.joinInfos" style="width: 100%">
+        <el-table-column
+          label="关联表名称"
+        >
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.joinTable" placeholder="请选择" @change="scope.row.joinField = null; scope.row.showFields = []">
+              <el-option
+                v-for="(table, index) in tables"
+                :key="index"
+                :label="table.tableName + '：' + table.tableComment"
+                :value="table.tableName"
+              ></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="'主表' + info.tableName + '的关联字段'"
+        >
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.tableFkName" placeholder="请选择">
+              <el-option
+                v-for="(column, index) in columns"
+                :key="index"
+                :label="column.columnName + '：' + column.columnComment"
+                :value="column.columnName"
+              ></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="'子表关联的字段'"
+        >
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.joinField" placeholder="请选择">
+              <el-option
+                v-for="(column, index) in (tableMap.get(scope.row.joinTable) ? tableMap.get(scope.row.joinTable).columns : [])"
+                :key="index"
+                :label="column.columnName + '：' + column.columnComment"
+                :value="column.columnName"
+              ></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="子表展示字段"
+          min-width="100"
+        >
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.showFields" multiple placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="(column, index) in (tableMap.get(scope.row.joinTable) ? tableMap.get(scope.row.joinTable).columns : [])"
+                :key="index"
+                :label="column.columnName + '：' + column.columnComment"
+                :value="column.columnName"
+              ></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="列表查询条件（尚未完成）"
+          min-width="100"
+        >
+          <template slot-scope="scope">
+            <el-select v-model="scope.row.queryFields" multiple placeholder="请选择" style="width:100%">
+              <el-option
+                v-for="(column, index) in (tableMap.get(scope.row.joinTable) ? tableMap.get(scope.row.joinTable).columns : [])"
+                :key="index"
+                :label="column.columnName + '：' + column.columnComment"
+                :value="column.columnName"
+              ></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="'操作'"
+        >
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="info.joinInfos.splice(scope.$index, 1)"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-row>
+
   </el-form>
 </template>
 <script>
@@ -233,10 +329,15 @@ export default {
       type: Array,
       default: []
     },
+    columns: {
+      type: Array,
+      default: []
+    },
   },
   data() {
     return {
       subColumns: [],
+      tableMap: new Map(), // 封装关联表对应的字段列表
       rules: {
         tplCategory: [
           { required: true, message: "请选择生成模板", trigger: "blur" }
@@ -260,6 +361,13 @@ export default {
   watch: {
     'info.subTableName': function(val) {
       this.setSubTableColumns(val);
+    },
+    'tables': function(tables) {
+      const that = this
+      tables.forEach(table => {
+        that.tableMap.set(table.tableName, table)
+        console.log("tableMap is:", that.tableMap)
+      })
     }
   },
   methods: {
@@ -284,9 +392,13 @@ export default {
         this.info.subTableName = '';
         this.info.subTableFkName = '';
       }
+      if(value !== 'join') {
+        this.info.joinInfos.splice(0, this.info.joinInfos.length);
+      }
     },
     /** 设置关联外键 */
     setSubTableColumns(value) {
+      console.log(this.tables)
       for (var item in this.tables) {
         const name = this.tables[item].tableName;
         if (value === name) {
@@ -294,6 +406,14 @@ export default {
           break;
         }
       }
+    },
+    addJoinInfo() {
+      this.info.joinInfos.push({
+        joinTable: null,
+        tableFkName: null,
+        joinField: null,
+        showFields: []
+      });
     }
   }
 };

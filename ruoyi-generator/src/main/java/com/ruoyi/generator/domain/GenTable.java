@@ -1,7 +1,10 @@
 package com.ruoyi.generator.domain;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.constant.GenConstants;
 import lombok.*;
@@ -11,10 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 业务表 gen_table
@@ -113,6 +113,18 @@ public class GenTable implements Serializable {
      */
     @TableField(exist = false)
     private GenTableColumn pkColumn;
+
+    /**
+     * 关联表配置信息
+     */
+	@TableField(typeHandler = JacksonTypeHandler.class)
+    private List<JoinInfo> joinInfos;
+
+	/**
+	 * 关联表信息
+	 */
+	@TableField(exist = false)
+	private Map<String, GenTable> joinTableMap = new HashMap<>();
 
     /**
      * 子表信息
@@ -234,4 +246,57 @@ public class GenTable implements Serializable {
         }
         return StrUtil.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
     }
+
+	/**
+	 * 关联表信息
+	 *
+	 * 举例
+	 * select A.xxx, B.xxx(showFields) from A left join B(joinTable) on A.fk_id(tableFkName) = B.id(joinField)
+	 */
+	@Data
+	public static class JoinInfo {
+
+		/**
+		 * 关联表的名称
+		 */
+		private String joinTable;
+
+		/**
+		 * 主表的关联字段
+		 */
+		private String tableFkName;
+
+		/**
+		 * 关联表的关联字段
+		 */
+		private String joinField;
+
+		/**
+		 * 关联表中要展示的字段
+		 */
+		private LinkedHashSet<String> showFields;
+
+		/**
+		 * 查询列表要展示的字段
+		 */
+		private LinkedHashSet<String> queryFields;
+
+	}
+
+	/**
+	 * 自定义类型转换器
+	 * 服务于GenTableMapper.xml
+	 */
+	public static class JoinInfoTypeHandler extends AbstractJsonTypeHandler<List<JoinInfo>> {
+
+		@Override
+		protected List<JoinInfo> parse(String json) {
+			return JSON.parseArray(json, JoinInfo.class);
+		}
+
+		@Override
+		protected String toJson(List<JoinInfo> obj) {
+			return JSON.toJSONString(obj);
+		}
+	}
 }

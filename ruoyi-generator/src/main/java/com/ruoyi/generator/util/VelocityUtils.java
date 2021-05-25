@@ -1,5 +1,6 @@
 package com.ruoyi.generator.util;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -7,15 +8,15 @@ import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.generator.domain.GenTable;
 import com.ruoyi.generator.domain.GenTableColumn;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * 模板处理工具类
- * 
+ *
  * @author ruoyi
  */
 public class VelocityUtils
@@ -69,6 +70,10 @@ public class VelocityUtils
         {
             setSubVelocityContext(velocityContext, genTable);
         }
+        if (GenConstants.TPL_JOIN.equals(tplCategory))
+        {
+            setJoinVelocityContext(velocityContext, genTable);
+        }
         return velocityContext;
     }
 
@@ -120,6 +125,101 @@ public class VelocityUtils
         context.put("subImportList", getImportList(genTable.getSubTable()));
     }
 
+	/**
+	 * 关联表类型的相关参数封装
+	 * @param context
+	 * @param genTable
+	 */
+	public static void setJoinVelocityContext(VelocityContext context, GenTable genTable) {
+		List<GenTable.JoinInfo> joinInfos = genTable.getJoinInfos();
+		Map<String, GenTable> joinTableMap = genTable.getJoinTableMap();
+		List<GenTableColumn> genTableColumns = genTable.getColumns();
+		Map<String, GenTableColumn> genTableColumnMap = CollUtil.fieldValueMap(genTableColumns, "columnName");
+		List<Map<String, Object>> joinInfoList = new ArrayList<>();
+		context.put("joinInfos", joinInfoList);
+		if (!CollectionUtils.isEmpty(joinInfos)) {
+			for (GenTable.JoinInfo joinInfo : joinInfos) {
+				Map<String, Object> joinInfoMap = new HashMap<>();
+				joinInfoList.add(joinInfoMap);
+
+				String joinTable = joinInfo.getJoinTable();
+				String joinTableClassName = StrUtil.toCamelCase(joinTable);
+				String joinTableLowerClassName = StrUtil.lowerFirst(joinTableClassName);
+				String joinTableUpperClassName = StrUtil.upperFirst(joinTableClassName);
+
+				joinInfoMap.put("joinGenTable", joinTableMap.get(joinTable));
+				joinInfoMap.put("joinGenTableBusinessName", StrUtil.upperFirst(joinTableMap.get(joinTable).getBusinessName()));
+				joinInfoMap.put("joinGenTableModuleName", StrUtil.upperFirst(joinTableMap.get(joinTable).getModuleName()));
+				joinInfoMap.put("joinTable", joinTable);
+				joinInfoMap.put("joinTableClassName", joinTableClassName);
+				joinInfoMap.put("joinTableLowerClassName", joinTableLowerClassName);
+				joinInfoMap.put("joinTableUpperClassName", joinTableUpperClassName);
+
+				String tableFkName = joinInfo.getTableFkName();
+				joinInfoMap.put("tableFkName", tableFkName);
+				GenTableColumn genTableColumn = genTableColumnMap.get(tableFkName);
+				// 主表关联的字段(tableFkName)，如果本身就在列表中展示，就会在各个vm中生成拼接，如果不需要在列表中展示，关联查询却仍需要这个字段，为避免重复生成增加该flag进行判断
+				joinInfoMap.put("tableFkGenerateFlag", !genTableColumn.isList());
+				joinInfoMap.put("tableFkColumn", genTableColumn);
+
+				String joinField = joinInfo.getJoinField();
+				joinInfoMap.put("joinField", joinField);
+
+
+				LinkedHashSet<String> showFields = joinInfo.getShowFields();
+				List<Map<String, String>> showFieldList = new ArrayList<>();
+				joinInfoMap.put("showFields", showFieldList);
+				if (!CollectionUtils.isEmpty(showFields)) {
+					GenTable joinGenTable = joinTableMap.get(joinTable);
+					List<GenTableColumn> columns = joinGenTable.getColumns();
+					Map<String, GenTableColumn> columnMap = CollUtil.fieldValueMap(columns, "columnName");
+
+					for (String showField : showFields) {
+						Map<String, String> showFieldMap = new HashMap<>();
+						showFieldList.add(showFieldMap);
+						String showFiledName = StrUtil.toCamelCase(showField);
+						String showFiledUpperName = StrUtil.upperFirst(showFiledName);
+						showFieldMap.put("showField", showField);
+						showFieldMap.put("showFiledName", showFiledName);
+						showFieldMap.put("showFiledUpperName", showFiledUpperName);
+						GenTableColumn column = columnMap.get(showField);
+						showFieldMap.put("showFieldJavaType", column.getJavaType());
+						showFieldMap.put("showFieldDictType", column.getDictType());
+						if (StringUtils.isNotBlank(column.getColumnComment())) {
+							showFieldMap.put("showFieldComment", column.getColumnComment());
+						} else {
+							showFieldMap.put("showFieldComment", joinTableLowerClassName + showFiledUpperName);
+						}
+					}
+				}
+				LinkedHashSet<String> queryFields = joinInfo.getQueryFields();
+				List<Map<String, String>> queryFieldList = new ArrayList<>();
+				joinInfoMap.put("queryFields", queryFieldList);
+				if (!CollectionUtils.isEmpty(queryFields)) {
+					GenTable joinGenTable = joinTableMap.get(joinTable);
+					List<GenTableColumn> columns = joinGenTable.getColumns();
+					Map<String, GenTableColumn> columnMap = CollUtil.fieldValueMap(columns, "columnName");
+					for (String queryField : queryFields) {
+						Map<String, String> queryFieldMap = new HashMap<>();
+						queryFieldList.add(queryFieldMap);
+						String queryFiledName = StrUtil.toCamelCase(queryField);
+						String queryFiledUpperName = StrUtil.upperFirst(queryFiledName);
+						queryFieldMap.put("queryField", queryField);
+						queryFieldMap.put("queryFiledName", queryFiledName);
+						queryFieldMap.put("queryFiledUpperName", queryFiledUpperName);
+
+						GenTableColumn column = columnMap.get(queryField);
+						if (StringUtils.isNotBlank(column.getColumnComment())) {
+							queryFieldMap.put("queryFieldComment", column.getColumnComment());
+						} else {
+							queryFieldMap.put("queryFieldComment", joinTableLowerClassName + queryFiledUpperName);
+						}
+					}
+				}
+			}
+		}
+	}
+
     /**
      * 获取模板信息
      *
@@ -140,7 +240,7 @@ public class VelocityUtils
         templates.add("vm/xml/mapper.xml.vm");
         templates.add("vm/sql/sql.vm");
         templates.add("vm/js/api.js.vm");
-        if (GenConstants.TPL_CRUD.equals(tplCategory))
+        if (GenConstants.TPL_CRUD.equals(tplCategory) || GenConstants.TPL_JOIN.equals(tplCategory))
         {
             templates.add("vm/vue/index.vue.vm");
         }

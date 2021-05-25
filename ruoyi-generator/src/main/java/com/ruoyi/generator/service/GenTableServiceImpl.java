@@ -24,12 +24,14 @@ import com.ruoyi.generator.util.VelocityInitializer;
 import com.ruoyi.generator.util.VelocityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -203,6 +205,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         GenTable table = baseMapper.selectGenTableById(tableId);
         // 设置主子表信息
         setSubTable(table);
+        // 设置关联表信息
+		setJoinTable(table);
         // 设置主键列信息
         setPkColumn(table);
         VelocityInitializer.initVelocity();
@@ -247,6 +251,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         GenTable table = baseMapper.selectGenTableByName(tableName);
         // 设置主子表信息
         setSubTable(table);
+		// 设置关联表信息
+		setJoinTable(table);
         // 设置主键列信息
         setPkColumn(table);
 
@@ -329,6 +335,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         GenTable table = baseMapper.selectGenTableByName(tableName);
         // 设置主子表信息
         setSubTable(table);
+		// 设置关联表信息
+		setJoinTable(table);
         // 设置主键列信息
         setPkColumn(table);
 
@@ -378,7 +386,11 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 } else if (Validator.isEmpty(genTable.getSubTableFkName())) {
                     throw new CustomException("子表关联的外键名不能为空");
                 }
-            }
+            } else if (GenConstants.TPL_JOIN.equals(genTable.getTplCategory())) {
+				if (CollectionUtils.isEmpty(genTable.getJoinInfos())) {
+					throw new CustomException("关联表的相关配置不能为空");
+				}
+			}
         }
     }
 
@@ -421,6 +433,25 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             table.setSubTable(baseMapper.selectGenTableByName(subTableName));
         }
     }
+
+	/**
+	 * 设置关联表的信息
+	 * @param table
+	 */
+	public void setJoinTable(GenTable table) {
+		Map<String, GenTable> joinTableMap = table.getJoinTableMap();
+		List<GenTable.JoinInfo> joinInfos = table.getJoinInfos();
+		if (!CollectionUtils.isEmpty(joinInfos)) {
+			for (GenTable.JoinInfo joinInfo: joinInfos) {
+				String joinTable = joinInfo.getJoinTable();
+				if (StringUtils.isNotBlank(joinTable)) {
+					GenTable joinGenTable = baseMapper.selectGenTableByName(joinTable);
+					setPkColumn(joinGenTable);
+					joinTableMap.put(joinTable, joinGenTable);
+				}
+			}
+		}
+	}
 
     /**
      * 设置代码生成其他选项值
