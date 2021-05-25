@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.edu.mapper.EduStudentExamMapper">
+
+    <resultMap type="com.ruoyi.edu.domain.EduStudentExam" id="EduStudentExamResult">
+        <result property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="examId" column="exam_id"/>
+        <result property="chineseScore" column="chinese_score"/>
+        <result property="mathScore" column="math_score"/>
+        <result property="englishScore" column="english_score"/>
+        <result property="chemistryScore" column="chemistry_score"/>
+        <result property="physicsScore" column="physics_score"/>
+        <result property="biologyScore" column="biology_score"/>
+        <result property="politicsScore" column="politics_score"/>
+        <result property="historyScore" column="history_score"/>
+        <result property="geographyScore" column="geography_score"/>
+        <result property="ethicScore" column="ethic_score"/>
+        <result property="classRank" column="class_rank"/>
+        <result property="gradeRank" column="grade_rank"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <resultMap type="Map" id="JoinResult" extends="EduStudentExamResult">
+        <!-- eduStudent -->
+        <result property="eduStudentIdCardNo" column="edu_student_id_card_no"/>
+        <result property="eduStudentCurrentClass" column="edu_student_current_class"/>
+        <result property="eduStudentCurrentGrade" column="edu_student_current_grade"/>
+        <result property="eduStudentStudentName" column="edu_student_student_name"/>
+        <result property="eduStudentMobile" column="edu_student_mobile"/>
+        <result property="eduStudentFatherMobile" column="edu_student_father_mobile"/>
+        <result property="eduStudentMotherMobile" column="edu_student_mother_mobile"/>
+        <result property="eduStudentCurrentSchool" column="edu_student_current_school"/>
+        <!-- eduExam -->
+        <result property="eduExamExamDate" column="edu_exam_exam_date"/>
+        <result property="eduExamExamNo" column="edu_exam_exam_no"/>
+        <result property="eduExamExamName" column="edu_exam_exam_name"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        select
+        <!-- 主表 edu_student_exam 字段 -->
+        edu_student_exam.id as id,
+        edu_student_exam.student_id as student_id,
+        edu_student_exam.exam_id as exam_id,
+        edu_student_exam.chinese_score as chinese_score,
+        edu_student_exam.math_score as math_score,
+        edu_student_exam.english_score as english_score,
+        edu_student_exam.chemistry_score as chemistry_score,
+        edu_student_exam.physics_score as physics_score,
+        edu_student_exam.biology_score as biology_score,
+        edu_student_exam.politics_score as politics_score,
+        edu_student_exam.history_score as history_score,
+        edu_student_exam.geography_score as geography_score,
+        edu_student_exam.ethic_score as ethic_score,
+        edu_student_exam.class_rank as class_rank,
+        edu_student_exam.grade_rank as grade_rank,
+        edu_student_exam.create_time as create_time,
+        edu_student_exam.create_by as create_by,
+        edu_student_exam.update_time as update_time,
+        edu_student_exam.update_by as update_by,
+
+        <!-- 关联表 eduStudent 字段 -->
+        edu_student.id_card_no as edu_student_id_card_no,
+        edu_student.current_class as edu_student_current_class,
+        edu_student.current_grade as edu_student_current_grade,
+        edu_student.student_name as edu_student_student_name,
+        edu_student.mobile as edu_student_mobile,
+        edu_student.father_mobile as edu_student_father_mobile,
+        edu_student.mother_mobile as edu_student_mother_mobile,
+        edu_student.current_school as edu_student_current_school,
+        <!-- 关联表 eduExam 字段 -->
+        edu_exam.exam_date as edu_exam_exam_date,
+        edu_exam.exam_no as edu_exam_exam_no,
+        edu_exam.exam_name as edu_exam_exam_name
+        <!-- 最后的逗号没找到好办法去除，先手动去除 -->
+        from edu_student_exam
+        left join edu_student on edu_student_exam.student_id = edu_student.id
+        left join edu_exam on edu_student_exam.exam_id = edu_exam.id
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="JoinResult">
+        <include refid="Base_Column_List"></include>
+        where edu_student_exam.id = #{id}
+    </select>
+
+    <select id="selectList" parameterType="Long" resultMap="JoinResult">
+        <include refid="Base_Column_List"></include>
+        <if test="ew.emptyOfWhere == false">
+            ${ew.customSqlSegment}
+        </if>
+    </select>
+
+    <select id="selectPage" parameterType="Long" resultMap="JoinResult">
+        <include refid="Base_Column_List"></include>
+        <if test="ew.emptyOfWhere == false">
+            ${ew.customSqlSegment}
+        </if>
+    </select>
+
+
+
+</mapper>

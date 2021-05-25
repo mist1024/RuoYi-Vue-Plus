@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.edu.mapper.EduStudentMapper">
+
+    <resultMap type="com.ruoyi.edu.domain.EduStudent" id="EduStudentResult">
+        <result property="id" column="id"/>
+        <result property="idCardNo" column="id_card_no"/>
+        <result property="studentName" column="student_name"/>
+        <result property="currentGrade" column="current_grade"/>
+        <result property="currentClass" column="current_class"/>
+        <result property="currentSchool" column="current_school"/>
+        <result property="mobile" column="mobile"/>
+        <result property="fatherMobile" column="father_mobile"/>
+        <result property="motherMobile" column="mother_mobile"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+</mapper>

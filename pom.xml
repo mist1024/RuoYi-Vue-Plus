@@ -180,6 +180,13 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
+            <!-- edu模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-edu</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -191,6 +198,7 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
+        <module>ruoyi-edu</module>
     </modules>
     <packaging>pom</packaging>
 
