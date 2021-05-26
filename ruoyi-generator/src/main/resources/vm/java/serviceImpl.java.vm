@@ -2,15 +2,20 @@ package ${packageName}.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-#if($table.crud || $table.sub)
+#if($table.crud || $table.sub || $table.join)
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 #end
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+#if($table.join)
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+#else
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+#end
 import ${packageName}.bo.${ClassName}AddBo;
 import ${packageName}.bo.${ClassName}QueryBo;
 import ${packageName}.bo.${ClassName}EditBo;
@@ -37,7 +42,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         return getVoById(${pkColumn.javaField}, ${ClassName}Vo.class);
     }
 
-#if($table.crud || $table.sub)
+#if($table.crud || $table.sub || $table.join)
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}QueryBo bo) {
         PagePlus<${ClassName}, ${ClassName}Vo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo), ${ClassName}Vo.class);
@@ -50,6 +55,31 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
         return listVo(buildQueryWrapper(bo), ${ClassName}Vo.class);
     }
 
+#if($table.join)
+    private Wrapper<${ClassName}> buildQueryWrapper(${ClassName}QueryBo bo) {
+        Map<String, Object> params = bo.getParams();
+        QueryWrapper<${ClassName}> qw = new QueryWrapper();
+#foreach ($joinInfo in $joinInfos)
+#if($foreach.hasNext)
+        // 关联表 ${joinInfo.joinTableLowerClassName} 相关字段
+#end
+#foreach ($queryField in $joinInfo.queryFields)
+#if(${queryField.queryFieldQueryType} != 'BETWEEN')
+#if(${queryField.queryFieldJavaType} == 'String')
+#set($condition='StrUtil.isNotBlank(bo.get'+${joinInfo.joinTableUpperClassName}+${queryField.queryFieldUpperName}+'())')
+#else
+#set($condition='bo.get'+${joinInfo.joinTableUpperClassName}+${queryField.queryFieldUpperName}+'() != null')
+#end
+        qw.${queryField.queryFieldQueryType.toLowerCase()}($condition, "${joinInfo.joinTable}.${queryField.queryField}", bo.get${joinInfo.joinTableUpperClassName}${queryField.queryFieldUpperName}());
+#else
+        qw.between(params.get("begin${queryField.queryFieldUpperName}") != null && params.get("end${queryField.queryFieldUpperName}") != null,
+            "${joinInfo.joinTable}.${joinInfo.joinField}" ,params.get("begin${queryField.queryFieldUpperName}"), params.get("end${queryField.queryFieldUpperName}"));
+#end
+#end
+#end
+        return qw;
+    }
+#else
     private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}QueryBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
@@ -76,6 +106,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #end
         return lqw;
     }
+#end
 
     @Override
     public Boolean insertByAddBo(${ClassName}AddBo bo) {

@@ -63,6 +63,61 @@
 #end
 #end
 #end
+
+#foreach($joinInfo in $joinInfos)
+#foreach($queryField in $joinInfo.queryFields)
+#if($queryField.queryFieldHtmlType == "input")
+      <el-form-item label="${queryField.queryFieldComment}" prop="${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}">
+        <el-input
+            v-model="queryParams.${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}"
+            placeholder="请输入${queryField.queryFieldComment}"
+            clearable
+            size="small"
+            @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+#elseif(($queryField.queryFieldHtmlType == "select" || $queryField.queryFieldHtmlType == "radio") && "" != $queryField.queryFieldDictType)
+      <el-form-item label="${queryField.queryFieldComment}" prop="${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}">
+        <el-select v-model="queryParams.${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}" placeholder="请选择${queryField.queryFieldComment}" clearable size="small">
+            <el-option
+                v-for="dict in ${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}Options"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+            />
+        </el-select>
+      </el-form-item>
+#elseif(($queryField.queryFieldHtmlType == "select" || $queryField.queryFieldHtmlType == "radio") && $queryField.queryFieldDictType)
+      <el-form-item label="${queryField.queryFieldComment}" prop="${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}">
+        <el-select v-model="queryParams.${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}" placeholder="请选择${queryField.queryFieldComment}" clearable size="small">
+            <el-option label="请选择字典生成" value="" />
+        </el-select>
+      </el-form-item>
+#elseif($queryField.queryFieldHtmlType == "datetime" && $queryField.queryFieldQueryType != "BETWEEN")
+      <el-form-item label="${queryField.queryFieldComment}" prop="${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}">
+        <el-date-picker clearable size="small"
+                        v-model="queryParams.${joinInfo.joinTableLowerClassName}${queryField.queryFieldUpperName}"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择${queryField.queryFieldComment}">
+        </el-date-picker>
+      </el-form-item>
+#elseif($queryField.queryFieldHtmlType == "datetime" && $queryField.queryFieldQueryType == "BETWEEN")
+      <el-form-item label="${queryField.queryFieldComment}">
+        <el-date-picker
+            v-model="daterange${queryField.queryFieldUpperName}"
+            size="small"
+            style="width: 240px"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
+#end
+#end
+#end
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -143,9 +198,9 @@
       <!-- 关联表 ${joinInfo.joinTableLowerClassName} 字段 -->
 #foreach ($showField in $joinInfo.showFields)
 #if($showField.showFieldDictType && "" != $showField.showFieldDictType)
-    <el-table-column label="${showField.showFieldComment}" align="center" prop="${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}" :formatter="${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}Format" />
+    <el-table-column label="${showField.showFieldComment}" align="center" prop="${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}" :formatter="${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}Format" />
 #else
-    <el-table-column label="${showField.showFieldComment}" align="center" prop="${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}" />
+    <el-table-column label="${showField.showFieldComment}" align="center" prop="${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}" />
 #end
 #end
 #end
@@ -195,7 +250,7 @@
             <el-option
                 v-for="item in ${joinInfo.joinTableLowerClassName}Options"
                 :key="item.${joinInfo.joinGenTable.pkColumn.javaField}"
-                :label="item.${joinInfo.showFields.get(0).showFiledName}"
+                :label="item.${joinInfo.showFields.get(0).showFieldName}"
                 :value="item.${joinInfo.joinGenTable.pkColumn.javaField}"
             />
         </el-select>
@@ -437,8 +492,8 @@ export default {
 #foreach($joinInfo in $joinInfos)
 #foreach ($showField in $joinInfo.showFields)
 #if($showField.showFieldDictType && "" != $showField.showFieldDictType)
-      // $comment字典
-      ${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}Options: [],
+      // ${showField.showFieldComment}字典
+      ${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}Options: [],
 #end
 #end
 #end
@@ -488,7 +543,7 @@ export default {
 #foreach ($showField in $joinInfo.showFields)
 #if($showField.showFieldDictType && "" != $showField.showFieldDictType)
     this.getDicts("${showField.showFieldDictType}").then(response => {
-        this.${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}Options = response.data;
+        this.${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}Options = response.data;
     });
 #end
 #end
@@ -525,7 +580,7 @@ export default {
         list${joinInfo.joinGenTableBusinessName}({
              pageNum: 1,
              pageSize: 10,
-             ${joinInfo.showFields.get(0).showFiledName}: keyword
+             ${joinInfo.showFields.get(0).showFieldName}: keyword
          }).then(response => {
             that.${joinInfo.joinGenTable.moduleName}${joinInfo.joinGenTableBusinessName}Options = response.rows
         });
@@ -549,8 +604,8 @@ export default {
 #foreach ($showField in $joinInfo.showFields)
 #if($showField.showFieldDictType && "" != $showField.showFieldDictType)
     // $comment字典翻译
-    ${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}Format(row, column) {
-        return this.selectDictLabel#if($column.htmlType == "checkbox")s#end(this.${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}Options, row.${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName});
+    ${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}Format(row, column) {
+        return this.selectDictLabel#if($column.htmlType == "checkbox")s#end(this.${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}Options, row.${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName});
     },
 #end
 #end

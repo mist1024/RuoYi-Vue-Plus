@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 #foreach ($joinInfo in $joinInfos)
         <!-- ${joinInfo.joinTableLowerClassName} -->
 #foreach ($showField in $joinInfo.showFields)
-        <result property="${joinInfo.joinTableLowerClassName}${showField.showFiledUpperName}" column="${joinInfo.joinTable}_${showField.showField}"/>
+        <result property="${joinInfo.joinTableLowerClassName}${showField.showFieldUpperName}" column="${joinInfo.joinTable}_${showField.showField}"/>
 #end
 #end
     </resultMap>

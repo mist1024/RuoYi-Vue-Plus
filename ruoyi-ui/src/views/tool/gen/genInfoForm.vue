@@ -263,9 +263,14 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="子表展示字段"
           min-width="100"
         >
+          <template slot="header" slot-scope="scope">
+            子表展示字段
+            <el-tooltip content="展示字段的第一个字段将作为表单录入页面中关联表下拉框远程搜索的搜索条件。例如通过输入用户名搜索用户列表，从而填充主表的userId。" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </template>
           <template slot-scope="scope">
             <el-select v-model="scope.row.showFields" multiple placeholder="请选择" style="width:100%">
               <el-option
@@ -278,9 +283,14 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="列表查询条件（尚未完成）"
           min-width="100"
         >
+          <template slot="header" slot-scope="scope">
+            列表查询条件
+            <el-tooltip content="列表查询上方的查询条件，查询方式同原表配置。" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </template>
           <template slot-scope="scope">
             <el-select v-model="scope.row.queryFields" multiple placeholder="请选择" style="width:100%">
               <el-option

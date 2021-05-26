@@ -159,7 +159,9 @@ public class VelocityUtils
 				joinInfoMap.put("tableFkName", tableFkName);
 				GenTableColumn genTableColumn = genTableColumnMap.get(tableFkName);
 				// 主表关联的字段(tableFkName)，如果本身就在列表中展示，就会在各个vm中生成拼接，如果不需要在列表中展示，关联查询却仍需要这个字段，为避免重复生成增加该flag进行判断
-				joinInfoMap.put("tableFkGenerateFlag", !genTableColumn.isList());
+				joinInfoMap.put("tableFkListFlag", !genTableColumn.isList());
+				// 主表关联的字段(tableFkName)，如果本身就支持查询，就会在各个vm中生成拼接，如果不支持查询，关联查询却仍需要这个字段，为避免重复生成增加该flag进行判断
+				joinInfoMap.put("tableFkQueryFlag", !genTableColumn.isQuery());
 				joinInfoMap.put("tableFkColumn", genTableColumn);
 
 				String joinField = joinInfo.getJoinField();
@@ -177,18 +179,18 @@ public class VelocityUtils
 					for (String showField : showFields) {
 						Map<String, String> showFieldMap = new HashMap<>();
 						showFieldList.add(showFieldMap);
-						String showFiledName = StrUtil.toCamelCase(showField);
-						String showFiledUpperName = StrUtil.upperFirst(showFiledName);
+						String showFieldName = StrUtil.toCamelCase(showField);
+						String showFieldUpperName = StrUtil.upperFirst(showFieldName);
 						showFieldMap.put("showField", showField);
-						showFieldMap.put("showFiledName", showFiledName);
-						showFieldMap.put("showFiledUpperName", showFiledUpperName);
+						showFieldMap.put("showFieldName", showFieldName);
+						showFieldMap.put("showFieldUpperName", showFieldUpperName);
 						GenTableColumn column = columnMap.get(showField);
 						showFieldMap.put("showFieldJavaType", column.getJavaType());
 						showFieldMap.put("showFieldDictType", column.getDictType());
 						if (StringUtils.isNotBlank(column.getColumnComment())) {
 							showFieldMap.put("showFieldComment", column.getColumnComment());
 						} else {
-							showFieldMap.put("showFieldComment", joinTableLowerClassName + showFiledUpperName);
+							showFieldMap.put("showFieldComment", joinTableLowerClassName + showFieldUpperName);
 						}
 					}
 				}
@@ -205,10 +207,15 @@ public class VelocityUtils
 						String queryFiledName = StrUtil.toCamelCase(queryField);
 						String queryFiledUpperName = StrUtil.upperFirst(queryFiledName);
 						queryFieldMap.put("queryField", queryField);
-						queryFieldMap.put("queryFiledName", queryFiledName);
-						queryFieldMap.put("queryFiledUpperName", queryFiledUpperName);
+						queryFieldMap.put("queryFieldName", queryFiledName);
+						queryFieldMap.put("queryFieldUpperName", queryFiledUpperName);
 
 						GenTableColumn column = columnMap.get(queryField);
+						queryFieldMap.put("queryFieldHtmlType", column.getHtmlType());
+						queryFieldMap.put("queryFieldDictType", column.getDictType());
+						queryFieldMap.put("queryFieldJavaType", column.getJavaType());
+						queryFieldMap.put("queryFieldQueryType", column.getQueryType());
+
 						if (StringUtils.isNotBlank(column.getColumnComment())) {
 							queryFieldMap.put("queryFieldComment", column.getColumnComment());
 						} else {

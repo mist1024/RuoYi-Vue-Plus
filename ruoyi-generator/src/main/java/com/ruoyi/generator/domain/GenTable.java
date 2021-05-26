@@ -215,6 +215,10 @@ public class GenTable implements Serializable {
         return isSub(this.tplCategory);
     }
 
+    public boolean isJoin() {
+		return StrUtil.equals(GenConstants.TPL_JOIN, tplCategory);
+    }
+
     public static boolean isSub(String tplCategory) {
         return tplCategory != null && StrUtil.equals(GenConstants.TPL_SUB, tplCategory);
     }

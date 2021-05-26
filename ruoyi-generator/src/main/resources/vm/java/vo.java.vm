@@ -50,12 +50,13 @@ public class ${ClassName}Vo {
 #end
 
 #foreach ($joinInfo in $joinInfos)
-#if(${joinInfo.tableFkGenerateFlag})
+#if(${joinInfo.tableFkListFlag})
 	// 补充主表字段
 	private ${joinInfo.tableFkColumn.javaType} ${joinInfo.tableFkColumn.javaField};
 #end
 	// 关联表 ${joinInfo.joinTableLowerClassName} 字段
 #foreach ($showField in $joinInfo.showFields)
+	/** $showField.showFieldComment */
 #if($showField.showFieldJavaType == 'Date')
 	@Excel(name = "${showField.showFieldComment}" , width = 30, dateFormat = "yyyy-MM-dd")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
