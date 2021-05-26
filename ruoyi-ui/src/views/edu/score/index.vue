@@ -1,15 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="学生id" prop="studentId">
-        <el-input
-          v-model="queryParams.studentId"
-          placeholder="请输入学生id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="考试id" prop="examId">
         <el-input
           v-model="queryParams.examId"
@@ -18,6 +9,26 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+      </el-form-item>
+
+      <el-form-item label="学生姓名" prop="eduStudentStudentName">
+        <el-input
+            v-model="queryParams.eduStudentStudentName"
+            placeholder="请输入学生姓名"
+            clearable
+            size="small"
+            @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="学校" prop="eduStudentCurrentSchool">
+        <el-select v-model="queryParams.eduStudentCurrentSchool" placeholder="请选择学校" clearable size="small">
+            <el-option
+                v-for="dict in eduStudentCurrentSchoolOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+            />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -87,13 +98,10 @@
       <el-table-column label="班级排名" align="center" prop="classRank" />
       <el-table-column label="级部排名" align="center" prop="gradeRank" />
       <!-- 关联表 eduStudent 字段 -->
-    <el-table-column label="身份证号" align="center" prop="eduStudentIdCardNo" />
-    <el-table-column label="班级" align="center" prop="eduStudentCurrentClass" :formatter="eduStudentCurrentClassFormat" />
-    <el-table-column label="年级" align="center" prop="eduStudentCurrentGrade" :formatter="eduStudentCurrentGradeFormat" />
     <el-table-column label="学生姓名" align="center" prop="eduStudentStudentName" />
-    <el-table-column label="手机号" align="center" prop="eduStudentMobile" />
-    <el-table-column label="父亲手机" align="center" prop="eduStudentFatherMobile" />
-    <el-table-column label="母亲手机" align="center" prop="eduStudentMotherMobile" />
+    <el-table-column label="身份证号" align="center" prop="eduStudentIdCardNo" />
+    <el-table-column label="年级" align="center" prop="eduStudentCurrentGrade" :formatter="eduStudentCurrentGradeFormat" />
+    <el-table-column label="班级" align="center" prop="eduStudentCurrentClass" :formatter="eduStudentCurrentClassFormat" />
     <el-table-column label="学校" align="center" prop="eduStudentCurrentSchool" :formatter="eduStudentCurrentSchoolFormat" />
       <!-- 关联表 eduExam 字段 -->
     <el-table-column label="考试日期" align="center" prop="eduExamExamDate" />
@@ -137,14 +145,14 @@
             filterable
             remote
             reserve-keyword
-            placeholder="请输入身份证号搜索"
+            placeholder="请输入学生姓名搜索"
             :remote-method="remoteFetchEduStudent"
             value-key="id"
         >
             <el-option
                 v-for="item in eduStudentOptions"
                 :key="item.id"
-                :label="item.idCardNo"
+                :label="item.studentName"
                 :value="item.id"
             />
         </el-select>
@@ -156,14 +164,14 @@
             filterable
             remote
             reserve-keyword
-            placeholder="请输入考试日期搜索"
+            placeholder="请输入考试名称搜索"
             :remote-method="remoteFetchEduExam"
             value-key="id"
         >
             <el-option
                 v-for="item in eduExamOptions"
                 :key="item.id"
-                :label="item.examDate"
+                :label="item.examName"
                 :value="item.id"
             />
         </el-select>
@@ -247,17 +255,16 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 修改人id字典
-      eduStudentCurrentClassOptions: [],
-      // 修改人id字典
+      // 年级字典
       eduStudentCurrentGradeOptions: [],
-      // 修改人id字典
+      // 班级字典
+      eduStudentCurrentClassOptions: [],
+      // 学校字典
       eduStudentCurrentSchoolOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        studentId: undefined,
         examId: undefined,
       },
       // 表单参数
@@ -276,11 +283,11 @@ export default {
   created() {
     this.getList();
 
-    this.getDicts("edu_class").then(response => {
-        this.eduStudentCurrentClassOptions = response.data;
-    });
     this.getDicts("edu_grade").then(response => {
         this.eduStudentCurrentGradeOptions = response.data;
+    });
+    this.getDicts("edu_class").then(response => {
+        this.eduStudentCurrentClassOptions = response.data;
     });
     this.getDicts("edu_school").then(response => {
         this.eduStudentCurrentSchoolOptions = response.data;
@@ -301,7 +308,7 @@ export default {
         listStudent({
              pageNum: 1,
              pageSize: 10,
-             idCardNo: keyword
+             studentName: keyword
          }).then(response => {
             that.eduStudentOptions = response.rows
         });
@@ -311,18 +318,18 @@ export default {
         listExam({
              pageNum: 1,
              pageSize: 10,
-             examDate: keyword
+             examName: keyword
          }).then(response => {
             that.eduExamOptions = response.rows
         });
     },
     // 考试id字典翻译
-    eduStudentCurrentClassFormat(row, column) {
-        return this.selectDictLabel(this.eduStudentCurrentClassOptions, row.eduStudentCurrentClass);
-    },
-    // 考试id字典翻译
     eduStudentCurrentGradeFormat(row, column) {
         return this.selectDictLabel(this.eduStudentCurrentGradeOptions, row.eduStudentCurrentGrade);
+    },
+    // 考试id字典翻译
+    eduStudentCurrentClassFormat(row, column) {
+        return this.selectDictLabel(this.eduStudentCurrentClassOptions, row.eduStudentCurrentClass);
     },
     // 考试id字典翻译
     eduStudentCurrentSchoolFormat(row, column) {

@@ -2,15 +2,13 @@ package com.ruoyi.edu.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.edu.bo.EduStudentExamAddBo;
 import com.ruoyi.edu.bo.EduStudentExamQueryBo;
 import com.ruoyi.edu.bo.EduStudentExamEditBo;
@@ -27,7 +25,7 @@ import java.util.Collection;
  * 学生考试信息Service业务层处理
  *
  * @author keyleaf
- * @date 2021-05-23
+ * @date 2021-05-26
  */
 @Service
 public class EduStudentExamServiceImpl extends ServiceImpl<EduStudentExamMapper, EduStudentExam> implements IEduStudentExamService {
@@ -50,12 +48,10 @@ public class EduStudentExamServiceImpl extends ServiceImpl<EduStudentExamMapper,
 
     private Wrapper<EduStudentExam> buildQueryWrapper(EduStudentExamQueryBo bo) {
         Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<EduStudentExam> lqw = Wrappers.lambdaQuery();
-        lqw.eq(bo.getStudentId() != null, EduStudentExam::getStudentId, bo.getStudentId());
-        lqw.eq(bo.getExamId() != null, EduStudentExam::getExamId, bo.getExamId());
-
-		QueryWrapper<EduStudentExam> qw = new QueryWrapper<>();
-//		qw.eq("b.id", 2);
+        QueryWrapper<EduStudentExam> qw = new QueryWrapper();
+        // 关联表 eduStudent 相关字段
+        qw.like(StrUtil.isNotBlank(bo.getEduStudentStudentName()), "edu_student.student_name", bo.getEduStudentStudentName());
+        qw.eq(StrUtil.isNotBlank(bo.getEduStudentCurrentSchool()), "edu_student.current_school", bo.getEduStudentCurrentSchool());
         return qw;
     }
 

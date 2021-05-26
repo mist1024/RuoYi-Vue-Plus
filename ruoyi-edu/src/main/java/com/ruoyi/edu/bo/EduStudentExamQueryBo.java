@@ -15,7 +15,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 学生考试信息分页查询对象 edu_student_exam
  *
  * @author keyleaf
- * @date 2021-05-23
+ * @date 2021-05-26
  */
 
 @Data
@@ -37,11 +37,21 @@ public class EduStudentExamQueryBo extends BaseEntity {
 	private String isAsc;
 
 
-	/** 学生id */
-	@ApiModelProperty("学生id")
-	private Long studentId;
 	/** 考试id */
 	@ApiModelProperty("考试id")
 	private Long examId;
+
+
+	// 补充主表字段
+	private Long studentId;
+
+	// 关联表 eduStudent 相关字段
+	/** 学生姓名 */
+	@ApiModelProperty("学生姓名")
+	private String eduStudentStudentName;
+	/** 学校 */
+	@ApiModelProperty("学校")
+	private String eduStudentCurrentSchool;
+
 
 }
