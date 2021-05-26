@@ -162,6 +162,9 @@
     />
     <!-- 预览界面 -->
     <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
+      <el-button class="copy-btn-main" icon="el-icon-document-copy" type="text" @click="execCopy">
+        复制代码
+      </el-button>
       <el-tabs v-model="preview.activeName">
         <el-tab-pane
           v-for="(value, key) in preview.data"
@@ -174,12 +177,14 @@
       </el-tabs>
     </el-dialog>
     <import-table ref="import" @ok="handleQuery" />
+    <input id="copyNode" type="hidden">
   </div>
 </template>
 
 <script>
 import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
 import importTable from "./importTable";
+import ClipboardJS from 'clipboard'
 import { downLoadZip } from "@/utils/zipdownload";
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
@@ -230,6 +235,24 @@ export default {
         activeName: "domain.java"
       }
     };
+  },
+  mounted() {
+    const clipboard = new ClipboardJS('#copyNode', {
+      text: trigger => {
+        const suffix = this.preview.activeName.substring(this.preview.activeName.indexOf(".") + 1)
+        const key = 'vm/' + suffix + '/' + this.preview.activeName + '.vm'
+        const codeStr = this.preview.data[key]
+        this.$notify({
+          title: '成功',
+          message: '代码已复制到剪切板，可粘贴。',
+          type: 'success'
+        })
+        return codeStr
+      }
+    })
+    clipboard.on('error', e => {
+      this.$message.error('代码复制失败')
+    })
   },
   created() {
     this.getList();
@@ -334,6 +357,9 @@ export default {
           this.getList();
           this.msgSuccess("删除成功");
       })
+    },
+    execCopy(data) {
+      document.getElementById('copyNode').click()
     }
   }
 };
