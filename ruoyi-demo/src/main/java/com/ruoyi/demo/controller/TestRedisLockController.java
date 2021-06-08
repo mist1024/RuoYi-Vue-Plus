@@ -31,9 +31,12 @@ public class TestRedisLockController {
 		 try {
 			 RLock rLock =  redisLockManager.getLock(key,time, TimeUnit.SECONDS);
 			 System.out.println(LocalTime.now().toString() +"获取到锁："+key);
+			 Thread.sleep(3000);
+			 redisLockManager.unLock(rLock);
 		 } catch (InterruptedException e) {
 			 System.out.println(e.getMessage());
 		 }
+
 		 return AjaxResult.success();
 	 }
 }

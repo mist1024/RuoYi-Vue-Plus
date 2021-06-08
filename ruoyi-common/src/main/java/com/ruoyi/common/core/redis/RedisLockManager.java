@@ -106,7 +106,7 @@ public class RedisLockManager {
 	 * 释放锁(统一释放)
 	 * @param lock
 	 */
-	public void closeLock(RLock lock){
+	public void unLock(RLock lock){
 		lock.unlock();
 	}
 }
