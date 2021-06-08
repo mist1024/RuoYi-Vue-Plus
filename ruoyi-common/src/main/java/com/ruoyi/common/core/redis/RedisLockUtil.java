@@ -20,13 +20,6 @@ public class RedisLockUtil {
 
 	private static final Logger log = LoggerFactory.getLogger(RedisLockUtil.class);
 
-/*	public boolean getLock(String key){
-		key = LOCK_TITLE + key;
-		RLock mylock = redissonClient.getLock(key);
-		System.err.println("======lock======" + Thread.currentThread().getName());
-		return true;
-	}*/
-
 	/**
 	 * 加锁 （RLock）带超时时间的
 	 * @param key
