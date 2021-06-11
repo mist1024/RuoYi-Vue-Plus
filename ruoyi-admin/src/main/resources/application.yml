@@ -158,7 +158,7 @@ mybatis-plus:
       # INPUT 用户输入ID
       # ASSIGN_ID 全局唯一ID
       # ASSIGN_UUID 全局唯一ID UUID
-      idType: AUTO
+      idType: ASSIGN_ID
       # 表名前缀
       tablePrefix: null
       # 字段 format,例: %s,(对主键无效)
