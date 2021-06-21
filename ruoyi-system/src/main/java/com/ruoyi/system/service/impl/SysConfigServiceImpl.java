@@ -67,7 +67,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
 	 * @return 参数配置信息
 	 */
 	@Override
-//	@DataSource(DataSourceType.MASTER)
 	public SysConfig selectConfigById(Long configId) {
 		return baseMapper.selectById(configId);
 	}
