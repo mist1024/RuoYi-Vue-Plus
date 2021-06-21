@@ -16,6 +16,7 @@ spring:
     dynamic:
       #是否开启读写分离
       ms: false
+      log: true
       druid:
         # 初始连接数
         initialSize: 5
