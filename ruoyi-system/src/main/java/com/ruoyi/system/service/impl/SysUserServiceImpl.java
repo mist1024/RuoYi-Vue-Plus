@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -34,6 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@DS("slave")
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
     @Autowired
@@ -53,7 +56,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
+	@DS("master")
     public TableDataInfo<SysUser> selectPageUserList(SysUser user) {
+		String dataName = DynamicDataSourceContextHolder.peek();
+		log.info("自定义方法--获取用户列表---当前数据源名称:"+dataName);
         return PageUtils.buildDataInfo(baseMapper.selectPageUserList(PageUtils.buildPage(), user));
     }
 

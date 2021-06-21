@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "spring.datasource.druid")
+@ConfigurationProperties(prefix = "spring.datasource.dynamic.druid")
 public class DruidProperties {
 
     /** 初始连接数 */

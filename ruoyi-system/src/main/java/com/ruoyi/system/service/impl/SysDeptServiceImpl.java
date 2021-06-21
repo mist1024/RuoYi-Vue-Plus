@@ -2,6 +2,9 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,9 +19,11 @@ import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysDeptService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -31,6 +36,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  */
 @Service
+@Slf4j
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> implements ISysDeptService {
 
     @Autowired
@@ -38,6 +44,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
 
     @Autowired
     private SysUserMapper userMapper;
+
+    //测试当前数据源
+	@Autowired
+	private DataSource dataSource;
 
     /**
      * 查询部门管理数据
@@ -48,6 +58,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Override
     @DataScope(deptAlias = "d")
     public List<SysDept> selectDeptList(SysDept dept) {
+		DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
+		DataSource datasource=ds.determineDataSource();
+		String dataName = DynamicDataSourceContextHolder.peek();
+		log.info("--查询部门管理数据---当前数据源名称:"+dataName);
         return baseMapper.selectDeptList(dept);
     }
 
@@ -109,7 +123,12 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 部门信息
      */
     @Override
+	@DS("slave")
     public SysDept selectDeptById(Long deptId) {
+		DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
+		DataSource datasource=ds.determineDataSource();
+		String dataName = DynamicDataSourceContextHolder.peek();
+		log.info("mp内置方法--根据部门ID查询信息---当前数据源名称:"+dataName);
         return getById(deptId);
     }
 
@@ -179,6 +198,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 结果
      */
     @Override
+	@DS("slave")
     public int insertDept(SysDept dept) {
         SysDept info = getById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
@@ -186,6 +206,8 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             throw new CustomException("部门停用，不允许新增");
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
+		String dataName = DynamicDataSourceContextHolder.peek();
+		log.info("mp内置方法--新增保存部门信息---当前数据源名称:"+dataName);
         return baseMapper.insert(dept);
     }
 
@@ -196,6 +218,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 结果
      */
     @Override
+	@DS("slave")
     public int updateDept(SysDept dept) {
         SysDept newParentDept = getById(dept.getParentId());
         SysDept oldDept = getById(dept.getDeptId());
@@ -205,6 +228,8 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
+		String dataName = DynamicDataSourceContextHolder.peek();
+		log.info("mp内置方法--修改保存部门信息---当前数据源名称:"+dataName);
         int result = baseMapper.updateById(dept);
         if (UserConstants.DEPT_NORMAL.equals(dept.getStatus())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
