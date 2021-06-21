@@ -22,7 +22,9 @@ import java.io.IOException;
 public class DynamicDataSourceConfig {
 
 	@Bean
+	@ConditionalOnProperty(name = "spring.datasource.dynamic.ms", havingValue = "true")
 	public MasterSlaveAutoRoutingPlugin masterSlaveAutoRoutingPlugin(){
+		System.out.println("-----------读写分离已开启------------");
 		return new MasterSlaveAutoRoutingPlugin();
 	}
 

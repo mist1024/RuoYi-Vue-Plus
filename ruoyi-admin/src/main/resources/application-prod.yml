@@ -14,6 +14,8 @@ spring:
         login-username: ruoyi
         login-password: 123456
     dynamic:
+      #是否开启读写分离
+      ms: false
       druid:
         # 初始连接数
         initialSize: 5
@@ -37,14 +39,6 @@ spring:
         filters: stat # 注意这个值和druid原生不一致，默认启动了stat
         webStatFilter:
           enabled: true
-        statViewServlet:
-          enabled: true
-          # 设置白名单，不填则允许所有访问
-          allow:
-          url-pattern: /druid/*
-          # 控制台管理用户名和密码
-          login-username: ruoyi
-          login-password: 123456
         filter:
           stat:
             enabled: true
