@@ -56,7 +56,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
-	@DS("master")
+	@DS("slave")
     public TableDataInfo<SysUser> selectPageUserList(SysUser user) {
 		String dataName = DynamicDataSourceContextHolder.peek();
 		log.info("自定义方法--获取用户列表---当前数据源名称:"+dataName);

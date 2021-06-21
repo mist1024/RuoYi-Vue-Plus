@@ -1,22 +1,20 @@
-# 数据源配置
 spring:
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username: ruoyi
+        login-password: 123456
     dynamic:
       druid:
-        # 主库数据源
-        master:
-          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
-          username: root
-          password: root123456
-        # 从库数据源
-        slave:
-          # 从数据源开关/默认关闭
-          enabled: false
-          url:
-          username:
-          password:
         # 初始连接数
         initialSize: 5
         # 最小连接池数量
@@ -36,6 +34,7 @@ spring:
         testWhileIdle: true
         testOnBorrow: false
         testOnReturn: false
+        filters: stat # 注意这个值和druid原生不一致，默认启动了stat
         webStatFilter:
           enabled: true
         statViewServlet:
@@ -56,6 +55,17 @@ spring:
           wall:
             config:
               multi-statement-allow: true
+      datasource:
+        # 主库数据源
+        master:
+          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+          username: root
+          password: root123456
+        # 从库数据源
+  #        slave:
+  #          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true
+  #          username: root
+  #          password: root123456
 
   # redis 配置
   redis:
