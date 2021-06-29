@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ruoyi-demo</artifactId>
+    <artifactId>ruoyi-mes</artifactId>
 
     <description>
-        demo模块
+        mes模块
     </description>
 
     <dependencies>

@@ -51,7 +51,7 @@
         <!--  demo模块  -->
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-demo</artifactId>
+            <artifactId>ruoyi-mes</artifactId>
         </dependency>
 
     </dependencies>
