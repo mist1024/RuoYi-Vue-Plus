@@ -28,9 +28,6 @@
         >
           <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
         </el-input>
-        <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img"/>
-        </div>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
       <el-form-item prop="code">
@@ -64,7 +61,6 @@
 </template>
 
 <script>
-// import { getCodeImg } from "@/api/login";
 import Verify from "@/components/Verifition/Verify";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
@@ -92,7 +88,6 @@ export default {
         password: [
           { required: true, trigger: "blur", message: "密码不能为空" }
         ],
-        // code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
       },
       loading: false,
       redirect: undefined,
@@ -108,20 +103,9 @@ export default {
     }
   },
   created() {
-    this.getCode();
     this.getCookie();
   },
   methods: {
-    /*getCode() {
-      getCodeImg().then(res => {
-        this.captchaEnabled = res.data.enabled;
-        if(res.data.enabled){
-          this.codeUrl = "data:image/gif;base64," + res.data.img;
-          this.loginForm.uuid = res.data.uuid;
-        }
-      });
-    },*/
-
     verifySuccess(params){
       // params 返回的二次验证参数, 和登录参数一起回传给登录接口，方便后台进行二次验证
       this.loginForm.code = params.captchaVerification;
@@ -164,7 +148,6 @@ export default {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;
-            // this.getCode();
           });
         }
       });
