@@ -5,13 +5,10 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.CustomException;
-import com.ruoyi.common.exception.user.CaptchaException;
-import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,87 +26,63 @@ import javax.servlet.http.HttpServletRequest;
  * @author ruoyi
  */
 @Component
-public class SysLoginService
-{
-    @Autowired
-    private TokenService tokenService;
+public class SysLoginService {
+	@Autowired
+	private TokenService tokenService;
 
-    @Resource
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private RedisCache redisCache;
+	@Resource
+	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	private CaptchaProperties captchaProperties;
+	private RedisCache redisCache;
+
+/*	@Autowired
+	private CaptchaProperties captchaProperties;*/
 
 	@Autowired
-    private ISysUserService userService;
+	private ISysUserService userService;
 
 	@Autowired
 	private AsyncService asyncService;
 
-    /**
-     * 登录验证
-     *
-     * @param username 用户名
-     * @param password 密码
-     * @param code 验证码
-     * @param uuid 唯一标识
-     * @return 结果
-     */
-    public String login(String username, String password, String code, String uuid)
-    {
+	/**
+	 * 登录验证
+	 *
+	 * @param username 用户名
+	 * @param password 密码
+	 * @return 结果
+	 */
+	public String login(String username, String password) {
 		HttpServletRequest request = ServletUtils.getRequest();
-		if(captchaProperties.getEnabled()) {
-			String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
-			String captcha = redisCache.getCacheObject(verifyKey);
-			redisCache.deleteObject(verifyKey);
-			if (captcha == null) {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"), request);
-				throw new CaptchaExpireException();
-			}
-			if (!code.equalsIgnoreCase(captcha)) {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"), request);
-				throw new CaptchaException();
+		// 用户验证
+		Authentication authentication;
+		try {
+			// 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+			authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		} catch (Exception e) {
+			if (e instanceof BadCredentialsException) {
+				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
+				throw new UserPasswordNotMatchException();
+			} else {
+				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
+				throw new CustomException(e.getMessage());
 			}
 		}
-        // 用户验证
-        Authentication authentication = null;
-        try
-        {
-            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
-            authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        }
-        catch (Exception e)
-        {
-            if (e instanceof BadCredentialsException)
-            {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match"), request);
-                throw new UserPasswordNotMatchException();
-            }
-            else
-            {
-				asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage(), request);
-                throw new CustomException(e.getMessage());
-            }
-        }
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        recordLoginInfo(loginUser.getUser());
-        // 生成token
-        return tokenService.createToken(loginUser);
-    }
+		LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+		recordLoginInfo(loginUser.getUser());
+		// 生成token
+		return tokenService.createToken(loginUser);
+	}
 
-    /**
-     * 记录登录信息
-     */
-    public void recordLoginInfo(SysUser user)
-    {
-        user.setLoginIp(ServletUtils.getClientIP());
-        user.setLoginDate(DateUtils.getNowDate());
+	/**
+	 * 记录登录信息
+	 */
+	public void recordLoginInfo(SysUser user) {
+		user.setLoginIp(ServletUtils.getClientIP());
+		user.setLoginDate(DateUtils.getNowDate());
 		user.setUpdateBy(user.getUserName());
-        userService.updateUserProfile(user);
-    }
+		userService.updateUserProfile(user);
+	}
 }

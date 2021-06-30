@@ -32,6 +32,7 @@
         <redisson.version>3.15.2</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <datasource.version>3.4.0</datasource.version>
+        <captcha.version>1.2.8</captcha.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -179,6 +180,13 @@
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+            <!-- 滑动验证码 -->
+            <dependency>
+                <groupId>com.anji-plus</groupId>
+                <artifactId>spring-boot-starter-captcha</artifactId>
+                <version>${captcha.version}</version>
             </dependency>
 
         </dependencies>

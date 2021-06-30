@@ -33,14 +33,24 @@
         </div>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <el-form-item prop="code">
+        <Verify
+          @success="verifySuccess"
+          :mode="'pop'"
+          :captchaType="'blockPuzzle'"
+          :imgSize="{ width: '330px', height: '155px' }"
+          ref="verify"
+        />
+      </el-form-item>
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
           size="medium"
           type="primary"
           style="width:100%;"
-          @click.native.prevent="handleLogin"
+          @click.native.prevent="useVerify"
         >
+<!--          @click.native.prevent="handleLogin"-->
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
@@ -54,12 +64,16 @@
 </template>
 
 <script>
-import { getCodeImg } from "@/api/login";
+// import { getCodeImg } from "@/api/login";
+import Verify from "@/components/Verifition/Verify";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
 export default {
   name: "Login",
+  components: {
+    Verify
+  },
   data() {
     return {
       codeUrl: "",
@@ -78,7 +92,7 @@ export default {
         password: [
           { required: true, trigger: "blur", message: "密码不能为空" }
         ],
-        code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
+        // code: [{ required: true, trigger: "change", message: "验证码不能为空" }]
       },
       loading: false,
       redirect: undefined,
@@ -98,7 +112,7 @@ export default {
     this.getCookie();
   },
   methods: {
-    getCode() {
+    /*getCode() {
       getCodeImg().then(res => {
         this.captchaEnabled = res.data.enabled;
         if(res.data.enabled){
@@ -106,7 +120,23 @@ export default {
           this.loginForm.uuid = res.data.uuid;
         }
       });
+    },*/
+
+    verifySuccess(params){
+      // params 返回的二次验证参数, 和登录参数一起回传给登录接口，方便后台进行二次验证
+      this.loginForm.code = params.captchaVerification;
+
+      this.handleLogin();
     },
+
+    useVerify() {
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          this.$refs.verify.show();
+        }
+      });
+    },
+
     getCookie() {
       const username = Cookies.get("username");
       const password = Cookies.get("password");
@@ -134,7 +164,7 @@ export default {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;
-            this.getCode();
+            // this.getCode();
           });
         }
       });
