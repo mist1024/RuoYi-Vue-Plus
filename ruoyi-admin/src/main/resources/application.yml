@@ -13,17 +13,26 @@ ruoyi:
   # 获取ip地址开关
   addressEnabled: true
 
-captcha:
-  # 验证码开关
-  enabled: true
-  # 验证码类型 math 数组计算 char 字符验证
-  type: math
-  # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
-  category: circle
-  # 数字验证码位数
-  numberLength: 1
-  # 字符验证码长度
-  charLength: 4
+aj:
+  captcha:
+    jigsaw: classpath:images/jigsaw
+    pic-click: classpath:images/pic-click
+    cache-type: local
+    type: default
+    water-mark: RuoYi-Vue-Plus
+    slip-offset: 5
+    aes-status: true
+    interference-options: 2
+    history-data-clear-enable: true
+    req-frequency-limit-enable: true
+    req-get-lock-limit: 5
+    req-get-lock-seconds: 360
+    # get接口一分钟内请求数限制
+    req-get-minute-limit: 30
+    # check接口一分钟内请求数限制
+    req-check-minute-limit: 60
+    # verify接口一分钟内请求数限制
+    req-verify-minute-limit: 60
 
 # 开发环境配置
 server:

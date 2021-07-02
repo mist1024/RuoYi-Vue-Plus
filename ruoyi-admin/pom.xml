@@ -48,10 +48,22 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!-- 产品模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-product</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-demo</artifactId>
+        </dependency>
+
+        <!-- 滑动验证码 -->
+        <dependency>
+            <groupId>com.anji-plus</groupId>
+            <artifactId>spring-boot-starter-captcha</artifactId>
         </dependency>
 
     </dependencies>
