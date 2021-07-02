@@ -136,4 +136,9 @@ public class Constants
 	 * 资源映射路径 前缀
 	 */
 	public static final String REDIS_LOCK_KEY = "redis_lock:";
+
+	/**
+	 * 日期相关常量
+	 */
+	public static final String FULL_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
 }

@@ -48,6 +48,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!-- 产品模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-product</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>com.ruoyi</groupId>

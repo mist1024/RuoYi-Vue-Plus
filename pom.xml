@@ -200,6 +200,9 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
+        <module>ruoyi-coupons</module>
+        <module>ruoyi-product</module>
+        <module>ruoyi-activity</module>
     </modules>
     <packaging>pom</packaging>
 

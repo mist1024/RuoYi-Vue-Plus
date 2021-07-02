@@ -1,5 +1,5 @@
 <template>
-<div :class="mode=='pop'?'mask':''"  v-show="showBox">
+<div :class="mode=='pop'?'mask_verify':''"  v-show="showBox">
     <div :class="mode=='pop'?'verifybox':''" :style="{'max-width':parseInt(imgSize.width)+30+'px'}">
         <div class="verifybox-top"  v-if="mode=='pop'">
             请完成安全验证
@@ -230,7 +230,7 @@
         text-align: center;
         cursor: pointer;
     }
-    .mask{
+    .mask_verify{
         position: fixed;
         top: 0;
         left:0;
