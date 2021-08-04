@@ -109,12 +109,11 @@
       <el-table-column label="文件展示" align="center" prop="url">
         <template slot-scope="scope">
           <el-image
-            v-if="previewListResource && scope.row.fileSuffix.indexOf('png','jpg','jpeg') > 0"
+            v-if="previewListResource && /png|jpg|jpeg/.test(scope.row.fileSuffix)"
             style="width: 100px; height: 100px;"
             :src="scope.row.url"
             :preview-src-list="[scope.row.url]"/>
-          <span v-text="scope.row.url"
-                v-if="scope.row.fileSuffix.indexOf('png','jpg','jpeg') < 0 || !previewListResource"/>
+          <span v-else v-text="scope.row.url"/>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
