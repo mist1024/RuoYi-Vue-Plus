@@ -37,7 +37,7 @@ public class SysOperLogServiceImpl extends ServicePlusImpl<SysOperLogMapper, Sys
                         f.in(SysOperLog::getBusinessType, Arrays.asList(operLog.getBusinessTypes()));
                     }
                 })
-                .eq(operLog.getStatus() != null && operLog.getStatus() > 0,
+                .eq(operLog.getStatus() != null && operLog.getStatus() >= 0,
                         SysOperLog::getStatus, operLog.getStatus())
                 .like(StrUtil.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
                 .apply(Validator.isNotEmpty(params.get("beginTime")),
