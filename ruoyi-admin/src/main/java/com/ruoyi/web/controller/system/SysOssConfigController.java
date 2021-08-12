@@ -1,36 +1,34 @@
 package com.ruoyi.web.controller.system;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.system.domain.SysOssConfig;
-import lombok.RequiredArgsConstructor;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.*;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.annotation.RepeatSubmit;
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.annotation.RepeatSubmit;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.system.domain.vo.SysOssConfigVo;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.domain.SysOssConfig;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
+import com.ruoyi.system.domain.vo.SysOssConfigVo;
 import com.ruoyi.system.service.ISysOssConfigService;
-import com.ruoyi.common.core.page.TableDataInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 云存储配置Controller
@@ -55,18 +53,6 @@ public class SysOssConfigController extends BaseController {
 	@GetMapping("/list")
 	public TableDataInfo<SysOssConfigVo> list(@Validated SysOssConfigBo bo) {
 		return iSysOssConfigService.queryPageList(bo);
-	}
-
-	/**
-	 * 导出云存储配置列表
-	 */
-	@ApiOperation("导出云存储配置列表")
-	@PreAuthorize("@ss.hasPermi('system:sysOssConfig:export')")
-	@Log(title = "云存储配置", businessType = BusinessType.EXPORT)
-	@GetMapping("/export")
-	public void export(@Validated SysOssConfigBo bo, HttpServletResponse response) {
-		List<SysOssConfigVo> list = iSysOssConfigService.queryList(bo);
-		ExcelUtil.exportExcel(list, "云存储配置", SysOssConfigVo.class, response);
 	}
 
 	/**
@@ -121,6 +107,10 @@ public class SysOssConfigController extends BaseController {
 	@DeleteMapping("/{ossConfigIds}")
 	public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
 								   @PathVariable Integer[] ossConfigIds) {
+		List<SysOssConfig> list = iSysOssConfigService.list();
+		if(ObjectUtil.isNotNull(list)&&list.size()==1){
+			return AjaxResult.error("必须保留一条云配置文件");
+		}
 		return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true) ? 1 : 0);
 	}
 
@@ -131,7 +121,6 @@ public class SysOssConfigController extends BaseController {
 	@Log(title = "云存储状态修改", businessType = BusinessType.UPDATE)
 	@PutMapping("/changeStatus")
 	public AjaxResult changeStatus(@RequestBody SysOssConfig sysOssConfig) {
-		sysOssConfig.setUpdateBy(getUsername());
 		return toAjax(iSysOssConfigService.updateOssConfigStatus(sysOssConfig));
 	}
 }

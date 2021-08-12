@@ -27,10 +27,6 @@ public interface ISysOssConfigService extends IServicePlus<SysOssConfig, SysOssC
 	 */
     TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo);
 
-	/**
-	 * 查询列表
-	 */
-	List<SysOssConfigVo> queryList(SysOssConfigBo bo);
 
 	/**
 	 * 根据新增业务对象插入云存储配置

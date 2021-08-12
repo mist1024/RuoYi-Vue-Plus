@@ -8,11 +8,14 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.oss.constant.CloudConstant;
 import com.ruoyi.system.domain.SysConfig;
+import com.ruoyi.system.mapper.SysConfigMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,8 +44,9 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 	@Autowired
 	private ISysConfigService iSysConfigService;
 	@Autowired
+	private SysConfigMapper sysConfigMapper;
+	@Autowired
 	private RedisCache redisCache;
-	public static final String sysConfigOss="sys.oss.cloudStorageService";
 
     @Override
     public SysOssConfigVo queryById(Integer ossConfigId){
@@ -55,10 +59,6 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
         return PageUtils.buildDataInfo(result);
     }
 
-    @Override
-    public List<SysOssConfigVo> queryList(SysOssConfigBo bo) {
-        return listVo(buildQueryWrapper(bo));
-    }
 
     private LambdaQueryWrapper<SysOssConfig> buildQueryWrapper(SysOssConfigBo bo) {
         Map<String, Object> params = bo.getParams();
@@ -93,12 +93,14 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 
     @Override
     public Boolean deleteWithValidByIds(Collection<Integer> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return removeByIds(ids);
     }
 
+	/**
+	 * 判断configKey是否唯一
+	 * @param bo
+	 * @return
+	 */
 	@Override
 	public String checkConfigKeyUnique(SysOssConfigBo bo) {
 		Long ossConfigId = StringUtils.isNull(bo.getOssConfigId()) ? -1L : bo.getOssConfigId();
@@ -111,23 +113,20 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
 		return UserConstants.UNIQUE;
 	}
 
+	/**
+	 * 启用禁用状态
+	 * @param sysOssConfig
+	 * @return
+	 */
 	@Override
 	public int updateOssConfigStatus(SysOssConfig sysOssConfig) {
     	LambdaQueryWrapper<SysConfig> queryWrapper = new LambdaQueryWrapper<>();
-    	queryWrapper.eq(SysConfig::getConfigKey,sysConfigOss);
-    	List<SysConfig> sysConfigs = iSysConfigService.list(queryWrapper);
-    	SysConfig config = null;
-    	if(ObjectUtil.isNotNull(sysConfigs)){
-    		config = sysConfigs.get(0);
-		}
-    	//更新sysconfig
-		LambdaUpdateWrapper<SysConfig> updateWrapper = new LambdaUpdateWrapper<>();
-		updateWrapper.eq(SysConfig::getConfigKey,sysConfigOss);
-		updateWrapper.set(SysConfig::getConfigValue,sysOssConfig.getConfigKey());
-		boolean bool = iSysConfigService.update(updateWrapper);
-		if(bool){
-			//更新redis缓存
-			redisCache.setCacheObject(getCacheKey(config.getConfigKey()), sysOssConfig.getConfigKey());
+    	queryWrapper.eq(SysConfig::getConfigKey, CloudConstant.CLOUD_STORAGE_CONFIG_KEY);
+    	SysConfig sysConfig = sysConfigMapper.selectOne(queryWrapper);
+
+    	if(ObjectUtil.isNotNull(sysConfig)){
+    		sysConfig.setConfigValue(sysOssConfig.getConfigKey());
+    		iSysConfigService.updateConfig(sysConfig);
 		}
 		return baseMapper.updateById(sysOssConfig);
 	}

@@ -33,26 +33,33 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 配置key
      */
-    @ApiModelProperty(value = "配置key", required = true)
-    @NotBlank(message = "配置key不能为空", groups = { AddGroup.class, EditGroup.class })
+    @ApiModelProperty(value = "configKey", required = true)
+    @NotBlank(message = "configKey不能为空", groups = { AddGroup.class, EditGroup.class })
+	@Size(min = 2, max = 100, message = "configKey长度必须介于2和20 之间")
     private String configKey;
 
     /**
      * accessKey
      */
     @ApiModelProperty(value = "accessKey")
+	@NotBlank(message = "accessKey不能为空", groups = { AddGroup.class, EditGroup.class })
+	@Size(min = 2, max = 100, message = "accessKey长度必须介于2和100 之间")
     private String accessKey;
 
     /**
      * 秘钥
      */
     @ApiModelProperty(value = "secretKey")
+	@NotBlank(message = "secretKey不能为空", groups = { AddGroup.class, EditGroup.class })
+	@Size(min = 2, max = 100, message = "secretKey长度必须介于2和100 之间")
     private String secretKey;
 
     /**
      * 桶名称
      */
-    @ApiModelProperty(value = "桶名称")
+    @ApiModelProperty(value = "bucketName")
+	@NotBlank(message = "bucketName不能为空", groups = { AddGroup.class, EditGroup.class })
+	@Size(min = 2, max = 100, message = "bucketName长度必须介于2和100之间")
     private String bucketName;
 
     /**
@@ -64,7 +71,9 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 访问站点
      */
-    @ApiModelProperty(value = "访问站点")
+    @ApiModelProperty(value = "endpoint")
+	@NotBlank(message = "endpoint不能为空", groups = { AddGroup.class, EditGroup.class })
+	@Size(min = 2, max = 100, message = "endpoint长度必须介于2和100之间")
     private String endpoint;
 
     /**
@@ -76,7 +85,7 @@ public class SysOssConfigBo extends BaseEntity {
     /**
      * 域
      */
-    @ApiModelProperty(value = "域")
+    @ApiModelProperty(value = "region")
     private String region;
 
     /**
@@ -109,5 +118,9 @@ public class SysOssConfigBo extends BaseEntity {
      */
     @ApiModelProperty(value = "排序的方向", example = "asc,desc")
     private String isAsc;
-
+	/**
+	 * 状态(0正常 1停用)
+	 */
+	@ApiModelProperty("状态(0正常 1停用)")
+	private String status;
 }
