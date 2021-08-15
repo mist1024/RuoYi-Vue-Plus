@@ -21,6 +21,7 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <druid.version>1.2.6</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
+        <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
@@ -28,10 +29,12 @@
         <hutool.version>5.7.6</hutool.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
+        <okio.version>1.17.2</okio.version>
         <spring-boot-admin.version>2.4.3</spring-boot-admin.version>
         <redisson.version>3.16.1</redisson.version>
         <lock4j.version>2.2.1</lock4j.version>
         <datasource.version>3.4.1</datasource.version>
+        <wildfly-common.version>1.5.2.Final</wildfly-common.version>
 
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
@@ -70,6 +73,19 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- 指定 swagger-annotations 版本冲突-->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
             </dependency>
 
             <!-- excel工具 -->
@@ -127,6 +143,17 @@
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
                 <version>${feign-okhttp.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.github.openfeign</groupId>
+                        <artifactId>feign-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>${okio.version}</version>
             </dependency>
 
             <dependency>
@@ -151,6 +178,14 @@
                 <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
                 <version>${lock4j.version}</version>
             </dependency>
+
+            <!-- undertow 中的wildfly-common包冲突处理 -->
+            <dependency>
+                <groupId>org.wildfly.common</groupId>
+                <artifactId>wildfly-common</artifactId>
+                <version>${wildfly-common.version}</version>
+            </dependency>
+
             <!-- 定时任务-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
