@@ -27,6 +27,7 @@
         <jwt.version>0.9.1</jwt.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
         <hutool.version>5.7.6</hutool.version>
+        <guava.version>29.0-jre</guava.version>
         <feign.version>3.0.3</feign.version>
         <feign-okhttp.version>11.0</feign-okhttp.version>
         <okio.version>1.17.2</okio.version>
@@ -73,12 +74,6 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- 指定 swagger-annotations 版本冲突-->
@@ -134,6 +129,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-openfeign</artifactId>
                 <version>${feign.version}</version>
@@ -167,6 +168,18 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!-- redis 缓存操作 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.lettuce</groupId>
+                        <artifactId>lettuce-core</artifactId>
+                    </exclusion>
+                </exclusions>
+                <version>${spring-boot.version}</version>
+            </dependency>
             <!--redisson-->
             <dependency>
                 <groupId>org.redisson</groupId>
