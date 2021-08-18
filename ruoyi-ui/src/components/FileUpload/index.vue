@@ -18,20 +18,34 @@
       <!-- 上传提示 -->
       <div class="el-upload__tip" slot="tip" v-if="showTip">
         请上传
-        <template v-if="fileSize"> 大小不超过 <b style="color: #f56c6c">{{ fileSize }}MB</b> </template>
-        <template v-if="fileType"> 格式为 <b style="color: #f56c6c">{{ fileType.join("/") }}</b> </template>
+        <template v-if="fileSize">
+          大小不超过 <b style="color: #f56c6c">{{ fileSize }}MB</b>
+        </template>
+        <template v-if="fileType">
+          格式为 <b style="color: #f56c6c">{{ fileType.join("/") }}</b>
+        </template>
         的文件
       </div>
     </el-upload>
 
     <!-- 文件列表 -->
-    <transition-group class="upload-file-list el-upload-list el-upload-list--text" name="el-fade-in-linear" tag="ul">
-      <li :key="file.uid" class="el-upload-list__item ele-upload-list__item-content" v-for="(file, index) in fileList">
+    <transition-group
+      class="upload-file-list el-upload-list el-upload-list--text"
+      name="el-fade-in-linear"
+      tag="ul"
+    >
+      <li
+        :key="file.uid"
+        class="el-upload-list__item ele-upload-list__item-content"
+        v-for="(file, index) in fileList"
+      >
         <el-link :href="`${file.url}`" :underline="false" target="_blank">
           <span class="el-icon-document"> {{ getFileName(file.name) }} </span>
         </el-link>
         <div class="ele-upload-list__item-content-action">
-          <el-link :underline="false" @click="handleDelete(index)" type="danger">删除</el-link>
+          <el-link :underline="false" @click="handleDelete(index)" type="danger"
+            >删除</el-link
+          >
         </div>
       </li>
     </transition-group>
@@ -64,8 +78,8 @@ export default {
     // 是否显示提示
     isShowTip: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   data() {
     return {
@@ -83,9 +97,9 @@ export default {
         if (val) {
           let temp = 1;
           // 首先将值转为数组
-          const list = Array.isArray(val) ? val : this.value.split(',');
+          const list = Array.isArray(val) ? val : this.value.split(",");
           // 然后将数组转为对象数组
-          this.fileList = list.map(item => {
+          this.fileList = list.map((item) => {
             if (typeof item === "string") {
               item = { name: item, url: item };
             }
@@ -98,8 +112,8 @@ export default {
         }
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   computed: {
     // 是否显示提示
@@ -122,7 +136,9 @@ export default {
           return false;
         });
         if (!isTypeOk) {
-          this.$message.error(`文件格式不正确, 请上传${this.fileType.join("/")}格式文件!`);
+          this.$message.error(
+            `文件格式不正确, 请上传${this.fileType.join("/")}格式文件!`
+          );
           return false;
         }
       }
@@ -146,9 +162,17 @@ export default {
     },
     // 上传成功回调
     handleUploadSuccess(res, file) {
-      this.$message.success("上传成功");
-      this.fileList.push({ name: res.data.fileName, url: res.data.fileName });
-      this.$emit("input", this.listToString(this.fileList));
+      if (res.code === 200) {
+        this.$message.success("上传成功");
+        this.fileList.push({ name: res.data.fileName, url: res.data.fileName });
+        this.$emit("input", this.listToString(this.fileList));
+      } else {
+        this.$message({
+          type: "error",
+          message: res.msg,
+        });
+        this.loading.close();
+      }
     },
     // 删除文件
     handleDelete(index) {
@@ -170,9 +194,9 @@ export default {
       for (let i in list) {
         strs += list[i].url + separator;
       }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
-    }
-  }
+      return strs != "" ? strs.substr(0, strs.length - 1) : "";
+    },
+  },
 };
 </script>
 
