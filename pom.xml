@@ -40,8 +40,9 @@
         <minio.version>8.2.0</minio.version>
 
         <!-- docker 配置 -->
-        <docker.registry.url>localhost</docker.registry.url>
-        <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
+        <docker.registry.url>182.92.67.41</docker.registry.url>
+        <docker.registry.host>https://${docker.registry.url}:2376</docker.registry.host>
+        <dockerCertPath>D:\DevEnvironment\dockerTls</dockerCertPath>
         <docker.namespace>ruoyi</docker.namespace>
         <docker.plugin.version>1.2.2</docker.plugin.version>
     </properties>

@@ -1,11 +1,9 @@
 #!/bin/bash
-
 #使用说明，用来提示输入参数
 usage() {
 	echo "Usage: sh 执行脚本.sh [port|mount|monitor|base|start|stop|stopall|rm|rmiNoneTag]"
 	exit 1
 }
-
 #开启所需端口(生产环境不推荐开启)
 port(){
     # mysql 端口

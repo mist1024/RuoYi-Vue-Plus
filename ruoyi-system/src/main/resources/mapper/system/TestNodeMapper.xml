@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.TestNodeMapper">
 
     <resultMap type="com.ruoyi.system.domain.TestNode" id="TestNodeResult">
@@ -11,5 +11,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pid" column="pid"/>
     </resultMap>
 
+    <!--递归查询所有节点-->
+    <resultMap id="nodeWithChildren" type="com.ruoyi.system.domain.TestNode">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="categary" property="categary"></result>
+        <collection property="children" ofType="com.ruoyi.system.domain.TestNode"
+                    select="com.ruoyi.system.mapper.TestNodeMapper.queryListWithChildren" column="id">
+        </collection>
+    </resultMap>
 
+    <!--查询节点以children的方式展示-->
+    <select id="queryListWithChildren" resultMap="nodeWithChildren">
+        SELECT n.id       id,
+               n.`name`   name,
+               n.categary categary
+        FROM test_node n
+        WHERE n.pid = #{nodeId}
+    </select>
 </mapper>

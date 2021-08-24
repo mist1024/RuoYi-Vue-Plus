@@ -1,12 +1,14 @@
 package com.ruoyi.system.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 节点维护对象 test_node
@@ -44,4 +46,9 @@ public class TestNode implements Serializable {
      */
     private Long pid;
 
+	/**
+	 * 子节点
+	 */
+	@TableField(exist = false)
+	private List<TestNode> children;
 }

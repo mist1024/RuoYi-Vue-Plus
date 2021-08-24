@@ -30,7 +30,7 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+	    <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -44,8 +44,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['system:node:add']"
-        >新增
-        </el-button>
+        >新增</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -56,10 +55,10 @@
       row-key="id"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column label="节点名" prop="name"/>
-      <el-table-column label="id" prop="id"/>
-      <el-table-column label="分类" align="center" prop="categary"/>
-      <el-table-column label="父id" align="center" prop="pid"/>
+      <el-table-column label="节点名" prop="name" />
+      <el-table-column label="id" prop="id" />
+      <el-table-column label="分类" align="center" prop="categary" />
+      <el-table-column label="父id" align="center" prop="pid" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -68,32 +67,28 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:node:edit']"
-          >修改
-          </el-button>
+          >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-plus"
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:node:add']"
-          >新增
-          </el-button>
+          >新增</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-plus"
-            @click="handleAddMultiple(scope.row)"
+            @click="handleAdd(scope.row)"
             v-hasPermi="['system:node:add']"
-          >新增多个
-          </el-button>
+          >新增多个</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:node:remove']"
-          >删除
-          </el-button>
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -102,13 +97,13 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="节点名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入节点名"/>
+          <el-input v-model="form.name" placeholder="请输入节点名" />
         </el-form-item>
         <el-form-item label="分类" prop="categary">
-          <el-input v-model="form.categary" placeholder="请输入分类"/>
+          <el-input v-model="form.categary" placeholder="请输入分类" />
         </el-form-item>
         <el-form-item label="父id" prop="pid">
-          <treeselect v-model="form.pid" :options="nodeOptions" :normalizer="normalizer" placeholder="请选择父id"/>
+          <treeselect v-model="form.pid" :options="nodeOptions" :normalizer="normalizer" placeholder="请选择父id" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,30 +111,11 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-
-    <!-- 添加多个节点维护对话框 -->
-    <el-dialog :title="title" :visible.sync="addMultiple" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="节点名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入节点名，多个节点名以英文逗号隔开"/>
-        </el-form-item>
-        <el-form-item label="分类" prop="categary">
-          <el-input v-model="form.categary" placeholder="多个分类名以英文逗号隔开,若分类为空以空格代替"/>
-        </el-form-item>
-        <el-form-item label="父id" prop="pid">
-          <treeselect v-model="form.pid" :options="nodeOptions" :normalizer="normalizer" placeholder="请选择父id"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button :loading="buttonLoading" type="primary" @click="submitNewForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import {listNode, getNode, delNode, addNode, updateNode, exportNode, addMultipleNode} from "@/api/system/node";
+import { listNode, getNode, delNode, addNode, updateNode, exportNode } from "@/api/system/node";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -164,8 +140,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 是否弹出添加多个对话框
-      addMultiple: false,
       // 查询参数
       queryParams: {
         name: null,
@@ -175,7 +149,8 @@ export default {
       // 表单参数
       form: {},
       // 表单校验
-      rules: {}
+      rules: {
+      }
     };
   },
   created() {
@@ -201,18 +176,17 @@ export default {
         children: node.children
       };
     },
-    /** 查询节点维护下拉树结构 */
+	/** 查询节点维护下拉树结构 */
     getTreeselect() {
       listNode().then(response => {
         this.nodeOptions = [];
-        const data = {id: 0, name: '顶级节点', children: []};
+        const data = { id: 0, name: '顶级节点', children: [] };
         data.children = this.handleTree(response.data, "id", "pid");
         this.nodeOptions.push(data);
       });
     },
     // 取消按钮
     cancel() {
-      this.addMultiple = false;
       this.open = false;
       this.reset();
     },
@@ -256,19 +230,19 @@ export default {
       } else {
         this.form.pid = 0;
       }
-      this.addMultiple = true;
-      this.title = "添加多个节点维护";
+      this.open = true;
+      this.title = "添加节点维护";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.loading = true;
+	  this.loading = true;
       this.reset();
       this.getTreeselect();
       if (row != null) {
         this.form.pid = row.id;
       }
       getNode(row.id).then(response => {
-        this.loading = false;
+	    this.loading = false;
         this.form = response.data;
         this.open = true;
         this.title = "修改节点维护";
@@ -278,7 +252,7 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          this.buttonLoading = true;
+		  this.buttonLoading = true;
           if (this.form.id != null) {
             updateNode(this.form).then(response => {
               this.msgSuccess("修改成功");
@@ -299,39 +273,20 @@ export default {
         }
       });
     },
-    submitNewForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          this.buttonLoading = true;
-          console.log(this.form)
-          addMultipleNode(this.form).then(response => {
-            this.msgSuccess("新增成功");
-            this.addMultiple = false;
-            this.getList();
-          }).catch(e => {
-            console.log(e)
-            this.addMultiple = false;
-          }).finally(() => {
-            this.buttonLoading = false;
-          });
-        }
-      });
-    },
     /** 删除按钮操作 */
     handleDelete(row) {
       this.$confirm('是否确认删除节点维护编号为"' + row.id + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        this.loading = true;
-        return delNode(row.id);
-      }).then(() => {
-        this.loading = false;
-        this.getList();
-        this.msgSuccess("删除成功");
-      }).catch(() => {
-      });
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+		  this.loading = true;
+          return delNode(row.id);
+        }).then(() => {
+		  this.loading = false;
+          this.getList();
+          this.msgSuccess("删除成功");
+        }).catch(() => {});
     }
   }
 };
