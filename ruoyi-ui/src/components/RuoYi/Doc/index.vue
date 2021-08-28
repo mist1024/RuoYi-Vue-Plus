@@ -9,7 +9,7 @@ export default {
   name: 'RuoYiDoc',
   data() {
     return {
-      url: 'https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages'
+      url: 'https://www.wolai.com/qianlan/q5N7mQ3Z5JVp58VL8KEWbD?theme=light'
     }
   },
   methods: {

@@ -121,10 +121,10 @@
     <el-dialog :title="title" :visible.sync="addMultiple" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="节点名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入节点名，多个节点名以英文逗号隔开"/>
+          <el-input v-model="form.name" placeholder="请输入节点名，多个节点名以#隔开"/>
         </el-form-item>
         <el-form-item label="分类" prop="categary">
-          <el-input v-model="form.categary" placeholder="多个分类名以英文逗号隔开,若分类为空以空格代替"/>
+          <el-input v-model="form.categary" placeholder="多个分类名以#隔开,若分类为空以空格代替"/>
         </el-form-item>
         <el-form-item label="父id" prop="pid">
           <treeselect v-model="form.pid" :options="nodeOptions" :normalizer="normalizer" placeholder="请选择父id"/>

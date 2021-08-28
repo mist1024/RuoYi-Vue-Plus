@@ -25,7 +25,7 @@ export default {
   props: {},
   data() {
     return {
-      categarys: ["java","前端","灯芯绒","java","前端","灯芯绒","java","前端","灯芯绒"],
+      categarys: ["java","前端","灯芯绒","java","前端","灯芯绒","java","前端","灯芯绒","java","前端","灯芯绒","java","前端","灯芯绒","java","前端","灯芯绒","java"],
       tags: [],
       RADIUS: 200,
       ZRADIUS: 200,
