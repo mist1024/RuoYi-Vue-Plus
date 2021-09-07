@@ -56,6 +56,7 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     public List<IscServiceVo> queryList(IscServiceBo bo)
     {
         final List<IscServiceVo> results = listVo(buildQueryWrapper(bo));
+        genVoInfo(results);
         return results;
     }
 

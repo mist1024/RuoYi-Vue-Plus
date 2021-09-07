@@ -98,14 +98,14 @@
 
     <el-table v-loading="loading" :data="serviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="服务ID" align="center" prop="serviceId" v-if="false"/>
-      <el-table-column label="服务名称" align="center" prop="serviceName" />
-      <el-table-column label="服务分类" align="center" prop="cateName" />
-      <el-table-column label="服务状态" align="center" prop="enabled" :formatter="enabledFormat" />
-      <el-table-column label="是否在线" align="center" prop="onlineStatus" :formatter="onlineStatusFormat" />
-      <el-table-column label="审核状态" align="center" prop="status" :formatter="statusFormat" />
-      <el-table-column label="更新人" align="center" prop="updateBy" />
-      <el-table-column label="更新时间" align="center" prop="updateTime" >
+      <el-table-column label="服务ID" align="center" prop="serviceId" width="100"/>
+      <el-table-column label="服务名称" align="left" prop="serviceName" />
+      <el-table-column label="服务分类" align="left" prop="cateName" width="150"/>
+      <el-table-column label="服务状态" align="center" prop="enabled" :formatter="enabledFormat"  width="100"/>
+      <el-table-column label="是否在线" align="center" prop="onlineStatus" :formatter="onlineStatusFormat"  width="100"/>
+      <el-table-column label="审核状态" align="center" prop="status" :formatter="statusFormat"  width="100"/>
+      <el-table-column label="更新人" align="center" prop="updateBy"  width="150"/>
+      <el-table-column label="更新时间" align="center" prop="updateTime"  width="150">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
@@ -154,7 +154,13 @@
           <el-input v-model="form.probeActiveAddr" placeholder="请输入探活地址" />
         </el-form-item>
         <el-form-item label="请求方式" prop="requestMethod">
-          <el-input v-model="form.requestMethod" placeholder="请输入请求方式" />
+          <el-radio-group v-model="form.requestMethod">
+            <el-radio
+              v-for="dict in requestMethodOptions"
+              :key="dict.dictValue"
+              :label="dict.dictValue"
+            >{{dict.dictLabel}}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -225,6 +231,8 @@ export default {
       statusOptions: [],
       // 服务状态字典
       enabledOptions: [],
+      // 服务状态字典
+      requestMethodOptions: [],
       //服务分类
       cateOptions:[],
       // 查询参数
@@ -235,8 +243,7 @@ export default {
         onlineStatus: undefined,
         status: undefined,
         enabled: undefined,
-        cateFullPath: undefined,
-        userId: undefined,
+        cateFullPath: undefined
       },
       // 表单参数
       form: {},
@@ -287,6 +294,9 @@ export default {
     this.getDicts("sys_normal_disable").then(response => {
       this.enabledOptions = response.data;
     });
+    this.getDicts("isc_request_method").then(response => {
+      this.requestMethodOptions = response.data;
+    });
   },
   methods: {
     /** 查询服务信息列表 */
@@ -326,9 +336,9 @@ export default {
         serviceName: undefined,
         serviceAddr: undefined,
         probeActiveAddr: undefined,
-        requestMethod: undefined,
+        requestMethod: 'GET',
         remark: undefined,
-        corsFlag: "0",
+        corsFlag: 'Y',
         hiddenParams: undefined,
         onlineStatus: undefined,
         status: undefined,
@@ -340,7 +350,6 @@ export default {
         createBy: undefined,
         createTime: undefined,
         updateBy: undefined,
-      Time: undefined,
         updateTime: undefined,
         delFlag: undefined
       };

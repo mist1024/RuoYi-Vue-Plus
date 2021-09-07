@@ -67,14 +67,14 @@ public class IscServiceVo {
     /**
      * 跨域标志（Y是 N否）
      */
-    @ExcelProperty(value = "跨域标志")
+    @ExcelProperty(value = "跨域标志", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_yes_no")
     @ApiModelProperty("跨域标志（Y是 N否）")
     private String corsFlag;
 
     /**
      * 隐藏参数
      */
-    @ExcelProperty(value = "隐藏参数")
     @ApiModelProperty("隐藏参数")
     private String hiddenParams;
 
@@ -117,7 +117,7 @@ public class IscServiceVo {
     /**
      * 服务分类名称
      */
-    @ExcelProperty(value = "服务分类名称")
+    @ExcelProperty(value = "服务分类")
     @ApiModelProperty("服务分类名称")
     private String cateName;
 
@@ -133,7 +133,6 @@ public class IscServiceVo {
      */
     @ExcelProperty(value = "更新时间")
     @ApiModelProperty("更新时间")
-    private String updateTime;
-
+    private Date updateTime;
 
 }

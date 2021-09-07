@@ -25,6 +25,13 @@ import com.ruoyi.common.core.domain.BaseEntity;
 public class IscServiceBo extends BaseEntity {
 
     /**
+     * 服务ID
+     */
+    @ApiModelProperty(value = "服务ID", required = true)
+    @NotNull(message = "服务ID不能为空", groups = { EditGroup.class })
+    private Long serviceId;
+
+    /**
      * 服务名称
      */
     @ApiModelProperty(value = "服务名称", required = true)
