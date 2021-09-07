@@ -54,6 +54,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!--  isc模块  -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-isc</artifactId>
+        </dependency>
+
         <!--  demo模块  -->
         <dependency>
             <groupId>com.ruoyi</groupId>

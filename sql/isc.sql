@@ -1,0 +1,217 @@
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for isc_app_service
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_app_service`;
+CREATE TABLE `isc_app_service`  (
+  `service_app_id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用服务ID',
+  `service_id` bigint NULL DEFAULT NULL COMMENT '服务ID',
+  `application_id` bigint NULL DEFAULT NULL COMMENT '应用ID',
+  `user_id` bigint NULL DEFAULT NULL COMMENT '用户ID',
+  `enabled` char(1) NOT NULL COMMENT '启用状态（0启用 1停用）',
+  `apply_type` char(1)  DEFAULT NULL COMMENT '申请类型(0申请 1续期)',
+  `status` char(1)  DEFAULT NULL COMMENT '审核状态（0待审核 1审核通过 2驳回）',
+  `virtual_addr` varchar(255)  DEFAULT NULL COMMENT '虚拟地址',
+  `end_time` datetime(0) NULL DEFAULT NULL COMMENT '到期时间',
+  `quota_days` int NULL DEFAULT NULL COMMENT '天配额',
+  `quota_hours` int NULL DEFAULT NULL COMMENT '小时配额',
+  `quota_minutes` int NULL DEFAULT NULL COMMENT '分钟配额',
+  `quota_seconds` int NULL DEFAULT NULL COMMENT '秒配额',
+  `create_by` varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` char(1)  DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  PRIMARY KEY (`service_app_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '应用服务信息';
+
+-- ----------------------------
+-- Records of isc_app_service
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_app_service_apply
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_app_service_apply`;
+CREATE TABLE `isc_app_service_apply`  (
+  `apply_id` bigint NOT NULL AUTO_INCREMENT COMMENT '申请ID',
+  `service_app_id` bigint NOT NULL COMMENT '应用服务ID',
+  `apply_type` char(1)  DEFAULT NULL COMMENT '申请类型(0申请 1续期)',
+  `status` char(1)  DEFAULT NULL COMMENT '审核状态（0待审核 1审核通过 2驳回）',
+  `audit_mind` varchar(255)  DEFAULT NULL COMMENT '审核意见',
+  `renewal_duration` int NULL DEFAULT NULL COMMENT '续期时长（单位月）',
+  `quota_days` int NULL DEFAULT NULL COMMENT '天配额',
+  `quota_hours` int NULL DEFAULT NULL COMMENT '小时配额',
+  `quota_minutes` int NULL DEFAULT NULL COMMENT '分钟配额',
+  `quota_seconds` int NULL DEFAULT NULL COMMENT '秒配额',
+  `create_by` varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` char(1)  DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  `remark` varchar(500)  DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`apply_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '应用服务申请信息';
+
+-- ----------------------------
+-- Records of isc_app_service_apply
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_application
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_application`;
+CREATE TABLE `isc_application`  (
+  `application_id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用ID',
+  `application_name` varchar(255) NOT NULL COMMENT '应用名称',
+  `access_key` varchar(32) NOT NULL COMMENT '应用密钥',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `create_by` varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` char(1)  DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  `remark` varchar(500)  DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`application_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '应用信息';
+
+-- ----------------------------
+-- Records of isc_application
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_service
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_service`;
+CREATE TABLE `isc_service`  (
+  `service_id` bigint NOT NULL AUTO_INCREMENT COMMENT '服务ID',
+  `service_name` varchar(255) NOT NULL COMMENT '服务名称',
+  `service_addr` varchar(255) NOT NULL COMMENT '服务地址',
+  `probe_active_addr` varchar(255)  DEFAULT NULL COMMENT '探活地址',
+  `request_method` varchar(10)  DEFAULT NULL COMMENT '请求方式（默认GET）',
+  `remark` varchar(500)  DEFAULT NULL COMMENT '备注',
+  `cors_flag` char(1)  DEFAULT NULL COMMENT '跨域标志（Y是 N否）',
+  `hidden_params` varchar(500)  DEFAULT NULL COMMENT '隐藏参数',
+  `api_doc` text  COMMENT 'JSON文档',
+  `online_status` char(1) DEFAULT NULL COMMENT '是否在线（0离线 1在线）',
+  `status` char(1)  DEFAULT NULL COMMENT '审核状态（0待审核 1审核通过 2驳回）',
+  `audit_mind` varchar(255)  DEFAULT NULL COMMENT '审核意见',
+  `enabled` char(1) NOT NULL COMMENT '服务状态（0启用 1停用）',
+  `cate_full_path` varchar(30)  DEFAULT NULL COMMENT '服务分类全路径',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `create_by` varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` char(1)  DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  PRIMARY KEY (`service_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '服务信息';
+
+-- ----------------------------
+-- Records of isc_service
+-- ----------------------------
+BEGIN;
+INSERT INTO `isc_service` VALUES (1, '测试', 'https://www.baidu.com/', 'https://www.baidu.com/', 'GET', NULL, 'Y', NULL, '{}', '1', '0', NULL, '0', '001000000000000000000000000000', 1, 'admin', '2021-09-05 22:47:41', 'admin', '2021-09-05 22:47:41', '0');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_service_cate
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_service_cate`;
+CREATE TABLE `isc_service_cate`  (
+  `cate_id` bigint NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+  `parent_id` bigint NULL DEFAULT NULL COMMENT '父分类ID',
+  `cate_name` varchar(64)  DEFAULT NULL COMMENT '分类名称',
+  `full_path` varchar(30)  DEFAULT NULL COMMENT '搜索全路径',
+  `enabled` char(1) NOT NULL COMMENT '服务状态（0启用 1停用）',
+  `order_num` int NULL DEFAULT 0 COMMENT '显示顺序',
+  `create_by` varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` char(1)  DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  `remark` varchar(500)  DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`cate_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 COMMENT = '服务分类';
+
+-- ----------------------------
+-- Records of isc_service_cate
+-- ----------------------------
+BEGIN;
+INSERT INTO `isc_service_cate` VALUES (10, 0, 'API服务', '001000000000000000000000000000', '0', 10, 'admin', '2021-09-04 23:35:13', 'admin', '2021-09-04 23:35:13', '0', NULL), (11, 0, '地图服务', '002000000000000000000000000000', '0', 20, 'admin', '2021-09-04 23:35:37', 'admin', '2021-09-04 23:35:37', '0', NULL), (12, 0, '数据服务', '003000000000000000000000000000', '0', 30, 'admin', '2021-09-04 23:36:01', 'admin', '2021-09-04 23:36:01', '0', NULL), (13, 11, 'WFS服务', '002001000000000000000000000000', '0', 10, 'admin', '2021-09-04 23:36:26', 'admin', '2021-09-04 23:36:26', '0', NULL);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_service_log_count
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_service_log_count`;
+CREATE TABLE `isc_service_log_count`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '唯一标识',
+  `service_id` bigint NOT NULL COMMENT '服务ID',
+  `count_date` date NOT NULL COMMENT '统计日期',
+  `total_num` bigint NOT NULL COMMENT '调用次数',
+  `avg_time` bigint NULL DEFAULT NULL COMMENT '平均响应时间',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '服务每日统计';
+
+-- ----------------------------
+-- Records of isc_service_log_count
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_service_log_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_service_log_detail`;
+CREATE TABLE `isc_service_log_detail`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `service_id` bigint NOT NULL COMMENT '服务ID',
+  `application_id` bigint NOT NULL COMMENT '应用ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `request_ip` varchar(64)  DEFAULT NULL COMMENT '调用IP',
+  `begin_time` timestamp(0) NULL DEFAULT NULL COMMENT '开始时间',
+  `end_time` timestamp(0) NULL DEFAULT NULL COMMENT '结束时间',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `remark` varchar(500)  DEFAULT NULL COMMENT '备注信息',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '服务调用日志';
+
+-- ----------------------------
+-- Records of isc_service_log_detail
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for isc_service_log_user_count
+-- ----------------------------
+DROP TABLE IF EXISTS `isc_service_log_user_count`;
+CREATE TABLE `isc_service_log_user_count`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '唯一标识',
+  `service_id` bigint NOT NULL COMMENT '服务ID',
+  `application_id` bigint NOT NULL COMMENT '应用ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `count_date` date NULL DEFAULT NULL COMMENT '统计日期',
+  `total_num` bigint NULL DEFAULT NULL COMMENT '调用次数',
+  `avg_time` bigint NULL DEFAULT NULL COMMENT '平均响应时间',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '服务日志用户统计';
+
+-- ----------------------------
+-- Records of isc_service_log_user_count
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+SET FOREIGN_KEY_CHECKS = 1;

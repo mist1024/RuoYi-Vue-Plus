@@ -261,10 +261,17 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
-            <!-- demo模块 -->
+            <!-- oss模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-oss</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+            <!-- isc模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-isc</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
@@ -288,6 +295,7 @@
         <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
         <module>ruoyi-oss</module>
+        <module>ruoyi-isc</module>
     </modules>
     <packaging>pom</packaging>
 
