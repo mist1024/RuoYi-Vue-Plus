@@ -162,6 +162,19 @@ export const constantRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen'}
       }
     ]
+  },
+  {
+    path: '/isc/app-service',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index/:applicationId(\\d+)',
+        component: (resolve) => require(['@/views/isc/appservice/index'], resolve),
+        name: 'Appservice',
+        meta: { title: '应用服务', activeMenu: '/isc/application'}
+      }
+    ]
   }
 ]
 

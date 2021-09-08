@@ -235,6 +235,13 @@ INSERT INTO `sys_menu` VALUES (1627, '应用信息新增', 1625, 2, '#', '', 1, 
 INSERT INTO `sys_menu` VALUES (1628, '应用信息修改', 1625, 3, '#', '', 1, 0, 'F', '0', '0', 'isc:application:edit', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1629, '应用信息删除', 1625, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:application:remove', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1630, '应用信息导出', 1625, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:application:export', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
+
+INSERT INTO `sys_menu` VALUES (1631, '应用服务', 1625, 1, 'appservice', 'isc/appservice/index', 1, 0, 'F', '0', '0', 'isc:appservice:list', '#', 'admin', '2021-09-08 16:11:57', 'admin', '2021-09-08 16:22:10', '应用服务菜单');
+INSERT INTO `sys_menu` VALUES (1632, '应用服务查询', 1631, 1, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:query', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1633, '应用服务新增', 1631, 2, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:add', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1634, '应用服务修改', 1631, 3, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:edit', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1635, '应用服务删除', 1631, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:remove', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1636, '应用服务导出', 1631, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:export', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

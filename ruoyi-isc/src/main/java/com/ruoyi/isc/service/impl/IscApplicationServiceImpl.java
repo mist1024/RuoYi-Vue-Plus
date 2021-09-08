@@ -51,6 +51,8 @@ public class IscApplicationServiceImpl extends ServicePlusImpl<IscApplicationMap
         LambdaQueryWrapper<IscApplication> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getApplicationName()), IscApplication::getApplicationName, bo.getApplicationName());
         lqw.eq(StringUtils.isNotBlank(bo.getAccessKey()), IscApplication::getAccessKey, bo.getAccessKey());
+        Long userId = SecurityUtils.getUserId();
+        lqw.eq(!SecurityUtils.isAdmin(userId), IscApplication::getUserId, userId);
         return lqw;
     }
 

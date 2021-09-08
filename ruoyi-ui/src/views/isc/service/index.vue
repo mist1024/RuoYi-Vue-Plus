@@ -272,10 +272,7 @@ export default {
         ],
         cateFullPath: [
           { required: true, message: "服务分类不能为空", trigger: "change" }
-        ],
-        userId: [
-          { required: true, message: "用户ID不能为空", trigger: "blur" }
-        ],
+        ]
       }
     };
   },
@@ -346,7 +343,6 @@ export default {
         auditMind: undefined,
         enabled: "0",
         cateFullPath: undefined,
-        userId: undefined,
         createBy: undefined,
         createTime: undefined,
         updateBy: undefined,

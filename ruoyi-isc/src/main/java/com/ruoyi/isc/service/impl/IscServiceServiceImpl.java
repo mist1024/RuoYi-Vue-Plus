@@ -83,7 +83,8 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
         lqw.eq(StringUtils.isNotBlank(bo.getEnabled()), IscService::getEnabled, bo.getEnabled());
         lqw.ge(StringUtils.isNotBlank(bo.getCateFullPath()), IscService::getCateFullPath, bo.getCateFullPath());
         lqw.le(StringUtils.isNotBlank(bo.getCateFullPath()), IscService::getCateFullPath, FullPathUtils.genMaxFullPath(bo.getCateFullPath()));
-        lqw.eq(bo.getUserId() != null, IscService::getUserId, bo.getUserId());
+        Long userId = SecurityUtils.getUserId();
+        lqw.eq(!SecurityUtils.isAdmin(userId), IscService::getUserId, userId);
         return lqw;
     }
 
