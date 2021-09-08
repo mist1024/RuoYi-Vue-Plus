@@ -60,6 +60,14 @@
 	color: inherit;
 }
 
+ /*超过三行隐藏*/
+ .line3{
+	 display: -webkit-box;
+	 -webkit-line-clamp: 3;
+	 -webkit-box-orient: vertical;
+	 overflow: hidden;
+ }
+
 .el-dialog:not(.is-fullscreen) {
 	margin-top: 6vh !important;
 }
