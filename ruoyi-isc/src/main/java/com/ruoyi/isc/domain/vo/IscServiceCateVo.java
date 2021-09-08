@@ -45,11 +45,11 @@ public class IscServiceCateVo {
     private String cateName;
 
     /**
-     * 服务状态（0启用 1停用）
+     * 启用状态（0启用 1停用）
      */
-    @ExcelProperty(value = "服务状态", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "启用状态", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_normal_disable")
-    @ApiModelProperty("服务状态（0启用 1停用）")
+    @ApiModelProperty("启用状态（0启用 1停用）")
     private String enabled;
 
     /**

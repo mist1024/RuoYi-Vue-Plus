@@ -131,7 +131,7 @@ CREATE TABLE `isc_service_cate`  (
   `parent_id` bigint NULL DEFAULT NULL COMMENT '父分类ID',
   `cate_name` varchar(64)  DEFAULT NULL COMMENT '分类名称',
   `full_path` varchar(30)  DEFAULT NULL COMMENT '搜索全路径',
-  `enabled` char(1) NOT NULL COMMENT '服务状态（0启用 1停用）',
+  `enabled` char(1) NOT NULL COMMENT '启用状态（0启用 1停用）',
   `order_num` int NULL DEFAULT 0 COMMENT '显示顺序',
   `create_by` varchar(64)  DEFAULT '' COMMENT '创建者',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
@@ -212,6 +212,29 @@ CREATE TABLE `isc_service_log_user_count`  (
 -- Records of isc_service_log_user_count
 -- ----------------------------
 BEGIN;
+COMMIT;
+
+BEGIN;
+INSERT INTO `sys_menu` VALUES (1607, '服务分类', 1606, 1, 'cate', 'isc/cate/index', 1, 0, 'C', '0', '0', 'isc:cate:list', '#', 'admin', '2021-09-08 13:59:21', 'admin', '2021-09-08 14:02:25', '服务分类菜单');
+INSERT INTO `sys_menu` VALUES (1608, '服务分类查询', 1607, 1, '#', '', 1, 0, 'F', '0', '0', 'isc:cate:query', '#', 'admin', '2021-09-08 13:59:21', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1609, '服务分类新增', 1607, 2, '#', '', 1, 0, 'F', '0', '0', 'isc:cate:add', '#', 'admin', '2021-09-08 13:59:21', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1610, '服务分类修改', 1607, 3, '#', '', 1, 0, 'F', '0', '0', 'isc:cate:edit', '#', 'admin', '2021-09-08 13:59:21', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1611, '服务分类删除', 1607, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:cate:remove', '#', 'admin', '2021-09-08 13:59:21', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1612, '服务分类导出', 1607, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:cate:export', '#', 'admin', '2021-09-08 13:59:21', '', NULL, '');
+
+INSERT INTO `sys_menu` VALUES (1619, '服务信息', 1606, 1, 'service', 'isc/service/index', 1, 0, 'C', '0', '0', 'isc:service:list', '#', 'admin', '2021-09-08 14:04:29', '', NULL, '服务信息菜单');
+INSERT INTO `sys_menu` VALUES (1620, '服务信息查询', 1619, 1, '#', '', 1, 0, 'F', '0', '0', 'isc:service:query', '#', 'admin', '2021-09-08 14:04:29', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1621, '服务信息新增', 1619, 2, '#', '', 1, 0, 'F', '0', '0', 'isc:service:add', '#', 'admin', '2021-09-08 14:04:29', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1622, '服务信息修改', 1619, 3, '#', '', 1, 0, 'F', '0', '0', 'isc:service:edit', '#', 'admin', '2021-09-08 14:04:29', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1623, '服务信息删除', 1619, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:service:remove', '#', 'admin', '2021-09-08 14:04:29', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1624, '服务信息导出', 1619, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:service:export', '#', 'admin', '2021-09-08 14:04:29', '', NULL, '');
+
+INSERT INTO `sys_menu` VALUES (1625, '应用信息', 1606, 1, 'application', 'isc/application/index', 1, 0, 'C', '0', '0', 'isc:application:list', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '应用信息菜单');
+INSERT INTO `sys_menu` VALUES (1626, '应用信息查询', 1625, 1, '#', '', 1, 0, 'F', '0', '0', 'isc:application:query', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1627, '应用信息新增', 1625, 2, '#', '', 1, 0, 'F', '0', '0', 'isc:application:add', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1628, '应用信息修改', 1625, 3, '#', '', 1, 0, 'F', '0', '0', 'isc:application:edit', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1629, '应用信息删除', 1625, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:application:remove', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1630, '应用信息导出', 1625, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:application:export', '#', 'admin', '2021-09-08 14:10:06', '', NULL, '');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

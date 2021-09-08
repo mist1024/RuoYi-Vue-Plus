@@ -10,8 +10,8 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="服务状态" prop="enabled">
-        <el-select v-model="queryParams.enabled" placeholder="请选择服务状态" clearable size="small">
+      <el-form-item label="启用状态" prop="enabled">
+        <el-select v-model="queryParams.enabled" placeholder="请选择启用状态" clearable size="small">
           <el-option
             v-for="dict in enabledOptions"
             :key="dict.dictValue"
@@ -48,7 +48,7 @@
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
       <el-table-column label="分类名称" align="center" prop="cateName"  width="160"/>
-      <el-table-column label="服务状态" align="center" prop="enabled" :formatter="enabledFormat" />
+      <el-table-column label="启用状态" align="center" prop="enabled" :formatter="enabledFormat" />
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
       <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
@@ -93,7 +93,7 @@
         <el-form-item label="分类名称" prop="cateName">
           <el-input v-model="form.cateName" placeholder="请输入分类名称" />
         </el-form-item>
-        <el-form-item label="服务状态" prop="enabled">
+        <el-form-item label="启用状态" prop="enabled">
           <el-radio-group v-model="form.enabled">
             <el-radio
               v-for="dict in enabledOptions"
@@ -143,7 +143,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 服务状态字典
+      // 启用状态字典
       enabledOptions: [],
       // 查询参数
       queryParams: {
@@ -162,7 +162,7 @@ export default {
           { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
         ],
         enabled: [
-          { required: true, message: "服务状态不能为空", trigger: "change" }
+          { required: true, message: "启用状态不能为空", trigger: "change" }
         ],
         orderNum: [
           { required: true, message: "显示顺序不能为空", trigger: "change" }
@@ -205,7 +205,7 @@ export default {
         this.cateOptions.push(data);
       });
     },
-    // 服务状态字典翻译
+    // 启用状态字典翻译
     enabledFormat(row, column) {
       return this.selectDictLabel(this.enabledOptions, row.enabled);
     },

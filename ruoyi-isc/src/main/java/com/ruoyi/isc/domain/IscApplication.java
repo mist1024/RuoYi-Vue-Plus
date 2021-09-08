@@ -1,67 +1,54 @@
 package com.ruoyi.isc.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.ruoyi.common.core.domain.entity.SysMenu;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
 
 /**
- * 服务分类对象 isc_service_cate
+ * 应用信息对象 isc_application
  *
  * @author wenchao gong
- * @date 2021-08-22
+ * @date 2021-09-08
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("isc_service_cate")
-public class IscServiceCate implements Serializable {
+@TableName("isc_application")
+public class IscApplication implements Serializable {
 
     private static final long serialVersionUID=1L;
 
 
     /**
-     * 分类ID
+     * 应用ID
      */
-    @TableId(value = "cate_id")
-    private Long cateId;
+    @TableId(value = "application_id")
+    private Long applicationId;
 
     /**
-     * 父分类ID
+     * 应用名称
      */
-    private Long parentId;
+    private String applicationName;
 
     /**
-     * 分类名称
+     * 应用密钥
      */
-    private String cateName;
+    private String accessKey;
 
     /**
-     * 搜索全路径
+     * 用户ID
      */
-    private String fullPath;
-
-    /**
-     * 启用状态（0启用 1停用）
-     */
-    private String enabled;
+    private Long userId;
 
     /**
      * 创建者
      */
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
-
-    /**
-     * 显示顺序
-     */
-    private Long orderNum;
 
     /**
      * 创建时间
@@ -91,11 +78,5 @@ public class IscServiceCate implements Serializable {
      * 备注
      */
     private String remark;
-
-    /**
-     * 子分类
-     */
-    @TableField(exist = false)
-    private List<SysMenu> children = new ArrayList<SysMenu>();
 
 }

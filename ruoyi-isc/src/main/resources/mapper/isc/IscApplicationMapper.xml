@@ -2,15 +2,14 @@
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.isc.mapper.IscServiceCateMapper">
+<mapper namespace="com.ruoyi.isc.mapper.IscApplicationMapper">
 
-    <resultMap type="com.ruoyi.isc.domain.IscServiceCate" id="IscServiceCateResult">
-        <result property="cateId" column="cate_id"/>
-        <result property="parentId" column="parent_id"/>
-        <result property="cateName" column="cate_name"/>
-        <result property="enabled" column="enabled"/>
+    <resultMap type="com.ruoyi.isc.domain.IscApplication" id="IscApplicationResult">
+        <result property="applicationId" column="application_id"/>
+        <result property="applicationName" column="application_name"/>
+        <result property="accessKey" column="access_key"/>
+        <result property="userId" column="user_id"/>
         <result property="createBy" column="create_by"/>
-        <result property="orderNum" column="order_num"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
