@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 服务信息业务对象 isc_service
  *
- * @author ruoyi
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 

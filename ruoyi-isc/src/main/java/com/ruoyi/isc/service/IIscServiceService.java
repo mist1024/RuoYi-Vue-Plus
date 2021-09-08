@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 服务信息Service接口
  *
- * @author ruoyi
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 public interface IIscServiceService extends IServicePlus<IscService, IscServiceVo> {

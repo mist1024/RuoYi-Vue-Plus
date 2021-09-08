@@ -14,7 +14,7 @@ import java.util.Date;
 /**
  * 服务分类视图对象 isc_service_cate
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 @Data

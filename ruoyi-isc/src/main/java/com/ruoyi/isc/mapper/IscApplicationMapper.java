@@ -6,7 +6,7 @@ import com.ruoyi.isc.domain.IscApplication;
 /**
  * 应用信息Mapper接口
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-09-08
  */
 public interface IscApplicationMapper extends BaseMapperPlus<IscApplication> {

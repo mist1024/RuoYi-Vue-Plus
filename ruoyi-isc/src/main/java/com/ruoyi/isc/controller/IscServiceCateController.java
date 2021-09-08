@@ -36,7 +36,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * 服务分类Controller
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 @Validated

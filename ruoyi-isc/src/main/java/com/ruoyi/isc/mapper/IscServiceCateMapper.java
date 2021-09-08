@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.CacheNamespace;
 /**
  * 服务分类Mapper接口
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 public interface IscServiceCateMapper extends BaseMapperPlus<IscServiceCate> {

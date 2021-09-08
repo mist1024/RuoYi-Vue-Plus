@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 应用信息业务对象 isc_application
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-09-08
  */
 

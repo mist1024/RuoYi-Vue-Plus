@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 /**
  * 应用信息对象 isc_application
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-09-08
  */
 @Data

@@ -29,7 +29,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * 服务信息Controller
  *
- * @author ruoyi
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 @Validated

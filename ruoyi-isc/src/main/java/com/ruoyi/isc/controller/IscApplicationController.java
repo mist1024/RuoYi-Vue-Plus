@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * 应用信息Controller
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-09-08
  */
 @Validated

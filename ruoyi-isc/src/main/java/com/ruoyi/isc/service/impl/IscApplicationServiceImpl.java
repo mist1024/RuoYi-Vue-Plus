@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * 应用信息Service业务层处理
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-09-08
  */
 @Service

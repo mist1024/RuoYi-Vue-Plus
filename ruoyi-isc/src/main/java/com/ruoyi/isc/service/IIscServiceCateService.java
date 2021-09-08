@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * 服务分类Service接口
  *
- * @author wenchao gong
+ * @author Wenchao Gong
  * @date 2021-08-22
  */
 public interface IIscServiceCateService extends IServicePlus<IscServiceCate, IscServiceCateVo> {

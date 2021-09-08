@@ -7,6 +7,12 @@ import cn.hutool.core.lang.tree.parser.NodeParser;
 
 import java.util.List;
 
+/**
+ * 树结构工具类
+ *
+ * @author Wenchao Gong
+ * @date 2021-09-08
+ */
 public class TreeUtils {
 
     public static final TreeNodeConfig DEFAULT_TREE_NODE_CONFIG = new TreeNodeConfig();
