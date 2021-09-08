@@ -42,3 +42,11 @@ export function delAppservice(serviceAppId) {
     method: 'delete'
   })
 }
+
+// 获取应用服务下拉树列表
+export function treeselect(applicationId) {
+  return request({
+    url: '/isc/appservice/treeselect/' + applicationId,
+    method: 'get'
+  })
+}

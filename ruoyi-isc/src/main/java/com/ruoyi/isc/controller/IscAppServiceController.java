@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import cn.hutool.core.lang.tree.Tree;
+import com.ruoyi.isc.domain.IscServiceCate;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
@@ -40,7 +42,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/isc/appservice")
 public class IscAppServiceController extends BaseController {
 
-    private final IIscAppServiceService iIscAppServiceService;
+    private final IIscAppServiceService appServiceService;
 
     /**
      * 查询应用服务列表
@@ -49,7 +51,7 @@ public class IscAppServiceController extends BaseController {
     @PreAuthorize("@ss.hasPermi('isc:appservice:list')")
     @GetMapping("/list")
     public TableDataInfo<IscAppServiceVo> list(@Validated(QueryGroup.class) IscAppServiceBo bo) {
-        return iIscAppServiceService.queryPageList(bo);
+        return appServiceService.queryPageList(bo);
     }
 
     /**
@@ -60,7 +62,7 @@ public class IscAppServiceController extends BaseController {
     @Log(title = "应用服务", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public void export(@Validated IscAppServiceBo bo, HttpServletResponse response) {
-        List<IscAppServiceVo> list = iIscAppServiceService.queryList(bo);
+        List<IscAppServiceVo> list = appServiceService.queryList(bo);
         ExcelUtil.exportExcel(list, "应用服务", IscAppServiceVo.class, response);
     }
 
@@ -72,7 +74,7 @@ public class IscAppServiceController extends BaseController {
     @GetMapping("/{serviceAppId}")
     public AjaxResult<IscAppServiceVo> getInfo(@NotNull(message = "主键不能为空")
                                                   @PathVariable("serviceAppId") Long serviceAppId) {
-        return AjaxResult.success(iIscAppServiceService.queryById(serviceAppId));
+        return AjaxResult.success(appServiceService.queryById(serviceAppId));
     }
 
     /**
@@ -84,7 +86,7 @@ public class IscAppServiceController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public AjaxResult<Void> add(@Validated(AddGroup.class) @RequestBody IscAppServiceBo bo) {
-        return toAjax(iIscAppServiceService.insertByBo(bo) ? 1 : 0);
+        return toAjax(appServiceService.insertByBo(bo) ? 1 : 0);
     }
 
     /**
@@ -96,7 +98,7 @@ public class IscAppServiceController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody IscAppServiceBo bo) {
-        return toAjax(iIscAppServiceService.updateByBo(bo) ? 1 : 0);
+        return toAjax(appServiceService.updateByBo(bo) ? 1 : 0);
     }
 
     /**
@@ -108,6 +110,16 @@ public class IscAppServiceController extends BaseController {
     @DeleteMapping("/{serviceAppIds}")
     public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
                                        @PathVariable Long[] serviceAppIds) {
-        return toAjax(iIscAppServiceService.deleteWithValidByIds(Arrays.asList(serviceAppIds), true) ? 1 : 0);
+        return toAjax(appServiceService.deleteWithValidByIds(Arrays.asList(serviceAppIds), true) ? 1 : 0);
+    }
+
+    /**
+     * 获取应用服务下拉树列表
+     */
+    @GetMapping("/treeselect/{applicationId}")
+    @ApiOperation("获取应用服务下拉树列表")
+    public AjaxResult<List<Tree<Long>>> treeselect(@NotNull(message = "应用主键不能为空") @PathVariable Long applicationId)
+    {
+        return AjaxResult.success(appServiceService.genAppServiceTree(applicationId));
     }
 }

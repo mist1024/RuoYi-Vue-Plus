@@ -1,13 +1,17 @@
 package com.ruoyi.isc.service;
 
-import com.ruoyi.isc.domain.IscService;
-import com.ruoyi.isc.domain.vo.IscServiceVo;
-import com.ruoyi.isc.domain.bo.IscServiceBo;
+import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.lang.tree.TreeNode;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.isc.domain.IscService;
+import com.ruoyi.isc.domain.bo.IscServiceBo;
+import com.ruoyi.isc.domain.vo.IscServiceVo;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 服务信息Service接口
@@ -53,4 +57,24 @@ public interface IIscServiceService extends IServicePlus<IscService, IscServiceV
      * @return
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 通过服务ID集合 查询服务名称map
+     * @param serviceIds 服务ID集合
+     * @return 服务名称map
+     */
+    Map<Long, String> getNameMap(Collection<Long> serviceIds);
+
+    /**
+     * 组装 服务树结构
+     * @return 服务树结构
+     */
+    List<Tree<Long>> genServiceTree();
+
+    /**
+     * 组装 服务树结构
+     * @param exitsIds 已存在服务ID集合
+     * @return 服务树结构
+     */
+    List<Tree<Long>> genServiceTree(Set<Long> exitsIds);
 }

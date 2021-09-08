@@ -64,16 +64,11 @@ public class IscServiceCateController extends BaseController {
      * 获取分类下拉树列表
      */
     @GetMapping("/treeselect")
-    public AjaxResult treeselect()
+    @ApiOperation("获取分类下拉树列表")
+    public AjaxResult<List<Tree<Long>>> treeselect()
     {
         List<IscServiceCate> cates = cateService.selectCateList();
-        return AjaxResult.success(TreeUtils.build(cates, (cate, tree) -> {
-            tree.setId(cate.getCateId());
-            tree.setParentId(cate.getParentId());
-            tree.setName(cate.getCateName());
-            tree.setWeight(cate.getOrderNum());
-            tree.putExtra("fullPath", cate.getFullPath());
-        }));
+        return AjaxResult.success(cateService.genCateTree(cates));
     }
 
     /**

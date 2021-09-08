@@ -1,10 +1,11 @@
 package com.ruoyi.isc.service;
 
-import com.ruoyi.common.core.domain.entity.SysMenu;
-import com.ruoyi.isc.domain.IscServiceCate;
-import com.ruoyi.isc.domain.vo.IscServiceCateVo;
-import com.ruoyi.isc.domain.bo.IscServiceCateBo;
+import cn.hutool.core.lang.tree.Tree;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
+import com.ruoyi.isc.domain.IscService;
+import com.ruoyi.isc.domain.IscServiceCate;
+import com.ruoyi.isc.domain.bo.IscServiceCateBo;
+import com.ruoyi.isc.domain.vo.IscServiceCateVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -64,4 +65,20 @@ public interface IIscServiceCateService extends IServicePlus<IscServiceCate, Isc
      * @return
      */
     Map<String, String> batchCateName(Set<String> fullPathList);
+
+    /**
+     * 组装 服务分类 树结构
+     * @param cates 所有分类
+     * @return 树结构信息
+     */
+    List<Tree<Long>> genCateTree(List<IscServiceCate> cates);
+
+    /**
+     * 组装 服务分类 树结构
+     * @param cates       所有分类
+     * @param serviceList 可用服务列表
+     * @param exitsIds    已存在服务ID集合
+     * @return 树结构信息
+     */
+    List<Tree<Long>> genCateTree(List<IscServiceCate> cates, List<IscService> serviceList, Set<Long> exitsIds);
 }

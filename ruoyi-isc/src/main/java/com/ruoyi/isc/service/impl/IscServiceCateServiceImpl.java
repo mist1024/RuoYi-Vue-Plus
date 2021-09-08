@@ -1,10 +1,14 @@
 package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.FullPathUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.TreeUtils;
+import com.ruoyi.isc.domain.IscService;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -26,6 +30,12 @@ import java.util.stream.Collectors;
  */
 @Service
 public class IscServiceCateServiceImpl extends ServicePlusImpl<IscServiceCateMapper, IscServiceCate, IscServiceCateVo> implements IIscServiceCateService {
+
+    public static final String FIELD_FULL_PATH = "fullPath";
+    public static final String FIELD_NODE_TYPE = "type";
+    public static final int NODE_TYPE_SERVICE = 1;
+    public static final int NODE_TYPE_CATE = 0;
+    public static final String FIELD_NODE_EXIST = "exist";
 
     @Override
     public IscServiceCateVo queryById(Long cateId){
@@ -133,6 +143,53 @@ public class IscServiceCateServiceImpl extends ServicePlusImpl<IscServiceCateMap
             results.put(cate.getFullPath(), cateNameMap.get(cate.getCateId()));
         }
         return results;
+    }
+
+    @Override
+    public List<Tree<Long>> genCateTree(List<IscServiceCate> cates)
+    {
+        return genCateTree(cates, null, CollectionUtil.newHashSet());
+    }
+
+    @Override
+    public List<Tree<Long>> genCateTree(List<IscServiceCate> cates, List<IscService> serviceList, Set<Long> exitsIds)
+    {
+        boolean isServiceTree = Objects.nonNull(serviceList);
+        final Map<String, List<IscService>> cateServiceMap = isServiceTree ? serviceList.stream()
+                .collect(Collectors.groupingBy(IscService::getCateFullPath)) : null;
+
+        return TreeUtils.build(cates, (cate, tree) -> {
+            tree.setId(cate.getCateId());
+            tree.setParentId(cate.getParentId());
+            tree.setName(cate.getCateName());
+            tree.setWeight(cate.getOrderNum());
+            tree.putExtra(FIELD_FULL_PATH, cate.getFullPath());
+            if(isServiceTree) {
+                tree.putExtra(FIELD_NODE_TYPE, NODE_TYPE_CATE);
+                List<IscService> services = cateServiceMap.get(cate.getFullPath());
+                if(CollectionUtil.isEmpty(services)) {
+                    return;
+                }
+                for (int index = 0; index < services.size(); index++)
+                {
+                    IscService service = services.get(index);
+                    List<Tree<Long>> children = tree.getChildren();
+                    if(Objects.isNull(children)) {
+                        children = CollectionUtil.newArrayList();
+                        tree.setChildren(children);
+                    }
+                    final Tree<Long> child = new Tree<>(TreeUtils.DEFAULT_TREE_NODE_CONFIG);
+                    child.setId(service.getServiceId());
+                    child.setName(service.getServiceName());
+                    child.setWeight(index);
+                    child.setParent(tree);
+                    child.setParentId(tree.getId());
+                    child.putExtra(FIELD_NODE_TYPE, NODE_TYPE_SERVICE);
+                    child.putExtra(FIELD_NODE_EXIST, exitsIds.contains(service.getServiceId()));
+                    children.add(child);
+                }
+            }
+        });
     }
 
     private Map<Long, String> batchCateName(List<IscServiceCate> list) {

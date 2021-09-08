@@ -1,10 +1,13 @@
 package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.constant.IscConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -24,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -125,5 +129,31 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return removeByIds(ids);
+    }
+
+    @Override
+    public Map<Long, String> getNameMap(Collection<Long> serviceIds)
+    {
+        return list(Wrappers.<IscService>lambdaQuery()
+                .select(IscService::getServiceId, IscService::getServiceName)
+                .in(IscService::getServiceId, serviceIds)).stream()
+                .collect(Collectors.toMap(IscService::getServiceId, IscService::getServiceName));
+    }
+
+    @Override
+    public List<Tree<Long>> genServiceTree()
+    {
+        return genServiceTree(CollectionUtil.newHashSet());
+    }
+
+    @Override
+    public List<Tree<Long>> genServiceTree(Set<Long> exitsIds)
+    {
+        List<IscService> serviceList = list(Wrappers.<IscService>lambdaQuery()
+                .select(IscService::getServiceId, IscService::getServiceName, IscService::getCateFullPath)
+                .eq(IscService::getStatus, IscConstants.AUDIT_PASS)
+                .eq(IscService::getEnabled, UserConstants.DICT_NORMAL)
+                .orderByDesc(IscService::getUpdateTime));
+        return cateService.genCateTree(cateService.selectCateList(), serviceList, exitsIds);
     }
 }

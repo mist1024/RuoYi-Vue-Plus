@@ -47,12 +47,6 @@ public class IscAppServiceBo extends BaseEntity {
     private Long applicationId;
 
     /**
-     * 用户ID
-     */
-    @ApiModelProperty(value = "用户ID")
-    private Long userId;
-
-    /**
      * 启用状态（0启用 1停用）
      */
     @ApiModelProperty(value = "启用状态（0启用 1停用）", required = true)

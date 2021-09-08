@@ -34,9 +34,15 @@ public class IscAppServiceVo {
     /**
      * 服务ID
      */
-    @ExcelProperty(value = "服务ID")
     @ApiModelProperty("服务ID")
     private Long serviceId;
+
+    /**
+     * 服务名称
+     */
+    @ExcelProperty(value = "服务名称")
+    @ApiModelProperty("服务名称")
+    private String serviceName;
 
     /**
      * 应用ID

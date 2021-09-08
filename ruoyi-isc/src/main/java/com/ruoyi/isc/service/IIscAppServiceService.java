@@ -1,5 +1,6 @@
 package com.ruoyi.isc.service;
 
+import cn.hutool.core.lang.tree.Tree;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.vo.IscAppServiceVo;
 import com.ruoyi.isc.domain.bo.IscAppServiceBo;
@@ -53,4 +54,11 @@ public interface IIscAppServiceService extends IServicePlus<IscAppService, IscAp
      * @return
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 构造 应用服务树结构
+     * @param applicationId 应用ID
+     * @return 应用服务树结构 （标识服务是否存在）
+     */
+    List<Tree<Long>> genAppServiceTree(Long applicationId);
 }

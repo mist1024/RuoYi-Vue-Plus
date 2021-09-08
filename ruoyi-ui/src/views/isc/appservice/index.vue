@@ -1,32 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="服务ID" prop="serviceId">
+      <el-form-item label="应用名称">
         <el-input
-          v-model="queryParams.serviceId"
-          placeholder="请输入服务ID"
+          v-model="applicationName"
+          disabled
           clearable
           size="small"
-          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="应用ID" prop="applicationId">
-        <el-input
-          v-model="queryParams.applicationId"
-          placeholder="请输入应用ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
       </el-form-item>
-      <el-form-item label="用户ID" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
       </el-form-item>
       <el-form-item label="启用状态" prop="enabled">
         <el-select v-model="queryParams.enabled" placeholder="请选择启用状态" clearable size="small">
@@ -104,7 +87,7 @@
     <el-table v-loading="loading" :data="appserviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="应用服务ID" align="center" prop="serviceAppId" v-if="false"/>
-      <el-table-column label="服务ID" align="center" prop="serviceId" />
+      <el-table-column label="服务名称" align="center" prop="serviceName" />
       <el-table-column label="启用状态" align="center" prop="enabled">
         <template slot-scope="scope">
           <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
@@ -163,11 +146,8 @@
     <!-- 添加或修改应用服务对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="服务ID" prop="serviceId">
-          <el-input v-model="form.serviceId" placeholder="请输入服务ID" />
-        </el-form-item>
-        <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户ID" />
+        <el-form-item label="服务" prop="serviceId">
+          <treeselect v-model="form.serviceId" :options="appServiceOptions" :show-count="true" :normalizer="normalizer" placeholder="请选择服务" style="width:215px"/>
         </el-form-item>
         <el-form-item label="启用状态">
           <el-radio-group v-model="form.enabled">
@@ -208,10 +188,13 @@
 </template>
 
 <script>
-import { listAppservice, getAppservice, delAppservice, addAppservice, updateAppservice } from "@/api/isc/appservice";
-
+import { listAppservice, getAppservice, delAppservice, addAppservice, updateAppservice, treeselect } from "@/api/isc/appservice";
+import { getApplication } from "@/api/isc/application";
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 export default {
   name: "Appservice",
+  components: { Treeselect },
   data() {
     return {
       // 按钮loading
@@ -242,17 +225,17 @@ export default {
       applyTypeOptions: [],
       // 审核状态字典
       statusOptions: [],
+      // 应用服务树
+      appServiceOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        serviceId: undefined,
         applicationId: undefined,
-        userId: undefined,
         enabled: undefined,
         status: undefined,
       },
-      applicationId: undefined,
+      applicationName: undefined,
       // 表单参数
       form: {},
       // 表单校验
@@ -283,6 +266,8 @@ export default {
     this.getDicts("sys_audit_status").then(response => {
       this.statusOptions = response.data;
     });
+    this.getApplicationName(applicationId);
+    this.getTreeselect(applicationId);
   },
   methods: {
     /** 查询应用服务列表 */
@@ -293,6 +278,29 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+    /** 获取应用信息 */
+    getApplicationName(applicationId) {
+      getApplication(applicationId).then(response => {
+        this.applicationName = response.data.applicationName;
+      });
+    },
+    /** 获取应用服务分类树结构 */
+    getTreeselect(applicationId) {
+      treeselect(applicationId).then(response => {
+        this.appServiceOptions = response.data;
+      });
+    },
+    //树节点转换
+    normalizer(node) {
+      const data = {
+        id: node.id,
+        label: node.label,
+        children: node.children,
+        disabled: true
+      }
+      console.log(data)
+      return 
     },
     // 取消按钮
     cancel() {
@@ -305,7 +313,6 @@ export default {
         serviceAppId: undefined,
         serviceId: undefined,
         applicationId: this.applicationId,
-        userId: undefined,
         enabled: "0",
         applyType: undefined,
         status: [],
