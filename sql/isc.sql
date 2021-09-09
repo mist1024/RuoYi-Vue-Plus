@@ -242,6 +242,22 @@ INSERT INTO `sys_menu` VALUES (1633, '应用服务新增', 1631, 2, '#', '', 1, 
 INSERT INTO `sys_menu` VALUES (1634, '应用服务修改', 1631, 3, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:edit', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1635, '应用服务删除', 1631, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:remove', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1636, '应用服务导出', 1631, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:export', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
+
+INSERT INTO  VALUES (100, '审核状态', 'sys_audit_status', '0', 'admin', '2021-08-21 21:21:58', 'admin', '2021-08-21 21:21:58', '审核状态列表');
+INSERT INTO  VALUES (101, '在线状态', 'isc_online_status', '0', 'admin', '2021-08-21 21:24:28', 'admin', '2021-08-21 21:24:28', '在线状态列表');
+INSERT INTO  VALUES (102, '申请类型', 'isc_apply_type', '0', 'admin', '2021-08-21 21:25:26', 'admin', '2021-08-21 21:25:26', '申请类型列表');
+INSERT INTO  VALUES (103, '请求方法', 'isc_request_method', '0', 'admin', '2021-09-07 22:12:58', 'admin', '2021-09-07 22:12:58', 'GET/POST');
+
+INSERT INTO `sys_dict_data` VALUES (100, 0, '待审核', '0', 'sys_audit_status', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:26:36', 'admin', '2021-08-21 21:26:36', NULL);
+INSERT INTO `sys_dict_data` VALUES (101, 1, '通过', '1', 'sys_audit_status', NULL, 'success', 'N', '0', 'admin', '2021-08-21 21:27:02', 'admin', '2021-08-21 21:27:02', NULL);
+INSERT INTO `sys_dict_data` VALUES (102, 2, '驳回', '2', 'sys_audit_status', NULL, 'warning', 'N', '0', 'admin', '2021-08-21 21:27:24', 'admin', '2021-08-21 21:27:24', NULL);
+INSERT INTO `sys_dict_data` VALUES (103, 0, '离线', '0', 'isc_online_status', NULL, 'info', 'N', '0', 'admin', '2021-08-21 21:28:56', 'admin', '2021-08-21 21:28:56', NULL);
+INSERT INTO `sys_dict_data` VALUES (104, 1, '在线', '1', 'isc_online_status', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:29:15', 'admin', '2021-08-21 21:29:15', NULL);
+INSERT INTO `sys_dict_data` VALUES (105, 0, '申请', '0', 'isc_apply_type', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:30:26', 'admin', '2021-08-21 21:30:26', NULL);
+INSERT INTO `sys_dict_data` VALUES (106, 1, '续期', '1', 'isc_apply_type', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:30:42', 'admin', '2021-08-21 21:30:42', NULL);
+INSERT INTO `sys_dict_data` VALUES (107, 1, 'GET', 'GET', 'isc_request_method', NULL, 'primary', 'N', '0', 'admin', '2021-09-07 22:13:22', 'admin', '2021-09-07 22:13:56', NULL);
+INSERT INTO `sys_dict_data` VALUES (108, 2, 'POST', 'POST', 'isc_request_method', NULL, 'info', 'N', '0', 'admin', '2021-09-07 22:13:40', 'admin', '2021-09-07 22:13:40', NULL);
+
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
