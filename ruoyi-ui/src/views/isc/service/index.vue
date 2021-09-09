@@ -73,6 +73,17 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          type="primary"
+          plain
+          icon="el-icon-view"
+          size="mini"
+          :disabled="multiple"
+          @click="handleUpdate"
+          v-hasPermi="['isc:service:audit']"
+        >批量审核</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
           type="danger"
           plain
           icon="el-icon-delete"
@@ -124,6 +135,20 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-info"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['isc:service:query']"
+          >查看</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['isc:service:audit']"
+          >审核</el-button>
           <el-button
             size="mini"
             type="text"
@@ -316,22 +341,6 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
-    },
-    // 跨域标志字典翻译
-    corsFlagFormat(row, column) {
-      return this.selectDictLabel(this.corsFlagOptions, row.corsFlag);
-    },
-    // 是否在线字典翻译
-    onlineStatusFormat(row, column) {
-      return this.selectDictLabel(this.onlineStatusOptions, row.onlineStatus);
-    },
-    // 审核状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
-    },
-    // 服务状态字典翻译
-    enabledFormat(row, column) {
-      return this.selectDictLabel(this.enabledOptions, row.enabled);
     },
     // 取消按钮
     cancel() {

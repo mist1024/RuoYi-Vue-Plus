@@ -126,6 +126,13 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-info"
+            @click="handleRenewal(scope.row)"
+            v-hasPermi="['isc:appservice:query']"
+          >查看</el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-time"
             @click="handleRenewal(scope.row)"
             v-hasPermi="['isc:appservice:edit']"

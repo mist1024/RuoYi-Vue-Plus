@@ -25,10 +25,7 @@ import com.ruoyi.isc.service.IIscServiceService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +43,9 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     @Override
     public IscServiceVo queryById(Long serviceId)
     {
-        return getVoById(serviceId);
+        final IscServiceVo vo = getVoById(serviceId);
+        genVoInfo(Arrays.asList(vo));
+        return vo;
     }
 
     @Override
