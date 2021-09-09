@@ -32,33 +32,13 @@
         <el-button
           type="primary"
           plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['isc:serviceapply:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['isc:serviceapply:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
+          icon="el-icon-view"
           size="mini"
           :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['isc:serviceapply:remove']"
-        >删除</el-button>
+          @click="handleAudit"
+          v-hasPermi="['isc:serviceapply:audit']"
+        >批量审核</el-button>
+      </el-col>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -75,7 +55,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="serviceapplyList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center" :selectable="selectable"/>
       <el-table-column label="申请ID" align="center" prop="applyId" v-if="false"/>
       <el-table-column label="应用名称" align="left" prop="applicationName" />
       <el-table-column label="服务名称" align="left" prop="serviceName" />
@@ -105,17 +85,19 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['isc:serviceapply:edit']"
-          >修改</el-button>
+            icon="el-icon-view"
+            @click="handleAuditSingle(scope.row)"
+            v-if="scope.row.status == 0"
+            v-hasPermi="['isc:serviceapply:audit']"
+          >审核</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['isc:serviceapply:remove']"
-          >删除</el-button>
+            icon="el-icon-info"
+            @click="handleAuditSingle(scope.row)"
+            v-if="scope.row.status > 0"
+            v-hasPermi="['isc:serviceapply:query']"
+          >查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -130,56 +112,68 @@
 
     <!-- 添加或修改应用服务申请信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="应用服务ID" prop="appServiceId">
-          <el-input v-model="form.appServiceId" placeholder="请输入应用服务ID" />
-        </el-form-item>
-        <el-form-item label="续期时长" prop="renewalDuration">
-          <el-input v-model="form.renewalDuration" placeholder="请输入续期时长" />
-        </el-form-item>
-        <el-form-item label="天配额" prop="quotaDays">
-          <el-input v-model="form.quotaDays" placeholder="请输入天配额" />
-        </el-form-item>
-        <el-form-item label="小时配额" prop="quotaHours">
-          <el-input v-model="form.quotaHours" placeholder="请输入小时配额" />
-        </el-form-item>
-        <el-form-item label="分钟配额" prop="quotaMinutes">
-          <el-input v-model="form.quotaMinutes" placeholder="请输入分钟配额" />
-        </el-form-item>
-        <el-form-item label="秒配额" prop="quotaSeconds">
-          <el-input v-model="form.quotaSeconds" placeholder="请输入秒配额" />
-        </el-form-item>
-        <el-form-item label="创建者" prop="createBy">
-          <el-input v-model="form.createBy" placeholder="请输入创建者" />
-        </el-form-item>
-        <el-form-item label="创建时间" prop="createTime">
-          <el-date-picker clearable size="small"
-            v-model="form.createTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="选择创建时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="更新者" prop="updateBy">
-          <el-input v-model="form.updateBy" placeholder="请输入更新者" />
-        </el-form-item>
-        <el-form-item label="更新时间" prop="updateTime">
-          <el-date-picker clearable size="small"
-            v-model="form.updateTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="选择更新时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+      <el-card shadow="never" v-if="!single" style="margin-bottom: 20px">
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">应用名称</el-col>
+          <el-col :span="18" class="col-content">{{this.form.applicationName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务名称</el-col>
+          <el-col :span="18" class="col-content">{{this.form.serviceName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">申请类型</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="applyTypeOptions" :value="this.form.applyType"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">审核状态</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="statusOptions" :value="this.form.status"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">续期时长(月)</el-col>
+          <el-col :span="18" class="col-content">{{this.form.renewalDuration}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">每日配额</el-col>
+          <el-col :span="18" class="col-content">{{this.form.quotaDays}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">小时配额</el-col>
+          <el-col :span="18" class="col-content">{{this.form.quotaHours}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">分钟配额</el-col>
+          <el-col :span="18" class="col-content">{{this.form.quotaMinutes}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">每秒配额</el-col>
+          <el-col :span="18" class="col-content">{{this.form.quotaSeconds}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">提交人</el-col>
+          <el-col :span="18" class="col-content">{{this.form.updateBy}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">提交时间</el-col>
+          <el-col :span="18" class="col-content">{{this.form.updateTime}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">备注</el-col>
+          <el-col :span="18" class="col-content">{{this.form.remark}}</el-col>
+        </el-row>
+      </el-card>
+      <el-form ref="auditForm" :model="auditForm" :rules="rules" label-width="80px">
+        <el-form-item label="审核意见" prop="remark">
+          <el-input v-model="auditForm.remark" type="textarea" :disabled='this.form.status > 0' placeholder="请输入审核意见"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
+        <el-button :loading="buttonLoading" type="success" @click="submitForm(1)" icon="el-icon-check" v-if="this.form.status == 0">通 过</el-button>
+        <el-button :loading="buttonLoading" type="warning" @click="submitForm(2)" icon="el-icon-close" v-if="this.form.status == 0">驳 回</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -187,7 +181,7 @@
 </template>
 
 <script>
-import { listServiceapply, getServiceapply, delServiceapply, addServiceapply, updateServiceapply } from "@/api/isc/serviceapply";
+import { listServiceapply, getServiceapply, auditServiceapply } from "@/api/isc/serviceapply";
 
 export default {
   name: "Serviceapply",
@@ -228,10 +222,12 @@ export default {
       },
       // 表单参数
       form: {},
+      // 审核表单参数
+      auditForm: {},
       // 表单校验
       rules: {
-        appServiceId: [
-          { required: true, message: "应用服务ID不能为空", trigger: "blur" }
+        remark: [
+          { max: 200, message: '最大长度为200个字符', trigger: 'blur' }
         ],
       }
     };
@@ -260,24 +256,14 @@ export default {
       this.open = false;
       this.reset();
     },
+    selectable(row, index) {
+      return row.status == 0;
+    },
     // 表单重置
     reset() {
       this.form = {
         applyId: undefined,
-        appServiceId: undefined,
-        applyType: undefined,
         status: "0",
-        auditMind: undefined,
-        renewalDuration: undefined,
-        quotaDays: undefined,
-        quotaHours: undefined,
-        quotaMinutes: undefined,
-        quotaSeconds: undefined,
-        createBy: undefined,
-        createTime: undefined,
-        updateBy: undefined,
-        updateTime: undefined,
-        delFlag: undefined,
         remark: undefined
       };
       this.resetForm("form");
@@ -298,65 +284,50 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加应用服务申请信息";
+    /** 审核按钮操作 */
+    handleAudit(row) {
+      if(this.single) {
+        this.open = true;
+        this.title = "服务申请审核";
+        this.auditForm.ids = this.ids;
+        return;
+      }
+      this.handleAuditSingle(row);
     },
-    /** 修改按钮操作 */
-    handleUpdate(row) {
+    handleAuditSingle(row) {
+      this.single = false;
       this.loading = true;
       this.reset();
       const applyId = row.applyId || this.ids
+      console.log(applyId)
       getServiceapply(applyId).then(response => {
         this.loading = false;
         this.form = response.data;
         this.open = true;
-        this.title = "修改应用服务申请信息";
+        this.title = "服务申请审核";
+        this.auditForm.ids = [applyId]
       });
     },
     /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
+    submitForm(status) {
+      this.auditForm.status = status;
+      this.$refs["auditForm"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
-          if (this.form.applyId != null) {
-            updateServiceapply(this.form).then(response => {
-              this.msgSuccess("修改成功");
+          console.log(this.auditForm)
+          if (this.auditForm.ids.length > 0) {
+            auditServiceapply(this.auditForm).then(response => {
+              this.msgSuccess("审核成功");
               this.open = false;
               this.getList();
             }).finally(() => {
               this.buttonLoading = false;
             });
           } else {
-            addServiceapply(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            }).finally(() => {
+              this.msgError("请选择记录");
               this.buttonLoading = false;
-            });
           }
         }
-      });
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const applyIds = row.applyId || this.ids;
-      this.$confirm('是否确认删除应用服务申请信息编号为"' + applyIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.loading = true;
-          return delServiceapply(applyIds);
-        }).then(() => {
-          this.loading = false;
-          this.getList();
-          this.msgSuccess("删除成功");
-      }).finally(() => {
-          this.loading = false;
       });
     },
     /** 导出按钮操作 */
@@ -366,3 +337,15 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+     .el-card .el-row {
+       font-size: 14px;
+       line-height: 36px;
+       vertical-align: middle;
+     }
+     .el-card .el-row .col-title {
+       text-align: right;
+       color: #606266;
+       font-weight: bold;
+     }
+</style>

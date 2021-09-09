@@ -101,9 +101,21 @@
       <el-table-column label="服务ID" align="center" prop="serviceId" width="100"/>
       <el-table-column label="服务名称" align="left" prop="serviceName" />
       <el-table-column label="服务分类" align="left" prop="cateName" width="150"/>
-      <el-table-column label="服务状态" align="center" prop="enabled" :formatter="enabledFormat"  width="100"/>
-      <el-table-column label="是否在线" align="center" prop="onlineStatus" :formatter="onlineStatusFormat"  width="100"/>
-      <el-table-column label="审核状态" align="center" prop="status" :formatter="statusFormat"  width="100"/>
+      <el-table-column label="服务状态" align="center" prop="enabled" width="100">
+        <template slot-scope="scope">
+          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否在线" align="center" prop="onlineStatus" width="100">
+        <template slot-scope="scope">
+          <dict-tag :options="onlineStatusOptions" :value="scope.row.onlineStatus"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="审核状态" align="center" prop="status" width="100">
+        <template slot-scope="scope">
+          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="更新人" align="center" prop="updateBy"  width="150"/>
       <el-table-column label="更新时间" align="center" prop="updateTime"  width="150">
         <template slot-scope="scope">

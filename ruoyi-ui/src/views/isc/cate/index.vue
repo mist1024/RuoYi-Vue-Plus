@@ -48,7 +48,11 @@
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
       <el-table-column label="分类名称" align="center" prop="cateName"  width="160"/>
-      <el-table-column label="启用状态" align="center" prop="enabled" :formatter="enabledFormat" />
+      <el-table-column label="启用状态" align="center" prop="enabled" >
+        <template slot-scope="scope">
+          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+        </template>
+      </el-table-column>
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
       <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
@@ -204,10 +208,6 @@ export default {
         data.children = this.handleTree(response.data, "cateId", "parentId");
         this.cateOptions.push(data);
       });
-    },
-    // 启用状态字典翻译
-    enabledFormat(row, column) {
-      return this.selectDictLabel(this.enabledOptions, row.enabled);
     },
     // 取消按钮
     cancel() {

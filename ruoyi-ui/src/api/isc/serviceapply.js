@@ -17,28 +17,11 @@ export function getServiceapply(applyId) {
   })
 }
 
-// 新增应用服务申请信息
-export function addServiceapply(data) {
+// 应用服务申请信息审核
+export function auditServiceapply(data) {
   return request({
-    url: '/isc/serviceapply',
-    method: 'post',
-    data: data
-  })
-}
-
-// 修改应用服务申请信息
-export function updateServiceapply(data) {
-  return request({
-    url: '/isc/serviceapply',
+    url: '/isc/serviceapply/audit',
     method: 'put',
     data: data
-  })
-}
-
-// 删除应用服务申请信息
-export function delServiceapply(applyId) {
-  return request({
-    url: '/isc/serviceapply/' + applyId,
-    method: 'delete'
   })
 }

@@ -4,6 +4,7 @@ import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.isc.domain.IscAppServiceApply;
 import com.ruoyi.isc.domain.bo.IscAppServiceApplyBo;
+import com.ruoyi.isc.domain.bo.IscAuditBo;
 import com.ruoyi.isc.domain.vo.IscAppServiceApplyVo;
 
 import java.util.Collection;
@@ -53,4 +54,11 @@ public interface IIscAppServiceApplyService extends IServicePlus<IscAppServiceAp
      * @return
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 应用服务审核
+     * @param bo 审核业务数据
+     * @return 是否审核成功
+     */
+    Boolean audit(IscAuditBo bo);
 }

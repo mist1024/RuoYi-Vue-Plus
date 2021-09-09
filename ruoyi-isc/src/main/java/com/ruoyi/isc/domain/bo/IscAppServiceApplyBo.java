@@ -79,12 +79,6 @@ public class IscAppServiceApplyBo extends BaseEntity {
     @ApiModelProperty(value = "秒配额")
     private Long quotaSeconds;
 
-    /**
-     * 删除标志（0代表存在 2代表删除）
-     */
-    @ApiModelProperty(value = "删除标志（0代表存在 2代表删除）")
-    private String delFlag;
-
 
     /**
      * 分页大小

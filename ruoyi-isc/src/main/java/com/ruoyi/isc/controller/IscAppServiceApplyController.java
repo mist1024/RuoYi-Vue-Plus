@@ -10,6 +10,7 @@ import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.isc.domain.bo.IscAppServiceApplyBo;
+import com.ruoyi.isc.domain.bo.IscAuditBo;
 import com.ruoyi.isc.domain.vo.IscAppServiceApplyVo;
 import com.ruoyi.isc.service.IIscAppServiceApplyService;
 import io.swagger.annotations.Api;
@@ -79,8 +80,8 @@ public class IscAppServiceApplyController extends BaseController {
     @PreAuthorize("@ss.hasPermi('isc:serviceapply:audit')")
     @Log(title = "应用服务申请信息审核", businessType = BusinessType.AUDIT)
     @RepeatSubmit()
-    @PutMapping()
-    public AjaxResult<Void> audit(@Validated(EditGroup.class) @RequestBody IscAppServiceApplyBo bo) {
-        return toAjax(iIscAppServiceApplyService.updateByBo(bo) ? 1 : 0);
+    @PutMapping("/audit")
+    public AjaxResult<Void> audit(@Validated @RequestBody IscAuditBo bo) {
+        return toAjax(iIscAppServiceApplyService.audit(bo) ? 1 : 0);
     }
 }

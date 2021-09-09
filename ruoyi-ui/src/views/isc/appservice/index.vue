@@ -186,8 +186,8 @@
             <el-option key="3" label="3(月)" value="3"/>
             <el-option key="6" label="6(月)" value="6"/>
             <el-option key="9" label="9(月)" value="9"/>
-            <el-option key="12" label="1(年)" value="12"/>
-            <el-option key="24" label="2(年)" value="24"/>
+            <el-option key="12" label="12(月)" value="12"/>
+            <el-option key="24" label="24(月)" value="24"/>
           </el-select>
         </el-form-item>
         <el-form-item label="日配额" prop="quotaDays" v-if="this.applyType === 0 || this.applyType === 2">

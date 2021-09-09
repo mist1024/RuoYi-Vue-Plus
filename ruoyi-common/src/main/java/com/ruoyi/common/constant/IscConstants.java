@@ -8,6 +8,9 @@ public class IscConstants {
     /** 审核通过 */
     public static final String AUDIT_PASS = "1";
 
+    /** 审核驳回 */
+    public static final String AUDIT_REJECT = "2";
+
     /** 待审核 */
     public static final String ONLINE_STATUS_ON = "1";
 
