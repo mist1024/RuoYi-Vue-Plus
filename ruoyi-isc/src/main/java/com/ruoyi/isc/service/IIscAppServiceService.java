@@ -1,11 +1,11 @@
 package com.ruoyi.isc.service;
 
 import cn.hutool.core.lang.tree.Tree;
-import com.ruoyi.isc.domain.IscAppService;
-import com.ruoyi.isc.domain.vo.IscAppServiceVo;
-import com.ruoyi.isc.domain.bo.IscAppServiceBo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.isc.domain.IscAppService;
+import com.ruoyi.isc.domain.bo.IscAppServiceBo;
+import com.ruoyi.isc.domain.vo.IscAppServiceVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +21,7 @@ public interface IIscAppServiceService extends IServicePlus<IscAppService, IscAp
      * 查询单个
      * @return
      */
-    IscAppServiceVo queryById(Long serviceAppId);
+    IscAppServiceVo queryById(Long appServiceId);
 
     /**
      * 查询列表
@@ -61,4 +61,11 @@ public interface IIscAppServiceService extends IServicePlus<IscAppService, IscAp
      * @return 应用服务树结构 （标识服务是否存在）
      */
     List<Tree<Long>> genAppServiceTree(Long applicationId);
+
+    /**
+     * 通过 Id集合 返回列表
+     * @param ids 应用服务ID
+     * @return 应用服务列表
+     */
+    List<IscAppService> getAppServiceListByIds(Collection<Long> ids);
 }

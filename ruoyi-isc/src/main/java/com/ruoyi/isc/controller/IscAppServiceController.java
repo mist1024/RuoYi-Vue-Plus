@@ -1,33 +1,32 @@
 package com.ruoyi.isc.controller;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-
 import cn.hutool.core.lang.tree.Tree;
-import com.ruoyi.isc.domain.IscServiceCate;
-import lombok.RequiredArgsConstructor;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.isc.domain.vo.IscAppServiceVo;
 import com.ruoyi.isc.domain.bo.IscAppServiceBo;
+import com.ruoyi.isc.domain.vo.IscAppServiceVo;
 import com.ruoyi.isc.service.IIscAppServiceService;
-import com.ruoyi.common.core.page.TableDataInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 应用服务Controller
@@ -71,10 +70,10 @@ public class IscAppServiceController extends BaseController {
      */
     @ApiOperation("获取应用服务详细信息")
     @PreAuthorize("@ss.hasPermi('isc:appservice:query')")
-    @GetMapping("/{serviceAppId}")
+    @GetMapping("/{appServiceId}")
     public AjaxResult<IscAppServiceVo> getInfo(@NotNull(message = "主键不能为空")
-                                                  @PathVariable("serviceAppId") Long serviceAppId) {
-        return AjaxResult.success(appServiceService.queryById(serviceAppId));
+                                                  @PathVariable("appServiceId") Long appServiceId) {
+        return AjaxResult.success(appServiceService.queryById(appServiceId));
     }
 
     /**
@@ -107,10 +106,10 @@ public class IscAppServiceController extends BaseController {
     @ApiOperation("删除应用服务")
     @PreAuthorize("@ss.hasPermi('isc:appservice:remove')")
     @Log(title = "应用服务" , businessType = BusinessType.DELETE)
-    @DeleteMapping("/{serviceAppIds}")
+    @DeleteMapping("/{appServiceIds}")
     public AjaxResult<Void> remove(@NotEmpty(message = "主键不能为空")
-                                       @PathVariable Long[] serviceAppIds) {
-        return toAjax(appServiceService.deleteWithValidByIds(Arrays.asList(serviceAppIds), true) ? 1 : 0);
+                                       @PathVariable Long[] appServiceIds) {
+        return toAjax(appServiceService.deleteWithValidByIds(Arrays.asList(appServiceIds), true) ? 1 : 0);
     }
 
     /**

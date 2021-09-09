@@ -75,7 +75,7 @@
     <el-table v-loading="loading" :data="applicationList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="应用ID" align="center" prop="applicationId" v-if="true" width="80"/>
-      <el-table-column label="应用名称" align="center" prop="applicationName" >
+      <el-table-column label="应用名称" align="left" prop="applicationName" >
         <template slot-scope="scope">
           <router-link :to="'/isc/app-service/index/' + scope.row.applicationId" class="link-type">
             <span>{{ scope.row.applicationName }}</span>
@@ -86,7 +86,7 @@
       <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

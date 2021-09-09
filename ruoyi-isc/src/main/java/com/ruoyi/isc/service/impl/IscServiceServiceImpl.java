@@ -3,6 +3,7 @@ package com.ruoyi.isc.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -134,6 +135,9 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     @Override
     public Map<Long, String> getNameMap(Collection<Long> serviceIds)
     {
+        if(CollectionUtil.isEmpty(serviceIds)) {
+            return MapUtil.empty();
+        }
         return list(Wrappers.<IscService>lambdaQuery()
                 .select(IscService::getServiceId, IscService::getServiceName)
                 .in(IscService::getServiceId, serviceIds)).stream()

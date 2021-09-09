@@ -7,35 +7,41 @@ import com.ruoyi.common.convert.ExcelDictConvert;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.util.Date;
 
 
 
 /**
- * 应用服务视图对象 isc_app_service
+ * 应用服务申请信息视图对象 isc_app_service_apply
  *
  * @author Wenchao Gong
- * @date 2021-09-08
+ * @date 2021-09-09
  */
 @Data
-@ApiModel("应用服务视图对象")
+@ApiModel("应用服务申请信息视图对象")
 @ExcelIgnoreUnannotated
-public class IscAppServiceVo {
+public class IscAppServiceApplyVo {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     *  应用服务ID
+     *  申请ID
+     */
+    @ApiModelProperty("申请ID")
+    private Long applyId;
+
+    /**
+     * 应用服务ID
      */
     @ApiModelProperty("应用服务ID")
     private Long appServiceId;
 
     /**
-     * 服务ID
+     * 应用名称
      */
-    @ApiModelProperty("服务ID")
-    private Long serviceId;
+    @ExcelProperty(value = "应用名称")
+    @ApiModelProperty("应用名称")
+    private String applicationName;
 
     /**
      * 服务名称
@@ -43,28 +49,6 @@ public class IscAppServiceVo {
     @ExcelProperty(value = "服务名称")
     @ApiModelProperty("服务名称")
     private String serviceName;
-
-    /**
-     * 应用ID
-     */
-    @ExcelProperty(value = "应用ID")
-    @ApiModelProperty("应用ID")
-    private Long applicationId;
-
-    /**
-     * 用户ID
-     */
-    @ExcelProperty(value = "用户ID")
-    @ApiModelProperty("用户ID")
-    private Long userId;
-
-    /**
-     * 启用状态（0启用 1停用）
-     */
-    @ExcelProperty(value = "启用状态", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_normal_disable")
-    @ApiModelProperty("启用状态（0启用 1停用）")
-    private String enabled;
 
     /**
      * 申请类型(0申请 1续期)
@@ -83,41 +67,39 @@ public class IscAppServiceVo {
     private String status;
 
     /**
-     * 虚拟地址
+     * 续期时长（单位月）
      */
-    @ExcelProperty(value = "虚拟地址")
-    @ApiModelProperty("虚拟地址")
-    private String virtualAddr;
-
-    /**
-     * 到期时间
-     */
-    @ExcelProperty(value = "到期时间")
-    @ApiModelProperty("到期时间")
-    private Date endTime;
+    @ExcelProperty(value = "续期时长", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "单=位月")
+    @ApiModelProperty("续期时长（单位月）")
+    private Long renewalDuration;
 
     /**
      * 天配额
      */
-    @ApiModelProperty(value = "天配额")
+    @ExcelProperty(value = "天配额")
+    @ApiModelProperty("天配额")
     private Long quotaDays;
 
     /**
      * 小时配额
      */
-    @ApiModelProperty(value = "小时配额")
+    @ExcelProperty(value = "小时配额")
+    @ApiModelProperty("小时配额")
     private Long quotaHours;
 
     /**
      * 分钟配额
      */
-    @ApiModelProperty(value = "分钟配额")
+    @ExcelProperty(value = "分钟配额")
+    @ApiModelProperty("分钟配额")
     private Long quotaMinutes;
 
     /**
      * 秒配额
      */
-    @ApiModelProperty(value = "秒配额")
+    @ExcelProperty(value = "秒配额")
+    @ApiModelProperty("秒配额")
     private Long quotaSeconds;
 
     /**
@@ -133,6 +115,13 @@ public class IscAppServiceVo {
     @ExcelProperty(value = "更新时间")
     @ApiModelProperty("更新时间")
     private Date updateTime;
+
+    /**
+     * 备注
+     */
+    @ExcelProperty(value = "备注")
+    @ApiModelProperty("备注")
+    private String remark;
 
 
 }

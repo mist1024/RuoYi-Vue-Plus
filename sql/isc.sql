@@ -6,7 +6,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `isc_app_service`;
 CREATE TABLE `isc_app_service`  (
-  `service_app_id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用服务ID',
+  `app_service_id` bigint NOT NULL AUTO_INCREMENT COMMENT '应用服务ID',
   `service_id` bigint NULL DEFAULT NULL COMMENT '服务ID',
   `application_id` bigint NULL DEFAULT NULL COMMENT '应用ID',
   `user_id` bigint NULL DEFAULT NULL COMMENT '用户ID',
@@ -24,7 +24,7 @@ CREATE TABLE `isc_app_service`  (
   `update_by` varchar(64)  DEFAULT '' COMMENT '更新者',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `del_flag` char(1)  DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
-  PRIMARY KEY (`service_app_id`) USING BTREE
+  PRIMARY KEY (`app_service_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 COMMENT = '应用服务信息';
 
 -- ----------------------------
@@ -39,7 +39,7 @@ COMMIT;
 DROP TABLE IF EXISTS `isc_app_service_apply`;
 CREATE TABLE `isc_app_service_apply`  (
   `apply_id` bigint NOT NULL AUTO_INCREMENT COMMENT '申请ID',
-  `service_app_id` bigint NOT NULL COMMENT '应用服务ID',
+  `app_service_id` bigint NOT NULL COMMENT '应用服务ID',
   `apply_type` char(1)  DEFAULT NULL COMMENT '申请类型(0申请 1续期)',
   `status` char(1)  DEFAULT NULL COMMENT '审核状态（0待审核 1审核通过 2驳回）',
   `audit_mind` varchar(255)  DEFAULT NULL COMMENT '审核意见',
@@ -243,10 +243,15 @@ INSERT INTO `sys_menu` VALUES (1634, '应用服务修改', 1631, 3, '#', '', 1, 
 INSERT INTO `sys_menu` VALUES (1635, '应用服务删除', 1631, 4, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:remove', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1636, '应用服务导出', 1631, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:appservice:export', '#', 'admin', '2021-09-08 16:11:57', '', NULL, '');
 
-INSERT INTO  VALUES (100, '审核状态', 'sys_audit_status', '0', 'admin', '2021-08-21 21:21:58', 'admin', '2021-08-21 21:21:58', '审核状态列表');
-INSERT INTO  VALUES (101, '在线状态', 'isc_online_status', '0', 'admin', '2021-08-21 21:24:28', 'admin', '2021-08-21 21:24:28', '在线状态列表');
-INSERT INTO  VALUES (102, '申请类型', 'isc_apply_type', '0', 'admin', '2021-08-21 21:25:26', 'admin', '2021-08-21 21:25:26', '申请类型列表');
-INSERT INTO  VALUES (103, '请求方法', 'isc_request_method', '0', 'admin', '2021-09-07 22:12:58', 'admin', '2021-09-07 22:12:58', 'GET/POST');
+INSERT INTO `sys_menu` VALUES (1637, '服务申请', 1606, 1, 'serviceapply', 'isc/serviceapply/index', 1, 0, 'C', '0', '0', 'isc:serviceapply:list', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '服务申请菜单');
+INSERT INTO `sys_menu` VALUES (1638, '服务申请信息查询', 1637, 1, '#', '', 1, 0, 'F', '0', '0', 'isc:serviceapply:query', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1639, '服务申请信息审核', 1637, 2, '#', '', 1, 0, 'F', '0', '0', 'isc:serviceapply:audit', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1640, '服务申请信息导出', 1637, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:serviceapply:export', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '');
+
+INSERT INTO `sys_dict_type` VALUES (100, '审核状态', 'sys_audit_status', '0', 'admin', '2021-08-21 21:21:58', 'admin', '2021-08-21 21:21:58', '审核状态列表');
+INSERT INTO `sys_dict_type` VALUES (101, '在线状态', 'isc_online_status', '0', 'admin', '2021-08-21 21:24:28', 'admin', '2021-08-21 21:24:28', '在线状态列表');
+INSERT INTO `sys_dict_type` VALUES (102, '申请类型', 'isc_apply_type', '0', 'admin', '2021-08-21 21:25:26', 'admin', '2021-08-21 21:25:26', '申请类型列表');
+INSERT INTO `sys_dict_type` VALUES (103, '请求方法', 'isc_request_method', '0', 'admin', '2021-09-07 22:12:58', 'admin', '2021-09-07 22:12:58', 'GET/POST');
 
 INSERT INTO `sys_dict_data` VALUES (100, 0, '待审核', '0', 'sys_audit_status', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:26:36', 'admin', '2021-08-21 21:26:36', NULL);
 INSERT INTO `sys_dict_data` VALUES (101, 1, '通过', '1', 'sys_audit_status', NULL, 'success', 'N', '0', 'admin', '2021-08-21 21:27:02', 'admin', '2021-08-21 21:27:02', NULL);
@@ -255,9 +260,9 @@ INSERT INTO `sys_dict_data` VALUES (103, 0, '离线', '0', 'isc_online_status', 
 INSERT INTO `sys_dict_data` VALUES (104, 1, '在线', '1', 'isc_online_status', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:29:15', 'admin', '2021-08-21 21:29:15', NULL);
 INSERT INTO `sys_dict_data` VALUES (105, 0, '申请', '0', 'isc_apply_type', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:30:26', 'admin', '2021-08-21 21:30:26', NULL);
 INSERT INTO `sys_dict_data` VALUES (106, 1, '续期', '1', 'isc_apply_type', NULL, 'primary', 'N', '0', 'admin', '2021-08-21 21:30:42', 'admin', '2021-08-21 21:30:42', NULL);
-INSERT INTO `sys_dict_data` VALUES (107, 1, 'GET', 'GET', 'isc_request_method', NULL, 'primary', 'N', '0', 'admin', '2021-09-07 22:13:22', 'admin', '2021-09-07 22:13:56', NULL);
-INSERT INTO `sys_dict_data` VALUES (108, 2, 'POST', 'POST', 'isc_request_method', NULL, 'info', 'N', '0', 'admin', '2021-09-07 22:13:40', 'admin', '2021-09-07 22:13:40', NULL);
-
+INSERT INTO `sys_dict_data` VALUES (107, 2, '修改', '2', 'isc_apply_type', NULL, 'primary', 'N', '0', 'admin', '2021-09-09 17:00:48', 'admin', '2021-09-09 17:00:48', NULL);
+INSERT INTO `sys_dict_data` VALUES (108, 1, 'GET', 'GET', 'isc_request_method', NULL, 'primary', 'N', '0', 'admin', '2021-09-07 22:13:22', 'admin', '2021-09-07 22:13:56', NULL);
+INSERT INTO `sys_dict_data` VALUES (109, 2, 'POST', 'POST', 'isc_request_method', NULL, 'info', 'N', '0', 'admin', '2021-09-07 22:13:40', 'admin', '2021-09-07 22:13:40', NULL);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -46,7 +46,18 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['isc:appservice:add']"
-        >新增</el-button>
+        >申请</el-button>
+      </el-col>
+        <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="el-icon-time"
+          size="mini"
+          :disabled="single"
+          @click="handleRenewal"
+          v-hasPermi="['isc:appservice:edit']"
+        >续期</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -58,7 +69,7 @@
           @click="handleUpdate"
           v-hasPermi="['isc:appservice:edit']"
         >修改</el-button>
-      </el-col>
+        </el-col>
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -86,37 +97,39 @@
 
     <el-table v-loading="loading" :data="appserviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="应用服务ID" align="center" prop="serviceAppId" v-if="false"/>
-      <el-table-column label="服务名称" align="center" prop="serviceName" />
-      <el-table-column label="启用状态" align="center" prop="enabled">
-        <template slot-scope="scope">
-          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="申请类型" align="center" prop="applyType">
-        <template slot-scope="scope">
-          <dict-tag :options="applyTypeOptions" :value="scope.row.applyType"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="审核状态" align="center" prop="status">
+      <el-table-column label="应用服务ID" align="center" prop="appServiceId" v-if="false"/>
+      <el-table-column label="服务名称" align="left" prop="serviceName" />
+      <el-table-column label="虚拟地址" align="left" prop="virtualAddr" />
+      <el-table-column label="审核状态" align="center" prop="status" width="100">
         <template slot-scope="scope">
           <dict-tag :options="statusOptions" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="虚拟地址" align="center" prop="virtualAddr" />
-      <el-table-column label="到期时间" align="center" prop="endTime" width="180">
+      <el-table-column label="到期时间" align="center" prop="endTime" width="100">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新者" align="center" prop="updateBy" />
+      <el-table-column label="启用状态" align="center" prop="enabled" width="100">
+        <template slot-scope="scope">
+          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="更新者" align="center" prop="updateBy" width="100"/>
       <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-time"
+            @click="handleRenewal(scope.row)"
+            v-hasPermi="['isc:appservice:edit']"
+          >续期</el-button>
           <el-button
             size="mini"
             type="text"
@@ -148,10 +161,17 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="服务名称" prop="serviceId">
           <!-- :disable-branch-nodes="true" 只能选叶子节点 -->
-          <treeselect v-model="form.serviceId" :options="appServiceOptions" :show-count="true" :normalizer="normalizer" 
-            :disable-branch-nodes="true" placeholder="请选择服务" style="width:215px"/>
+          <treeselect 
+            v-model="form.serviceId" 
+            :options="appServiceOptions" 
+            :show-count="true" 
+            :normalizer="normalizer" 
+            :disable-branch-nodes="true" 
+            :disabled="this.applyType !== 0"
+            placeholder="请选择服务" 
+            style="width:215px"/>
         </el-form-item>
-        <el-form-item label="启用状态">
+        <el-form-item label="启用状态" v-if="this.applyType === 0">
           <el-radio-group v-model="form.enabled">
             <el-radio
               v-for="dict in enabledOptions"
@@ -160,25 +180,30 @@
             >{{dict.dictLabel}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="到期时间" prop="endTime">
-          <el-date-picker clearable size="small"
-            v-model="form.endTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="选择到期时间">
-          </el-date-picker>
+        <el-form-item label="申请时长" prop="renewalDuration" v-if="this.applyType === 0 || this.applyType === 1">
+          <el-select v-model="form.renewalDuration" placeholder="请选择申请时长" clearable size="small">
+            <el-option key="1" label="1(月)" value="1"/>
+            <el-option key="3" label="3(月)" value="3"/>
+            <el-option key="6" label="6(月)" value="6"/>
+            <el-option key="9" label="9(月)" value="9"/>
+            <el-option key="12" label="1(年)" value="12"/>
+            <el-option key="24" label="2(年)" value="24"/>
+          </el-select>
         </el-form-item>
-        <el-form-item label="日配额" prop="quotaDays">
-          <el-input-number v-model="form.quotaDays" step="1000" placeholder="请输入日配额" />
+        <el-form-item label="日配额" prop="quotaDays" v-if="this.applyType === 0 || this.applyType === 2">
+          <el-input-number v-model="form.quotaDays" :step="1000" placeholder="请输入日配额" />
         </el-form-item>
-        <el-form-item label="小时配额" prop="quotaHours">
-          <el-input-number v-model="form.quotaHours" step="100" placeholder="请输入小时配额" />
+        <el-form-item label="小时配额" prop="quotaHours" v-if="this.applyType === 0 || this.applyType === 2">
+          <el-input-number v-model="form.quotaHours" :step="100" placeholder="请输入小时配额" />
         </el-form-item>
-        <el-form-item label="分钟配额" prop="quotaMinutes">
-          <el-input-number v-model="form.quotaMinutes" step="10" placeholder="请输入分钟配额" />
+        <el-form-item label="分钟配额" prop="quotaMinutes" v-if="this.applyType === 0 || this.applyType === 2">
+          <el-input-number v-model="form.quotaMinutes" :step="10" placeholder="请输入分钟配额" />
         </el-form-item>
-        <el-form-item label="秒配额" prop="quotaSeconds">
+        <el-form-item label="秒配额" prop="quotaSeconds" v-if="this.applyType === 0 || this.applyType === 2">
           <el-input-number v-model="form.quotaSeconds" placeholder="请输入秒配额" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -223,8 +248,6 @@ export default {
       open: false,
       // 启用状态字典
       enabledOptions: [],
-      // 申请类型字典
-      applyTypeOptions: [],
       // 审核状态字典
       statusOptions: [],
       // 应用服务树
@@ -239,6 +262,7 @@ export default {
       },
       applicationName: undefined,
       applicationId: undefined,
+      applyType: undefined,
       // 表单参数
       form: {},
       // 表单校验
@@ -248,6 +272,9 @@ export default {
         ],
         enabled: [
           { required: true, message: "启用状态不能为空", trigger: "blur" }
+        ],
+        renewalDuration: [
+          { required: true, message: "申请时长不能为空", trigger: "blur" }
         ],
       }
     };
@@ -259,9 +286,6 @@ export default {
     this.getList(applicationId);
     this.getDicts("sys_normal_disable").then(response => {
       this.enabledOptions = response.data;
-    });
-    this.getDicts("isc_apply_type").then(response => {
-      this.applyTypeOptions = response.data;
     });
     this.getDicts("sys_audit_status").then(response => {
       this.statusOptions = response.data;
@@ -309,13 +333,12 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        serviceAppId: undefined,
+        appServiceId: undefined,
         serviceId: undefined,
         applicationId: this.applicationId,
         enabled: "0",
-        applyType: undefined,
         status: [],
-        endTime: undefined,
+        renewalDuration: undefined,
         quotaDays: undefined,
         quotaHours: undefined,
         quotaMinutes: undefined,
@@ -335,13 +358,15 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.serviceAppId)
+      this.ids = selection.map(item => item.appServiceId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.applyType = 0;
+      this.getTreeselect(this.applicationId);
       this.open = true;
       this.title = "添加应用服务";
     },
@@ -349,13 +374,28 @@ export default {
     handleUpdate(row) {
       this.loading = true;
       this.reset();
-      const serviceAppId = row.serviceAppId || this.ids
-      getAppservice(serviceAppId).then(response => {
+      this.applyType = 2;
+      const appServiceId = row.appServiceId || this.ids
+      getAppservice(appServiceId).then(response => {
         this.loading = false;
         this.form = response.data;
         this.form.status = this.form.status.split(",");
         this.open = true;
         this.title = "修改应用服务";
+      });
+    },
+    /** 续期按钮操作 */
+    handleRenewal(row) {
+      this.loading = true;
+      this.reset();
+      this.applyType = 1;
+      const appServiceId = row.appServiceId || this.ids
+      getAppservice(appServiceId).then(response => {
+        this.loading = false;
+        this.form = response.data;
+        this.form.status = this.form.status.split(",");
+        this.open = true;
+        this.title = "应用服务续期";
       });
     },
     /** 提交按钮 */
@@ -364,7 +404,7 @@ export default {
         if (valid) {
           this.buttonLoading = true;
           this.form.status = this.form.status.join(",");
-          if (this.form.serviceAppId != null) {
+          if (this.form.appServiceId != null) {
             updateAppservice(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
@@ -386,14 +426,14 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const serviceAppIds = row.serviceAppId || this.ids;
-      this.$confirm('是否确认删除应用服务编号为"' + serviceAppIds + '"的数据项?', "警告", {
+      const appServiceIds = row.appServiceId || this.ids;
+      this.$confirm('是否确认删除应用服务编号为"' + appServiceIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
           this.loading = true;
-          return delAppservice(serviceAppIds);
+          return delAppservice(appServiceIds);
         }).then(() => {
           this.loading = false;
           this.getList();

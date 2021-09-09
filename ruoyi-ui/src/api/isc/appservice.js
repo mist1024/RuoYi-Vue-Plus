@@ -10,9 +10,9 @@ export function listAppservice(query) {
 }
 
 // 查询应用服务详细
-export function getAppservice(serviceAppId) {
+export function getAppservice(appServiceId) {
   return request({
-    url: '/isc/appservice/' + serviceAppId,
+    url: '/isc/appservice/' + appServiceId,
     method: 'get'
   })
 }
@@ -36,9 +36,9 @@ export function updateAppservice(data) {
 }
 
 // 删除应用服务
-export function delAppservice(serviceAppId) {
+export function delAppservice(appServiceId) {
   return request({
-    url: '/isc/appservice/' + serviceAppId,
+    url: '/isc/appservice/' + appServiceId,
     method: 'delete'
   })
 }

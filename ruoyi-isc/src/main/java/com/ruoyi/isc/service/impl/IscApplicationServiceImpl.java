@@ -1,6 +1,8 @@
 package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 应用信息Service业务层处理
@@ -87,5 +90,17 @@ public class IscApplicationServiceImpl extends ServicePlusImpl<IscApplicationMap
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return removeByIds(ids);
+    }
+
+    @Override
+    public Map<Long, String> getNameMap(Collection<Long> applicationIds)
+    {
+        if(CollectionUtil.isEmpty(applicationIds)) {
+            return MapUtil.empty();
+        }
+        return list(Wrappers.<IscApplication>lambdaQuery()
+            .select(IscApplication::getApplicationId, IscApplication::getApplicationName)
+            .in(IscApplication::getApplicationId, applicationIds)).stream()
+            .collect(Collectors.toMap(IscApplication::getApplicationId, IscApplication::getApplicationName));
     }
 }

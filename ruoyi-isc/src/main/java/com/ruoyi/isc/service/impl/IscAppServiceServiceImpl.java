@@ -2,29 +2,33 @@ package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.PageUtils;
-import com.ruoyi.common.core.page.PagePlus;
-import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.isc.domain.IscService;
-import com.ruoyi.isc.service.IIscServiceService;
-import org.springframework.stereotype.Service;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.ruoyi.common.constant.IscConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
+import com.ruoyi.common.core.page.PagePlus;
+import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.PageUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.isc.domain.IscAppService;
+import com.ruoyi.isc.domain.IscAppServiceApply;
+import com.ruoyi.isc.domain.bo.IscAppServiceApplyBo;
 import com.ruoyi.isc.domain.bo.IscAppServiceBo;
 import com.ruoyi.isc.domain.vo.IscAppServiceVo;
-import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.mapper.IscAppServiceMapper;
+import com.ruoyi.isc.service.IIscAppServiceApplyService;
 import com.ruoyi.isc.service.IIscAppServiceService;
+import com.ruoyi.isc.service.IIscServiceService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -38,9 +42,12 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
 
     @Resource
     private IIscServiceService serviceService;
+    @Resource
+    private IIscAppServiceApplyService applyService;
+
     @Override
-    public IscAppServiceVo queryById(Long serviceAppId){
-        return getVoById(serviceAppId);
+    public IscAppServiceVo queryById(Long appServiceId){
+        return getVoById(appServiceId);
     }
 
     @Override
@@ -90,13 +97,20 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     public Boolean insertByBo(IscAppServiceBo bo) {
         IscAppService add = BeanUtil.toBean(bo, IscAppService.class);
         validEntityBeforeSave(add);
-        return save(add);
+        add.setStatus(IscConstants.AUDIT_WAIT);
+        add.setApplyType(IscConstants.APPLY_TYPE_APPLY);
+        add.setUserId(SecurityUtils.getUserId());
+        boolean result = save(add);
+        addApplyRecord(bo, IscConstants.APPLY_TYPE_APPLY, add.getAppServiceId());
+        return result;
     }
 
     @Override
     public Boolean updateByBo(IscAppServiceBo bo) {
         IscAppService update = BeanUtil.toBean(bo, IscAppService.class);
         validEntityBeforeSave(update);
+        update.setStatus(IscConstants.AUDIT_WAIT);
+        addApplyRecord(bo, IscConstants.APPLY_TYPE_RENEWAL, bo.getAppServiceId());
         return updateById(update);
     }
 
@@ -106,7 +120,13 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
      * @param entity 实体类数据
      */
     private void validEntityBeforeSave(IscAppService entity){
-        //TODO 做一些数据校验,如唯一约束
+        //判断是否有申请未审核
+        if(Objects.nonNull(entity.getAppServiceId())){
+            long count = applyService.count(Wrappers.<IscAppServiceApply>lambdaQuery()
+                .eq(IscAppServiceApply::getAppServiceId, entity.getAppServiceId())
+                .eq(IscAppServiceApply::getStatus, IscConstants.AUDIT_WAIT));
+            Assert.isFalse(SqlHelper.retBool(count), () -> new ServiceException("有申请未审核, 不能再申请"));
+        }
     }
 
     @Override
@@ -124,5 +144,43 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
                 .select(IscAppService::getServiceId)
                 .eq(IscAppService::getApplicationId, applicationId), o -> (Long) o);
         return serviceService.genServiceTree(CollectionUtil.newHashSet(serviceIds));
+    }
+
+    @Override
+    public List<IscAppService> getAppServiceListByIds(Collection<Long> ids)
+    {
+        return list(Wrappers.<IscAppService>lambdaQuery()
+            .select(IscAppService::getAppServiceId, IscAppService::getApplicationId, IscAppService::getServiceId)
+            .in(IscAppService::getAppServiceId, ids));
+    }
+
+    /**
+     * 添加 服务申请记录
+     * @param appService   应用服务信息
+     * @param applyType    申请类型
+     * @param appServiceId 应用服务ID
+     * @return 是否添加成功
+     */
+    private Boolean addApplyRecord(IscAppServiceBo appService, String applyType, Long appServiceId) {
+        IscAppServiceApplyBo entity = new IscAppServiceApplyBo();
+        entity.setAppServiceId(appServiceId);
+        entity.setApplyType(applyType);
+        entity.setStatus(IscConstants.AUDIT_WAIT);
+        entity.setRemark(appService.getRemark());
+        switch (applyType) {
+            case IscConstants.APPLY_TYPE_APPLY:
+                entity.setRenewalDuration(appService.getRenewalDuration());
+            case IscConstants.APPLY_TYPE_MODIFY:
+                entity.setQuotaDays(appService.getQuotaDays());
+                entity.setQuotaHours(appService.getQuotaHours());
+                entity.setQuotaMinutes(appService.getQuotaMinutes());
+                entity.setQuotaSeconds(appService.getQuotaSeconds());
+                break;
+            case IscConstants.APPLY_TYPE_RENEWAL:
+                entity.setRenewalDuration(appService.getRenewalDuration());
+                break;
+            default:
+        }
+        return applyService.insertByBo(entity);
     }
 }

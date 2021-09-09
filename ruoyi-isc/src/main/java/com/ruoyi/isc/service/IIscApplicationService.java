@@ -1,13 +1,14 @@
 package com.ruoyi.isc.service;
 
-import com.ruoyi.isc.domain.IscApplication;
-import com.ruoyi.isc.domain.vo.IscApplicationVo;
-import com.ruoyi.isc.domain.bo.IscApplicationBo;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.isc.domain.IscApplication;
+import com.ruoyi.isc.domain.bo.IscApplicationBo;
+import com.ruoyi.isc.domain.vo.IscApplicationVo;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 应用信息Service接口
@@ -53,4 +54,11 @@ public interface IIscApplicationService extends IServicePlus<IscApplication, Isc
      * @return
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 通过应用ID集合批量查询 应用名称
+     * @param applicationIds 应用ID集合
+     * @return 应用名称Map
+     */
+    Map<Long, String> getNameMap(Collection<Long> applicationIds);
 }

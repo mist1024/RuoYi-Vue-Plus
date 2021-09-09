@@ -4,50 +4,35 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.math.BigDecimal;
 
 /**
- * 应用服务对象 isc_app_service
+ * 应用服务申请信息对象 isc_app_service_apply
  *
  * @author Wenchao Gong
- * @date 2021-09-08
+ * @date 2021-09-09
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("isc_app_service")
-public class IscAppService implements Serializable {
+@TableName("isc_app_service_apply")
+public class IscAppServiceApply implements Serializable {
 
     private static final long serialVersionUID=1L;
 
 
     /**
+     * 申请ID
+     */
+    @TableId(value = "apply_id")
+    private Long applyId;
+
+    /**
      * 应用服务ID
      */
-    @TableId(value = "app_service_id")
     private Long appServiceId;
-
-    /**
-     * 服务ID
-     */
-    private Long serviceId;
-
-    /**
-     * 应用ID
-     */
-    private Long applicationId;
-
-    /**
-     * 用户ID
-     */
-    private Long userId;
-
-    /**
-     * 启用状态（0启用 1停用）
-     */
-    private String enabled;
 
     /**
      * 申请类型(0申请 1续期)
@@ -60,14 +45,14 @@ public class IscAppService implements Serializable {
     private String status;
 
     /**
-     * 虚拟地址
+     * 审核意见
      */
-    private String virtualAddr;
+    private String auditMind;
 
     /**
-     * 到期时间
+     * 续期时长（单位月）
      */
-    private Date endTime;
+    private Long renewalDuration;
 
     /**
      * 天配额

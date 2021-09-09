@@ -1,55 +1,47 @@
 package com.ruoyi.isc.domain.bo;
 
-import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import javax.validation.constraints.*;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+import com.ruoyi.common.core.domain.BaseEntity;
+
 /**
- * 应用服务业务对象 isc_app_service
+ * 应用服务申请信息业务对象 isc_app_service_apply
  *
  * @author Wenchao Gong
- * @date 2021-09-08
+ * @date 2021-09-09
  */
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ApiModel("应用服务业务对象")
-public class IscAppServiceBo extends BaseEntity {
+@ApiModel("应用服务申请信息业务对象")
+public class IscAppServiceApplyBo extends BaseEntity {
+
+    /**
+     * 申请ID
+     */
+    @ApiModelProperty(value = "申请ID")
+    private Long applyId;
 
     /**
      * 应用服务ID
      */
-    @ApiModelProperty(value = "应用服务ID")
+    @ApiModelProperty(value = "应用服务ID", required = true)
+    @NotNull(message = "应用服务ID不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long appServiceId;
 
     /**
-     * 服务ID
+     * 申请类型(0申请 1续期)
      */
-    @ApiModelProperty(value = "服务ID", required = true)
-    @NotNull(message = "服务ID不能为空", groups = { AddGroup.class, EditGroup.class })
-    private Long serviceId;
-
-    /**
-     * 应用ID
-     */
-    @ApiModelProperty(value = "应用ID", required = true)
-    @NotNull(message = "应用ID不能为空", groups = { AddGroup.class, EditGroup.class })
-    private Long applicationId;
-
-    /**
-     * 启用状态（0启用 1停用）
-     */
-    @ApiModelProperty(value = "启用状态（0启用 1停用）", required = true)
-    @NotBlank(message = "启用状态（0启用 1停用）不能为空", groups = { AddGroup.class, EditGroup.class })
-    private String enabled;
+    @ApiModelProperty(value = "申请类型(0申请 1续期)")
+    private String applyType;
 
     /**
      * 审核状态（0待审核 1审核通过 2驳回）
@@ -58,10 +50,10 @@ public class IscAppServiceBo extends BaseEntity {
     private String status;
 
     /**
-     * 到期时间
+     * 续期时长（单位月）
      */
-    @ApiModelProperty(value = "到期时间")
-    private Date endTime;
+    @ApiModelProperty(value = "续期时长（单位月）")
+    private Long renewalDuration;
 
     /**
      * 天配额
@@ -88,10 +80,10 @@ public class IscAppServiceBo extends BaseEntity {
     private Long quotaSeconds;
 
     /**
-     * 续期时长（单位月）
+     * 删除标志（0代表存在 2代表删除）
      */
-    @NotNull(message = "续期时长不能为空", groups = { AddGroup.class })
-    private Long renewalDuration;
+    @ApiModelProperty(value = "删除标志（0代表存在 2代表删除）")
+    private String delFlag;
 
 
     /**
