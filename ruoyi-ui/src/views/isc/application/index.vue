@@ -74,7 +74,7 @@
 
     <el-table v-loading="loading" :data="applicationList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="应用ID" align="center" prop="applicationId" v-if="true" width="50"/>
+      <el-table-column label="应用ID" align="center" prop="applicationId" v-if="true" width="80"/>
       <el-table-column label="应用名称" align="center" prop="applicationName" >
         <template slot-scope="scope">
           <router-link :to="'/isc/app-service/index/' + scope.row.applicationId" class="link-type">

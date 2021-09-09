@@ -3,21 +3,22 @@ package com.ruoyi.isc.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.lang.tree.parser.NodeParser;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.utils.FullPathUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TreeUtils;
 import com.ruoyi.isc.domain.IscService;
-import org.springframework.stereotype.Service;
-import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.isc.domain.IscServiceCate;
 import com.ruoyi.isc.domain.bo.IscServiceCateBo;
 import com.ruoyi.isc.domain.vo.IscServiceCateVo;
-import com.ruoyi.isc.domain.IscServiceCate;
 import com.ruoyi.isc.mapper.IscServiceCateMapper;
 import com.ruoyi.isc.service.IIscServiceCateService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +36,6 @@ public class IscServiceCateServiceImpl extends ServicePlusImpl<IscServiceCateMap
     public static final String FIELD_NODE_TYPE = "type";
     public static final int NODE_TYPE_SERVICE = 1;
     public static final int NODE_TYPE_CATE = 0;
-    public static final String FIELD_NODE_EXIST = "exist";
 
     @Override
     public IscServiceCateVo queryById(Long cateId){
@@ -158,7 +158,7 @@ public class IscServiceCateServiceImpl extends ServicePlusImpl<IscServiceCateMap
         final Map<String, List<IscService>> cateServiceMap = isServiceTree ? serviceList.stream()
                 .collect(Collectors.groupingBy(IscService::getCateFullPath)) : null;
 
-        return TreeUtils.build(cates, (cate, tree) -> {
+        NodeParser<IscServiceCate, Long> parser = (cate, tree) -> {
             tree.setId(cate.getCateId());
             tree.setParentId(cate.getParentId());
             tree.setName(cate.getCateName());
@@ -166,8 +166,10 @@ public class IscServiceCateServiceImpl extends ServicePlusImpl<IscServiceCateMap
             tree.putExtra(FIELD_FULL_PATH, cate.getFullPath());
             if(isServiceTree) {
                 tree.putExtra(FIELD_NODE_TYPE, NODE_TYPE_CATE);
+                boolean exist = true;
                 List<IscService> services = cateServiceMap.get(cate.getFullPath());
                 if(CollectionUtil.isEmpty(services)) {
+                    tree.putExtra(TreeUtils.FIELD_NODE_EXIST, true);
                     return;
                 }
                 for (int index = 0; index < services.size(); index++)
@@ -182,14 +184,18 @@ public class IscServiceCateServiceImpl extends ServicePlusImpl<IscServiceCateMap
                     child.setId(service.getServiceId());
                     child.setName(service.getServiceName());
                     child.setWeight(index);
-                    child.setParent(tree);
-                    child.setParentId(tree.getId());
                     child.putExtra(FIELD_NODE_TYPE, NODE_TYPE_SERVICE);
-                    child.putExtra(FIELD_NODE_EXIST, exitsIds.contains(service.getServiceId()));
+                    boolean contains = exitsIds.contains(service.getServiceId());
+                    child.putExtra(TreeUtils.FIELD_NODE_EXIST, contains);
                     children.add(child);
+                    if(exist && !contains) {
+                        exist = false;
+                    }
                 }
+                tree.putExtra(TreeUtils.FIELD_NODE_EXIST, exist);
             }
-        });
+        };
+        return TreeUtils.build(cates, TreeUtils.DEFAULT_PARENT_ID, parser, isServiceTree);
     }
 
     private Map<Long, String> batchCateName(List<IscServiceCate> list) {

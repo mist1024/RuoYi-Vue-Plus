@@ -146,8 +146,10 @@
     <!-- 添加或修改应用服务对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="服务" prop="serviceId">
-          <treeselect v-model="form.serviceId" :options="appServiceOptions" :show-count="true" :normalizer="normalizer" placeholder="请选择服务" style="width:215px"/>
+        <el-form-item label="服务名称" prop="serviceId">
+          <!-- :disable-branch-nodes="true" 只能选叶子节点 -->
+          <treeselect v-model="form.serviceId" :options="appServiceOptions" :show-count="true" :normalizer="normalizer" 
+            :disable-branch-nodes="true" placeholder="请选择服务" style="width:215px"/>
         </el-form-item>
         <el-form-item label="启用状态">
           <el-radio-group v-model="form.enabled">
@@ -166,17 +168,17 @@
             placeholder="选择到期时间">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="天配额" prop="quotaDays">
-          <el-input v-model="form.quotaDays" placeholder="请输入天配额" />
+        <el-form-item label="日配额" prop="quotaDays">
+          <el-input-number v-model="form.quotaDays" step="1000" placeholder="请输入日配额" />
         </el-form-item>
         <el-form-item label="小时配额" prop="quotaHours">
-          <el-input v-model="form.quotaHours" placeholder="请输入小时配额" />
+          <el-input-number v-model="form.quotaHours" step="100" placeholder="请输入小时配额" />
         </el-form-item>
         <el-form-item label="分钟配额" prop="quotaMinutes">
-          <el-input v-model="form.quotaMinutes" placeholder="请输入分钟配额" />
+          <el-input-number v-model="form.quotaMinutes" step="10" placeholder="请输入分钟配额" />
         </el-form-item>
         <el-form-item label="秒配额" prop="quotaSeconds">
-          <el-input v-model="form.quotaSeconds" placeholder="请输入秒配额" />
+          <el-input-number v-model="form.quotaSeconds" placeholder="请输入秒配额" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -231,20 +233,18 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        applicationId: undefined,
         enabled: undefined,
         status: undefined,
+        applicationId: undefined
       },
       applicationName: undefined,
+      applicationId: undefined,
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         serviceId: [
           { required: true, message: "服务ID不能为空", trigger: "blur" }
-        ],
-        applicationId: [
-          { required: true, message: "应用ID不能为空", trigger: "blur" }
         ],
         enabled: [
           { required: true, message: "启用状态不能为空", trigger: "blur" }
@@ -254,7 +254,7 @@ export default {
   },
   created() {
     const applicationId = this.$route.params && this.$route.params.applicationId;
-    this.form.applicationId = applicationId;
+    this.applicationId = applicationId;
     this.queryParams.applicationId = applicationId;
     this.getList(applicationId);
     this.getDicts("sys_normal_disable").then(response => {
@@ -293,14 +293,13 @@ export default {
     },
     //树节点转换
     normalizer(node) {
-      const data = {
+      return {
         id: node.id,
         label: node.label,
         children: node.children,
-        disabled: true
-      }
-      console.log(data)
-      return 
+        isDisabled: node.exist,
+        type: node.type
+      };
     },
     // 取消按钮
     cancel() {
@@ -316,17 +315,11 @@ export default {
         enabled: "0",
         applyType: undefined,
         status: [],
-        virtualAddr: undefined,
         endTime: undefined,
         quotaDays: undefined,
         quotaHours: undefined,
         quotaMinutes: undefined,
         quotaSeconds: undefined,
-        createBy: undefined,
-        createTime: undefined,
-        updateBy: undefined,
-        updateTime: undefined,
-        delFlag: undefined
       };
       this.resetForm("form");
     },
