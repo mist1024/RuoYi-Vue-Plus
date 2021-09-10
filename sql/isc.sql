@@ -247,6 +247,7 @@ INSERT INTO `sys_menu` VALUES (1637, '服务申请', 1606, 1, 'serviceapply', 'i
 INSERT INTO `sys_menu` VALUES (1638, '服务申请信息查询', 1637, 1, '#', '', 1, 0, 'F', '0', '0', 'isc:serviceapply:query', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1639, '服务申请信息审核', 1637, 2, '#', '', 1, 0, 'F', '0', '0', 'isc:serviceapply:audit', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1640, '服务申请信息导出', 1637, 5, '#', '', 1, 0, 'F', '0', '0', 'isc:serviceapply:export', '#', 'admin', '2021-09-09 14:45:09', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (1641, '服务审核', 1606, 5, 'service/audit', 'isc/service/audit', 1, 0, 'C', '0', '0', 'isc:service:audit', 'eye-open', 'admin', '2021-09-10 13:35:18', 'admin', '2021-09-10 13:37:14', '');
 
 INSERT INTO `sys_dict_type` VALUES (100, '审核状态', 'sys_audit_status', '0', 'admin', '2021-08-21 21:21:58', 'admin', '2021-08-21 21:21:58', '审核状态列表');
 INSERT INTO `sys_dict_type` VALUES (101, '在线状态', 'isc_online_status', '0', 'admin', '2021-08-21 21:24:28', 'admin', '2021-08-21 21:24:28', '在线状态列表');
