@@ -84,9 +84,7 @@
       </el-table-column>
       <el-table-column label="应用密钥" align="center" prop="accessKey">
         <template slot-scope="scope">
-            <span>{{ scope.row.accessKey }} </span> 
-            <i class="el-icon-copy-document" style="color: #4A8DFF;cursor:pointer" v-if="scope.row.accessKey"
-            @click="handleCopy(scope.row.accessKey)" title="复制"/>
+            <copy-tag :data="scope.row.accessKey"/>
         </template>
       </el-table-column>
       <el-table-column label="更新者" align="center" prop="updateBy" />
@@ -143,9 +141,11 @@
 
 <script>
 import { listApplication, getApplication, delApplication, addApplication, updateApplication } from "@/api/isc/application";
+import CopyTag from '@/components/CopyTag';
 
 export default {
   name: "Application",
+  components: {CopyTag},
   data() {
     return {
       // 按钮loading
@@ -259,19 +259,6 @@ export default {
         this.open = true;
         this.title = "修改应用信息";
       });
-    },
-    // 复制ak
-    handleCopy(data) {
-      let oInput = document.createElement('input')
-      oInput.value = data
-      document.body.appendChild(oInput)
-      oInput.select()
-      document.execCommand('copy')
-      this.$message({
-        message: '复制成功',
-        type: 'success'
-      })
-      oInput.remove()
     },
     /** 提交按钮 */
     submitForm() {

@@ -90,9 +90,7 @@
       <el-table-column label="服务名称" align="left" prop="serviceName" />
       <el-table-column label="虚拟地址" align="left" prop="virtualAddr">
         <template slot-scope="scope">
-            <span :title="scope.row.virtualAddr" v-text="handleVirtualAddr(scope.row.virtualAddr)"/>
-            <i class="el-icon-copy-document" v-if="scope.row.virtualAddr" style="color: #4A8DFF;cursor:pointer" 
-            @click="handleCopy(scope.row.virtualAddr)" title="复制"/>
+          <copy-tag :data="scope.row.virtualAddr"/>
         </template>
       </el-table-column>
       <el-table-column label="审核状态" align="center" prop="status" width="100">
@@ -289,10 +287,11 @@
 import { listAppservice, getAppservice, delAppservice, addAppservice, updateAppservice, treeselect } from "@/api/isc/appservice";
 import { getApplication } from "@/api/isc/application";
 import Treeselect from "@riophae/vue-treeselect";
+import CopyTag from '@/components/CopyTag';
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 export default {
   name: "Appservice",
-  components: { Treeselect },
+  components: { Treeselect, CopyTag },
   data() {
     return {
       // 按钮loading
@@ -488,23 +487,6 @@ export default {
         this.form.status = this.form.status.split(",");
         this.openView = true;
       });
-    },
-    /** 复制地址 */ 
-    handleCopy(data) {
-      let oInput = document.createElement('input')
-      oInput.value = data
-      document.body.appendChild(oInput)
-      oInput.select()
-      document.execCommand('copy')
-      this.$message({
-        message: '复制成功',
-        type: 'success'
-      })
-      oInput.remove()
-    },
-    // 处理虚拟地址
-    handleVirtualAddr(data) {
-      return data && data.length > 40 ? data.substring(0, 37) + '...' : data;
     },
     /** 提交按钮 */
     submitForm() {
