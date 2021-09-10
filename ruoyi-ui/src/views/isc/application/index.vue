@@ -85,7 +85,8 @@
       <el-table-column label="应用密钥" align="center" prop="accessKey">
         <template slot-scope="scope">
             <span>{{ scope.row.accessKey }} </span> 
-            <i class="el-icon-copy-document" style="color: #4A8DFF" @click="handleCopy(scope.row.accessKey)" title="复制"/>
+            <i class="el-icon-copy-document" style="color: #4A8DFF;cursor:pointer" v-if="scope.row.accessKey"
+            @click="handleCopy(scope.row.accessKey)" title="复制"/>
         </template>
       </el-table-column>
       <el-table-column label="更新者" align="center" prop="updateBy" />

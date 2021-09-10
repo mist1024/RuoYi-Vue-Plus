@@ -90,8 +90,9 @@
       <el-table-column label="服务名称" align="left" prop="serviceName" />
       <el-table-column label="虚拟地址" align="left" prop="virtualAddr">
         <template slot-scope="scope">
-            <span :title="scope.row.virtualAddr" v-text="handleVirtualAddr(scope.row.virtualAddr)"></span> 
-            <i class="el-icon-copy-document" style="color: #4A8DFF" @click="handleCopy(scope.row.virtualAddr)" title="复制"/>
+            <span :title="scope.row.virtualAddr" v-text="handleVirtualAddr(scope.row.virtualAddr)"/>
+            <i class="el-icon-copy-document" v-if="scope.row.virtualAddr" style="color: #4A8DFF;cursor:pointer" 
+            @click="handleCopy(scope.row.virtualAddr)" title="复制"/>
         </template>
       </el-table-column>
       <el-table-column label="审核状态" align="center" prop="status" width="100">
@@ -421,7 +422,7 @@ export default {
     },
     // 处理虚拟地址
     handleVirtualAddr(data) {
-      return data.length > 40 ? data.substring(0, 37) + '...' : data;
+      return data && data.length > 40 ? data.substring(0, 37) + '...' : data;
     },
     /** 提交按钮 */
     submitForm() {
