@@ -170,6 +170,8 @@ export default {
         pageSize: 10,
         applicationName: undefined,
         accessKey: undefined,
+        orderByColumn: 'update_time',
+        isAsc: 'desc'
       },
       // 表单参数
       form: {},

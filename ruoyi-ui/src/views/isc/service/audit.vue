@@ -246,7 +246,9 @@ export default {
         onlineStatus: undefined,
         status: undefined,
         enabled: undefined,
-        cateFullPath: undefined
+        cateFullPath: undefined,
+        orderByColumn: 'update_time',
+        isAsc: 'desc'
       },
       // 表单参数
       form: {},

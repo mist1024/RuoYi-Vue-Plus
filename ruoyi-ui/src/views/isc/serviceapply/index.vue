@@ -222,6 +222,8 @@ export default {
         pageSize: 10,
         applyType: undefined,
         status: undefined,
+        orderByColumn: 'update_time',
+        isAsc: 'desc'
       },
       // 表单参数
       viewData: {},
