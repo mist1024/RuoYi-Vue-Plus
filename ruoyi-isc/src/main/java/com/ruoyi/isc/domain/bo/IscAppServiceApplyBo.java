@@ -1,16 +1,14 @@
 package com.ruoyi.isc.domain.bo;
 
+import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import javax.validation.constraints.*;
 
-import java.util.Date;
-
-import com.ruoyi.common.core.domain.BaseEntity;
+import javax.validation.constraints.NotNull;
 
 /**
  * 应用服务申请信息业务对象 isc_app_service_apply
@@ -53,7 +51,7 @@ public class IscAppServiceApplyBo extends BaseEntity {
      * 续期时长（单位月）
      */
     @ApiModelProperty(value = "续期时长（单位月）")
-    private Long renewalDuration;
+    private Integer renewalDuration;
 
     /**
      * 天配额

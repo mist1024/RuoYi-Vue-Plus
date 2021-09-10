@@ -91,7 +91,7 @@ public class IscAppServiceBo extends BaseEntity {
      * 续期时长（单位月）
      */
     @NotNull(message = "续期时长不能为空", groups = { AddGroup.class })
-    private Long renewalDuration;
+    private Integer renewalDuration;
 
 
     /**

@@ -72,7 +72,7 @@ public class IscAppServiceApplyVo {
     @ExcelProperty(value = "续期时长", converter = ExcelDictConvert.class)
     @ExcelDictFormat(readConverterExp = "单=位月")
     @ApiModelProperty("续期时长（单位月）")
-    private Long renewalDuration;
+    private Integer renewalDuration;
 
     /**
      * 天配额

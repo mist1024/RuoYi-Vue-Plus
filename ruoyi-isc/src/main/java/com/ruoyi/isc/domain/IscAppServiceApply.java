@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
 import java.io.Serializable;
 import java.util.Date;
-import java.math.BigDecimal;
 
 /**
  * 应用服务申请信息对象 isc_app_service_apply
@@ -52,7 +52,7 @@ public class IscAppServiceApply implements Serializable {
     /**
      * 续期时长（单位月）
      */
-    private Long renewalDuration;
+    private Integer renewalDuration;
 
     /**
      * 天配额

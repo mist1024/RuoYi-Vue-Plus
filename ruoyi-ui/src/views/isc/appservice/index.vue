@@ -48,17 +48,6 @@
           v-hasPermi="['isc:appservice:add']"
         >申请</el-button>
       </el-col>
-        <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-time"
-          size="mini"
-          :disabled="single"
-          @click="handleRenewal"
-          v-hasPermi="['isc:appservice:edit']"
-        >续期</el-button>
-      </el-col>
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -96,7 +85,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="appserviceList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center" :selectable="selectable"/>
       <el-table-column label="应用服务ID" align="center" prop="appServiceId" v-if="false"/>
       <el-table-column label="服务名称" align="left" prop="serviceName" />
       <el-table-column label="虚拟地址" align="left" prop="virtualAddr" />
@@ -136,6 +125,7 @@
             icon="el-icon-time"
             @click="handleRenewal(scope.row)"
             v-hasPermi="['isc:appservice:edit']"
+            v-if="scope.row.status == 1"
           >续期</el-button>
           <el-button
             size="mini"
@@ -143,6 +133,7 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['isc:appservice:edit']"
+            v-if="scope.row.status != 0"
           >修改</el-button>
           <el-button
             size="mini"
@@ -309,6 +300,9 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+    selectable(row, index) {
+      return row.status != 0;
     },
     /** 获取应用信息 */
     getApplicationName(applicationId) {

@@ -309,6 +309,7 @@ export default {
       this.view = view;
       this.show = true;
       this.reset();
+      this.resetAudit();
       const applyId = row.applyId || this.ids
       getServiceapply(applyId).then(response => {
         this.loading = false;

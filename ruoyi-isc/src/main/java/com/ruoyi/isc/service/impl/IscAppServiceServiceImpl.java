@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +37,8 @@ import java.util.stream.Collectors;
  * @date 2021-09-08
  */
 @Service
-public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMapper, IscAppService, IscAppServiceVo> implements IIscAppServiceService {
+public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMapper, IscAppService, IscAppServiceVo> implements IIscAppServiceService
+{
 
     @Resource
     private IIscServiceService serviceService;
@@ -46,19 +46,22 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     private IIscAppServiceApplyService applyService;
 
     @Override
-    public IscAppServiceVo queryById(Long appServiceId){
+    public IscAppServiceVo queryById(Long appServiceId)
+    {
         return getVoById(appServiceId);
     }
 
     @Override
-    public TableDataInfo<IscAppServiceVo> queryPageList(IscAppServiceBo bo) {
+    public TableDataInfo<IscAppServiceVo> queryPageList(IscAppServiceBo bo)
+    {
         PagePlus<IscAppService, IscAppServiceVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
         genServiceName(result.getRecordsVo());
         return PageUtils.buildDataInfo(result);
     }
 
     @Override
-    public List<IscAppServiceVo> queryList(IscAppServiceBo bo) {
+    public List<IscAppServiceVo> queryList(IscAppServiceBo bo)
+    {
         final List<IscAppServiceVo> results = listVo(buildQueryWrapper(bo));
         genServiceName(results);
         return results;
@@ -66,22 +69,23 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
 
     /**
      * 组装服务名称
+     *
      * @param results 应用服务列表
      */
     private void genServiceName(List<IscAppServiceVo> results)
     {
-        if(CollectionUtil.isEmpty(results)) {
+        if (CollectionUtil.isEmpty(results)) {
             return;
         }
         Set<Long> serviceIds = results.stream().map(IscAppServiceVo::getServiceId).collect(Collectors.toSet());
         Map<Long, String> nameMap = serviceService.getNameMap(serviceIds);
-        for (IscAppServiceVo result : results)
-        {
+        for (IscAppServiceVo result : results) {
             result.setServiceName(nameMap.get(result.getServiceId()));
         }
     }
 
-    private LambdaQueryWrapper<IscAppService> buildQueryWrapper(IscAppServiceBo bo) {
+    private LambdaQueryWrapper<IscAppService> buildQueryWrapper(IscAppServiceBo bo)
+    {
         Map<String, Object> params = bo.getParams();
         Long userId = SecurityUtils.getUserId();
         LambdaQueryWrapper<IscAppService> lqw = Wrappers.lambdaQuery();
@@ -94,7 +98,8 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     }
 
     @Override
-    public Boolean insertByBo(IscAppServiceBo bo) {
+    public Boolean insertByBo(IscAppServiceBo bo)
+    {
         IscAppService add = BeanUtil.toBean(bo, IscAppService.class);
         validEntityBeforeSave(add);
         add.setStatus(IscConstants.AUDIT_WAIT);
@@ -106,12 +111,21 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     }
 
     @Override
-    public Boolean updateByBo(IscAppServiceBo bo) {
-        IscAppService update = BeanUtil.toBean(bo, IscAppService.class);
+    public Boolean updateByBo(IscAppServiceBo bo)
+    {
+        IscAppService appService = getById(bo.getAppServiceId());
+        Assert.notNull(appService, () -> new ServiceException("申请信息不存在"));
+        IscAppService update = new IscAppService().setAppServiceId(bo.getAppServiceId());
         validEntityBeforeSave(update);
-        update.setStatus(IscConstants.AUDIT_WAIT);
-        addApplyRecord(bo, IscConstants.APPLY_TYPE_RENEWAL, bo.getAppServiceId());
-        return updateById(update);
+        boolean result = true;
+        if(!IscConstants.AUDIT_PASS.equals(appService.getStatus())) {
+            update.setStatus(IscConstants.AUDIT_WAIT);
+            result = updateById(update);
+        }
+        String applyType = Objects.nonNull(bo.getRenewalDuration()) ? IscConstants.APPLY_TYPE_RENEWAL :
+            IscConstants.APPLY_TYPE_MODIFY;
+        addApplyRecord(bo, applyType, bo.getAppServiceId());
+        return result;
     }
 
     /**
@@ -119,9 +133,10 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
      *
      * @param entity 实体类数据
      */
-    private void validEntityBeforeSave(IscAppService entity){
+    private void validEntityBeforeSave(IscAppService entity)
+    {
         //判断是否有申请未审核
-        if(Objects.nonNull(entity.getAppServiceId())){
+        if (Objects.nonNull(entity.getAppServiceId())) {
             long count = applyService.count(Wrappers.<IscAppServiceApply>lambdaQuery()
                 .eq(IscAppServiceApply::getAppServiceId, entity.getAppServiceId())
                 .eq(IscAppServiceApply::getStatus, IscConstants.AUDIT_WAIT));
@@ -130,8 +145,9 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     }
 
     @Override
-    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
+    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid)
+    {
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return removeByIds(ids);
@@ -141,8 +157,8 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     public List<Tree<Long>> genAppServiceTree(Long applicationId)
     {
         List<Long> serviceIds = listObjs(Wrappers.<IscAppService>lambdaQuery()
-                .select(IscAppService::getServiceId)
-                .eq(IscAppService::getApplicationId, applicationId), o -> (Long) o);
+            .select(IscAppService::getServiceId)
+            .eq(IscAppService::getApplicationId, applicationId), o -> (Long) o);
         return serviceService.genServiceTree(CollectionUtil.newHashSet(serviceIds));
     }
 
@@ -156,12 +172,14 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
 
     /**
      * 添加 服务申请记录
+     *
      * @param appService   应用服务信息
      * @param applyType    申请类型
      * @param appServiceId 应用服务ID
      * @return 是否添加成功
      */
-    private Boolean addApplyRecord(IscAppServiceBo appService, String applyType, Long appServiceId) {
+    private Boolean addApplyRecord(IscAppServiceBo appService, String applyType, Long appServiceId)
+    {
         IscAppServiceApplyBo entity = new IscAppServiceApplyBo();
         entity.setAppServiceId(appServiceId);
         entity.setApplyType(applyType);

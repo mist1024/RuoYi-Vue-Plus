@@ -76,7 +76,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="serviceList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center" :selectable="selectable"/>
       <el-table-column label="服务ID" align="center" prop="serviceId" width="100"/>
       <el-table-column label="服务名称" align="left" prop="serviceName" />
       <el-table-column label="服务分类" align="left" prop="cateName" width="150"/>
@@ -107,15 +107,16 @@
             size="mini"
             type="text"
             icon="el-icon-info"
-            @click="handleAuditSingle(scope.row)"
+            @click="handleAuditSingle(scope.row, true)"
             v-hasPermi="['isc:service:query']"
           >查看</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-view"
-            @click="handleAuditSingle(scope.row)"
+            @click="handleAuditSingle(scope.row, false)"
             v-hasPermi="['isc:service:audit']"
+            v-if="scope.row.status == 0"
           >审核</el-button>
         </template>
       </el-table-column>
@@ -292,6 +293,10 @@ export default {
     cancel() {
       this.open = false;
       this.reset();
+      this.resetAudit();
+    },
+    selectable(row, index) {
+      return row.status == 0;
     },
     // 表单重置
     reset() {
@@ -360,6 +365,7 @@ export default {
       this.view = view;
       this.show = true;
       this.reset();
+      this.resetAudit();
       const serviceId = row.serviceId || this.ids
       getService(serviceId).then(response => {
         this.loading = false;
