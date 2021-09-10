@@ -121,6 +121,12 @@ public class IscAppServiceVo {
     private Long quotaSeconds;
 
     /**
+     * 备注
+     */
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+    /**
      * 更新者
      */
     @ExcelProperty(value = "更新者")

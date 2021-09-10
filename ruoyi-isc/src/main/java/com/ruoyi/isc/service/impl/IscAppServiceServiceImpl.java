@@ -48,7 +48,9 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     @Override
     public IscAppServiceVo queryById(Long appServiceId)
     {
-        return getVoById(appServiceId);
+        IscAppServiceVo vo = getVoById(appServiceId);
+        genServiceName(Arrays.asList(vo));
+        return vo;
     }
 
     @Override

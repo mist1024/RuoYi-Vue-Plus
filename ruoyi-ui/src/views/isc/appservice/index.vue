@@ -100,14 +100,14 @@
           <dict-tag :options="statusOptions" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="到期时间" align="center" prop="endTime" width="100">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="启用状态" align="center" prop="enabled" width="100">
         <template slot-scope="scope">
           <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="到期时间" align="center" prop="endTime" width="100">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="更新者" align="center" prop="updateBy" width="100"/>
@@ -122,7 +122,7 @@
             size="mini"
             type="text"
             icon="el-icon-info"
-            @click="handleRenewal(scope.row)"
+            @click="handleView(scope.row)"
             v-hasPermi="['isc:appservice:query']"
           >查看</el-button>
           <el-button
@@ -194,7 +194,7 @@
             <el-option key="24" label="24(月)" value="24"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="日配额" prop="quotaDays" v-if="this.applyType === 0 || this.applyType === 2">
+        <el-form-item label="每日配额" prop="quotaDays" v-if="this.applyType === 0 || this.applyType === 2">
           <el-input-number v-model="form.quotaDays" :step="1000" placeholder="请输入日配额" />
         </el-form-item>
         <el-form-item label="小时配额" prop="quotaHours" v-if="this.applyType === 0 || this.applyType === 2">
@@ -203,7 +203,7 @@
         <el-form-item label="分钟配额" prop="quotaMinutes" v-if="this.applyType === 0 || this.applyType === 2">
           <el-input-number v-model="form.quotaMinutes" :step="10" placeholder="请输入分钟配额" />
         </el-form-item>
-        <el-form-item label="秒配额" prop="quotaSeconds" v-if="this.applyType === 0 || this.applyType === 2">
+        <el-form-item label="每秒配额" prop="quotaSeconds" v-if="this.applyType === 0 || this.applyType === 2">
           <el-input-number v-model="form.quotaSeconds" placeholder="请输入秒配额" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -212,6 +212,69 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+    
+    <!-- 查看应用服务信息对话框 -->
+    <el-dialog title="应用服务查看" :visible.sync="openView" width="500px" append-to-body>
+      <el-card shadow="never" style="margin-bottom: 20px">
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务名称</el-col>
+          <el-col :span="18" class="col-content">{{this.form.serviceName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">虚拟地址</el-col>
+          <el-col :span="18" class="col-content">{{this.form.virtualAddr}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">审核状态</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="statusOptions" :value="this.form.status"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">启用状态</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="enabledOptions" :value="this.form.enabled"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">到期时间</el-col>
+          <el-col :span="18" class="col-content">
+            <span>{{ parseTime(this.form.endTime, '{y}-{m}-{d}') }}</span>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">每日配额</el-col>
+          <el-col :span="18" class="col-content" v-text="this.form.quotaDays"/>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">小时配额</el-col>
+          <el-col :span="18" class="col-content" v-text="this.form.quotaHours"/>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">分钟配额</el-col>
+          <el-col :span="18" class="col-content" v-text="this.form.quotaMinutes"/>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">每秒配额</el-col>
+          <el-col :span="18" class="col-content" v-text="this.form.quotaSeconds"/>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">更新人</el-col>
+          <el-col :span="18" class="col-content">{{this.form.updateBy}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">更新时间</el-col>
+          <el-col :span="18" class="col-content">{{parseTime(this.form.updateTime)}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">备注</el-col>
+          <el-col :span="18" class="col-content">{{this.form.remark}}</el-col>
+        </el-row>
+      </el-card>
+      <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -250,6 +313,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示查看弹出层
+      openView: false,
       // 启用状态字典
       enabledOptions: [],
       // 审核状态字典
@@ -336,7 +401,7 @@ export default {
     },
     // 取消按钮
     cancel() {
-      this.open = false;
+      this.open = this.openView = false;
       this.reset();
     },
     // 表单重置
@@ -407,7 +472,19 @@ export default {
         this.title = "应用服务续期";
       });
     },
-    // 复制地址
+    /** 查看按钮操作 */
+    handleView(row) {
+      this.loading = true;
+      this.reset();
+      const appServiceId = row.appServiceId;
+      getAppservice(appServiceId).then(response => {
+        this.loading = false;
+        this.form = response.data;
+        this.form.status = this.form.status.split(",");
+        this.openView = true;
+      });
+    },
+    /** 复制地址 */ 
     handleCopy(data) {
       let oInput = document.createElement('input')
       oInput.value = data
@@ -475,3 +552,15 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+     .el-card .el-row {
+       font-size: 14px;
+       line-height: 36px;
+       vertical-align: middle;
+     }
+     .el-card .el-row .col-title {
+       text-align: right;
+       color: #606266;
+       font-weight: bold;
+     }
+</style>
