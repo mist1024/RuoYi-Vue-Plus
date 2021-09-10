@@ -82,7 +82,12 @@
           </router-link>
         </template>
       </el-table-column>
-      <el-table-column label="应用密钥" align="center" prop="accessKey" />
+      <el-table-column label="应用密钥" align="center" prop="accessKey">
+        <template slot-scope="scope">
+            <span>{{ scope.row.accessKey }} </span> 
+            <i class="el-icon-copy-document" style="color: #4A8DFF" @click="handleCopy(scope.row.accessKey)" title="复制"/>
+        </template>
+      </el-table-column>
       <el-table-column label="更新者" align="center" prop="updateBy" />
       <el-table-column label="更新时间" align="center" prop="updateTime" width="180">
         <template slot-scope="scope">
@@ -253,6 +258,19 @@ export default {
         this.open = true;
         this.title = "修改应用信息";
       });
+    },
+    // 复制ak
+    handleCopy(data) {
+      let oInput = document.createElement('input')
+      oInput.value = data
+      document.body.appendChild(oInput)
+      oInput.select()
+      document.execCommand('copy')
+      this.$message({
+        message: '复制成功',
+        type: 'success'
+      })
+      oInput.remove()
     },
     /** 提交按钮 */
     submitForm() {
