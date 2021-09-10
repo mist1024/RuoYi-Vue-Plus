@@ -93,6 +93,12 @@ public class IscAppServiceBo extends BaseEntity {
     @NotNull(message = "续期时长不能为空", groups = { AddGroup.class })
     private Integer renewalDuration;
 
+    /**
+     * 申请类型(0申请 1续期)
+     */
+    @NotBlank(message = "申请类型必填")
+    private String applyType;
+
 
     /**
      * 分页大小

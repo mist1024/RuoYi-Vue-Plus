@@ -50,14 +50,14 @@ public class IscAppService implements Serializable {
     private String enabled;
 
     /**
-     * 申请类型(0申请 1续期)
-     */
-    private String applyType;
-
-    /**
      * 审核状态（0待审核 1审核通过 2驳回）
      */
     private String status;
+
+    /**
+     * 审核意见
+     */
+    private String auditMind;
 
     /**
      * 虚拟地址

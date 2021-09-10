@@ -83,6 +83,12 @@ public class IscAppServiceVo {
     private String status;
 
     /**
+     * 审核意见
+     */
+    @ApiModelProperty("审核意见")
+    private String auditMind;
+
+    /**
      * 虚拟地址
      */
     @ExcelProperty(value = "虚拟地址")

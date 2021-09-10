@@ -105,7 +105,6 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         IscAppService add = BeanUtil.toBean(bo, IscAppService.class);
         validEntityBeforeSave(add);
         add.setStatus(IscConstants.AUDIT_WAIT);
-        add.setApplyType(IscConstants.APPLY_TYPE_APPLY);
         add.setUserId(SecurityUtils.getUserId());
         boolean result = save(add);
         addApplyRecord(bo, IscConstants.APPLY_TYPE_APPLY, add.getAppServiceId());
@@ -120,12 +119,22 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         IscAppService update = new IscAppService().setAppServiceId(bo.getAppServiceId());
         validEntityBeforeSave(update);
         boolean result = true;
-        if(!IscConstants.AUDIT_PASS.equals(appService.getStatus())) {
-            update.setStatus(IscConstants.AUDIT_WAIT);
+        boolean changeStatus = !IscConstants.AUDIT_PASS.equals(appService.getStatus());
+        boolean changeRemark = !IscConstants.APPLY_TYPE_RENEWAL.equals(bo.getApplyType());
+        if (changeStatus || changeRemark)
+        {
+            if (changeStatus)
+            {
+                update.setStatus(IscConstants.AUDIT_WAIT);
+            }
+            if (changeRemark)
+            {
+                update.setRemark(bo.getRemark());
+            }
             result = updateById(update);
         }
-        String applyType = Objects.nonNull(bo.getRenewalDuration()) ? IscConstants.APPLY_TYPE_RENEWAL :
-            IscConstants.APPLY_TYPE_MODIFY;
+        String applyType = IscConstants.APPLY_TYPE_RENEWAL.equals(bo.getApplyType())
+                ? IscConstants.APPLY_TYPE_RENEWAL : IscConstants.APPLY_TYPE_MODIFY;
         addApplyRecord(bo, applyType, bo.getAppServiceId());
         return result;
     }
@@ -189,8 +198,8 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         entity.setRemark(appService.getRemark());
         switch (applyType) {
             case IscConstants.APPLY_TYPE_APPLY:
-                entity.setRenewalDuration(appService.getRenewalDuration());
             case IscConstants.APPLY_TYPE_MODIFY:
+                entity.setRenewalDuration(appService.getRenewalDuration());
                 entity.setQuotaDays(appService.getQuotaDays());
                 entity.setQuotaHours(appService.getQuotaHours());
                 entity.setQuotaMinutes(appService.getQuotaMinutes());

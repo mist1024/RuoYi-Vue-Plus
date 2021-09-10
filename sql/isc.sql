@@ -11,7 +11,6 @@ CREATE TABLE `isc_app_service`  (
   `application_id` bigint NULL DEFAULT NULL COMMENT '应用ID',
   `user_id` bigint NULL DEFAULT NULL COMMENT '用户ID',
   `enabled` char(1) NOT NULL COMMENT '启用状态（0启用 1停用）',
-  `apply_type` char(1)  DEFAULT NULL COMMENT '申请类型(0申请 1续期)',
   `status` char(1)  DEFAULT NULL COMMENT '审核状态（0待审核 1审核通过 2驳回）',
   `virtual_addr` varchar(255)  DEFAULT NULL COMMENT '虚拟地址',
   `end_time` datetime(0) NULL DEFAULT NULL COMMENT '到期时间',

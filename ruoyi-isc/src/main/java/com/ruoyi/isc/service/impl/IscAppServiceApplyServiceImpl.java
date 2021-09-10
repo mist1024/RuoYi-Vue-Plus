@@ -159,6 +159,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
             IscAppService updateData = null;
             if(IscConstants.AUDIT_PASS.equals(bo.getStatus())) {
                 updateData = genAuditPassData(apply, appService, bo.getStatus());
+                updateData.setAuditMind(bo.getRemark());
             }else{
                 //如果 应用服务 状态为不通过 时需要同步状态
                 updateData = genAuditRejectData(appService, bo);
@@ -243,6 +244,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
         if(!IscConstants.AUDIT_PASS.equals(appService.getStatus())) {
             IscAppService updateData = new IscAppService().setAppServiceId(appService.getAppServiceId());
             updateData.setStatus(bo.getStatus());
+            updateData.setAuditMind(bo.getRemark());
             return updateData;
         }
         return null;

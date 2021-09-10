@@ -184,7 +184,7 @@
             >{{dict.dictLabel}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="申请时长" prop="renewalDuration" v-if="this.applyType === 0 || this.applyType === 1">
+        <el-form-item label="申请时长" prop="renewalDuration" v-if="!(this.form.status == 1 && this.applyType == 2)">
           <el-select v-model="form.renewalDuration" placeholder="请选择申请时长" clearable size="small">
             <el-option key="1" label="1(月)" value="1"/>
             <el-option key="3" label="3(月)" value="3"/>
@@ -232,6 +232,10 @@
           <el-col :span="18" class="col-content">
             <dict-tag :options="statusOptions" :value="this.form.status"/>
           </el-col>
+        </el-row>
+        <el-row :gutter="20" v-if="this.form.status == 2">
+          <el-col :span="6" class="col-title">审核意见</el-col>
+          <el-col :span="18" class="col-content">{{this.form.auditMind}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">启用状态</el-col>
@@ -467,6 +471,7 @@ export default {
       getAppservice(appServiceId).then(response => {
         this.loading = false;
         this.form = response.data;
+        this.form.remark = undefined;
         this.form.status = this.form.status.split(",");
         this.open = true;
         this.title = "应用服务续期";
@@ -506,6 +511,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
+          this.form.applyType = this.applyType;
           this.form.status = this.form.status.join(",");
           if (this.form.appServiceId != null) {
             updateAppservice(this.form).then(response => {
