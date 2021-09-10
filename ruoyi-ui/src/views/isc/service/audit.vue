@@ -54,33 +54,12 @@
         <el-button
           type="primary"
           plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['isc:service:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['isc:service:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
+          icon="el-icon-view"
           size="mini"
           :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['isc:service:remove']"
-        >删除</el-button>
+          @click="handleAudit"
+          v-hasPermi="['isc:service:audit']"
+        >批量审核</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -127,17 +106,17 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['isc:service:edit']"
-          >修改</el-button>
+            icon="el-icon-info"
+            @click="handleAuditSingle(scope.row)"
+            v-hasPermi="['isc:service:query']"
+          >查看</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['isc:service:remove']"
-          >删除</el-button>
+            icon="el-icon-view"
+            @click="handleAuditSingle(scope.row)"
+            v-hasPermi="['isc:service:audit']"
+          >审核</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -149,52 +128,59 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <!-- 添加或修改服务信息对话框 -->
+    
+    <!-- 查看或审核服务信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="服务分类" prop="cateFullPath">
-          <treeselect v-model="form.cateFullPath" :options="cateOptions" :show-count="true" :normalizer="normalizer" placeholder="请选择服务分类" />
-        </el-form-item>
-        <el-form-item label="服务名称" prop="serviceName">
-          <el-input v-model="form.serviceName" placeholder="请输入服务名称" />
-        </el-form-item>
-        <el-form-item label="服务地址" prop="serviceAddr">
-          <el-input v-model="form.serviceAddr" placeholder="请输入服务地址" />
-        </el-form-item>
-        <el-form-item label="探活地址" prop="probeActiveAddr">
-          <el-input v-model="form.probeActiveAddr" placeholder="请输入探活地址" />
-        </el-form-item>
-        <el-form-item label="请求方式" prop="requestMethod">
-          <el-radio-group v-model="form.requestMethod">
-            <el-radio
-              v-for="dict in requestMethodOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="跨域标志">
-          <el-radio-group v-model="form.corsFlag">
-            <el-radio
-              v-for="dict in corsFlagOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="隐藏参数" prop="hiddenParams">
-          <el-input v-model="form.hiddenParams" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="JSON文档" prop="apiDoc">
-          <el-input v-model="form.apiDoc" type="textarea" placeholder="请输入内容" />
+      <el-card shadow="never" v-if="this.show" style="margin-bottom: 20px">
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务分类</el-col>
+          <el-col :span="18" class="col-content">{{this.form.cateName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务名称</el-col>
+          <el-col :span="18" class="col-content">{{this.form.serviceName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务地址</el-col>
+          <el-col :span="18" class="col-content">{{this.form.serviceAddr}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">探活地址</el-col>
+          <el-col :span="18" class="col-content">{{this.form.probeActiveAddr}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">请求方式</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="requestMethodOptions" :value="this.form.requestMethod"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">备注</el-col>
+          <el-col :span="18" class="col-content">{{this.form.remark}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">跨域标志</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="corsFlagOptions" :value="this.form.corsFlag"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">隐藏参数</el-col>
+          <el-col :span="18" class="col-content">{{this.form.hiddenParams}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">JSON文档</el-col>
+          <el-col :span="18" class="col-content">{{this.form.apiDoc}}</el-col>
+        </el-row>
+      </el-card>
+      <el-form ref="auditForm" :model="auditForm" :rules="rules" label-width="80px">
+        <el-form-item label="审核意见" prop="remark">
+          <el-input v-model="auditForm.remark" type="textarea" :disabled='this.view' placeholder="请输入审核意见"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :loading="buttonLoading" type="primary" @click="submitForm">确 定</el-button>
+        <el-button :loading="buttonLoading" type="success" @click="submitForm(1)" icon="el-icon-check" v-if="!this.view">通 过</el-button>
+        <el-button :loading="buttonLoading" type="warning" @click="submitForm(2)" icon="el-icon-close" v-if="!this.view">驳 回</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -202,7 +188,7 @@
 </template>
 
 <script>
-import { listService, getService, delService, addService, updateService } from "@/api/isc/service";
+import { listService, getService, auditService } from "@/api/isc/service";
 import { treeselect } from "@/api/isc/cate";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -221,6 +207,10 @@ export default {
       exportLoading: false,
       // 选中数组
       ids: [],
+      // 是否查看
+      view: false,
+      // 是否展示详情
+      show: false,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -259,31 +249,12 @@ export default {
       },
       // 表单参数
       form: {},
+      // 审核表单参数
+      auditForm: {},
       // 表单校验
       rules: {
-        serviceName: [
-          { required: true, message: "服务名称不能为空", trigger: "blur" }
-        ],
-        serviceAddr: [
-          { required: true, message: "服务地址不能为空", trigger: "blur" }
-        ],
-        probeActiveAddr: [
-          { required: true, message: "探活地址不能为空", trigger: "blur" }
-        ],
-        requestMethod: [
-          { required: true, message: "请求方式不能为空", trigger: "blur" }
-        ],
-        corsFlag: [
-          { required: true, message: "跨域标志不能为空", trigger: "blur" }
-        ],
-        apiDoc: [
-          { required: true, message: "JSON文档不能为空", trigger: "blur" }
-        ],
-        enabled: [
-          { required: true, message: "服务状态不能为空", trigger: "blur" }
-        ],
-        cateFullPath: [
-          { required: true, message: "服务分类不能为空", trigger: "change" }
+        remark: [
+          { max: 200, message: '最大长度为200个字符', trigger: 'blur' }
         ]
       }
     };
@@ -347,6 +318,15 @@ export default {
       };
       this.resetForm("form");
     },
+    // 审核表单重置
+    resetAudit() {
+      this.auditForm = {
+        ids: [],
+        status: "0",
+        remark: undefined
+      };
+      this.resetForm("auditForm");
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -363,22 +343,34 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
-    /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加服务信息";
+    /** 审核按钮操作 */
+    handleAudit(row) {
+      if(this.single) {
+        this.open = true;
+        this.show = false;
+        this.title = "服务审核";
+        this.resetAudit();
+        this.auditForm.ids = this.ids;
+        return;
+      }
+      this.handleAuditSingle(row, false);
     },
-    /** 修改按钮操作 */
-    handleUpdate(row) {
+    handleAuditSingle(row, view) {
       this.loading = true;
+      this.view = view;
+      this.show = true;
       this.reset();
       const serviceId = row.serviceId || this.ids
       getService(serviceId).then(response => {
         this.loading = false;
         this.form = response.data;
         this.open = true;
-        this.title = "修改服务信息";
+        if(view) {
+          this.title = "服务查看";
+        }else{
+          this.title = "服务审核";
+        }
+        this.auditForm.ids = [serviceId]
       });
     },
     /** 查询服务分类树结构 */
@@ -396,46 +388,24 @@ export default {
       }
     },
     /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
+    submitForm(status) {
+      this.auditForm.status = status;
+      this.$refs["auditForm"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
-          if (this.form.serviceId != null) {
-            updateService(this.form).then(response => {
-              this.msgSuccess("修改成功");
+          if (this.auditForm.ids.length > 0) {
+            auditService(this.auditForm).then(response => {
+              this.msgSuccess("审核成功");
               this.open = false;
               this.getList();
             }).finally(() => {
               this.buttonLoading = false;
             });
           } else {
-            addService(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            }).finally(() => {
+              this.msgError("请选择记录");
               this.buttonLoading = false;
-            });
           }
         }
-      });
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const serviceIds = row.serviceId || this.ids;
-      this.$confirm('是否确认删除服务信息编号为"' + serviceIds + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.loading = true;
-          return delService(serviceIds);
-        }).then(() => {
-          this.loading = false;
-          this.getList();
-          this.msgSuccess("删除成功");
-      }).finally(() => {
-          this.loading = false;
       });
     },
     /** 导出按钮操作 */
@@ -445,3 +415,15 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+     .el-card .el-row {
+       font-size: 14px;
+       line-height: 36px;
+       vertical-align: middle;
+     }
+     .el-card .el-row .col-title {
+       text-align: right;
+       color: #606266;
+       font-weight: bold;
+     }
+</style>
