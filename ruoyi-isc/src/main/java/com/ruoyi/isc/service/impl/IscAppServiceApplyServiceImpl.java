@@ -2,14 +2,12 @@ package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.isc.domain.IscAppService;
@@ -138,15 +136,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
     @Override
     public Boolean audit(IscAuditBo bo)
     {
-        switch (bo.getStatus()) {
-            case IscConstants.AUDIT_PASS:
-                break;
-            case IscConstants.AUDIT_REJECT:
-                Assert.notBlank(bo.getRemark(), () -> new ServiceException("审核意见不能为空"));
-                break;
-            default:
-                throw new ServiceException("审核状态异常");
-        }
+        serviceService.checkAuditBO(bo);
         boolean result = true;
         for (Long id : bo.getIds())
         {

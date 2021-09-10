@@ -78,7 +78,7 @@
           icon="el-icon-view"
           size="mini"
           :disabled="multiple"
-          @click="handleUpdate"
+          @click="handleAudit"
           v-hasPermi="['isc:service:audit']"
         >批量审核</el-button>
       </el-col>
@@ -139,14 +139,14 @@
             size="mini"
             type="text"
             icon="el-icon-info"
-            @click="handleUpdate(scope.row)"
+            @click="handleAuditSingle(scope.row)"
             v-hasPermi="['isc:service:query']"
           >查看</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-view"
-            @click="handleUpdate(scope.row)"
+            @click="handleAuditSingle(scope.row)"
             v-hasPermi="['isc:service:audit']"
           >审核</el-button>
           <el-button
@@ -223,11 +223,67 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+    
+    <!-- 查看或审核服务信息对话框 -->
+    <el-dialog :title="title" :visible.sync="openView" width="500px" append-to-body>
+      <el-card shadow="never" v-if="this.show" style="margin-bottom: 20px">
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务分类</el-col>
+          <el-col :span="18" class="col-content">{{this.form.cateName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务名称</el-col>
+          <el-col :span="18" class="col-content">{{this.form.serviceName}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">服务地址</el-col>
+          <el-col :span="18" class="col-content">{{this.form.serviceAddr}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">探活地址</el-col>
+          <el-col :span="18" class="col-content">{{this.form.probeActiveAddr}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">请求方式</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="requestMethodOptions" :value="this.form.requestMethod"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">备注</el-col>
+          <el-col :span="18" class="col-content">{{this.form.remark}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">跨域标志</el-col>
+          <el-col :span="18" class="col-content">
+            <dict-tag :options="corsFlagOptions" :value="this.form.corsFlag"/>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">隐藏参数</el-col>
+          <el-col :span="18" class="col-content">{{this.form.hiddenParams}}</el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="6" class="col-title">JSON文档</el-col>
+          <el-col :span="18" class="col-content">{{this.form.apiDoc}}</el-col>
+        </el-row>
+      </el-card>
+      <el-form ref="auditForm" :model="auditForm" :rules="rules" label-width="80px">
+        <el-form-item label="审核意见" prop="remark">
+          <el-input v-model="auditForm.remark" type="textarea" :disabled='this.view' placeholder="请输入审核意见"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :loading="buttonLoading" type="success" @click="submitAuditForm(1)" icon="el-icon-check" v-if="!this.view">通 过</el-button>
+        <el-button :loading="buttonLoading" type="warning" @click="submitAuditForm(2)" icon="el-icon-close" v-if="!this.view">驳 回</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listService, getService, delService, addService, updateService } from "@/api/isc/service";
+import { listService, getService, delService, addService, updateService, auditService } from "@/api/isc/service";
 import { treeselect } from "@/api/isc/cate";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -246,6 +302,10 @@ export default {
       exportLoading: false,
       // 选中数组
       ids: [],
+      // 是否查看
+      view: false,
+      // 是否展示详情
+      show: false,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -260,6 +320,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示弹出层
+      openView: false,
       // 跨域标志字典
       corsFlagOptions: [],
       // 是否在线字典
@@ -284,6 +346,8 @@ export default {
       },
       // 表单参数
       form: {},
+      // 审核表单参数
+      auditForm: {},
       // 表单校验
       rules: {
         serviceName: [
@@ -344,7 +408,7 @@ export default {
     },
     // 取消按钮
     cancel() {
-      this.open = false;
+      this.open = this.openView = false;
       this.reset();
     },
     // 表单重置
@@ -372,6 +436,15 @@ export default {
       };
       this.resetForm("form");
     },
+    // 审核表单重置
+    resetAudit() {
+      this.auditForm = {
+        ids: [],
+        status: "0",
+        remark: undefined
+      };
+      this.resetForm("auditForm");
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -387,6 +460,36 @@ export default {
       this.ids = selection.map(item => item.serviceId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    /** 审核按钮操作 */
+    handleAudit(row) {
+      if(this.single) {
+        this.openView = true;
+        this.show = false;
+        this.title = "服务审核";
+        this.resetAudit();
+        this.auditForm.ids = this.ids;
+        return;
+      }
+      this.handleAuditSingle(row, false);
+    },
+    handleAuditSingle(row, view) {
+      this.loading = true;
+      this.view = view;
+      this.show = true;
+      this.reset();
+      const serviceId = row.serviceId || this.ids
+      getService(serviceId).then(response => {
+        this.loading = false;
+        this.form = response.data;
+        this.openView = true;
+        if(view) {
+          this.title = "服务查看";
+        }else{
+          this.title = "服务审核";
+        }
+        this.auditForm.ids = [serviceId]
+      });
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -445,6 +548,27 @@ export default {
         }
       });
     },
+    /** 提交按钮 */
+    submitAuditForm(status) {
+      this.auditForm.status = status;
+      this.$refs["auditForm"].validate(valid => {
+        if (valid) {
+          this.buttonLoading = true;
+          if (this.auditForm.ids.length > 0) {
+            auditService(this.auditForm).then(response => {
+              this.msgSuccess("审核成功");
+              this.openView = false;
+              this.getList();
+            }).finally(() => {
+              this.buttonLoading = false;
+            });
+          } else {
+              this.msgError("请选择记录");
+              this.buttonLoading = false;
+          }
+        }
+      });
+    },
     /** 删除按钮操作 */
     handleDelete(row) {
       const serviceIds = row.serviceId || this.ids;
@@ -470,3 +594,15 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+     .el-card .el-row {
+       font-size: 14px;
+       line-height: 36px;
+       vertical-align: middle;
+     }
+     .el-card .el-row .col-title {
+       text-align: right;
+       color: #606266;
+       font-weight: bold;
+     }
+</style>

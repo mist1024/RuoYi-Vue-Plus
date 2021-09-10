@@ -1,10 +1,10 @@
 package com.ruoyi.isc.service;
 
 import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.lang.tree.TreeNode;
 import com.ruoyi.common.core.mybatisplus.core.IServicePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.isc.domain.IscService;
+import com.ruoyi.isc.domain.bo.IscAuditBo;
 import com.ruoyi.isc.domain.bo.IscServiceBo;
 import com.ruoyi.isc.domain.vo.IscServiceVo;
 
@@ -77,4 +77,17 @@ public interface IIscServiceService extends IServicePlus<IscService, IscServiceV
      * @return 服务树结构
      */
     List<Tree<Long>> genServiceTree(Set<Long> exitsIds);
+
+    /**
+     * 服务信息审核
+     * @param bo 审核信息
+     * @return 操作结果
+     */
+    Boolean audit(IscAuditBo bo);
+
+    /**
+     * 校验 审核参数
+     * @param bo 审核业务对象
+     */
+    void checkAuditBO(IscAuditBo bo);
 }

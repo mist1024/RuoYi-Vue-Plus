@@ -2,6 +2,7 @@ package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,11 +13,13 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.FullPathUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.isc.domain.IscService;
+import com.ruoyi.isc.domain.bo.IscAuditBo;
 import com.ruoyi.isc.domain.bo.IscServiceBo;
 import com.ruoyi.isc.domain.vo.IscServiceVo;
 import com.ruoyi.isc.mapper.IscServiceMapper;
@@ -158,5 +161,38 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
                 .eq(IscService::getEnabled, UserConstants.DICT_NORMAL)
                 .orderByDesc(IscService::getUpdateTime));
         return cateService.genCateTree(cateService.selectCateList(), serviceList, exitsIds);
+    }
+
+    @Override
+    public Boolean audit(IscAuditBo bo)
+    {
+        checkAuditBO(bo);
+        boolean result = true;
+        for (Long id : bo.getIds())
+        {
+            IscService service = getOne(Wrappers.<IscService>lambdaQuery()
+                .eq(IscService::getServiceId, id)
+                .eq(IscService::getStatus, IscConstants.AUDIT_WAIT), false);
+            if(Objects.isNull(service)) {
+                continue;
+            }
+            result = updateById(new IscService().setServiceId(id).setStatus(bo.getStatus())
+                .setAuditMind(bo.getRemark()));
+        }
+        return result;
+    }
+
+    @Override
+    public void checkAuditBO(IscAuditBo bo)
+    {
+        switch (bo.getStatus()) {
+            case IscConstants.AUDIT_PASS:
+                break;
+            case IscConstants.AUDIT_REJECT:
+                Assert.notBlank(bo.getRemark(), () -> new ServiceException("审核意见不能为空"));
+                break;
+            default:
+                throw new ServiceException("审核状态异常");
+        }
     }
 }

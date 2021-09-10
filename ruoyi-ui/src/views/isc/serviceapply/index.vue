@@ -85,19 +85,18 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleAuditSingle(scope.row)"
-            v-if="scope.row.status == 0"
-            v-hasPermi="['isc:serviceapply:audit']"
-          >审核</el-button>
+            icon="el-icon-info"
+            @click="handleAuditSingle(scope.row, true)"
+            v-hasPermi="['isc:serviceapply:query']"
+          >查看</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-info"
-            @click="handleAuditSingle(scope.row)"
-            v-if="scope.row.status > 0"
-            v-hasPermi="['isc:serviceapply:query']"
-          >查看</el-button>
+            icon="el-icon-view"
+            @click="handleAuditSingle(scope.row, false)"
+            v-if="scope.row.status == 0"
+            v-hasPermi="['isc:serviceapply:audit']"
+          >审核</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,70 +109,70 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改应用服务申请信息对话框 -->
+    <!-- 查看或审核服务申请信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-card shadow="never" v-if="!single" style="margin-bottom: 20px">
+      <el-card shadow="never" v-if="this.show" style="margin-bottom: 20px">
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">应用名称</el-col>
-          <el-col :span="18" class="col-content">{{this.form.applicationName}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.applicationName}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">服务名称</el-col>
-          <el-col :span="18" class="col-content">{{this.form.serviceName}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.serviceName}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">申请类型</el-col>
           <el-col :span="18" class="col-content">
-            <dict-tag :options="applyTypeOptions" :value="this.form.applyType"/>
+            <dict-tag :options="applyTypeOptions" :value="this.viewData.applyType"/>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">审核状态</el-col>
           <el-col :span="18" class="col-content">
-            <dict-tag :options="statusOptions" :value="this.form.status"/>
+            <dict-tag :options="statusOptions" :value="this.viewData.status"/>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">续期时长(月)</el-col>
-          <el-col :span="18" class="col-content">{{this.form.renewalDuration}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.renewalDuration}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">每日配额</el-col>
-          <el-col :span="18" class="col-content">{{this.form.quotaDays}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.quotaDays}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">小时配额</el-col>
-          <el-col :span="18" class="col-content">{{this.form.quotaHours}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.quotaHours}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">分钟配额</el-col>
-          <el-col :span="18" class="col-content">{{this.form.quotaMinutes}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.quotaMinutes}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">每秒配额</el-col>
-          <el-col :span="18" class="col-content">{{this.form.quotaSeconds}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.quotaSeconds}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">提交人</el-col>
-          <el-col :span="18" class="col-content">{{this.form.updateBy}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.updateBy}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">提交时间</el-col>
-          <el-col :span="18" class="col-content">{{this.form.updateTime}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.updateTime}}</el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">备注</el-col>
-          <el-col :span="18" class="col-content">{{this.form.remark}}</el-col>
+          <el-col :span="18" class="col-content">{{this.viewData.remark}}</el-col>
         </el-row>
       </el-card>
       <el-form ref="auditForm" :model="auditForm" :rules="rules" label-width="80px">
         <el-form-item label="审核意见" prop="remark">
-          <el-input v-model="auditForm.remark" type="textarea" :disabled='this.form.status > 0' placeholder="请输入审核意见"/>
+          <el-input v-model="auditForm.remark" type="textarea" :disabled='this.view' placeholder="请输入审核意见"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :loading="buttonLoading" type="success" @click="submitForm(1)" icon="el-icon-check" v-if="this.form.status == 0">通 过</el-button>
-        <el-button :loading="buttonLoading" type="warning" @click="submitForm(2)" icon="el-icon-close" v-if="this.form.status == 0">驳 回</el-button>
+        <el-button :loading="buttonLoading" type="success" @click="submitForm(1)" icon="el-icon-check" v-if="!this.view">通 过</el-button>
+        <el-button :loading="buttonLoading" type="warning" @click="submitForm(2)" icon="el-icon-close" v-if="!this.view">驳 回</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -195,6 +194,10 @@ export default {
       exportLoading: false,
       // 选中数组
       ids: [],
+      // 是否查看
+      view: false,
+      // 是否展示详情
+      show: false,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -221,7 +224,7 @@ export default {
         status: undefined,
       },
       // 表单参数
-      form: {},
+      viewData: {},
       // 审核表单参数
       auditForm: {},
       // 表单校验
@@ -255,18 +258,23 @@ export default {
     cancel() {
       this.open = false;
       this.reset();
+      this.resetAudit();
     },
     selectable(row, index) {
       return row.status == 0;
     },
     // 表单重置
     reset() {
-      this.form = {
-        applyId: undefined,
+      this.viewData = { };
+    },
+    // 审核表单重置
+    resetAudit() {
+      this.auditForm = {
+        ids: [],
         status: "0",
         remark: undefined
       };
-      this.resetForm("form");
+      this.resetForm("auditForm");
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -289,22 +297,28 @@ export default {
       if(this.single) {
         this.open = true;
         this.title = "服务申请审核";
+        this.resetAudit();
+        this.show = false;
         this.auditForm.ids = this.ids;
         return;
       }
-      this.handleAuditSingle(row);
+      this.handleAuditSingle(row, false);
     },
-    handleAuditSingle(row) {
-      this.single = false;
+    handleAuditSingle(row, view) {
       this.loading = true;
+      this.view = view;
+      this.show = true;
       this.reset();
       const applyId = row.applyId || this.ids
-      console.log(applyId)
       getServiceapply(applyId).then(response => {
         this.loading = false;
-        this.form = response.data;
+        this.viewData = response.data;
         this.open = true;
-        this.title = "服务申请审核";
+        if(view) {
+          this.title = "服务申请查看";
+        }else{
+          this.title = "服务申请审核";
+        }
         this.auditForm.ids = [applyId]
       });
     },
@@ -314,7 +328,6 @@ export default {
       this.$refs["auditForm"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
-          console.log(this.auditForm)
           if (this.auditForm.ids.length > 0) {
             auditServiceapply(this.auditForm).then(response => {
               this.msgSuccess("审核成功");

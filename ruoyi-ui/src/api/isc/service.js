@@ -42,3 +42,12 @@ export function delService(serviceId) {
     method: 'delete'
   })
 }
+
+// 服务信息审核
+export function auditService(data) {
+  return request({
+    url: '/isc/service/audit',
+    method: 'put',
+    data: data
+  })
+}
