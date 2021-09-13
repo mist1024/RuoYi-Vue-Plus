@@ -1,8 +1,7 @@
 package com.ruoyi.gateway.config;
 
-import com.ruoyi.gateway.config.provider.ComplexRouteDefinitionRepository;
 import com.ruoyi.gateway.config.provider.RedisRouteDefinitionRepository;
-import org.springframework.cloud.gateway.route.InMemoryRouteDefinitionRepository;
+import org.redisson.api.RedissonClient;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +20,13 @@ import javax.annotation.Resource;
  * @date 2021-09-11
  */
 @Configuration
-public class GatewayConfig {
+public class GatewayConfig
+{
 
     @Resource
     private RedisTemplate<String, RouteDefinition> redisTemplate;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Bean
     public RedisTemplate<String, RouteDefinition> redisTemplate(RedisConnectionFactory redisConnectionFactory)
@@ -40,29 +42,14 @@ public class GatewayConfig {
         return template;
     }
 
-    @Bean
-    public RouteDefinitionRepository complexRouteDefinitionRepository()
-    {
-        return new ComplexRouteDefinitionRepository(inMemoryRouteDefinitionRepository(), redisRouteDefinitionRepository());
-    }
-
-    /**
-     * 内存 路由仓库
-     *
-     * @return 本地内存路由仓库
-     */
-    RouteDefinitionRepository inMemoryRouteDefinitionRepository()
-    {
-        return new InMemoryRouteDefinitionRepository();
-    }
-
     /**
      * Redis 路由仓库
      *
      * @return redis路由仓库
      */
-    RouteDefinitionRepository redisRouteDefinitionRepository()
+    @Bean
+    public RouteDefinitionRepository redisRouteDefinitionRepository()
     {
-        return new RedisRouteDefinitionRepository(redisTemplate);
+        return new RedisRouteDefinitionRepository(redissonClient);
     }
 }
