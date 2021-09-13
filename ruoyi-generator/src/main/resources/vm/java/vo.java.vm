@@ -28,7 +28,7 @@ public class ${ClassName}Vo {
 	private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
-#if($column.isList && $column.isPk!=1 || $column.isPk==1)
+#if($column.isList || $column.isPk==1)
     /**
      * $column.columnComment
      */
