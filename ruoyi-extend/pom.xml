@@ -13,6 +13,7 @@
 
     <modules>
         <module>ruoyi-monitor-admin</module>
+        <module>ruoyi-isc-gateway</module>
     </modules>
 
 </project>

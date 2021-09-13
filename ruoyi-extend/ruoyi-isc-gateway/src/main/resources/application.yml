@@ -1,0 +1,8 @@
+server:
+  port: 8090
+# Spring配置
+spring:
+  application:
+    name: RuoYi-Gateway
+  profiles:
+    active: @profiles.active@

@@ -31,6 +31,7 @@
         <hutool.version>5.7.11</hutool.version>
         <guava.version>29.0-jre</guava.version>
         <feign.version>3.0.3</feign.version>
+        <gateway.version>3.0.3</gateway.version>
         <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
         <spring-boot-admin.version>2.5.1</spring-boot-admin.version>
@@ -153,6 +154,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway</artifactId>
+                <version>${gateway.version}</version>
             </dependency>
 
             <dependency>
