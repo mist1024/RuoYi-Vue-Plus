@@ -1,5 +1,6 @@
 package com.ruoyi.gateway.config.provider;
 
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
  * @author Wenchao Gong
  * @date 2021-09-11
  */
+@Slf4j
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
 {
     public static final String KEY_ROUTES = "ROUTES::";
@@ -27,6 +29,7 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
     public Flux<RouteDefinition> getRouteDefinitions()
     {
         RMap<String, RouteDefinition> map = redissonClient.getMap(KEY_ROUTES);
+        log.debug("Routes from redis size:[{}]!", map.size());
         return Flux.fromIterable(map.values());
     }
 
@@ -36,6 +39,7 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
         return route.flatMap(definition -> {
             RMap<String, RouteDefinition> map = redissonClient.getMap(KEY_ROUTES);
             map.put(definition.getId(), definition);
+            log.debug("Saving route to redis id:[{}]!", definition.getId());
             return Mono.empty();
         });
     }
@@ -46,6 +50,7 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
         return routeId.flatMap(id -> {
             RMap<String, RouteDefinition> map = redissonClient.getMap(KEY_ROUTES);
             map.remove(id);
+            log.debug("Remove route from redis id:[{}]!", id);
             return Mono.empty();
         });
     }
