@@ -1,4 +1,4 @@
-package com.ruoyi.isc;
+package com.ruoyi.isc.utils;
 
 import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.exception.ServiceException;
@@ -33,4 +33,5 @@ public class RouteUtils
         return String.format("%s/%s/%s%s", PATH_PREFIX, SecureUtil.md5(String.valueOf(applicationId)),
             SecureUtil.md5(String.valueOf(serviceId)), uri.getPath());
     }
+
 }

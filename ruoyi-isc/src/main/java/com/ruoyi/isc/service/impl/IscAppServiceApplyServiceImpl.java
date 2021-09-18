@@ -13,7 +13,7 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.isc.RouteUtils;
+import com.ruoyi.isc.utils.RouteUtils;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscAppServiceApply;
 import com.ruoyi.isc.domain.IscService;

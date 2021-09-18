@@ -130,5 +130,5 @@ spring:
         url: http://localhost:9090/admin
         instance:
           prefer-ip: true # 注册实例时，优先使用 IP
-        username: ruoyi
-        password: 123456
+        username: admin
+        password: admin123
