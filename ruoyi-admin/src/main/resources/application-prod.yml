@@ -131,4 +131,4 @@ spring:
         instance:
           prefer-ip: true # 注册实例时，优先使用 IP
         username: ruoyi
-        password: 123456
+        password: admin@123456
