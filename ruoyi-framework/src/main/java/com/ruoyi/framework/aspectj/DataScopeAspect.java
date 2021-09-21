@@ -127,7 +127,9 @@ public class DataScopeAspect {
 				}
 			}
 		}
-
+        //sql添加括号防止OR导致其他条件失效
+        sqlString.insert(4,"(");
+        sqlString.append(')');
 		if (StringUtils.isNotBlank(sqlString.toString())) {
 			putDataScope(joinPoint, sqlString.substring(4));
 		}
