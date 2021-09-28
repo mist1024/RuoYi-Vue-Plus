@@ -52,18 +52,30 @@ public class LoginUtils {
      * 获取用户类型
      */
     public static UserType getUserType() {
-        String loginId = StpUtil.getLoginIdAsString();
+        String loginId = null;
+        try {
+            loginId = StpUtil.getLoginIdAsString();
+        } catch (Exception e) {
+            System.out.println("获取loginId出错,返回空");
+        }
         return getUserType(loginId);
     }
 
     public static UserType getUserType(Object loginId) {
+        if (StringUtils.isEmpty(loginId)) {
+            return null;
+        }
         if (StringUtils.contains(loginId.toString(), UserType.SYS_USER.getUserType())) {
             return UserType.SYS_USER;
         } else if (StringUtils.contains(loginId.toString(), UserType.APP_USER.getUserType())){
             return UserType.APP_USER;
         } else {
-            throw new UtilException("登录用户: LoginId异常 => " + loginId);
+//            throw new UtilException("登录用户: LoginId异常 => " + loginId);
+            return null;//这里如果查不出用户类型 就返回null
         }
     }
 
+    public static String getToken() {
+        return StpUtil.getTokenValue();
+    }
 }

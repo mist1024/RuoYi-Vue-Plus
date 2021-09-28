@@ -8,6 +8,7 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
@@ -28,11 +29,15 @@ public class MySaTokenListener implements SaTokenListener {
      */
     @Override
     public void doLogin(String loginType, Object loginId, SaLoginModel loginModel) {
-        UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
-        String ip = ServletUtils.getClientIP();
-        SysUser user = SecurityUtils.getUser();
-        String tokenValue = StpUtil.getTokenValue();
-        UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
+        /*这里的loginType在移动端登录的时候是login*/
+        System.out.println(UserType.SYS_USER.getUserType());//sys_user:
+        if (loginType.equals(UserType.SYS_USER.getUserType())) {
+            /*系统用户才处理*/
+            UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
+            String ip = ServletUtils.getClientIP();
+            SysUser user = SecurityUtils.getUser();
+            String tokenValue = StpUtil.getTokenValue();
+            UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
                 .setIpaddr(ip)
                 .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
                 .setBrowser(userAgent.getBrowser().getName())
@@ -40,11 +45,12 @@ public class MySaTokenListener implements SaTokenListener {
                 .setLoginTime(System.currentTimeMillis())
                 .setTokenId(tokenValue)
                 .setUserName(user.getUserName());
-        if (StringUtils.isNotNull(user.getDept())) {
-            userOnlineDTO.setDeptName(user.getDept().getDeptName());
+            if (StringUtils.isNotNull(user.getDept())) {
+                userOnlineDTO.setDeptName(user.getDept().getDeptName());
+            }
+            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO);
+            log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         }
-        RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO);
-        log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
     }
 
     /**
