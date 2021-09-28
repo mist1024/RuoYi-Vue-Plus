@@ -161,6 +161,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
+        applyService.remove(Wrappers.<IscAppServiceApply>lambdaQuery().in(IscAppServiceApply::getAppServiceId, ids));
         return removeByIds(ids);
     }
 

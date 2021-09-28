@@ -27,11 +27,10 @@ public class RouteUtils
         URI uri = null;
         try {
             uri = new URI(serviceAddr);
+            return PATH_PREFIX + uri.getPath();
         } catch (URISyntaxException e) {
             throw new ServiceException("URL格式异常");
         }
-        return String.format("%s/%s/%s%s", PATH_PREFIX, SecureUtil.md5(String.valueOf(applicationId)),
-            SecureUtil.md5(String.valueOf(serviceId)), uri.getPath());
     }
 
 }
