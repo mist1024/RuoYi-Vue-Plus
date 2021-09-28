@@ -126,6 +126,7 @@ sa-token:
 security:
   # 排除路径
   excludes:
+    - /app/appLogin #app用户登录放行
     - /login
     - /logout
     - /register
