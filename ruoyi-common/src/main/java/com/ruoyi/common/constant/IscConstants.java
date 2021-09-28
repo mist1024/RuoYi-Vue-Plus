@@ -23,5 +23,8 @@ public class IscConstants {
     /** 申请类型 申请修改 */
     public static final String APPLY_TYPE_MODIFY = "2";
 
-
+    /**
+     * Gateway 路由信息Redis Key
+     */
+    public static final String KEY_ROUTES = "ROUTES::";
 }

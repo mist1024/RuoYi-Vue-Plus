@@ -13,7 +13,6 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.isc.utils.RouteUtils;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscAppServiceApply;
 import com.ruoyi.isc.domain.IscService;
@@ -25,6 +24,8 @@ import com.ruoyi.isc.service.IIscAppServiceApplyService;
 import com.ruoyi.isc.service.IIscAppServiceService;
 import com.ruoyi.isc.service.IIscApplicationService;
 import com.ruoyi.isc.service.IIscServiceService;
+import com.ruoyi.isc.utils.RouteUtils;
+import com.ruoyi.isc.utils.beans.IscRouteDefinition;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -157,8 +158,12 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
             Assert.notNull(appService, () -> new ServiceException("申请信息不存在"));
 
             IscAppService updateData = null;
+            IscRouteDefinition route = null;
+            IscService service = null;
             if(IscConstants.AUDIT_PASS.equals(bo.getStatus())) {
-                updateData = genAuditPassData(apply, appService, bo.getStatus());
+                service = serviceService.getById(appService.getServiceId());
+                Assert.notNull(service, () -> new ServiceException("服务信息不存在"));
+                updateData = genAuditPassData(apply, appService, service, bo.getStatus());
                 updateData.setAuditMind(bo.getRemark());
             }else{
                 //如果 应用服务 状态为不通过 时需要同步状态
@@ -166,6 +171,11 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
             }
             if(Objects.nonNull(updateData)) {
                 result = appServiceService.updateById(updateData);
+                if(Objects.nonNull(service)) {
+                    IscAppService dbAppService = appServiceService.getById(apply.getAppServiceId());
+                    route = RouteUtils.generateRoute(dbAppService, service.getServiceAddr());
+                    RouteUtils.saveRoute(route);
+                }
             }
         }
         return result;
@@ -175,22 +185,24 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
      * 审核通过处理
      * @param apply      申请信息
      * @param appService 应用服务信息
+     * @param service    服务信息
      * @param status     操作状态
      * @return 更新数据
      */
-    private IscAppService genAuditPassData(IscAppServiceApply apply, IscAppService appService, String status)
+    private IscAppService genAuditPassData(IscAppServiceApply apply, IscAppService appService, IscService service,
+                                           String status)
     {
         IscAppService updateData = new IscAppService().setAppServiceId(appService.getAppServiceId());
         //如果是 服务申请 修改 应用服务 审核状态、生成虚拟地址、服务到期时间
         //如果是续期申请 修改 服务到期时间
         switch (apply.getApplyType()) {
             case IscConstants.APPLY_TYPE_APPLY:
-                genServicePassInit(apply, appService, status, updateData);
+                genServicePassInit(apply, appService, status, updateData, service);
                 break;
             case IscConstants.APPLY_TYPE_MODIFY:
                 //如果 应用服务 状态不为通过 则修改状态（如果是通过：续期不能影响使用）
                 if(!IscConstants.AUDIT_PASS.equals(appService.getStatus())) {
-                    genServicePassInit(apply, appService, status, updateData);
+                    genServicePassInit(apply, appService, status, updateData, service);
                 }
                 updateData.setQuotaDays(apply.getQuotaDays());
                 updateData.setQuotaHours(apply.getQuotaHours());
@@ -213,13 +225,12 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
      * @param appService 应用服务信息
      * @param status     审核状态
      * @param updateData 需要修改的数据
+     * @param service    服务信息
      */
     private void genServicePassInit(IscAppServiceApply apply, IscAppService appService, String status,
-                                    IscAppService updateData)
+                                    IscAppService updateData, IscService service)
     {
         updateData.setStatus(status);
-        IscService service = serviceService.getById(appService.getServiceId());
-        Assert.notNull(service, () -> new ServiceException("服务信息不存在"));
         Integer renewalDuration = apply.getRenewalDuration();
         //如果 申请时长为空，需要查询审核记录 中的审核时长
         if(Objects.isNull(renewalDuration)) {
