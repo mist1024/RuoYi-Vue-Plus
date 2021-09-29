@@ -3,9 +3,11 @@ package com.ruoyi.isc.utils;
 import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.isc.domain.IscAppService;
+import com.ruoyi.isc.domain.IscService;
 import com.ruoyi.isc.utils.beans.IscFilterDefinition;
 import com.ruoyi.isc.utils.beans.IscPredicateDefinition;
 import com.ruoyi.isc.utils.beans.IscRouteDefinition;
@@ -130,31 +132,64 @@ public class RouteUtils {
     /**
      * 生成 路由信息
      *
-     * @param appService  应用服务信息
-     * @param serviceAddr 服务地址
+     * @param appService 应用服务信息
+     * @param service    服务信息
+     * @param ak         AK
      * @return 路由信息
      */
-    public static IscRouteDefinition generateRoute(IscAppService appService, String serviceAddr)
+    public static IscRouteDefinition generateRoute(IscAppService appService, IscService service, String ak)
     {
         IscRouteDefinition route = new IscRouteDefinition();
         route.setId(String.valueOf(appService.getAppServiceId()));
+        final String serviceAddr = service.getServiceAddr();
         route.setUri(getURI(serviceAddr.substring(0, serviceAddr.length() - getPathUri(serviceAddr).length())));
 
         //断言
+        IscPredicateDefinition methodPredicate = new IscPredicateDefinition();
+        methodPredicate.setName("Method");
+        methodPredicate.getArgs().put("methods", service.getRequestMethod());
+
+        IscPredicateDefinition queryPredicate = new IscPredicateDefinition();
+        queryPredicate.setName("Query");
+        queryPredicate.getArgs().put("param", "ak");
+
         IscPredicateDefinition pathPredicate = new IscPredicateDefinition();
         pathPredicate.setName("Path");
         pathPredicate.getArgs().put("pattern", appService.getVirtualAddr());
-        route.setPredicates(Arrays.asList(pathPredicate));
+        route.setPredicates(Arrays.asList(methodPredicate, queryPredicate, pathPredicate));
 
         //过滤器
+        List<IscFilterDefinition> filters = new ArrayList<>();
         IscFilterDefinition stripPrefixFilter = new IscFilterDefinition();
         stripPrefixFilter.setName("StripPrefix");
         stripPrefixFilter.getArgs().put("parts", "1");
+        filters.add(stripPrefixFilter);
+
+        IscFilterDefinition removeRequestParameterFilter = new IscFilterDefinition();
+        removeRequestParameterFilter.setName("RemoveRequestParameter");
+        removeRequestParameterFilter.getArgs().put("name", "ak");
+        filters.add(removeRequestParameterFilter);
+
+        String hiddenParams = service.getHiddenParams();
+        if(StringUtils.isNotBlank(hiddenParams)) {
+            Map<String, Object> paramsMap = JsonUtils.parseMap(hiddenParams);
+            Iterator<Map.Entry<String, Object>> it = paramsMap.entrySet().iterator();
+            while (it.hasNext()) {
+                IscFilterDefinition addRequestParameterFilter = new IscFilterDefinition();
+                Map<String, String> args = addRequestParameterFilter.getArgs();
+                addRequestParameterFilter.setName("AddRequestParameter");
+                Map.Entry<String, Object> param = it.next();
+                args.put("name", param.getKey());
+                args.put("value", String.valueOf(param.getValue()));
+                filters.add(addRequestParameterFilter);
+            }
+        }
 
         IscFilterDefinition retryFilter = new IscFilterDefinition();
         retryFilter.setName("Retry");
         retryFilter.getArgs().put("retries", "1");
-        route.setFilters(Arrays.asList(stripPrefixFilter, retryFilter));
+        filters.add(retryFilter);
+        route.setFilters(filters);
 
         //其他信息
         Map<String, Object> metadata = route.getMetadata();

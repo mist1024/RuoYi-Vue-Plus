@@ -15,6 +15,7 @@ import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscAppServiceApply;
+import com.ruoyi.isc.domain.IscApplication;
 import com.ruoyi.isc.domain.IscService;
 import com.ruoyi.isc.domain.bo.IscAppServiceApplyBo;
 import com.ruoyi.isc.domain.bo.IscAuditBo;
@@ -173,7 +174,8 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
                 result = appServiceService.updateById(updateData);
                 if(Objects.nonNull(service)) {
                     IscAppService dbAppService = appServiceService.getById(apply.getAppServiceId());
-                    route = RouteUtils.generateRoute(dbAppService, service.getServiceAddr());
+                    IscApplication application = applicationService.getById(dbAppService.getApplicationId());
+                    route = RouteUtils.generateRoute(dbAppService, service, application.getAccessKey());
                     RouteUtils.saveRoute(route);
                 }
             }
