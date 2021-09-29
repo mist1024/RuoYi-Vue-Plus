@@ -11,7 +11,8 @@ import com.ruoyi.isc.utils.beans.IscPredicateDefinition;
 import com.ruoyi.isc.utils.beans.IscRouteDefinition;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.client.codec.Codec;
+import org.redisson.codec.TypedJsonJacksonCodec;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
  * @date 2021/9/10 14:46
  */
 public class RouteUtils {
+
+    public static final Codec ROUTE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRouteDefinition.class);
     /**
      * Gateway 虚拟路径前缀
      */
@@ -81,7 +84,7 @@ public class RouteUtils {
     {
         Map<String, IscRouteDefinition> routeMap = routes.stream().collect(Collectors.toMap(IscRouteDefinition::getId,
                 Function.identity(), (o1, o2) -> o2));
-        final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES);
+        final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         map.clear();
         map.putAll(routeMap);
         return true;
@@ -95,7 +98,7 @@ public class RouteUtils {
      */
     public static boolean saveRoute(IscRouteDefinition route)
     {
-        final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES);
+        final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         map.put(route.getId(), route);
         return true;
     }
@@ -108,7 +111,7 @@ public class RouteUtils {
      */
     public static boolean deleteRoute(String routeId)
     {
-        final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES);
+        final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         map.remove(routeId);
         return true;
     }

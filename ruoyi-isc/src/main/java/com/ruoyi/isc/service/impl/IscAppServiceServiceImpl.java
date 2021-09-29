@@ -8,15 +8,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.ruoyi.common.constant.IscConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscAppServiceApply;
+import com.ruoyi.isc.domain.IscService;
 import com.ruoyi.isc.domain.bo.IscAppServiceApplyBo;
 import com.ruoyi.isc.domain.bo.IscAppServiceBo;
 import com.ruoyi.isc.domain.vo.IscAppServiceVo;
@@ -24,10 +27,15 @@ import com.ruoyi.isc.mapper.IscAppServiceMapper;
 import com.ruoyi.isc.service.IIscAppServiceApplyService;
 import com.ruoyi.isc.service.IIscAppServiceService;
 import com.ruoyi.isc.service.IIscServiceService;
+import com.ruoyi.isc.utils.RouteUtils;
+import com.ruoyi.isc.utils.beans.IscRouteDefinition;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +44,7 @@ import java.util.stream.Collectors;
  * @author Wenchao Gong
  * @date 2021-09-08
  */
+@Slf4j
 @Service
 public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMapper, IscAppService, IscAppServiceVo> implements IIscAppServiceService
 {
@@ -44,6 +53,11 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     private IIscServiceService serviceService;
     @Resource
     private IIscAppServiceApplyService applyService;
+
+    @PostConstruct
+    public void init() {
+        refreshRoutes();
+    }
 
     @Override
     public IscAppServiceVo queryById(Long appServiceId)
@@ -180,6 +194,35 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         return list(Wrappers.<IscAppService>lambdaQuery()
             .select(IscAppService::getAppServiceId, IscAppService::getApplicationId, IscAppService::getServiceId)
             .in(IscAppService::getAppServiceId, ids));
+    }
+
+    @Override
+    public void refreshRoutes()
+    {
+        List<IscAppService> list = list(Wrappers.<IscAppService>lambdaQuery()
+                .eq(IscAppService::getEnabled, UserConstants.NORMAL)
+                .eq(IscAppService::getStatus, IscConstants.AUDIT_PASS)
+                .gt(IscAppService::getEndTime, DateUtils.getNowDate()));
+        if(CollectionUtil.isEmpty(list)) {
+            return;
+        }
+        Set<Long> serviceIds = list.stream().map(IscAppService::getServiceId).collect(Collectors.toSet());
+        Map<Long, IscService> serviceMap = serviceService.list(Wrappers.<IscService>lambdaQuery()
+                .select(IscService::getServiceId, IscService::getServiceAddr)
+                .in(IscService::getServiceId, serviceIds)).stream()
+                .collect(Collectors.toMap(IscService::getServiceId, Function.identity()));
+        List<IscRouteDefinition> routes = new ArrayList<>();
+
+        for (IscAppService appService : list)
+        {
+            IscService service = serviceMap.get(appService.getServiceId());
+            if(Objects.isNull(service)) {
+                log.error("路由初始化失败: 服务[{}]信息不存在！", appService.getServiceId());
+                continue;
+            }
+            routes.add(RouteUtils.generateRoute(appService, service.getServiceAddr()));
+        }
+        RouteUtils.refreshRoute(routes);
     }
 
     /**
