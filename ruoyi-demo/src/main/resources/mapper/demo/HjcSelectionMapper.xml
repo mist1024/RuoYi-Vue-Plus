@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.demo.mapper.HjcSelectionMapper">
+
+    <resultMap type="com.ruoyi.demo.domain.HjcSelection" id="HjcSelectionResult">
+        <result property="sid" column="sid"/>
+        <result property="pid" column="pid"/>
+        <result property="selection" column="selection"/>
+    </resultMap>
+
+
+</mapper>
