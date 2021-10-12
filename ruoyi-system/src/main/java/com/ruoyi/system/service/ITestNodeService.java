@@ -72,4 +72,19 @@ public interface ITestNodeService extends IServicePlus<TestNode, TestNodeVo> {
 	 * @return
 	 */
 	AjaxResult<Void> addMultiple(Map map);
+
+	/**
+	 * 若数据库查询不到，则从第三方接口取得数据，并插入到数据库中
+	 * @param nodeName
+	 * @return
+	 */
+	List<TestNode> queryListWithSizhi(String nodeName);
+
+	/**
+	 * 查出维护列表
+	 * @param node 前端传来的搜索条件
+	 * @return
+	 */
+	List<TestNode> queryLists(TestNode node);
+
 }

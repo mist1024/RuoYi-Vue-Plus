@@ -14,9 +14,17 @@ import directive from './directive' //directive
 
 import './assets/icons' // icon
 import './permission' // permission control
-import { getDicts } from "@/api/system/dict/data";
-import { getConfigKey } from "@/api/system/config";
-import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, download, handleTree } from "@/utils/ruoyi";
+import {getDicts} from "@/api/system/dict/data";
+import {getConfigKey} from "@/api/system/config";
+import {
+  parseTime,
+  resetForm,
+  addDateRange,
+  selectDictLabel,
+  selectDictLabels,
+  download,
+  handleTree
+} from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 // 自定义表格工具组件
 import RightToolbar from "@/components/RightToolbar"
@@ -30,6 +38,8 @@ import ImageUpload from "@/components/ImageUpload"
 import DictTag from '@/components/DictTag'
 // 头部标签组件
 import VueMeta from 'vue-meta'
+// 图片懒加载
+import VueLazyload from 'vue-lazyload'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -43,11 +53,11 @@ Vue.prototype.download = download
 Vue.prototype.handleTree = handleTree
 
 Vue.prototype.msgSuccess = function (msg) {
-  this.$message({ showClose: true, message: msg, type: "success" });
+  this.$message({showClose: true, message: msg, type: "success"});
 }
 
 Vue.prototype.msgError = function (msg) {
-  this.$message({ showClose: true, message: msg, type: "error" });
+  this.$message({showClose: true, message: msg, type: "error"});
 }
 
 Vue.prototype.msgInfo = function (msg) {
@@ -64,7 +74,10 @@ Vue.component('ImageUpload', ImageUpload)
 
 Vue.use(directive)
 Vue.use(VueMeta)
-
+Vue.use(VueLazyload, {
+  loading: require('./assets/images/loading.gif'),//加载中图片，一定要有，不然会一直重复加载占位图
+  // error: require('img/error.png')  //加载失败图片
+})
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

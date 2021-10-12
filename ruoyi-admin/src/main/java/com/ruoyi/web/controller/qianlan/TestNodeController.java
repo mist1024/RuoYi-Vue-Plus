@@ -62,8 +62,10 @@ public class TestNodeController extends BaseController {
 	@GetMapping("/listWithChildren")
 	public AjaxResult listWithChildren(String nodeName) {
 		List<TestNode> nodeList = iTestNodeService.queryListWithChildren(nodeName);
+
 		if (nodeList == null) {
-			return AjaxResult.error("查询无果");
+			List<TestNode> list = iTestNodeService.queryListWithSizhi(nodeName);
+			return AjaxResult.success(list);
 		} else {
 			return AjaxResult.success(nodeList);
 		}
@@ -75,9 +77,9 @@ public class TestNodeController extends BaseController {
 	@ApiOperation("查询节点维护列表")
 	@PreAuthorize("@ss.hasPermi('system:node:list')")
 	@GetMapping("/list")
-	public AjaxResult<List<TestNodeVo>> list(@Validated TestNodeBo bo) {
-		List<TestNodeVo> list = iTestNodeService.queryList(bo);
-		return AjaxResult.success(list);
+	public AjaxResult list(@Validated TestNode node) {
+		List<TestNode> list = iTestNodeService.queryLists(node);
+		return (list != null) ? AjaxResult.success(list) : AjaxResult.error("查询无果");
 	}
 
 	/**

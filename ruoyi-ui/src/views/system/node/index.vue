@@ -184,7 +184,6 @@ export default {
   methods: {
     /** 查询节点维护列表 */
     getList() {
-      this.loading = true;
       listNode(this.queryParams).then(response => {
         this.nodeList = this.handleTree(response.data, "id", "pid");
         this.loading = false;

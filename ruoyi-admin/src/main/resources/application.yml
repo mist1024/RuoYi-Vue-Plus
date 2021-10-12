@@ -216,8 +216,8 @@ swagger:
   version: '版本号: ${ruoyi-vue-plus.version}'
   # 作者信息
   contact:
-    name: Lion Li
-    email: crazylionli@163.com
+    name: qianlan
+    email: 3220857484@qq.com
     url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
 
 # 防止XSS攻击

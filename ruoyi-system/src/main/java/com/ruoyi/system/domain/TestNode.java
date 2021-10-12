@@ -28,7 +28,7 @@ public class TestNode implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.INPUT)
     private Long id;
 
     /**
