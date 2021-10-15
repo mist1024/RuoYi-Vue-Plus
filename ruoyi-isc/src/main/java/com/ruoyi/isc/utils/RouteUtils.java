@@ -33,6 +33,7 @@ public class RouteUtils {
      * Gateway 虚拟路径前缀
      */
     public static final String PATH_PREFIX = "/proxy";
+    public static final String ACCESS_KEY_NAME = "ak";
     private static RedissonClient client = SpringUtils.getBean(RedissonClient.class);
 
     /**
@@ -151,7 +152,7 @@ public class RouteUtils {
 
         IscPredicateDefinition queryPredicate = new IscPredicateDefinition();
         queryPredicate.setName("Query");
-        queryPredicate.getArgs().put("param", "ak");
+        queryPredicate.getArgs().put("param", ACCESS_KEY_NAME);
 
         IscPredicateDefinition pathPredicate = new IscPredicateDefinition();
         pathPredicate.setName("Path");
@@ -165,23 +166,34 @@ public class RouteUtils {
         stripPrefixFilter.getArgs().put("parts", "1");
         filters.add(stripPrefixFilter);
 
-        IscFilterDefinition removeRequestParameterFilter = new IscFilterDefinition();
-        removeRequestParameterFilter.setName("RemoveRequestParameter");
-        removeRequestParameterFilter.getArgs().put("name", "ak");
-        filters.add(removeRequestParameterFilter);
+        final Long quotaSeconds = appService.getQuotaSeconds();
+        if (Objects.nonNull(quotaSeconds))
+        {
+            IscFilterDefinition requestRateLimiterFilter = new IscFilterDefinition();
+            requestRateLimiterFilter.setName("RequestRateLimiter");
+            requestRateLimiterFilter.getArgs().put("redis-rate-limiter.replenishRate", String.valueOf(quotaSeconds));
+            requestRateLimiterFilter.getArgs().put("redis-rate-limiter.burstCapacity", String.valueOf(quotaSeconds << 1));
+            requestRateLimiterFilter.getArgs().put("key-resolver", "#{@routeIdKeyResolver}");
+            filters.add(requestRateLimiterFilter);
+        }
+
+        IscFilterDefinition removeRequestParamFilter = new IscFilterDefinition();
+        removeRequestParamFilter.setName("RemoveRequestParam");
+        removeRequestParamFilter.getArgs().put("name", ACCESS_KEY_NAME);
+        filters.add(removeRequestParamFilter);
 
         String hiddenParams = service.getHiddenParams();
         if(StringUtils.isNotBlank(hiddenParams)) {
             Map<String, Object> paramsMap = JsonUtils.parseMap(hiddenParams);
             Iterator<Map.Entry<String, Object>> it = paramsMap.entrySet().iterator();
             while (it.hasNext()) {
-                IscFilterDefinition addRequestParameterFilter = new IscFilterDefinition();
-                Map<String, String> args = addRequestParameterFilter.getArgs();
-                addRequestParameterFilter.setName("AddRequestParameter");
+                IscFilterDefinition addRequestParamFilter = new IscFilterDefinition();
+                Map<String, String> args = addRequestParamFilter.getArgs();
+                addRequestParamFilter.setName("AddRequestParam");
                 Map.Entry<String, Object> param = it.next();
                 args.put("name", param.getKey());
                 args.put("value", String.valueOf(param.getValue()));
-                filters.add(addRequestParameterFilter);
+                filters.add(addRequestParamFilter);
             }
         }
 
@@ -193,7 +205,6 @@ public class RouteUtils {
 
         //其他信息
         Map<String, Object> metadata = route.getMetadata();
-        metadata.put("secondsLimit", toString(appService.getQuotaSeconds()));
         metadata.put("minutesLimit", toString(appService.getQuotaMinutes()));
         metadata.put("hoursLimit", toString(appService.getQuotaHours()));
         metadata.put("daysLimit", toString(appService.getQuotaDays()));
