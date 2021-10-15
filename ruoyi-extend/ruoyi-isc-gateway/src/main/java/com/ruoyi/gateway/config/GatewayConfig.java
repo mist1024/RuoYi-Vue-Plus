@@ -4,18 +4,14 @@ import com.ruoyi.gateway.config.provider.RedisRouteDefinitionRepository;
 import com.ruoyi.gateway.filter.factory.AddRequestParamGatewayFilterFactory;
 import com.ruoyi.gateway.filter.factory.RemoveRequestParamGatewayFilterFactory;
 import org.redisson.api.RedissonClient;
-import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
-import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
-import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 
@@ -69,11 +65,5 @@ public class GatewayConfig
     public RemoveRequestParamGatewayFilterFactory removeRequestParamGatewayFilterFactory()
     {
         return new RemoveRequestParamGatewayFilterFactory();
-    }
-
-    @Bean("routeIdKeyResolver")
-    public KeyResolver routeIdKeyResolver()
-    {
-        return exchange -> Mono.just(((Route) exchange.getAttributes().get(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR)).getId());
     }
 }

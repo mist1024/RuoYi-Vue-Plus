@@ -166,17 +166,6 @@ public class RouteUtils {
         stripPrefixFilter.getArgs().put("parts", "1");
         filters.add(stripPrefixFilter);
 
-        final Long quotaSeconds = appService.getQuotaSeconds();
-        if (Objects.nonNull(quotaSeconds))
-        {
-            IscFilterDefinition requestRateLimiterFilter = new IscFilterDefinition();
-            requestRateLimiterFilter.setName("RequestRateLimiter");
-            requestRateLimiterFilter.getArgs().put("redis-rate-limiter.replenishRate", String.valueOf(quotaSeconds));
-            requestRateLimiterFilter.getArgs().put("redis-rate-limiter.burstCapacity", String.valueOf(quotaSeconds << 1));
-            requestRateLimiterFilter.getArgs().put("key-resolver", "#{@routeIdKeyResolver}");
-            filters.add(requestRateLimiterFilter);
-        }
-
         IscFilterDefinition removeRequestParamFilter = new IscFilterDefinition();
         removeRequestParamFilter.setName("RemoveRequestParam");
         removeRequestParamFilter.getArgs().put("name", ACCESS_KEY_NAME);
@@ -205,6 +194,7 @@ public class RouteUtils {
 
         //其他信息
         Map<String, Object> metadata = route.getMetadata();
+        metadata.put("secondsLimit", toString(appService.getQuotaSeconds()));
         metadata.put("minutesLimit", toString(appService.getQuotaMinutes()));
         metadata.put("hoursLimit", toString(appService.getQuotaHours()));
         metadata.put("daysLimit", toString(appService.getQuotaDays()));
