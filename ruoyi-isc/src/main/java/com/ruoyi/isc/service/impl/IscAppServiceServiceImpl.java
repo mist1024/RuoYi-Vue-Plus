@@ -20,7 +20,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscAppServiceApply;
 import com.ruoyi.isc.domain.IscApplication;
-import com.ruoyi.isc.domain.IscService;
 import com.ruoyi.isc.domain.bo.IscAppServiceApplyBo;
 import com.ruoyi.isc.domain.bo.IscAppServiceBo;
 import com.ruoyi.isc.domain.vo.IscAppServiceVo;
@@ -30,14 +29,13 @@ import com.ruoyi.isc.service.IIscAppServiceService;
 import com.ruoyi.isc.service.IIscApplicationService;
 import com.ruoyi.isc.service.IIscServiceService;
 import com.ruoyi.isc.utils.RouteUtils;
-import com.ruoyi.isc.utils.beans.IscRouteDefinition;
+import com.ruoyi.isc.utils.beans.IscRule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +58,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
 
     @PostConstruct
     public void init() {
-        refreshRoutes();
+        refreshRules();
     }
 
     @Override
@@ -201,7 +199,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     }
 
     @Override
-    public void refreshRoutes()
+    public void refreshRules()
     {
         List<IscAppService> list = list(Wrappers.<IscAppService>lambdaQuery()
                 .eq(IscAppService::getEnabled, UserConstants.NORMAL)
@@ -210,33 +208,23 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         if(CollectionUtil.isEmpty(list)) {
             return;
         }
-        Set<Long> serviceIds = list.stream().map(IscAppService::getServiceId).collect(Collectors.toSet());
-        Map<Long, IscService> serviceMap = serviceService.list(Wrappers.<IscService>lambdaQuery()
-                .select(IscService::getServiceId, IscService::getServiceAddr, IscService::getHiddenParams, IscService::getRequestMethod)
-                .in(IscService::getServiceId, serviceIds)).stream()
-                .collect(Collectors.toMap(IscService::getServiceId, Function.identity()));
         Set<Long> applicationIds = list.stream().map(IscAppService::getApplicationId).collect(Collectors.toSet());
         Map<Long, String> accessKeyMap = applicationService.list(Wrappers.<IscApplication>lambdaQuery()
                 .select(IscApplication::getApplicationId, IscApplication::getAccessKey)
                 .in(IscApplication::getApplicationId, applicationIds)).stream()
                 .collect(Collectors.toMap(IscApplication::getApplicationId, IscApplication::getAccessKey));
-        List<IscRouteDefinition> routes = new ArrayList<>();
+        List<IscRule> routes = new ArrayList<>();
 
         for (IscAppService appService : list)
         {
-            IscService service = serviceMap.get(appService.getServiceId());
-            if(Objects.isNull(service)) {
-                log.error("路由初始化失败: id:[{}],服务[{}]信息不存在！", appService.getAppServiceId(), appService.getServiceId());
-                continue;
-            }
             String ak = accessKeyMap.get(appService.getApplicationId());
             if(StringUtils.isBlank(ak)) {
                 log.error("路由初始化失败: id:[{}],ak[{}]信息不存在！", appService.getAppServiceId(), appService.getApplicationId());
                 continue;
             }
-            routes.add(RouteUtils.generateRoute(appService, service, ak));
+            routes.add(RouteUtils.generateRule(appService, ak));
         }
-        RouteUtils.refreshRoute(routes);
+        RouteUtils.refreshRules(routes);
     }
 
     /**

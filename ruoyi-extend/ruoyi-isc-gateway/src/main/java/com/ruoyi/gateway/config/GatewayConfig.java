@@ -1,9 +1,9 @@
 package com.ruoyi.gateway.config;
 
 import com.ruoyi.gateway.config.provider.RedisRouteDefinitionRepository;
-import com.ruoyi.gateway.filter.factory.AddRequestParamGatewayFilterFactory;
-import com.ruoyi.gateway.filter.factory.RemoveRequestParamGatewayFilterFactory;
+import com.ruoyi.gateway.filter.CustomerGlobalFilter;
 import org.redisson.api.RedissonClient;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.annotation.Bean;
@@ -56,14 +56,8 @@ public class GatewayConfig
     }
 
     @Bean
-    public AddRequestParamGatewayFilterFactory addRequestParamGatewayFilterFactory()
+    public GlobalFilter customerGlobalFilter()
     {
-        return new AddRequestParamGatewayFilterFactory();
-    }
-
-    @Bean
-    public RemoveRequestParamGatewayFilterFactory removeRequestParamGatewayFilterFactory()
-    {
-        return new RemoveRequestParamGatewayFilterFactory();
+        return new CustomerGlobalFilter();
     }
 }

@@ -70,7 +70,7 @@ public interface IIscAppServiceService extends IServicePlus<IscAppService, IscAp
     List<IscAppService> getAppServiceListByIds(Collection<Long> ids);
 
     /**
-     * 刷新路由信息
+     * 刷新规则信息（服务对应AK）
      */
-    void refreshRoutes();
+    void refreshRules();
 }

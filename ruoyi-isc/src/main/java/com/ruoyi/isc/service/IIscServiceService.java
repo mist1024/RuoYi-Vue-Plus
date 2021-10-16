@@ -90,4 +90,9 @@ public interface IIscServiceService extends IServicePlus<IscService, IscServiceV
      * @param bo 审核业务对象
      */
     void checkAuditBO(IscAuditBo bo);
+
+    /**
+     * 刷新路由信息
+     */
+    void refreshRoutes();
 }

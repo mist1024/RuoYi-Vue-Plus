@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
 {
     public static final Codec ROUTE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, RouteDefinition.class);
-    public static final String KEY_ROUTES = "ROUTES::";
+    public static final String KEY_ROUTES = "ROUTES:";
     private final RedissonClient redissonClient;
 
     public RedisRouteDefinitionRepository(RedissonClient redissonClient)

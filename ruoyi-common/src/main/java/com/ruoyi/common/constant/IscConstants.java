@@ -26,5 +26,10 @@ public class IscConstants {
     /**
      * Gateway 路由信息Redis Key
      */
-    public static final String KEY_ROUTES = "ROUTES::";
+    public static final String KEY_ROUTES = "ROUTES:";
+
+    /**
+     * Gateway 服务对应AK规则
+     */
+    public static final String KEY_RULES = "RULES:";
 }

@@ -25,8 +25,11 @@ import com.ruoyi.isc.domain.vo.IscServiceVo;
 import com.ruoyi.isc.mapper.IscServiceMapper;
 import com.ruoyi.isc.service.IIscServiceCateService;
 import com.ruoyi.isc.service.IIscServiceService;
+import com.ruoyi.isc.utils.RouteUtils;
+import com.ruoyi.isc.utils.beans.IscRouteDefinition;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,6 +45,11 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
 
     @Resource
     private IIscServiceCateService cateService;
+
+    @PostConstruct
+    public void init() {
+        refreshRoutes();
+    }
 
     @Override
     public IscServiceVo queryById(Long serviceId)
@@ -194,5 +202,19 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
             default:
                 throw new ServiceException("审核状态异常");
         }
+    }
+
+    @Override
+    public void refreshRoutes()
+    {
+        final List<IscService> serviceList = list(Wrappers.<IscService>lambdaQuery()
+                .select(IscService::getServiceId, IscService::getServiceAddr, IscService::getHiddenParams, IscService::getRequestMethod)
+                .eq(IscService::getStatus, IscConstants.AUDIT_PASS));
+        List<IscRouteDefinition> routes = new ArrayList<>();
+        for (IscService service : serviceList)
+        {
+            routes.add(RouteUtils.generateRoute(service));
+        }
+        RouteUtils.refreshRoute(routes);
     }
 }

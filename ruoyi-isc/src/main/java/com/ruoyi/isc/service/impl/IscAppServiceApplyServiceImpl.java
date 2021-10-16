@@ -159,7 +159,6 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
             Assert.notNull(appService, () -> new ServiceException("申请信息不存在"));
 
             IscAppService updateData = null;
-            IscRouteDefinition route = null;
             IscService service = null;
             if(IscConstants.AUDIT_PASS.equals(bo.getStatus())) {
                 service = serviceService.getById(appService.getServiceId());
@@ -175,8 +174,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
                 if(Objects.nonNull(service)) {
                     IscAppService dbAppService = appServiceService.getById(apply.getAppServiceId());
                     IscApplication application = applicationService.getById(dbAppService.getApplicationId());
-                    route = RouteUtils.generateRoute(dbAppService, service, application.getAccessKey());
-                    RouteUtils.saveRoute(route);
+                    RouteUtils.saveRule(RouteUtils.generateRule(dbAppService, application.getAccessKey()));
                 }
             }
         }
@@ -243,8 +241,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
             renewalDuration = Objects.nonNull(log) ? log.getRenewalDuration() : 1;
         }
         updateData.setEndTime(DateUtils.beginOfDay(DateUtils.addMonths(DateUtils.getNowDate(), renewalDuration)));
-        updateData.setVirtualAddr(RouteUtils.genVirtualAddrPath(appService.getApplicationId(),
-            appService.getServiceId(), service.getServiceAddr()));
+        updateData.setVirtualAddr(RouteUtils.genVirtualAddrPath(service.getServiceAddr()));
     }
 
     /**
