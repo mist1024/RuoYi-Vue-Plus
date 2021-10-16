@@ -1,6 +1,7 @@
 package com.ruoyi.gateway.filter;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.ruoyi.gateway.utils.GatewayUtils;
@@ -57,16 +58,14 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
             final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(request.getQueryParams());
             handleRule(headerAk, () -> queryParams.get(accessKeyName), route, request, accessKeyName);
             queryParams.remove(accessKeyName);
-            handleHiddenParams(route, queryParams, (json, map) -> {
-                Iterator<Map.Entry<String, Object>> iterator = json.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<String, Object> next = iterator.next();
-                    Object value;
-                    if (Objects.isNull(value = next.getValue()) || StrUtil.isBlank(value.toString())) {
-                        map.add(next.getKey(), StrUtil.EMPTY);
-                    } else {
-                        map.add(next.getKey(), value.toString());
-                    }
+            handleHiddenParams(route, queryParams, (next, map) -> {
+                Object value;
+                if (Objects.isNull(value = next.getValue())) {
+                    map.add(next.getKey(), StrUtil.EMPTY);
+                } else if(value instanceof JSONArray) {
+                    map.put(next.getKey(), ((JSONArray)value).toList(String.class));
+                } else {
+                    map.add(next.getKey(), value.toString());
                 }
             });
             URI newUri = UriComponentsBuilder.fromUri(request.getURI())
@@ -80,15 +79,11 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                 MediaType mediaType = request.getHeaders().getContentType();
                 if (MediaType.APPLICATION_JSON.equals(mediaType)) {
                     JSONObject jsonObj = JSONUtil.parseObj(body);
-                    String ak = handleRule(headerAk, () -> Arrays.asList(jsonObj.get(accessKeyName, String.class,
-                            true)), route, request, accessKeyName);
+                    handleRule(headerAk, () -> Arrays.asList(jsonObj.get(accessKeyName, String.class, true)),
+                            route, request, accessKeyName);
                     jsonObj.remove(accessKeyName);
-                    handleHiddenParams(route, jsonObj, (json, map) -> {
-                        Iterator<Map.Entry<String, Object>> iterator = json.entrySet().iterator();
-                        while (iterator.hasNext()) {
-                            Map.Entry<String, Object> next = iterator.next();
-                            map.set(next.getKey(), next.getValue());
-                        }
+                    handleHiddenParams(route, jsonObj, (next, map) -> {
+                        map.set(next.getKey(), next.getValue());
                     });
                     return Mono.just(jsonObj.toString());
                 } else if (MediaType.APPLICATION_FORM_URLENCODED.equals(mediaType)) {
@@ -98,12 +93,18 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                                         accessKeyName.equals(param[0])).map(param -> param[1]).collect(Collectors.toList()),
                                 route, request, accessKeyName);
                         final List<String[]> params = stream.filter(param -> !accessKeyName.equals(param[0])).collect(Collectors.toList());
-                        handleHiddenParams(route, params, (json, list) -> {
-                            Iterator<Map.Entry<String, Object>> iterator = json.entrySet().iterator();
-                            while (iterator.hasNext()) {
-                                Map.Entry<String, Object> next = iterator.next();
+                        handleHiddenParams(route, params, (next, list) -> {
+                            Object value;
+                            if (Objects.isNull(value = next.getValue())) {
+                                list.add(new String[]{next.getKey(), StrUtil.EMPTY});
+                            } else if(value instanceof JSONArray) {
+                                ((JSONArray)value).stream().map(o -> String.valueOf(o)).forEach(v -> {
+                                    list.add(new String[]{next.getKey(), v});
+                                });
+                            } else {
                                 list.add(new String[]{next.getKey(), next.getValue().toString()});
                             }
+
                         });
                         return Mono.just(params.stream().map(param -> param[0] + '=' + param[1]).collect(Collectors.joining("&")));
                     }
@@ -156,7 +157,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * @param mapper
      * @param <U>
      */
-    private <U> void handleHiddenParams(Route route, U result, BiConsumer<JSONObject, U> mapper) {
+    private <U> void handleHiddenParams(Route route, U result, BiConsumer<Map.Entry<String, Object>, U> mapper) {
         final Object obj = route.getMetadata().get(GatewayUtils.CONFIG_ADD_PARAM_KEY);
         if (Objects.isNull(obj)) {
             return;
@@ -165,6 +166,10 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         if (json.isEmpty()) {
             return;
         }
-        mapper.accept(json, result);
+        Iterator<Map.Entry<String, Object>> iterator = json.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Object> next = iterator.next();
+            mapper.accept(next, result);
+        }
     }
 }
