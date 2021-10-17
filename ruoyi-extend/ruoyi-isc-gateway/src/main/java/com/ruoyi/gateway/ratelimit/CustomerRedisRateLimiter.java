@@ -1,6 +1,7 @@
 package com.ruoyi.gateway.ratelimit;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.support.ConfigurationService;
@@ -14,9 +15,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -67,7 +66,7 @@ public class CustomerRedisRateLimiter extends RedisRateLimiter {
             default:
                 return Mono.just(new Response(true, getHeaders(routeConfig, -1L)));
         }
-        return isAllowed(routeConfig, keys, time);
+        return isAllowed(routeConfig, keys, time, timeUnit);
     }
 
     public Mono<Response> isAllowed(Config routeConfig, String id) {
@@ -124,7 +123,7 @@ public class CustomerRedisRateLimiter extends RedisRateLimiter {
         return Mono.just(new Response(true, getHeaders(routeConfig, -1L)));
     }
 
-    public Mono<Response> isAllowed(Config routeConfig, List<String> keys, int time) {
+    public Mono<Response> isAllowed(Config routeConfig, List<String> keys, int time, TimeUnit timeUnit) {
         if (!this.initialized.get()) {
             throw new IllegalStateException("RedisRateLimiter is not initialized");
         }
@@ -151,7 +150,7 @@ public class CustomerRedisRateLimiter extends RedisRateLimiter {
                 return Mono.just(-1L);
             }).map(tokensLeft -> {
                 boolean allowed = tokensLeft < replenishRate;
-                Response response = new Response(allowed, getHeaders(routeConfig, tokensLeft));
+                Response response = new Response(allowed, getHeaders(routeConfig, tokensLeft, timeUnit));
                 if (log.isDebugEnabled()) {
                     log.debug("response: " + response);
                 }
@@ -166,7 +165,17 @@ public class CustomerRedisRateLimiter extends RedisRateLimiter {
              */
             log.error("Error determining if user allowed from redis", e);
         }
-        return Mono.just(new Response(true, getHeaders(routeConfig, -1L)));
+        return Mono.just(new Response(true, getHeaders(routeConfig, -1L, timeUnit)));
+    }
+
+    public Map<String, String> getHeaders(Config config, Long tokensLeft, TimeUnit timeUnit) {
+        Map<String, String> headers = new HashMap<>();
+        if (isIncludeHeaders()) {
+            String suffix = StrUtil.upperFirst(timeUnit.name().toLowerCase());
+            headers.put(this.getRemainingHeader() + '-' + suffix, tokensLeft.toString());
+            headers.put(this.getReplenishRateHeader() + '-' + suffix, String.valueOf(config.getReplenishRate()));
+        }
+        return headers;
     }
 
     static List<String> getKeys(String id) {

@@ -233,7 +233,6 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                     return rateLimiterAfterSupplier.get();
                 }
                 return rateLimiter(exchange, rule, route, index + 1, rateLimiterAfterSupplier);
-
             }
             setResponseStatus(exchange, HttpStatus.TOO_MANY_REQUESTS);
             return exchange.getResponse().setComplete();
