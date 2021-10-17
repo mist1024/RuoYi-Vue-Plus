@@ -77,7 +77,7 @@
       <el-table-column label="应用ID" align="center" prop="applicationId" v-if="true" width="80"/>
       <el-table-column label="应用名称" align="left" prop="applicationName" >
         <template slot-scope="scope">
-          <router-link :to="'/isc/app-service/index/' + scope.row.applicationId" class="link-type">
+          <router-link :to="'/isc/app-service/index/' + scope.row.applicationId" v-hasPermi="['isc:appservice:list']" class="link-type">
             <span>{{ scope.row.applicationName }}</span>
           </router-link>
         </template>
@@ -95,6 +95,13 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-tickets"
+            @click="handleAppServiceList(scope.row)"
+            v-hasPermi="['isc:appservice:list']"
+          >服务清单</el-button>
           <el-button
             size="mini"
             type="text"
@@ -259,6 +266,10 @@ export default {
         this.open = true;
         this.title = "修改应用信息";
       });
+    },
+    handleAppServiceList(row) {
+      const applicationId = row.applicationId;
+      this.$router.push("/isc/app-service/index/" + applicationId);
     },
     /** 提交按钮 */
     submitForm() {

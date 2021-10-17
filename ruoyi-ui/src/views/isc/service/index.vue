@@ -129,6 +129,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-if="scope.row.status != 1"
             v-hasPermi="['isc:service:edit']"
           >修改</el-button>
           <el-button
