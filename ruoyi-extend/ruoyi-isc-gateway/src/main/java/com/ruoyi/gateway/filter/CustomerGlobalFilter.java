@@ -9,7 +9,6 @@ import com.ruoyi.gateway.utils.GatewayUtils;
 import com.ruoyi.gateway.utils.beans.IscRule;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.Ordered;
@@ -28,6 +27,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -48,10 +48,11 @@ import static org.springframework.util.CollectionUtils.unmodifiableMultiValueMap
  * @date 2021-10-15
  */
 public class CustomerGlobalFilter implements GlobalFilter, Ordered {
-    private CustomerRedisRateLimiter rateLimiter;
+    private final CustomerRedisRateLimiter rateLimiter;
     public CustomerGlobalFilter(CustomerRedisRateLimiter rateLimiter) {
         this.rateLimiter = rateLimiter;
     }
+    public static final TimeUnit[] TIME_UNITS = {TimeUnit.SECONDS, TimeUnit.MINUTES, TimeUnit.HOURS, TimeUnit.DAYS};
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -65,7 +66,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         if (HttpMethod.GET.equals(httpMethod)) {
             final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(request.getQueryParams());
             final IscRule rule = handleRule(headerAk, () -> queryParams.get(accessKeyName), route);
-            Supplier<Mono<Void>> rateLimiterAftersupplier = () -> {
+            Supplier<Mono<Void>> rateLimiterAfterSupplier = () -> {
                 removeParam(headerAk, request, accessKeyName, () -> queryParams.remove(accessKeyName));
                 handleHiddenParams(route, queryParams, (next, map) -> {
                     Object value;
@@ -83,7 +84,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                 return chain.filter(exchange.mutate().request(updatedRequest).build());
             };
 
-            return rateLimiter(exchange, rule, route, rateLimiterAftersupplier);
+            return rateLimiter(exchange, rule, route, 0, rateLimiterAfterSupplier);
         } else if (HttpMethod.POST.equals(httpMethod)) {
             final ServerRequest serverRequest = ServerRequest.create(exchange, HandlerStrategies.withDefaults().messageReaders());
             final Mono<String> modifiedBody = serverRequest.bodyToMono(String.class);
@@ -93,7 +94,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                     JSONObject jsonObj = JSONUtil.parseObj(body);
                     final IscRule rule = handleRule(headerAk, () ->
                             Arrays.asList(jsonObj.get(accessKeyName, String.class, true)), route);
-                    Supplier<Mono<String>> rateLimiterAftersupplier = () -> {
+                    Supplier<Mono<String>> rateLimiterAfterSupplier = () -> {
                         removeParam(headerAk, request, accessKeyName, () -> jsonObj.remove(accessKeyName));
                         handleHiddenParams(route, jsonObj, (next, map) -> {
                             map.set(next.getKey(), next.getValue());
@@ -101,13 +102,13 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                         return Mono.just(jsonObj.toString());
                     };
 
-                    return rateLimiter(exchange, rule, route, rateLimiterAftersupplier);
+                    return rateLimiter(exchange, rule, route, 0, rateLimiterAfterSupplier);
                 } else if (MediaType.APPLICATION_FORM_URLENCODED.equals(mediaType)) {
                     if (StringUtils.hasText(body)) {
                         final Stream<String[]> stream = Arrays.stream(body.split("&")).map(param -> param.split("="));
                         final IscRule rule = handleRule(headerAk, () -> stream.filter(param -> param.length > 0 &&
                                         accessKeyName.equals(param[0])).map(param -> param[1]).collect(Collectors.toList()), route);
-                        Supplier<Mono<String>> rateLimiterAftersupplier = () -> {
+                        Supplier<Mono<String>> rateLimiterAfterSupplier = () -> {
                             removeParam(headerAk, request, accessKeyName, null);
                             final List<String[]> params = stream.filter(param -> !accessKeyName.equals(param[0])).collect(Collectors.toList());
                             handleHiddenParams(route, params, (next, list) -> {
@@ -125,7 +126,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                             return Mono.just(params.stream().map(param -> param[0] + '=' + param[1]).collect(Collectors.joining("&")));
                         };
 
-                        return rateLimiter(exchange, rule, route, rateLimiterAftersupplier);
+                        return rateLimiter(exchange, rule, route, 0, rateLimiterAfterSupplier);
                     }
                 }
                 return Mono.empty();
@@ -207,20 +208,32 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * 限流
      * @param exchange
      * @param rule
-     * @Param route
-     * @param rateLimiterAftersupplier 限流后操作(删除参数、添加隐藏参数，跳转)
+     * @param route
+     * @param rateLimiterAfterSupplier 限流后操作(删除参数、添加隐藏参数，跳转)
      * @param <T>
      * @return
      */
-    private <T extends Object> Mono rateLimiter(ServerWebExchange exchange, IscRule rule, Route route,
-                                                Supplier<Mono<T>> rateLimiterAftersupplier) {
-        final RedisRateLimiter.Config config = new RedisRateLimiter.Config().setReplenishRate(1);
-        return rateLimiter.isAllowed(config, rule.getId() + ':' + route.getId()).flatMap(response -> {
+    private <T extends Object> Mono rateLimiter(ServerWebExchange exchange, IscRule rule, Route route, final int index,
+                                                Supplier<Mono<T>> rateLimiterAfterSupplier) {
+        final TimeUnit timeUnit = TIME_UNITS[index];
+        final Long limit = TimeUnit.SECONDS.equals(timeUnit) ? rule.getSecondsLimit() : TimeUnit.MINUTES.equals(timeUnit)
+                ? rule.getMinutesLimit() : TimeUnit.HOURS.equals(timeUnit) ? rule.getHoursLimit() : rule.getDaysLimit();
+        if(Objects.isNull(limit) || limit <= 0L) {
+            if(TimeUnit.DAYS.equals(timeUnit)) {
+                return rateLimiterAfterSupplier.get();
+            }
+            return rateLimiter(exchange, rule, route, index + 1, rateLimiterAfterSupplier);
+        }
+        return rateLimiter.isAllowed(route.getId(), rule.getId(), limit, timeUnit).flatMap(response -> {
             for (Map.Entry<String, String> header : response.getHeaders().entrySet()) {
                 exchange.getResponse().getHeaders().add(header.getKey(), header.getValue());
             }
             if (response.isAllowed()) {
-                return rateLimiterAftersupplier.get();
+                if(TimeUnit.DAYS.equals(timeUnit)) {
+                    return rateLimiterAfterSupplier.get();
+                }
+                return rateLimiter(exchange, rule, route, index + 1, rateLimiterAfterSupplier);
+
             }
             setResponseStatus(exchange, HttpStatus.TOO_MANY_REQUESTS);
             return exchange.getResponse().setComplete();
