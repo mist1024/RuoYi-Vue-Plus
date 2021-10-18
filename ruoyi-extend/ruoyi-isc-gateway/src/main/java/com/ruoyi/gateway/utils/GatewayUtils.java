@@ -44,41 +44,46 @@ public class GatewayUtils {
     public static final Codec RULE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRule.class);
     private static RedissonClient client = SpringUtil.getBean(RedissonClient.class);
 
-    public static Mono<Void> modifyBody(ServerWebExchange exchange, GatewayFilterChain chain, Mono<String> publisher)
-    {
+    /**
+     * 修改请求Body
+     *
+     * @param exchange  当前服务交换器
+     * @param chain     当前过滤链
+     * @param publisher body体提供者
+     * @return 指示请求处理何时完成
+     */
+    public static Mono<Void> modifyBody(ServerWebExchange exchange, GatewayFilterChain chain, Mono<String> publisher) {
         BodyInserter bodyInserter = BodyInserters.fromPublisher(publisher, String.class);
         HttpHeaders headers = new HttpHeaders();
         headers.putAll(exchange.getRequest().getHeaders());
         headers.remove(HttpHeaders.CONTENT_LENGTH);
         CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, headers);
         return bodyInserter.insert(outputMessage, new BodyInserterContext())
-                .then(Mono.defer(() -> {
-                    ServerHttpRequest decorator = decorate(exchange, headers, outputMessage);
-                    return chain.filter(exchange.mutate().request(decorator).build());
-                }));
+            .then(Mono.defer(() -> {
+                ServerHttpRequest request = decorate(exchange, headers, outputMessage);
+                return chain.filter(exchange.mutate().request(request).build());
+            }));
     }
 
 
-    public static ServerHttpRequestDecorator decorate(ServerWebExchange exchange, HttpHeaders headers, CachedBodyOutputMessage outputMessage)
-    {
+    public static ServerHttpRequestDecorator decorate(ServerWebExchange exchange, HttpHeaders headers,
+                                                      CachedBodyOutputMessage outputMessage) {
         return new ServerHttpRequestDecorator(exchange.getRequest()) {
-            public HttpHeaders getHeaders()
-            {
+            @Override
+            public HttpHeaders getHeaders() {
                 long contentLength = headers.getContentLength();
                 HttpHeaders httpHeaders = new HttpHeaders();
                 httpHeaders.putAll(super.getHeaders());
-                if (contentLength > 0L)
-                {
+                if (contentLength > 0L) {
                     httpHeaders.setContentLength(contentLength);
-                } else
-                {
+                } else {
                     httpHeaders.set("Transfer-Encoding", "chunked");
                 }
                 return httpHeaders;
             }
 
-            public Flux<DataBuffer> getBody()
-            {
+            @Override
+            public Flux<DataBuffer> getBody() {
                 return outputMessage.getBody();
             }
         };
@@ -104,21 +109,21 @@ public class GatewayUtils {
      * @param <X>
      * @return
      */
-    public static <X extends RuntimeException> String getValue(String before, Supplier<List<String>> valueSupplier, Supplier<X> errorMsgSupplier)
-    {
-        if(StringUtils.hasText(before)) {
+    public static <X extends RuntimeException> String getValue(String before, Supplier<List<String>> valueSupplier,
+                                                               Supplier<X> errorMsgSupplier) {
+        if (StringUtils.hasText(before)) {
             return before;
         }
         final List<String> values = valueSupplier.get();
-        if(CollectionUtil.isNotEmpty(values)) {
+        if (CollectionUtil.isNotEmpty(values)) {
             for (String value : values) {
-                if(StringUtils.hasText(value)) {
+                if (StringUtils.hasText(value)) {
                     before = value;
                     break;
                 }
             }
         }
-        if(errorMsgSupplier != null) {
+        if (errorMsgSupplier != null) {
             Assert.notBlank(before, errorMsgSupplier);
         }
         return before;
@@ -126,15 +131,17 @@ public class GatewayUtils {
 
     /**
      * 获取必要值，可抛出异常
+     *
      * @param valueSupplier
      * @param errorMsgSupplier
      * @param <T>
      * @param <X>
      * @return
      */
-    public static <T, X extends RuntimeException> T getRequiredValue(Supplier<T> valueSupplier, Supplier<X> errorMsgSupplier) {
+    public static <T, X extends RuntimeException> T getRequiredValue(Supplier<T> valueSupplier,
+                                                                     Supplier<X> errorMsgSupplier) {
         final T value = valueSupplier.get();
-        if(Objects.nonNull(errorMsgSupplier)) {
+        if (Objects.nonNull(errorMsgSupplier)) {
             Assert.notNull(value, errorMsgSupplier);
         }
         return value;
@@ -143,7 +150,8 @@ public class GatewayUtils {
 
     /**
      * 获取规则
-     * @param ak AK
+     *
+     * @param ak      AK
      * @param routeId 路由ID
      * @return
      */
@@ -154,11 +162,13 @@ public class GatewayUtils {
 
     /**
      * 断言是否超过结束时间
+     *
      * @param rule
      * @param errorMsgSupplier
      * @param <X>
      */
-    public static  <X extends RuntimeException> void isBefore(IscRule rule, Supplier<X> errorMsgSupplier) {
-        Assert.isTrue(Objects.nonNull(rule.getExpire()) && Date.from(Instant.now()).before(rule.getExpire()), errorMsgSupplier);
+    public static <X extends RuntimeException> void isBefore(IscRule rule, Supplier<X> errorMsgSupplier) {
+        Assert.isTrue(Objects.nonNull(rule.getExpire()) && Date.from(Instant.now()).before(rule.getExpire()),
+            errorMsgSupplier);
     }
 }
