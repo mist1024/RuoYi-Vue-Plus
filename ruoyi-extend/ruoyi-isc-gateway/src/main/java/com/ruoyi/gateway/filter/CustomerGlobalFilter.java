@@ -87,8 +87,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
             return rateLimiter(exchange, rule, route, 0, rateLimiterAfterSupplier);
         } else if (HttpMethod.POST.equals(httpMethod)) {
             final ServerRequest serverRequest = ServerRequest.create(exchange, HandlerStrategies.withDefaults().messageReaders());
-            final Mono<String> modifiedBody = serverRequest.bodyToMono(String.class);
-            modifiedBody.flatMap(body -> {
+            final Mono<String> modifiedBody = serverRequest.bodyToMono(String.class).flatMap(body -> {
                 MediaType mediaType = request.getHeaders().getContentType();
                 if (MediaType.APPLICATION_JSON.equals(mediaType)) {
                     JSONObject jsonObj = JSONUtil.parseObj(body);
