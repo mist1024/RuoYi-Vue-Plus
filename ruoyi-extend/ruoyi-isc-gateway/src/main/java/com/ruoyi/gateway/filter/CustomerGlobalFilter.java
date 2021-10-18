@@ -97,7 +97,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                 } else if (MediaType.APPLICATION_FORM_URLENCODED.equals(mediaType)) {
                     return handlePostRequestFormUrlencoded(exchange, route, request, accessKeyName, headerAk, body);
                 }
-                throw new ContentTypeNotSupportedException();
+                return Mono.error(ContentTypeNotSupportedException::new);
             });
         return GatewayUtils.modifyBody(exchange, chain, modifiedBody);
     }
@@ -312,7 +312,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
             }
             setResponseStatus(exchange, HttpStatus.TOO_MANY_REQUESTS);
             exchange.getResponse().setComplete();
-            throw new RateLimitException(limit.intValue(), 1, timeUnit);
+            return Mono.error(new RateLimitException(limit.intValue(), 1, timeUnit));
         });
     }
 }
