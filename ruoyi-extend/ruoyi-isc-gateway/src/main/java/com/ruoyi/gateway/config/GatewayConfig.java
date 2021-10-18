@@ -1,10 +1,12 @@
 package com.ruoyi.gateway.config;
 
+import com.ruoyi.gateway.config.handler.GlobalErrorWebExceptionHandler;
 import com.ruoyi.gateway.config.provider.RedisRouteDefinitionRepository;
 import com.ruoyi.gateway.filter.CustomerGlobalFilter;
 import com.ruoyi.gateway.ratelimit.CustomerRedisRateLimiter;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
@@ -52,5 +54,10 @@ public class GatewayConfig
     public GlobalFilter customerGlobalFilter(CustomerRedisRateLimiter customerRedisRateLimiter)
     {
         return new CustomerGlobalFilter(customerRedisRateLimiter);
+    }
+
+    @Bean
+    public ErrorWebExceptionHandler errorWebExceptionHandler() {
+        return new GlobalErrorWebExceptionHandler();
     }
 }

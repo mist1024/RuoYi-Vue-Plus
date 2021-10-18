@@ -16,7 +16,6 @@ import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.LinkedMultiValueMap;
@@ -34,7 +33,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.setResponseStatus;
 import static org.springframework.util.CollectionUtils.unmodifiableMultiValueMap;
 
 /**
@@ -310,9 +308,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                 }
                 return rateLimiter(exchange, rule, route, index + 1, rateLimiterAfterSupplier);
             }
-            setResponseStatus(exchange, HttpStatus.TOO_MANY_REQUESTS);
-            exchange.getResponse().setComplete();
-            return Mono.error(new RateLimitException(limit.intValue(), 1, timeUnit));
+            return Mono.error(RateLimitException::new);
         });
     }
 }
