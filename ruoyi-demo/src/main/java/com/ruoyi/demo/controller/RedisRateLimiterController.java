@@ -24,7 +24,7 @@ public class RedisRateLimiterController {
 
 	/**
 	 * 测试全局限流
-	 * 全局影响
+	 * 全局影响（全局限流优先其它限流（比如ip限流））
 	 */
 	@ApiOperation("测试全局限流")
 	@RateLimiter(count = 2, time = 10)
