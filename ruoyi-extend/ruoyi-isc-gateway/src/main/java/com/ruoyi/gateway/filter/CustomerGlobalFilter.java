@@ -289,8 +289,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
     private <T> Mono<T> rateLimiter(ServerWebExchange exchange, IscRule rule, Route route, final int index,
                                     Supplier<Mono<T>> rateLimiterAfterSupplier) {
         final TimeUnit timeUnit = TIME_UNITS[index];
-        final Long limit = TimeUnit.SECONDS.equals(timeUnit) ? rule.getSecondsLimit() :
-            TimeUnit.MINUTES.equals(timeUnit)
+        final Long limit = TimeUnit.SECONDS.equals(timeUnit) ? rule.getSecondsLimit() : TimeUnit.MINUTES.equals(timeUnit)
             ? rule.getMinutesLimit() : TimeUnit.HOURS.equals(timeUnit) ? rule.getHoursLimit() : rule.getDaysLimit();
         if (Objects.isNull(limit) || limit <= 0L) {
             if (TimeUnit.DAYS.equals(timeUnit)) {

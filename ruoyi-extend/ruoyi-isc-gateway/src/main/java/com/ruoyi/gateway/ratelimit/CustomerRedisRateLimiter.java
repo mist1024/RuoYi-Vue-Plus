@@ -149,7 +149,7 @@ public class CustomerRedisRateLimiter extends RedisRateLimiter {
                 }
                 return Mono.just(-1L);
             }).map(tokensLeft -> {
-                boolean allowed = tokensLeft < replenishRate;
+                boolean allowed = tokensLeft > 0 && tokensLeft < replenishRate;
                 Response response = new Response(allowed, getHeaders(routeConfig, tokensLeft, timeUnit));
                 if (log.isDebugEnabled()) {
                     log.debug("response: " + response);
