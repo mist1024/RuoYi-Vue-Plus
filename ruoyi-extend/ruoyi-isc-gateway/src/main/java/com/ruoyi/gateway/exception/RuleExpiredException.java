@@ -1,6 +1,9 @@
 package com.ruoyi.gateway.exception;
 
+import cn.hutool.core.date.DateUtil;
 import com.ruoyi.gateway.constant.ErrorMessageConstant;
+
+import java.util.Date;
 
 /**
  * 网关异常-规则已过期
@@ -10,8 +13,8 @@ import com.ruoyi.gateway.constant.ErrorMessageConstant;
  */
 public class RuleExpiredException extends GatewayException {
 
-    public RuleExpiredException()
+    public RuleExpiredException(Date endTime)
     {
-        super(ErrorMessageConstant.RULE_EXPIRED);
+        super(String.format(ErrorMessageConstant.RULE_EXPIRED, DateUtil.formatDateTime(endTime)));
     }
 }

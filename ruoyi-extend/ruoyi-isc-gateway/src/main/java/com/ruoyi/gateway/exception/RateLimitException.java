@@ -3,6 +3,8 @@ package com.ruoyi.gateway.exception;
 import com.ruoyi.gateway.constant.ErrorMessageConstant;
 import org.springframework.http.HttpStatus;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 网关异常-限流异常
  *
@@ -11,8 +13,8 @@ import org.springframework.http.HttpStatus;
  */
 public class RateLimitException extends GatewayException {
 
-    public RateLimitException()
+    public RateLimitException(long limit, TimeUnit timeUnit)
     {
-        super(HttpStatus.TOO_MANY_REQUESTS, ErrorMessageConstant.RATE_LIMIT);
+        super(HttpStatus.TOO_MANY_REQUESTS, String.format(ErrorMessageConstant.RATE_LIMIT, limit, timeUnit.name()));
     }
 }

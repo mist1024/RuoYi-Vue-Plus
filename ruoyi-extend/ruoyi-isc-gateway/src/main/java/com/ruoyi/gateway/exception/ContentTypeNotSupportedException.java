@@ -1,6 +1,7 @@
 package com.ruoyi.gateway.exception;
 
 import com.ruoyi.gateway.constant.ErrorMessageConstant;
+import org.springframework.http.MediaType;
 
 /**
  * 网关异常-请求方法不支持
@@ -10,8 +11,8 @@ import com.ruoyi.gateway.constant.ErrorMessageConstant;
  */
 public class ContentTypeNotSupportedException extends GatewayException {
 
-    public ContentTypeNotSupportedException()
+    public ContentTypeNotSupportedException(MediaType contentType)
     {
-        super(ErrorMessageConstant.CONTENT_TYPE_NOT_SUPPORTED);
+        super(String.format(ErrorMessageConstant.CONTENT_TYPE_NOT_SUPPORTED, contentType));
     }
 }

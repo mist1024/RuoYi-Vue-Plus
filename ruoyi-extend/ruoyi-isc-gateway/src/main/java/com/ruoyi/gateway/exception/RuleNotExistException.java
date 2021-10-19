@@ -10,8 +10,8 @@ import com.ruoyi.gateway.constant.ErrorMessageConstant;
  */
 public class RuleNotExistException extends GatewayException {
 
-    public RuleNotExistException()
+    public RuleNotExistException(String ak, String path)
     {
-        super(ErrorMessageConstant.RULE_NOT_EXIST);
+        super(String.format(ErrorMessageConstant.RULE_NOT_EXIST, ak, path));
     }
 }

@@ -58,8 +58,12 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
     {
         if(ex instanceof ResponseStatusException) {
             String reason = ((ResponseStatusException) ex).getReason();
-            log.info(reason);
-            return reason;
+            if(log.isDebugEnabled()){
+                log.debug(ex.getMessage());
+            }
+            if(StrUtil.isNotBlank(reason)) {
+                return reason;
+            }
         }
         String message = ex.getMessage();
         log.error(message, ex);

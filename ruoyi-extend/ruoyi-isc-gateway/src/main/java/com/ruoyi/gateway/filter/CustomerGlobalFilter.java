@@ -69,7 +69,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         } else if (HttpMethod.POST.equals(httpMethod)) {
             return handlePostRequest(exchange, chain, route, request, accessKeyName, headerAk);
         }
-        throw new MethodNotSupportedException();
+        throw new MethodNotSupportedException(httpMethod);
     }
 
     /**
@@ -95,7 +95,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                 } else if (MediaType.APPLICATION_FORM_URLENCODED.equals(mediaType)) {
                     return handlePostRequestFormUrlencoded(exchange, route, request, accessKeyName, headerAk, body);
                 }
-                return Mono.error(ContentTypeNotSupportedException::new);
+                return Mono.error(() -> new ContentTypeNotSupportedException(mediaType));
             });
         return GatewayUtils.modifyBody(exchange, chain, modifiedBody);
     }
@@ -116,13 +116,13 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                                                                    String headerAk, String body) {
 
         if (StrUtil.isBlank(body)) {
-            Assert.notBlank(headerAk, AkRequireException::new);
+            Assert.notBlank(headerAk, () -> new AkRequireException(accessKeyName));
         }
         final List<String[]> srcParams = Arrays.stream(body.split("&")).map(param -> param.split("="))
             .collect(Collectors.toList());
         final IscRule rule = handleRule(headerAk, () -> srcParams.stream()
             .filter(param -> param.length > 0 && accessKeyName.equals(param[0]))
-            .map(param -> param[1]).collect(Collectors.toList()), route);
+            .map(param -> param[1]).collect(Collectors.toList()), route, accessKeyName);
         Supplier<Mono<String>> rateLimiterAfterSupplier = () -> {
             removeParam(headerAk, request, accessKeyName, null);
             final List<String[]> params = srcParams.stream().filter(param -> !accessKeyName.equals(param[0]))
@@ -160,7 +160,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                                                          String headerAk, String body) {
         JSONObject jsonObj = StrUtil.isBlank(body) ? new JSONObject() : JSONUtil.parseObj(body);
         final IscRule rule = handleRule(headerAk, () -> Collections.singletonList(jsonObj.get(accessKeyName,
-            String.class, true)), route);
+            String.class, true)), route, accessKeyName);
         Supplier<Mono<String>> rateLimiterAfterSupplier = () -> {
             removeParam(headerAk, request, accessKeyName, () -> jsonObj.remove(accessKeyName));
             handleHiddenParams(route, jsonObj, (next, map) -> map.set(next.getKey(), next.getValue()));
@@ -184,7 +184,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
     private Mono<Void> handleGetRequest(ServerWebExchange exchange, GatewayFilterChain chain, Route route,
                                         ServerHttpRequest request, String accessKeyName, String headerAk) {
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(request.getQueryParams());
-        final IscRule rule = handleRule(headerAk, () -> queryParams.get(accessKeyName), route);
+        final IscRule rule = handleRule(headerAk, () -> queryParams.get(accessKeyName), route, accessKeyName);
         Supplier<Mono<Void>> rateLimiterAfterSupplier = () -> {
             removeParam(headerAk, request, accessKeyName, () -> queryParams.remove(accessKeyName));
             handleHiddenParams(route, queryParams, (next, map) -> {
@@ -216,16 +216,17 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * @param headerAk      头部AK
      * @param valueSupplier valueList 生产者
      * @param route         路由信息
+     * @param accessKeyName AK键名
      * @return AK对应服务规则信息
      */
-    private IscRule handleRule(String headerAk, Supplier<List<String>> valueSupplier, Route route) {
+    private IscRule handleRule(String headerAk, Supplier<List<String>> valueSupplier, Route route, String accessKeyName) {
         //获取AK
-        final String ak = GatewayUtils.getValue(headerAk, valueSupplier, AkRequireException::new);
+        final String ak = GatewayUtils.getValue(headerAk, valueSupplier, () -> new AkRequireException(accessKeyName));
         //获取规则
         final IscRule rule = GatewayUtils.getRequiredValue(() -> GatewayUtils.getRule(ak, route.getId()),
-            RuleNotExistException::new);
+                () -> new RuleNotExistException(ak, route.getId()));
         //是否到期
-        GatewayUtils.isBefore(rule, RuleExpiredException::new);
+        GatewayUtils.isBefore(rule, () -> new RuleExpiredException(rule.getExpire()));
         //设置AK 到ID 为了传参方便
         rule.setId(ak);
         return rule;
@@ -307,7 +308,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                 }
                 return rateLimiter(exchange, rule, route, index + 1, rateLimiterAfterSupplier);
             }
-            return Mono.error(RateLimitException::new);
+            return Mono.error(() -> new RateLimitException(limit, timeUnit));
         });
     }
 }

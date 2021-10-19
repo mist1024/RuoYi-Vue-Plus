@@ -10,8 +10,8 @@ import com.ruoyi.gateway.constant.ErrorMessageConstant;
  */
 public class AkRequireException extends GatewayException {
 
-    public AkRequireException()
+    public AkRequireException(String ak)
     {
-        super(ErrorMessageConstant.AK_REQUIRE);
+        super(String.format(ErrorMessageConstant.AK_REQUIRE, ak));
     }
 }

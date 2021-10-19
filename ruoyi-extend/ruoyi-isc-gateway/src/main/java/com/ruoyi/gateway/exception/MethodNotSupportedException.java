@@ -1,6 +1,7 @@
 package com.ruoyi.gateway.exception;
 
 import com.ruoyi.gateway.constant.ErrorMessageConstant;
+import org.springframework.http.HttpMethod;
 
 /**
  * 网关异常-请求方法不支持
@@ -10,8 +11,8 @@ import com.ruoyi.gateway.constant.ErrorMessageConstant;
  */
 public class MethodNotSupportedException extends GatewayException {
 
-    public MethodNotSupportedException()
+    public MethodNotSupportedException(HttpMethod httpMethod)
     {
-        super(ErrorMessageConstant.METHOD_NOT_SUPPORTED);
+        super(String.format(ErrorMessageConstant.METHOD_NOT_SUPPORTED, httpMethod));
     }
 }
