@@ -3,6 +3,7 @@ package com.ruoyi.gateway.filter;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.ruoyi.gateway.exception.*;
@@ -30,9 +31,12 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.ruoyi.gateway.filter.CustomerGlobalFilter.AccessKey.AccessKeyType;
+import static com.ruoyi.gateway.filter.CustomerGlobalFilter.AccessKey.AccessKeyType.*;
 import static org.springframework.util.CollectionUtils.unmodifiableMultiValueMap;
 
 /**
@@ -53,6 +57,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         this.rateLimiter = rateLimiter;
     }
 
+    private static final String ACCESS_KEY_NAME_DEFAULT = "ak";
     private static final TimeUnit[] TIME_UNITS = {TimeUnit.SECONDS, TimeUnit.MINUTES, TimeUnit.HOURS, TimeUnit.DAYS};
 
     @Override
@@ -62,12 +67,15 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         final ServerHttpRequest request = exchange.getRequest();
         //ak 是否存在
         final HttpMethod httpMethod = request.getMethod();
-        final String accessKeyName = String.valueOf(metadata.get(GatewayUtils.CONFIG_ACCESS_KEY_NAME_KEY));
-        String headerAk = GatewayUtils.getValue(null, () -> request.getHeaders().get(accessKeyName));
+        AccessKey accessKey = new AccessKey(String.valueOf(metadata.getOrDefault(GatewayUtils.CONFIG_ACCESS_KEY_NAME_KEY,
+                ACCESS_KEY_NAME_DEFAULT)));
+        accessKey.set(GatewayUtils.getValue(null, () -> request.getHeaders().get(accessKey.name)), HEADER);
+        MultiValueMap<String, String> queryParams = request.getQueryParams().containsKey(accessKey.name) ?
+                new LinkedMultiValueMap<>(request.getQueryParams()) : request.getQueryParams();
         if (HttpMethod.GET.equals(httpMethod)) {
-            return handleGetRequest(exchange, chain, route, request, accessKeyName, headerAk);
+            return handleGetRequest(exchange, chain, route, request, accessKey, queryParams);
         } else if (HttpMethod.POST.equals(httpMethod)) {
-            return handlePostRequest(exchange, chain, route, request, accessKeyName, headerAk);
+            return handlePostRequest(exchange, chain, route, request, accessKey, queryParams);
         }
         throw new MethodNotSupportedException(httpMethod);
     }
@@ -75,29 +83,40 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
     /**
      * 处理POST 请求
      *
-     * @param exchange      当前服务交换器
-     * @param chain         当前过滤链
-     * @param route         路由信息
-     * @param request       请求信息
-     * @param accessKeyName AK键名
-     * @param headerAk      头部AK信息
+     * @param exchange    当前服务交换器
+     * @param chain       当前过滤链
+     * @param route       路由信息
+     * @param request     请求信息
+     * @param accessKey   AK信息
+     * @param queryParams URL查询参数
      * @return 指示请求处理何时完成
      */
     private Mono<Void> handlePostRequest(ServerWebExchange exchange, GatewayFilterChain chain, Route route,
-                                         ServerHttpRequest request, String accessKeyName, String headerAk) {
-        final ServerRequest serverRequest = ServerRequest.create(exchange,
-            HandlerStrategies.withDefaults().messageReaders());
+                                         ServerHttpRequest request, AccessKey accessKey,
+                                         MultiValueMap<String, String> queryParams) {
+        //处理 URL AccessKey
+        handleAccessKey(accessKey, () -> queryParams.get(accessKey.name), URI, false);
+        ServerRequest serverRequest = ServerRequest.create(exchange, HandlerStrategies.withDefaults().messageReaders());
         final Mono<String> modifiedBody = serverRequest.bodyToMono(String.class).defaultIfEmpty(StrUtil.EMPTY)
             .flatMap(body -> {
                 MediaType mediaType = request.getHeaders().getContentType();
-                if (MediaType.APPLICATION_JSON.equals(mediaType)) {
-                    return handlePostRequestJson(exchange, route, request, accessKeyName, headerAk, body);
+                if (Objects.isNull(mediaType) || MediaType.APPLICATION_JSON.equals(mediaType)) {
+                    try {
+                        JSONObject jsonObj = StrUtil.isBlank(body) ? new JSONObject() : JSONUtil.parseObj(body);
+                        return handlePostRequestJson(exchange, route, request, accessKey, jsonObj, queryParams);
+                    }catch (JSONException e) {
+                        if(Objects.nonNull(mediaType)) {
+                            return Mono.error(e);
+                        }
+                    }
                 } else if (MediaType.APPLICATION_FORM_URLENCODED.equals(mediaType)) {
-                    return handlePostRequestFormUrlencoded(exchange, route, request, accessKeyName, headerAk, body);
+                    return handlePostRequestFormUrlencoded(exchange, route, request, accessKey, body, queryParams);
                 }
                 return Mono.error(() -> new ContentTypeNotSupportedException(mediaType));
             });
-        return GatewayUtils.modifyBody(exchange, chain, modifiedBody);
+        //如果 AccessKey 在URI部分 URI需要重新生成
+        URI uri = URI.equals(accessKey.type) ? getNewUri().apply(request, queryParams) : null;
+        return GatewayUtils.modifyBody(exchange, chain, modifiedBody, uri);
     }
 
     /**
@@ -106,26 +125,25 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * @param exchange      当前服务交换器
      * @param route         路由信息
      * @param request       请求信息
-     * @param accessKeyName AK键名
-     * @param headerAk      头部AK信息
+     * @param accessKey     AK信息
      * @param body          请求Body信息
      * @return 处理后的Body信息
      */
     private Mono<? extends String> handlePostRequestFormUrlencoded(ServerWebExchange exchange, Route route,
-                                                                   ServerHttpRequest request, String accessKeyName,
-                                                                   String headerAk, String body) {
+                                                                   ServerHttpRequest request, AccessKey accessKey,
+                                                                   String body, MultiValueMap<String, String> queryParams) {
 
         if (StrUtil.isBlank(body)) {
-            Assert.notBlank(headerAk, () -> new AkRequireException(accessKeyName));
+            Assert.notBlank(accessKey.value, () -> new AkRequireException(accessKey.name));
         }
         final List<String[]> srcParams = Arrays.stream(body.split("&")).map(param -> param.split("="))
             .collect(Collectors.toList());
-        final IscRule rule = handleRule(headerAk, () -> srcParams.stream()
-            .filter(param -> param.length > 0 && accessKeyName.equals(param[0]))
-            .map(param -> param[1]).collect(Collectors.toList()), route, accessKeyName);
+        final IscRule rule = handleRule(accessKey, () -> srcParams.stream()
+            .filter(param -> param.length > 0 && accessKey.name.equals(param[0]))
+            .map(param -> param[1]).collect(Collectors.toList()), route, BODY);
         Supplier<Mono<String>> rateLimiterAfterSupplier = () -> {
-            removeParam(headerAk, request, accessKeyName, null);
-            final List<String[]> params = srcParams.stream().filter(param -> !accessKeyName.equals(param[0]))
+            removeParam(accessKey, request, null, queryParams);
+            final List<String[]> params = srcParams.stream().filter(param -> !accessKey.name.equals(param[0]))
                 .collect(Collectors.toList());
             handleHiddenParams(route, params, (next, list) -> {
                 Object value;
@@ -150,19 +168,17 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * @param exchange      当前服务交换器
      * @param route         路由信息
      * @param request       请求信息
-     * @param accessKeyName AK键名
-     * @param headerAk      头部AK信息
-     * @param body          请求Body信息
+     * @param accessKey     AK信息
+     * @param jsonObj       请求Body JSON信息
      * @return 处理后的Body信息
      */
     private Mono<? extends String> handlePostRequestJson(ServerWebExchange exchange, Route route,
-                                                         ServerHttpRequest request, String accessKeyName,
-                                                         String headerAk, String body) {
-        JSONObject jsonObj = StrUtil.isBlank(body) ? new JSONObject() : JSONUtil.parseObj(body);
-        final IscRule rule = handleRule(headerAk, () -> Collections.singletonList(jsonObj.get(accessKeyName,
-            String.class, true)), route, accessKeyName);
+                                                         ServerHttpRequest request, AccessKey accessKey,
+                                                         JSONObject jsonObj, MultiValueMap<String, String> queryParams) {
+        final IscRule rule = handleRule(accessKey, () -> Collections.singletonList(jsonObj.get(accessKey.name,
+            String.class, true)), route, BODY);
         Supplier<Mono<String>> rateLimiterAfterSupplier = () -> {
-            removeParam(headerAk, request, accessKeyName, () -> jsonObj.remove(accessKeyName));
+            removeParam(accessKey, request, () -> jsonObj.remove(accessKey.name), queryParams);
             handleHiddenParams(route, jsonObj, (next, map) -> map.set(next.getKey(), next.getValue()));
             return Mono.just(jsonObj.toString());
         };
@@ -177,16 +193,16 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * @param chain         当前过滤链
      * @param route         路由信息
      * @param request       请求信息
-     * @param accessKeyName AK键名
-     * @param headerAk      头部AK信息
+     * @param accessKey     AK信息
+     * @param queryParams   URL查询参数
      * @return 指示请求处理何时完成
      */
     private Mono<Void> handleGetRequest(ServerWebExchange exchange, GatewayFilterChain chain, Route route,
-                                        ServerHttpRequest request, String accessKeyName, String headerAk) {
-        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>(request.getQueryParams());
-        final IscRule rule = handleRule(headerAk, () -> queryParams.get(accessKeyName), route, accessKeyName);
+                                        ServerHttpRequest request, AccessKey accessKey,
+                                        MultiValueMap<String, String> queryParams) {
+        final IscRule rule = handleRule(accessKey, () -> queryParams.get(accessKey.name), route, URI);
         Supplier<Mono<Void>> rateLimiterAfterSupplier = () -> {
-            removeParam(headerAk, request, accessKeyName, () -> queryParams.remove(accessKeyName));
+            removeParam(accessKey, request, null, queryParams);
             handleHiddenParams(route, queryParams, (next, map) -> {
                 Object value;
                 if (Objects.isNull(value = next.getValue())) {
@@ -197,12 +213,15 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
                     map.add(next.getKey(), value.toString());
                 }
             });
-            URI newUri = UriComponentsBuilder.fromUri(request.getURI())
-                .replaceQueryParams(unmodifiableMultiValueMap(queryParams)).build().toUri();
-            ServerHttpRequest updatedRequest = exchange.getRequest().mutate().uri(newUri).build();
-            return chain.filter(exchange.mutate().request(updatedRequest).build());
+            ServerHttpRequest req = exchange.getRequest().mutate().uri(getNewUri().apply(request, queryParams)).build();
+            return chain.filter(exchange.mutate().request(req).build());
         };
         return rateLimiter(exchange, rule, route, 0, rateLimiterAfterSupplier);
+    }
+
+    private BiFunction<ServerHttpRequest, MultiValueMap<String, String>, URI> getNewUri() {
+        return (request, queryParams) -> UriComponentsBuilder.fromUri(request.getURI())
+                .replaceQueryParams(unmodifiableMultiValueMap(queryParams)).build().toUri();
     }
 
     @Override
@@ -213,42 +232,64 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
     /**
      * 处理规则
      *
-     * @param headerAk      头部AK
+     * @param accessKey     AK信息
      * @param valueSupplier valueList 生产者
      * @param route         路由信息
-     * @param accessKeyName AK键名
+     * @param type          AK类型
      * @return AK对应服务规则信息
      */
-    private IscRule handleRule(String headerAk, Supplier<List<String>> valueSupplier, Route route, String accessKeyName) {
-        //获取AK
-        final String ak = GatewayUtils.getValue(headerAk, valueSupplier, () -> new AkRequireException(accessKeyName));
+    private IscRule handleRule(AccessKey accessKey, Supplier<List<String>> valueSupplier, Route route, AccessKeyType type) {
+        if(Objects.nonNull(valueSupplier) && Objects.nonNull(type)) {
+            handleAccessKey(accessKey, valueSupplier, type, true);
+        }
         //获取规则
-        final IscRule rule = GatewayUtils.getRequiredValue(() -> GatewayUtils.getRule(ak, route.getId()),
-                () -> new RuleNotExistException(ak, route.getId()));
+        final IscRule rule = GatewayUtils.getRequiredValue(() -> GatewayUtils.getRule(accessKey.value, route.getId()),
+                () -> new RuleNotExistException(accessKey.value, route.getId()));
         //是否到期
         GatewayUtils.isBefore(rule, () -> new RuleExpiredException(rule.getExpire()));
         //设置AK 到ID 为了传参方便
-        rule.setId(ak);
+        rule.setId(accessKey.value);
         return rule;
+    }
+
+    /**
+     * 处理 accessKey
+     *
+     * @param accessKey      AccessKey
+     * @param valueSupplier  valueList 生产者
+     * @param type           AccessKeyType
+     * @param throwException 是否抛出异常
+     */
+    private void handleAccessKey(AccessKey accessKey, Supplier<List<String>> valueSupplier, AccessKeyType type, boolean throwException) {
+        //获取AK
+        String value;
+        if(throwException) {
+            value = GatewayUtils.getValue(accessKey.value, valueSupplier, () -> new AkRequireException(accessKey.name));
+        }else {
+            value = GatewayUtils.getValue(accessKey.value, valueSupplier, null);
+        }
+        accessKey.set(value, type);
     }
 
     /**
      * 删除参数
      *
-     * @param headerAk       头部AK
+     * @param accessKey       AK信息
      * @param request        请求
-     * @param accessKeyName  AK名称
      * @param removeSupplier 删除参数提供者
+     * @param queryParams   URI请求参数
      * @param <T>            类型
      */
-    private <T> void removeParam(String headerAk, ServerHttpRequest request, String accessKeyName,
-                                 Supplier<T> removeSupplier) {
+    private <T> void removeParam(AccessKey accessKey, ServerHttpRequest request, Supplier<T> removeSupplier,
+                                 MultiValueMap<String, String> queryParams) {
         //如果header中有AK,则删除
-        if (Objects.nonNull(headerAk)) {
+        if (HEADER.equals(accessKey.type)) {
             final HttpHeaders headers = request.getHeaders();
-            if(headers.containsKey(accessKeyName)) {
-                request.mutate().headers(headMap -> headMap.remove(accessKeyName)).build();
+            if(headers.containsKey(accessKey.name)) {
+                request.mutate().headers(headMap -> headMap.remove(accessKey.name)).build();
             }
+        }else if(URI.equals(accessKey.type)) {
+            queryParams.remove(accessKey.name);
         }
         if (Objects.nonNull(removeSupplier)) {
             removeSupplier.get();
@@ -310,5 +351,28 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
             }
             return Mono.error(() -> new RateLimitException(limit, timeUnit));
         });
+    }
+
+    /**
+     * AK 信息
+     */
+    public static class AccessKey {
+        public AccessKey(String name) {
+            this.name = name;
+        }
+        public void set(String value, AccessKeyType type) {
+            if(StrUtil.isNotBlank(value)) {
+                this.value = value;
+                this.type = type;
+            }
+        }
+        public enum AccessKeyType {
+            HEADER,
+            URI,
+            BODY
+        }
+        private final String name;
+        private String value;
+        private AccessKeyType type;
     }
 }

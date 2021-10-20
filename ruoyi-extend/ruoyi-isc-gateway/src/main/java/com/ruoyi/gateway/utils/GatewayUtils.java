@@ -22,6 +22,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.List;
@@ -50,9 +51,10 @@ public class GatewayUtils {
      * @param exchange  当前服务交换器
      * @param chain     当前过滤链
      * @param publisher body体提供者
+     * @param newUri    新的URI（去掉AccessKey）
      * @return 指示请求处理何时完成
      */
-    public static Mono<Void> modifyBody(ServerWebExchange exchange, GatewayFilterChain chain, Mono<String> publisher) {
+    public static Mono<Void> modifyBody(ServerWebExchange exchange, GatewayFilterChain chain, Mono<String> publisher, URI newUri) {
         BodyInserter bodyInserter = BodyInserters.fromPublisher(publisher, String.class);
         HttpHeaders headers = new HttpHeaders();
         headers.putAll(exchange.getRequest().getHeaders());
@@ -60,14 +62,14 @@ public class GatewayUtils {
         CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, headers);
         return bodyInserter.insert(outputMessage, new BodyInserterContext())
             .then(Mono.defer(() -> {
-                ServerHttpRequest request = decorate(exchange, headers, outputMessage);
+                ServerHttpRequest request = decorate(exchange, headers, outputMessage, newUri);
                 return chain.filter(exchange.mutate().request(request).build());
             }));
     }
 
 
     public static ServerHttpRequestDecorator decorate(ServerWebExchange exchange, HttpHeaders headers,
-                                                      CachedBodyOutputMessage outputMessage) {
+                                                      CachedBodyOutputMessage outputMessage, URI newUri) {
         return new ServerHttpRequestDecorator(exchange.getRequest()) {
             @Override
             public HttpHeaders getHeaders() {
@@ -85,6 +87,12 @@ public class GatewayUtils {
             @Override
             public Flux<DataBuffer> getBody() {
                 return outputMessage.getBody();
+            }
+
+            @Override
+            public URI getURI()
+            {
+                return Objects.isNull(newUri) ? super.getURI() : newUri;
             }
         };
     }
@@ -123,7 +131,7 @@ public class GatewayUtils {
                 }
             }
         }
-        if (errorMsgSupplier != null) {
+        if (Objects.nonNull(errorMsgSupplier)) {
             Assert.notBlank(before, errorMsgSupplier);
         }
         return before;
