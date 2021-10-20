@@ -59,6 +59,10 @@ logging:
     org.springframework: warn
   config: classpath:logback.xml
 
+# tlog 全局访问性能拦截
+tlog:
+  enable-invoke-time-print: true
+
 # Spring配置
 spring:
   application:
@@ -244,10 +248,12 @@ swagger:
     email: crazylionli@163.com
     url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
   groups:
+    - name: 代码生成模块
+      basePackage: com.ruoyi.generator
     - name: 演示案例
       basePackage: com.ruoyi.demo
     - name: 系统模块
-      basePackage: com.ruoyi.admin
+      basePackage: com.ruoyi.web
 
 # 防止XSS攻击
 xss:
