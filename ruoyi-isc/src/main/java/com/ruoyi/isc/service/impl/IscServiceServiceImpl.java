@@ -2,6 +2,7 @@ package com.ruoyi.isc.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.map.MapUtil;
@@ -119,7 +120,9 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     {
         IscService update = BeanUtil.toBean(bo, IscService.class);
         validEntityBeforeSave(update);
-        return updateById(update);
+        boolean result = updateById(update);
+        RouteUtils.updateRoute(RouteUtils.generateRoute(update));
+        return result;
     }
 
     /**
@@ -139,7 +142,9 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
         {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return removeByIds(ids);
+        boolean result = removeByIds(ids);
+        RouteUtils.deleteRoute(ids.stream().map(String::valueOf).collect(Collectors.toSet()));
+        return result;
     }
 
     @Override
@@ -176,6 +181,8 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     {
         checkAuditBO(bo);
         boolean result = true;
+        boolean pass = IscConstants.AUDIT_PASS.equals(bo.getStatus());
+        Collection<IscRouteDefinition> routes = pass ? ListUtil.list(false) : null;
         for (Long id : bo.getIds())
         {
             IscService service = getOne(Wrappers.<IscService>lambdaQuery()
@@ -186,6 +193,14 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
             }
             result = updateById(new IscService().setServiceId(id).setStatus(bo.getStatus())
                 .setAuditMind(bo.getRemark()));
+            if(pass) {
+                //生成路由
+                routes.add(RouteUtils.generateRoute(service));
+            }
+        }
+        if(pass) {
+            //保存路由信息
+            RouteUtils.saveRoute(routes);
         }
         return result;
     }

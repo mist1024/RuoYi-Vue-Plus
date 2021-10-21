@@ -1,7 +1,10 @@
 package com.ruoyi.isc.utils;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscService;
@@ -9,6 +12,7 @@ import com.ruoyi.isc.utils.beans.IscFilterDefinition;
 import com.ruoyi.isc.utils.beans.IscPredicateDefinition;
 import com.ruoyi.isc.utils.beans.IscRouteDefinition;
 import com.ruoyi.isc.utils.beans.IscRule;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
@@ -16,10 +20,9 @@ import org.redisson.codec.TypedJsonJacksonCodec;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,10 +30,12 @@ import java.util.stream.Collectors;
  * @author Wenchao Gong
  * @date 2021/9/10 14:46
  */
+@Slf4j
 public class RouteUtils {
 
     public static final Codec ROUTE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRouteDefinition.class);
     public static final Codec RULE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRule.class);
+    public static final String TOPIC_GATEWAY_REFRESH_ROUTE = "TOPIC_GATEWAY_REFRESH_ROUTE";
     /**
      * Gateway 虚拟路径前缀
      */
@@ -68,13 +73,21 @@ public class RouteUtils {
      */
     public static URI getURI(String uri)
     {
-        try
-        {
+        try {
             return new URI(uri);
         } catch (URISyntaxException e)
         {
             throw new ServiceException("URL格式异常");
         }
+    }
+
+    /**
+     * 发布路由刷新通知
+     * @param consumer
+     * @return
+     */
+    public static void sendRefreshRouteToGateway(Consumer<String> consumer) {
+        RedisUtils.publish(TOPIC_GATEWAY_REFRESH_ROUTE, DateUtil.now(), consumer);
     }
 
     /**
@@ -90,32 +103,53 @@ public class RouteUtils {
         final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         map.clear();
         map.putAll(routeMap);
+        sendRefreshRouteToGateway((time) -> log.info("路由刷新完成，通知网关刷新路由![{}]", time));
         return true;
     }
 
     /**
      * 保存路由信息
      *
-     * @param route 路由信息
+     * @param routes 路由信息
      * @return 是否成功
      */
-    public static boolean saveRoute(IscRouteDefinition route)
+    public static boolean saveRoute(Collection<IscRouteDefinition> routes) {
+        return saveRoute(routes, null);
+    }
+
+    /**
+     * 保存路由信息
+     *
+     * @param routes    路由信息
+     * @param consumer 回调操作
+     * @return 是否成功
+     */
+    public static boolean saveRoute(Collection<IscRouteDefinition> routes, Consumer<String> consumer)
     {
+        if(CollectionUtil.isEmpty(routes)) {
+            return true;
+        }
         final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
-        map.put(route.getId(), route);
+        Map<String, IscRouteDefinition> collect = routes.stream().collect(Collectors.toMap(IscRouteDefinition::getId, Function.identity()));
+        map.putAll(collect);
+        if(Objects.isNull(consumer)) {
+            consumer = (time) -> log.info("保存路由[{}]完成，通知网关刷新路由![{}]", map.keySet(), time);
+        }
+        sendRefreshRouteToGateway(consumer);
         return true;
     }
 
     /**
      * 删除路由信息
      *
-     * @param routeId 路由ID
+     * @param routeIds 路由ID
      * @return 是否成功
      */
-    public static boolean deleteRoute(String routeId)
+    public static boolean deleteRoute(Collection<String> routeIds)
     {
         final RMap<String, IscRouteDefinition> map = client.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
-        map.remove(routeId);
+        map.fastRemove(routeIds.toArray(new String[0]));
+        sendRefreshRouteToGateway((time) -> log.info("删除路由[{}]完成，通知网关刷新路由![{}]", routeIds, time));
         return true;
     }
 
@@ -127,7 +161,9 @@ public class RouteUtils {
      */
     public static boolean updateRoute(IscRouteDefinition route)
     {
-        return saveRoute(route);
+        boolean result = saveRoute(Collections.singletonList(route), (time) ->
+                log.info("更新路由[{}]完成，通知网关刷新路由![{}]", route.getId(), time));
+        return result;
     }
 
     /**
