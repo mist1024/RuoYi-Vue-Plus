@@ -1,4 +1,4 @@
-package com.ruoyi.gateway.utils.beans;
+package com.ruoyi.isc.common.utils.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

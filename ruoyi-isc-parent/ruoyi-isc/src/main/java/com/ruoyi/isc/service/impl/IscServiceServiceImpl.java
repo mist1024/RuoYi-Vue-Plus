@@ -9,6 +9,7 @@ import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -111,7 +112,7 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
         validEntityBeforeSave(add);
         add.setUserId(SecurityUtils.getUserId());
         add.setOnlineStatus(IscConstants.ONLINE_STATUS_ON);
-        add.setStatus(IscConstants.AUDIT_WAIT);
+        add.setStatus(Constants.AUDIT_WAIT);
         return save(add);
     }
 
@@ -170,7 +171,7 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     {
         List<IscService> serviceList = list(Wrappers.<IscService>lambdaQuery()
                 .select(IscService::getServiceId, IscService::getServiceName, IscService::getCateFullPath)
-                .eq(IscService::getStatus, IscConstants.AUDIT_PASS)
+                .eq(IscService::getStatus, Constants.AUDIT_PASS)
                 .eq(IscService::getEnabled, UserConstants.DICT_NORMAL)
                 .orderByDesc(IscService::getUpdateTime));
         return cateService.genCateTree(cateService.selectCateList(), serviceList, exitsIds);
@@ -181,13 +182,13 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     {
         checkAuditBO(bo);
         boolean result = true;
-        boolean pass = IscConstants.AUDIT_PASS.equals(bo.getStatus());
+        boolean pass = Constants.AUDIT_PASS.equals(bo.getStatus());
         Collection<IscRouteDefinition> routes = pass ? ListUtil.list(false) : null;
         for (Long id : bo.getIds())
         {
             IscService service = getOne(Wrappers.<IscService>lambdaQuery()
                 .eq(IscService::getServiceId, id)
-                .eq(IscService::getStatus, IscConstants.AUDIT_WAIT), false);
+                .eq(IscService::getStatus, Constants.AUDIT_WAIT), false);
             if(Objects.isNull(service)) {
                 continue;
             }
@@ -209,9 +210,9 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     public void checkAuditBO(IscAuditBo bo)
     {
         switch (bo.getStatus()) {
-            case IscConstants.AUDIT_PASS:
+            case Constants.AUDIT_PASS:
                 break;
-            case IscConstants.AUDIT_REJECT:
+            case Constants.AUDIT_REJECT:
                 Assert.notBlank(bo.getRemark(), () -> new ServiceException("审核意见不能为空"));
                 break;
             default:
@@ -224,7 +225,7 @@ public class IscServiceServiceImpl extends ServicePlusImpl<IscServiceMapper, Isc
     {
         final List<IscService> serviceList = list(Wrappers.<IscService>lambdaQuery()
                 .select(IscService::getServiceId, IscService::getServiceAddr, IscService::getHiddenParams, IscService::getRequestMethod)
-                .eq(IscService::getStatus, IscConstants.AUDIT_PASS));
+                .eq(IscService::getStatus, Constants.AUDIT_PASS));
         List<IscRouteDefinition> routes = new ArrayList<>();
         for (IscService service : serviceList)
         {

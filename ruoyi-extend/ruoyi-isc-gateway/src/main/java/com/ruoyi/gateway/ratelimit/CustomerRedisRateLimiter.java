@@ -2,6 +2,7 @@ package com.ruoyi.gateway.ratelimit;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.StrUtil;
+import com.ruoyi.gateway.utils.GatewayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.support.ConfigurationService;
@@ -26,12 +27,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class CustomerRedisRateLimiter extends RedisRateLimiter {
 
-    private ReactiveStringRedisTemplate redisTemplate;
+    private final ReactiveStringRedisTemplate redisTemplate;
 
-    private RedisScript<List<Long>> script;
-    private RedisScript<Long> timeRedisScript;
+    private final RedisScript<List<Long>> script;
+    private final RedisScript<Long> timeRedisScript;
 
-    private AtomicBoolean initialized = new AtomicBoolean(false);
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     public CustomerRedisRateLimiter(ReactiveStringRedisTemplate redisTemplate, RedisScript<List<Long>> script,
                                     ConfigurationService configurationService, DefaultRedisScript<Long> timeRedisScript) {
@@ -44,7 +45,7 @@ public class CustomerRedisRateLimiter extends RedisRateLimiter {
 
     public Mono<Response> isAllowed(String routeId, String ak, Long replenishRate, TimeUnit timeUnit) {
         Config routeConfig = new Config().setReplenishRate(replenishRate.intValue());
-        String id = ak + ':' + routeId;
+        String id = GatewayUtils.getRouteKey(ak, routeId);
         int time = 60;
         LocalDateTime now = LocalDateTime.now();
         List<String> keys;

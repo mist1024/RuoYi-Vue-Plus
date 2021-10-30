@@ -7,6 +7,7 @@ import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -17,6 +18,7 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.isc.common.utils.beans.IscRule;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscAppServiceApply;
 import com.ruoyi.isc.domain.IscApplication;
@@ -29,7 +31,6 @@ import com.ruoyi.isc.service.IIscAppServiceService;
 import com.ruoyi.isc.service.IIscApplicationService;
 import com.ruoyi.isc.service.IIscServiceService;
 import com.ruoyi.isc.utils.RouteUtils;
-import com.ruoyi.isc.utils.beans.IscRule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -120,7 +121,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     {
         IscAppService add = BeanUtil.toBean(bo, IscAppService.class);
         validEntityBeforeSave(add);
-        add.setStatus(IscConstants.AUDIT_WAIT);
+        add.setStatus(Constants.AUDIT_WAIT);
         add.setUserId(SecurityUtils.getUserId());
         boolean result = save(add);
         addApplyRecord(bo, IscConstants.APPLY_TYPE_APPLY, add.getAppServiceId());
@@ -135,13 +136,13 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         IscAppService update = new IscAppService().setAppServiceId(bo.getAppServiceId());
         validEntityBeforeSave(update);
         boolean result = true;
-        boolean changeStatus = !IscConstants.AUDIT_PASS.equals(appService.getStatus());
+        boolean changeStatus = !Constants.AUDIT_PASS.equals(appService.getStatus());
         boolean changeRemark = !IscConstants.APPLY_TYPE_RENEWAL.equals(bo.getApplyType());
         if (changeStatus || changeRemark)
         {
             if (changeStatus)
             {
-                update.setStatus(IscConstants.AUDIT_WAIT);
+                update.setStatus(Constants.AUDIT_WAIT);
             }
             if (changeRemark)
             {
@@ -166,7 +167,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         if (Objects.nonNull(entity.getAppServiceId())) {
             long count = applyService.count(Wrappers.<IscAppServiceApply>lambdaQuery()
                 .eq(IscAppServiceApply::getAppServiceId, entity.getAppServiceId())
-                .eq(IscAppServiceApply::getStatus, IscConstants.AUDIT_WAIT));
+                .eq(IscAppServiceApply::getStatus, Constants.AUDIT_WAIT));
             Assert.isFalse(SqlHelper.retBool(count), () -> new ServiceException("有申请未审核, 不能再申请"));
         }
     }
@@ -203,7 +204,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
     {
         List<IscAppService> list = list(Wrappers.<IscAppService>lambdaQuery()
                 .eq(IscAppService::getEnabled, UserConstants.NORMAL)
-                .eq(IscAppService::getStatus, IscConstants.AUDIT_PASS)
+                .eq(IscAppService::getStatus, Constants.AUDIT_PASS)
                 .gt(IscAppService::getEndTime, DateUtils.getNowDate()));
         if(CollectionUtil.isEmpty(list)) {
             return;
@@ -240,7 +241,7 @@ public class IscAppServiceServiceImpl extends ServicePlusImpl<IscAppServiceMappe
         IscAppServiceApplyBo entity = new IscAppServiceApplyBo();
         entity.setAppServiceId(appServiceId);
         entity.setApplyType(applyType);
-        entity.setStatus(IscConstants.AUDIT_WAIT);
+        entity.setStatus(Constants.AUDIT_WAIT);
         entity.setRemark(appService.getRemark());
         switch (applyType) {
             case IscConstants.APPLY_TYPE_APPLY:

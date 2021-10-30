@@ -9,7 +9,7 @@ import cn.hutool.json.JSONUtil;
 import com.ruoyi.gateway.exception.*;
 import com.ruoyi.gateway.ratelimit.CustomerRedisRateLimiter;
 import com.ruoyi.gateway.utils.GatewayUtils;
-import com.ruoyi.gateway.utils.beans.IscRule;
+import com.ruoyi.isc.common.utils.beans.IscRule;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.route.Route;
@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.ruoyi.gateway.filter.CustomerGlobalFilter.AccessKey.AccessKeyType;
 import static com.ruoyi.gateway.filter.CustomerGlobalFilter.AccessKey.AccessKeyType.*;
+import static com.ruoyi.isc.common.constant.IscGatewayContants.*;
 import static org.springframework.util.CollectionUtils.unmodifiableMultiValueMap;
 
 /**
@@ -57,7 +58,6 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         this.rateLimiter = rateLimiter;
     }
 
-    private static final String ACCESS_KEY_NAME_DEFAULT = "ak";
     private static final TimeUnit[] TIME_UNITS = {TimeUnit.SECONDS, TimeUnit.MINUTES, TimeUnit.HOURS, TimeUnit.DAYS};
 
     @Override
@@ -67,7 +67,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
         final ServerHttpRequest request = exchange.getRequest();
         //ak 是否存在
         final HttpMethod httpMethod = request.getMethod();
-        AccessKey accessKey = new AccessKey(String.valueOf(metadata.getOrDefault(GatewayUtils.CONFIG_ACCESS_KEY_NAME_KEY,
+        AccessKey accessKey = new AccessKey(String.valueOf(metadata.getOrDefault(CONFIG_ACCESS_KEY_NAME_KEY,
                 ACCESS_KEY_NAME_DEFAULT)));
         accessKey.set(GatewayUtils.getValue(null, () -> request.getHeaders().get(accessKey.name)), HEADER);
         MultiValueMap<String, String> queryParams = request.getQueryParams().containsKey(accessKey.name) ?
@@ -305,7 +305,7 @@ public class CustomerGlobalFilter implements GlobalFilter, Ordered {
      * @param <U>    参数类型
      */
     private <U> void handleHiddenParams(Route route, U result, BiConsumer<Map.Entry<String, Object>, U> mapper) {
-        final Object obj = route.getMetadata().get(GatewayUtils.CONFIG_ADD_PARAM_KEY);
+        final Object obj = route.getMetadata().get(CONFIG_ADD_PARAM_KEY);
         if (Objects.isNull(obj)) {
             return;
         }

@@ -3,9 +3,8 @@ package com.ruoyi.gateway.utils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
-import com.ruoyi.gateway.utils.beans.IscRule;
 import com.ruoyi.gateway.utils.caching.CachingRule;
-import org.redisson.api.DeletedObjectListener;
+import com.ruoyi.isc.common.utils.beans.IscRule;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
@@ -31,20 +30,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static com.ruoyi.isc.common.constant.IscGatewayContants.RULE_CODES_INSTANCE;
+import static com.ruoyi.isc.common.constant.IscRedisKeys.KEY_RULES;
+
 /**
  * @author Wenchao Gong
  * @date 2021-10-15
  */
-public class GatewayUtils {
-
-    public static final String CONFIG_ACCESS_KEY_NAME_KEY = "accessKeyName";
-    public static final String CONFIG_ADD_PARAM_KEY = "addParam";
-    /**
-     * Gateway 服务对应AK规则
-     */
-    public static final String KEY_RULES = "RULES:";
-
-    public static final Codec RULE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRule.class);
+public class GatewayUtils extends com.ruoyi.isc.common.utils.GatewayUtils {
     private static RedissonClient client = SpringUtil.getBean(RedissonClient.class);
 
     /**
@@ -166,7 +159,7 @@ public class GatewayUtils {
      * @return
      */
     public static IscRule getRule(String ak, String routeId) {
-        String key = ak + ':' + routeId;
+        String key = getRouteKey(ak, routeId);
         return CachingRule.getRule(key, GatewayUtils::getRedisRule);
     }
 

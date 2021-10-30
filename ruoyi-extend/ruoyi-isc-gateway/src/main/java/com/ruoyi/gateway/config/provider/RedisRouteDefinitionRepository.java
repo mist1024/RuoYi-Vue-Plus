@@ -10,6 +10,8 @@ import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.ruoyi.isc.common.constant.IscRedisKeys.KEY_ROUTES;
+
 /**
  * Redis 路由仓库
  *
@@ -20,7 +22,6 @@ import reactor.core.publisher.Mono;
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
 {
     public static final Codec ROUTE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, RouteDefinition.class);
-    public static final String KEY_ROUTES = "ROUTES:";
     private final RedissonClient redissonClient;
 
     public RedisRouteDefinitionRepository(RedissonClient redissonClient)

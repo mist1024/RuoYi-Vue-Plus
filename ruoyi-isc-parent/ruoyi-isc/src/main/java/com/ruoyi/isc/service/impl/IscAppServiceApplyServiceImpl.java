@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.PagePlus;
@@ -149,7 +150,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
         {
             IscAppServiceApply apply = getOne(Wrappers.<IscAppServiceApply>lambdaQuery()
                     .eq(IscAppServiceApply::getApplyId, id)
-                    .eq(IscAppServiceApply::getStatus, IscConstants.AUDIT_WAIT), false);
+                    .eq(IscAppServiceApply::getStatus, Constants.AUDIT_WAIT), false);
             if(Objects.isNull(apply)) {
                 continue;
             }
@@ -160,7 +161,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
 
             IscAppService updateData = null;
             IscService service = null;
-            if(IscConstants.AUDIT_PASS.equals(bo.getStatus())) {
+            if(Constants.AUDIT_PASS.equals(bo.getStatus())) {
                 service = serviceService.getById(appService.getServiceId());
                 Assert.notNull(service, () -> new ServiceException("服务信息不存在"));
                 updateData = genAuditPassData(apply, appService, service, bo.getStatus());
@@ -201,7 +202,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
                 break;
             case IscConstants.APPLY_TYPE_MODIFY:
                 //如果 应用服务 状态不为通过 则修改状态（如果是通过：续期不能影响使用）
-                if(!IscConstants.AUDIT_PASS.equals(appService.getStatus())) {
+                if(!Constants.AUDIT_PASS.equals(appService.getStatus())) {
                     genServicePassInit(apply, appService, status, updateData, service);
                 }
                 updateData.setQuotaDays(apply.getQuotaDays());
@@ -251,7 +252,7 @@ public class IscAppServiceApplyServiceImpl extends ServicePlusImpl<IscAppService
      * @return 需要更新的信息
      */
     private IscAppService genAuditRejectData(IscAppService appService, IscAuditBo bo) {
-        if(!IscConstants.AUDIT_PASS.equals(appService.getStatus())) {
+        if(!Constants.AUDIT_PASS.equals(appService.getStatus())) {
             IscAppService updateData = new IscAppService().setAppServiceId(appService.getAppServiceId());
             updateData.setStatus(bo.getStatus());
             updateData.setAuditMind(bo.getRemark());

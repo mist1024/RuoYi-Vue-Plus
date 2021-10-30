@@ -1,6 +1,6 @@
 package com.ruoyi.gateway.utils.caching;
 
-import com.ruoyi.gateway.utils.beans.IscRule;
+import com.ruoyi.isc.common.utils.beans.IscRule;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 

@@ -5,14 +5,11 @@ import com.ruoyi.gateway.config.handler.GlobalErrorWebExceptionHandler;
 import com.ruoyi.gateway.config.provider.RedisRouteDefinitionRepository;
 import com.ruoyi.gateway.filter.CustomerGlobalFilter;
 import com.ruoyi.gateway.ratelimit.CustomerRedisRateLimiter;
-import com.ruoyi.gateway.utils.beans.TopicMsg;
 import com.ruoyi.gateway.utils.caching.CachingRule;
+import com.ruoyi.isc.common.utils.beans.TopicMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.codec.Codec;
-import org.redisson.codec.SerializationCodec;
-import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
@@ -32,6 +29,8 @@ import org.springframework.lang.NonNull;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.ruoyi.isc.common.constant.IscGatewayContants.*;
+
 /**
  * Gateway 配置文件
  *
@@ -41,9 +40,6 @@ import java.util.function.Consumer;
 @Slf4j
 @Configuration
 public class GatewayConfig implements ApplicationEventPublisherAware {
-    public static final Codec TOPIC_MSG_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, TopicMsg.class);
-    public static final String TOPIC_GATEWAY_REFRESH_ROUTE = "TOPIC_GATEWAY_REFRESH_ROUTE";
-    public static final String TOPIC_GATEWAY_RULE = "TOPIC_GATEWAY_RULE";
     public ApplicationEventPublisher publisher;
     private final RedissonClient client = SpringUtil.getBean(RedissonClient.class);
 
@@ -105,7 +101,7 @@ public class GatewayConfig implements ApplicationEventPublisherAware {
      * @param consumer   自定义处理
      */
     public <T> void subscribe(String channelKey, Class<T> clazz, Consumer<T> consumer) {
-        RTopic topic = client.getTopic(channelKey, new SerializationCodec());
+        RTopic topic = client.getTopic(channelKey);
         topic.addListener(clazz, (channel, msg) -> consumer.accept(msg));
     }
 

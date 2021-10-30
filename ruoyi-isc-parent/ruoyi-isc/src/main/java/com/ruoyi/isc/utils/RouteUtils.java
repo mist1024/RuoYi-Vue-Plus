@@ -2,13 +2,16 @@ package com.ruoyi.isc.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
-import com.ruoyi.common.constant.IscConstants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.isc.common.constant.IscRedisKeys;
+import com.ruoyi.isc.common.utils.GatewayUtils;
+import com.ruoyi.isc.common.utils.beans.IscRule;
+import com.ruoyi.isc.common.utils.beans.TopicMsg;
+import com.ruoyi.isc.common.utils.beans.TopicMsg.Type;
 import com.ruoyi.isc.domain.IscAppService;
 import com.ruoyi.isc.domain.IscService;
 import com.ruoyi.isc.utils.beans.*;
-import com.ruoyi.isc.utils.beans.TopicMsg.Type;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
@@ -23,6 +26,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.ruoyi.isc.common.constant.IscGatewayContants.*;
+
 /**
  * @author Wenchao Gong
  * @date 2021/9/10 14:46
@@ -31,15 +36,10 @@ import java.util.stream.Collectors;
 public class RouteUtils {
 
     public static final Codec ROUTE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRouteDefinition.class);
-    public static final Codec RULE_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, IscRule.class);
-    public static final Codec TOPIC_MSG_CODES_INSTANCE = new TypedJsonJacksonCodec(String.class, TopicMsg.class);
-    public static final String TOPIC_GATEWAY_REFRESH_ROUTE = "TOPIC_GATEWAY_REFRESH_ROUTE";
-    public static final String TOPIC_GATEWAY_RULE = "TOPIC_GATEWAY_RULE";
     /**
      * Gateway 虚拟路径前缀
      */
     public static final String PATH_PREFIX = "/proxy";
-    public static final String ACCESS_KEY_NAME = "ak";
     private static final RedissonClient CLIENT = SpringUtils.getBean(RedissonClient.class);
 
     /**
@@ -88,7 +88,7 @@ public class RouteUtils {
      * @param consumer   自定义处理
      */
     public static <T> void publish(String channelKey, T msg, Consumer<T> consumer) {
-        RTopic topic = CLIENT.getTopic(channelKey, TOPIC_MSG_CODES_INSTANCE);
+        RTopic topic = CLIENT.getTopic(channelKey);
         topic.publish(msg);
         consumer.accept(msg);
     }
@@ -119,10 +119,10 @@ public class RouteUtils {
     {
         Map<String, IscRouteDefinition> routeMap = routes.stream().collect(Collectors.toMap(IscRouteDefinition::getId,
                 Function.identity(), (o1, o2) -> o2));
-        final RMap<String, IscRouteDefinition> map = CLIENT.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
+        final RMap<String, IscRouteDefinition> map = CLIENT.getMap(IscRedisKeys.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         map.clear();
         map.putAll(routeMap);
-        sendRefreshRouteToGateway(null, Type.REFRESH,
+        sendRefreshRouteToGateway(null, TopicMsg.Type.REFRESH,
                 (msg) -> log.info("路由刷新完成，通知网关刷新路由![{}]", msg.getMsg()));
         return true;
     }
@@ -149,7 +149,7 @@ public class RouteUtils {
         if(CollectionUtil.isEmpty(routes)) {
             return true;
         }
-        final RMap<String, IscRouteDefinition> map = CLIENT.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
+        final RMap<String, IscRouteDefinition> map = CLIENT.getMap(IscRedisKeys.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         Map<String, IscRouteDefinition> collect = routes.stream().collect(Collectors.toMap(IscRouteDefinition::getId, Function.identity()));
         map.putAll(collect);
         final String id = String.join(",", collect.keySet());
@@ -170,7 +170,7 @@ public class RouteUtils {
      */
     public static boolean deleteRoute(Collection<String> routeIds)
     {
-        final RMap<String, IscRouteDefinition> map = CLIENT.getMap(IscConstants.KEY_ROUTES, ROUTE_CODES_INSTANCE);
+        final RMap<String, IscRouteDefinition> map = CLIENT.getMap(IscRedisKeys.KEY_ROUTES, ROUTE_CODES_INSTANCE);
         final String[] ids = routeIds.toArray(new String[0]);
         map.fastRemove(ids);
         final String id = String.join(",", routeIds);
@@ -229,8 +229,8 @@ public class RouteUtils {
 
         //其他信息
         Map<String, Object> metadata = route.getMetadata();
-        metadata.put("accessKeyName", ACCESS_KEY_NAME);
-        metadata.put("addParam", service.getHiddenParams());
+        metadata.put(CONFIG_ACCESS_KEY_NAME_KEY, ACCESS_KEY_NAME_DEFAULT);
+        metadata.put(CONFIG_ADD_PARAM_KEY, service.getHiddenParams());
         return route;
     }
 
@@ -244,7 +244,7 @@ public class RouteUtils {
     public static IscRule generateRule(IscAppService appService, String accessKey)
     {
         IscRule rule = new IscRule();
-        rule.setId(accessKey + ':' + appService.getServiceId());
+        rule.setId(GatewayUtils.getRouteKey(accessKey, appService.getServiceId()));
         rule.setExpire(appService.getEndTime());
         rule.setDaysLimit(appService.getQuotaDays());
         rule.setHoursLimit(appService.getQuotaHours());
@@ -262,7 +262,7 @@ public class RouteUtils {
     public static boolean refreshRules(List<IscRule> rules)
     {
         Map<String, IscRule> ruleMap = rules.stream().collect(Collectors.toMap(IscRule::getId, Function.identity(), (o1, o2) -> o2));
-        final RMap<String, IscRule> map = CLIENT.getMap(IscConstants.KEY_RULES, RULE_CODES_INSTANCE);
+        final RMap<String, IscRule> map = CLIENT.getMap(IscRedisKeys.KEY_RULES, RULE_CODES_INSTANCE);
         map.clear();
         map.putAll(ruleMap);
         final String id = String.join(",", ruleMap.keySet());
@@ -290,7 +290,7 @@ public class RouteUtils {
      */
     public static boolean saveRule(IscRule rule, Consumer<TopicMsg> consumer)
     {
-        final RMap<String, IscRule> map = CLIENT.getMap(IscConstants.KEY_RULES, RULE_CODES_INSTANCE);
+        final RMap<String, IscRule> map = CLIENT.getMap(IscRedisKeys.KEY_RULES, RULE_CODES_INSTANCE);
         map.put(rule.getId(), rule);
         Type type = Type.UPDATE;
         if(Objects.isNull(consumer)) {
@@ -309,7 +309,7 @@ public class RouteUtils {
      */
     public static boolean deleteRule(String ruleId)
     {
-        final RMap<String, IscRule> map = CLIENT.getMap(IscConstants.KEY_RULES, RULE_CODES_INSTANCE);
+        final RMap<String, IscRule> map = CLIENT.getMap(IscRedisKeys.KEY_RULES, RULE_CODES_INSTANCE);
         map.remove(ruleId);
         sendRuleNoticeToGateway(ruleId, Type.DELETE,
                 (msg) ->  log.info("删除[{}]规则[{}]完成，通知网关刷新规则![{}]", msg.getType(), msg.getId(), msg.getMsg()));
