@@ -1,6 +1,7 @@
 package com.ruoyi.demo.controller;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * spring-cache 演示案例
@@ -33,6 +36,9 @@ public class RedisCacheController {
 	 * 如果有就直接返回,不调用方法
 	 * 如果没有,就调用方法,然后把结果缓存起来
 	 * 这个注解「一般用在查询方法上」
+	 *
+	 * 重点说明: 缓存注解严谨与其他筛选数据功能一起使用
+	 * 例如: 数据权限注解 会造成 缓存击穿 与 数据不一致问题
 	 *
 	 * cacheNames 为配置文件内 groupId
 	 */
@@ -71,6 +77,26 @@ public class RedisCacheController {
 	@GetMapping("/test3")
 	public AjaxResult<String> test3(String key, String value){
 		return AjaxResult.success("操作成功", value);
+	}
+
+	/**
+	 * 测试设置过期时间
+	 * 手动设置过期时间10秒
+	 * 11秒后获取 判断是否相等
+	 */
+	@ApiOperation("测试设置过期时间")
+	@GetMapping("/test6")
+	public AjaxResult<Boolean> test6(String key, String value){
+		RedisUtils.setCacheObject(key, value);
+		boolean flag = RedisUtils.expire(key, 10, TimeUnit.SECONDS);
+		System.out.println("***********" + flag);
+		try {
+			Thread.sleep(11 * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		Object obj = RedisUtils.getCacheObject(key);
+		return AjaxResult.success("操作成功", value.equals(obj));
 	}
 
 }

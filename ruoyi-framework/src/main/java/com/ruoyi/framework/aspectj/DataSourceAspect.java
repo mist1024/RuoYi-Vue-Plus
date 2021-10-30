@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * 多数据源处理
  *
- * @author ruoyi
+ * @author Lion Li
  */
 @Aspect
 @Order(-500)
@@ -25,7 +25,7 @@ import java.util.Objects;
 public class DataSourceAspect {
 
 	@Pointcut("@annotation(com.ruoyi.common.annotation.DataSource)"
-		+ "|| @within(com.ruoyi.common.annotation.DataSource)")
+			+ "|| @within(com.ruoyi.common.annotation.DataSource)")
 	public void dsPointCut() {
 	}
 
@@ -59,4 +59,5 @@ public class DataSourceAspect {
 
 		return AnnotationUtils.findAnnotation(signature.getDeclaringType(), DataSource.class);
 	}
+
 }

@@ -6,46 +6,51 @@
 
     <groupId>com.ruoyi</groupId>
     <artifactId>ruoyi-vue-plus</artifactId>
-    <version>3.1.0</version>
+    <version>3.3.0</version>
 
     <name>RuoYi-Vue-Plus</name>
     <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
     <description>RuoYi-Vue-Plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>3.1.0</ruoyi-vue-plus.version>
-        <spring-boot.version>2.5.4</spring-boot.version>
+        <ruoyi-vue-plus.version>3.3.0</ruoyi-vue-plus.version>
+        <spring-boot.version>2.5.6</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <druid.version>1.2.6</druid.version>
+        <druid.version>1.2.8</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
         <poi.version>4.1.2</poi.version>
-        <easyexcel.version>2.2.10</easyexcel.version>
+        <easyexcel.version>2.2.11</easyexcel.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <mybatis-plus.version>3.4.3.3</mybatis-plus.version>
+        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <hutool.version>5.7.11</hutool.version>
+        <hutool.version>5.7.15</hutool.version>
         <guava.version>29.0-jre</guava.version>
         <feign.version>3.0.3</feign.version>
         <gateway.version>3.0.3</gateway.version>
         <feign-okhttp.version>11.6</feign-okhttp.version>
         <okhttp.version>4.9.1</okhttp.version>
-        <spring-boot-admin.version>2.5.1</spring-boot-admin.version>
-        <redisson.version>3.16.2</redisson.version>
+        <spring-boot-admin.version>2.5.2</spring-boot-admin.version>
+        <redisson.version>3.16.3</redisson.version>
         <okio.version>2.8.0</okio.version>
         <lock4j.version>2.2.1</lock4j.version>
         <dynamic-ds.version>3.4.1</dynamic-ds.version>
+        <tlog.version>1.3.3</tlog.version>
+        <xxl-job.version>2.3.0</xxl-job.version>
         <wildfly-common.version>1.5.2.Final</wildfly-common.version>
+
+        <!-- jdk11 缺失依赖 jaxb-->
+        <jaxb.version>3.0.1</jaxb.version>
 
         <!-- OSS 配置 -->
         <qiniu.version>7.8.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
-        <qcloud.cos.version>5.6.51</qcloud.cos.version>
-        <minio.version>8.3.0</minio.version>
+        <qcloud.cos.version>5.6.58</qcloud.cos.version>
+        <minio.version>8.3.3</minio.version>
 
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
@@ -78,6 +83,18 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>swagger-annotations</artifactId>
+                        <groupId>io.swagger</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
             </dependency>
 
             <!-- 指定 swagger-annotations 版本冲突-->
@@ -101,7 +118,11 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.poi</groupId>
-                        <artifactId>*</artifactId>
+                        <artifactId>poi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi-ooxml-schemas</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -118,6 +139,13 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jwt.version}</version>
+            </dependency>
+
+            <!-- jdk11 缺失依赖 jaxb-->
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
             </dependency>
 
             <!-- dynamic-datasource 多数据源-->
@@ -162,12 +190,19 @@
                 <version>${gateway.version}</version>
             </dependency>
 
+            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-openfeign</artifactId>
                 <version>${feign.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>feign-core</artifactId>
+                        <groupId>io.github.openfeign</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
-
+            <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
             <dependency>
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
@@ -238,10 +273,58 @@
                 <version>${wildfly-common.version}</version>
             </dependency>
 
-            <!-- 定时任务-->
+            <!-- xxl-job-core -->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-spring-boot-configuration</artifactId>
+                <version>${tlog.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-webroot</artifactId>
+                <version>${tlog.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>javassist</artifactId>
+                        <groupId>org.javassist</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>guava</artifactId>
+                        <groupId>com.google.guava</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-feign</artifactId>
+                <version>${tlog.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-xxl-job</artifactId>
+                <version>${tlog.version}</version>
+            </dependency>
+
+            <!-- 定时任务 @deprecated 3.4.0删除 迁移至xxl-job -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-quartz</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+            <!-- 定时任务 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-job</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
@@ -273,7 +356,7 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
-            <!-- oss模块 -->
+            <!-- OSS对象存储模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-oss</artifactId>
@@ -312,6 +395,7 @@
         <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
         <module>ruoyi-quartz</module>
+        <module>ruoyi-job</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
@@ -320,11 +404,6 @@
         <module>ruoyi-isc-parent</module>
     </modules>
     <packaging>pom</packaging>
-
-
-    <dependencies>
-
-    </dependencies>
 
     <build>
         <plugins>
@@ -402,47 +481,8 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
-                <endpoints.include>health,info</endpoints.include>
+                <endpoints.include>health, info, logfile</endpoints.include>
             </properties>
-        </profile>
-
-        <!-- jdk多版本配置 -->
-        <profile>
-            <id>jdk8</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <java.version>1.8</java.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <jdk>11</jdk>
-            </activation>
-            <properties>
-                <java.version>11</java.version>
-                <jaxb.version>3.0.1</jaxb.version>
-            </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <!-- jdk11 缺失依赖 jaxb-->
-                    <dependency>
-                        <groupId>com.sun.xml.bind</groupId>
-                        <artifactId>jaxb-impl</artifactId>
-                        <version>${jaxb.version}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-            <dependencies>
-                <!--jaxb-->
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 
