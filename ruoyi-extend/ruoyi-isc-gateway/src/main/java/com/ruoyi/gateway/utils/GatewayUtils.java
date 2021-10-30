@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import com.ruoyi.gateway.utils.beans.IscRule;
+import com.ruoyi.gateway.utils.caching.CachingRule;
+import org.redisson.api.DeletedObjectListener;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
@@ -164,8 +166,18 @@ public class GatewayUtils {
      * @return
      */
     public static IscRule getRule(String ak, String routeId) {
+        String key = ak + ':' + routeId;
+        return CachingRule.getRule(key, GatewayUtils::getRedisRule);
+    }
+
+    /**
+     * 获取Redis Rule
+     * @param key
+     * @return
+     */
+    private static IscRule getRedisRule(String key) {
         final RMap<String, IscRule> map = client.getMap(KEY_RULES, RULE_CODES_INSTANCE);
-        return map.get(ak + ':' + routeId);
+        return map.get(key);
     }
 
     /**
