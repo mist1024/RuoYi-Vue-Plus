@@ -102,4 +102,10 @@ public class IscAppServiceApplyBo extends BaseEntity {
     @ApiModelProperty(value = "排序的方向", example = "asc,desc")
     private String isAsc;
 
+    /**
+     * 备注
+     */
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
 }

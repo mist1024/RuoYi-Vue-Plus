@@ -91,12 +91,6 @@
                 </exclusions>
             </dependency>
 
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-annotations.version}</version>
-            </dependency>
-
             <!-- 指定 swagger-annotations 版本冲突-->
             <dependency>
                 <groupId>io.swagger</groupId>
@@ -200,6 +194,10 @@
                         <artifactId>feign-core</artifactId>
                         <groupId>io.github.openfeign</groupId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcprov-jdk15on</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <!-- @deprecated 由于使用人数较少 决定与 3.4.0 版本移除 -->
@@ -207,12 +205,6 @@
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
                 <version>${feign-okhttp.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.github.openfeign</groupId>
-                        <artifactId>feign-core</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
@@ -278,6 +270,12 @@
                 <groupId>com.xuxueli</groupId>
                 <artifactId>xxl-job-core</artifactId>
                 <version>${xxl-job.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
