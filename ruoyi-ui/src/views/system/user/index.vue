@@ -150,6 +150,7 @@
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.status"
+                :disabled="scope.row.userId === 1"
                 active-value="0"
                 inactive-value="1"
                 @change="handleStatusChange(scope.row)"

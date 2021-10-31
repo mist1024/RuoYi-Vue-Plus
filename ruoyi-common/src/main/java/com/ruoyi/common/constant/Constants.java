@@ -142,4 +142,14 @@ public class Constants {
      * LDAP 远程方法调用
      */
     public static final String LOOKUP_LDAP = "ldap://";
+
+    /** 待审核 */
+    public static final String AUDIT_WAIT = "0";
+
+    /** 审核通过 */
+    public static final String AUDIT_PASS = "1";
+
+    /** 审核驳回 */
+    public static final String AUDIT_REJECT = "2";
+
 }

@@ -1,10 +1,12 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -132,5 +134,31 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+
+    /**
+     * 获取一天的开始时间 即00:00:00
+     *
+     * @param date 日期
+     * @return 一天的开始时间
+     */
+    public static Date beginOfDay(Date date)
+    {
+        return Date.from(LocalDateTimeUtil.beginOfDay(LocalDateTimeUtil.of(date))
+            .atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+
+
+    /**
+     * 获取一天的结束时间 即23:59:59
+     *
+     * @param date 日期
+     * @return 一天的最后一秒
+     */
+    public static Date endOfDay(Date date)
+    {
+        return Date.from(LocalDateTimeUtil.endOfDay(LocalDateTimeUtil.of(date))
+            .atZone(ZoneId.systemDefault()).toInstant());
     }
 }
