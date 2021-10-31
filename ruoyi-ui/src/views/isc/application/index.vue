@@ -316,7 +316,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/isc/application/export', this.queryParams);
+      this.$download.excel('/isc/application/export', this.queryParams);
     }
   }
 };

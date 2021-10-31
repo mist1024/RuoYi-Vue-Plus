@@ -14,20 +14,20 @@
       <el-form-item label="启用状态" prop="enabled">
         <el-select v-model="queryParams.enabled" placeholder="请选择启用状态" clearable size="small">
           <el-option
-            v-for="dict in enabledOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="审核状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择审核状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_audit_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -95,12 +95,12 @@
       </el-table-column>
       <el-table-column label="审核状态" align="center" prop="status" width="100">
         <template slot-scope="scope">
-          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+          <dict-tag :options="dict.type.sys_audit_status" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="启用状态" align="center" prop="enabled" width="100">
         <template slot-scope="scope">
-          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+          <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.enabled"/>
         </template>
       </el-table-column>
       <el-table-column label="到期时间" align="center" prop="endTime" width="100">
@@ -176,10 +176,10 @@
         <el-form-item label="启用状态" v-if="this.applyType === 0">
           <el-radio-group v-model="form.enabled">
             <el-radio
-              v-for="dict in enabledOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.sys_normal_disable"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="申请时长" prop="renewalDuration" v-if="!(this.form.status == 1 && this.applyType == 2)">
@@ -228,7 +228,7 @@
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">审核状态</el-col>
           <el-col :span="18" class="col-content">
-            <dict-tag :options="statusOptions" :value="this.form.status"/>
+            <dict-tag :options="dict.type.sys_audit_status" :value="this.form.status"/>
           </el-col>
         </el-row>
         <el-row :gutter="20" v-if="this.form.status == 2">
@@ -238,7 +238,7 @@
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">启用状态</el-col>
           <el-col :span="18" class="col-content">
-            <dict-tag :options="enabledOptions" :value="this.form.enabled"/>
+            <dict-tag :options="dict.type.sys_normal_disable" :value="this.form.enabled"/>
           </el-col>
         </el-row>
         <el-row :gutter="20">
@@ -291,6 +291,7 @@ import CopyTag from '@/components/CopyTag';
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 export default {
   name: "Appservice",
+  dicts: ['sys_normal_disable', 'sys_audit_status'],
   components: { Treeselect, CopyTag },
   data() {
     return {
@@ -318,10 +319,6 @@ export default {
       open: false,
       // 是否显示查看弹出层
       openView: false,
-      // 启用状态字典
-      enabledOptions: [],
-      // 审核状态字典
-      statusOptions: [],
       // 应用服务树
       appServiceOptions: [],
       // 查询参数
@@ -358,12 +355,6 @@ export default {
     this.applicationId = applicationId;
     this.queryParams.applicationId = applicationId;
     this.getList(applicationId);
-    this.getDicts("sys_normal_disable").then(response => {
-      this.enabledOptions = response.data;
-    });
-    this.getDicts("sys_audit_status").then(response => {
-      this.statusOptions = response.data;
-    });
     this.getApplicationName(applicationId);
     this.getTreeselect(applicationId);
   },
@@ -535,7 +526,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/isc/appservice/export', this.queryParams);
+      this.$download.excel('/isc/appservice/export', this.queryParams);
     }
   }
 };

@@ -13,10 +13,10 @@
       <el-form-item label="启用状态" prop="enabled">
         <el-select v-model="queryParams.enabled" placeholder="请选择启用状态" clearable size="small">
           <el-option
-            v-for="dict in enabledOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -50,7 +50,7 @@
       <el-table-column label="分类名称" align="center" prop="cateName"  width="160"/>
       <el-table-column label="启用状态" align="center" prop="enabled" >
         <template slot-scope="scope">
-          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+          <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.enabled"/>
         </template>
       </el-table-column>
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
@@ -100,10 +100,10 @@
         <el-form-item label="启用状态" prop="enabled">
           <el-radio-group v-model="form.enabled">
             <el-radio
-              v-for="dict in enabledOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.sys_normal_disable"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="显示顺序" prop="orderNum">
@@ -128,6 +128,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "Cate",
+  dicts:['sys_normal_disable'],
   components: {
     Treeselect
   },
@@ -147,8 +148,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 启用状态字典
-      enabledOptions: [],
       // 查询参数
       queryParams: {
         cateName: null,
@@ -176,9 +175,6 @@ export default {
   },
   created() {
     this.getList();
-    this.getDicts("sys_normal_disable").then(response => {
-      this.enabledOptions = response.data;
-    });
   },
   methods: {
     /** 查询服务分类列表 */

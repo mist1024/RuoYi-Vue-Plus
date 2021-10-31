@@ -13,30 +13,30 @@
       <el-form-item label="是否在线" prop="onlineStatus">
         <el-select v-model="queryParams.onlineStatus" placeholder="请选择是否在线" clearable size="small">
           <el-option
-            v-for="dict in onlineStatusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.isc_online_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="审核状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择审核状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_audit_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="服务状态" prop="enabled">
         <el-select v-model="queryParams.enabled" placeholder="请选择服务状态" clearable size="small">
           <el-option
-            v-for="dict in enabledOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_normal_disable"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -103,17 +103,17 @@
       <el-table-column label="服务分类" align="left" prop="cateName" width="150"/>
       <el-table-column label="服务状态" align="center" prop="enabled" width="100">
         <template slot-scope="scope">
-          <dict-tag :options="enabledOptions" :value="scope.row.enabled"/>
+          <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.enabled"/>
         </template>
       </el-table-column>
       <el-table-column label="是否在线" align="center" prop="onlineStatus" width="100">
         <template slot-scope="scope">
-          <dict-tag :options="onlineStatusOptions" :value="scope.row.onlineStatus"/>
+          <dict-tag :options="dict.type.isc_online_status" :value="scope.row.onlineStatus"/>
         </template>
       </el-table-column>
       <el-table-column label="审核状态" align="center" prop="status" width="100">
         <template slot-scope="scope">
-          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+          <dict-tag :options="dict.type.sys_audit_status" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="更新人" align="center" prop="updateBy"  width="150"/>
@@ -169,10 +169,10 @@
         <el-form-item label="请求方式" prop="requestMethod">
           <el-radio-group v-model="form.requestMethod">
             <el-radio
-              v-for="dict in requestMethodOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.isc_request_method"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -181,10 +181,10 @@
         <el-form-item label="跨域标志">
           <el-radio-group v-model="form.corsFlag">
             <el-radio
-              v-for="dict in corsFlagOptions"
-              :key="dict.dictValue"
-              :label="dict.dictValue"
-            >{{dict.dictLabel}}</el-radio>
+              v-for="dict in dict.type.sys_yes_no"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="隐藏参数" prop="hiddenParams">
@@ -207,10 +207,10 @@ import { listService, getService, delService, addService, updateService } from "
 import { treeselect } from "@/api/isc/cate";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import { downLoadExcel } from "@/utils/download";
 
 export default {
   name: "Service",
+  dicts: ['sys_yes_no', 'isc_online_status', 'sys_audit_status', 'sys_normal_disable', 'isc_request_method'],
   components: { Treeselect },
   data() {
     return {
@@ -236,16 +236,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 跨域标志字典
-      corsFlagOptions: [],
-      // 是否在线字典
-      onlineStatusOptions: [],
-      // 审核状态字典
-      statusOptions: [],
-      // 服务状态字典
-      enabledOptions: [],
-      // 服务状态字典
-      requestMethodOptions: [],
       //服务分类
       cateOptions:[],
       // 查询参数
@@ -294,21 +284,6 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
-    this.getDicts("sys_yes_no").then(response => {
-      this.corsFlagOptions = response.data;
-    });
-    this.getDicts("isc_online_status").then(response => {
-      this.onlineStatusOptions = response.data;
-    });
-    this.getDicts("sys_audit_status").then(response => {
-      this.statusOptions = response.data;
-    });
-    this.getDicts("sys_normal_disable").then(response => {
-      this.enabledOptions = response.data;
-    });
-    this.getDicts("isc_request_method").then(response => {
-      this.requestMethodOptions = response.data;
-    });
   },
   methods: {
     /** 查询服务信息列表 */
@@ -443,7 +418,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      downLoadExcel('/isc/service/export', this.queryParams);
+      this.$download.excel('/isc/service/export', this.queryParams);
     }
   }
 };

@@ -4,20 +4,20 @@
       <el-form-item label="申请类型" prop="applyType">
         <el-select v-model="queryParams.applyType" placeholder="请选择申请类型" clearable size="small">
           <el-option
-            v-for="dict in applyTypeOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.isc_apply_type"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="审核状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择审核状态" clearable size="small">
           <el-option
-            v-for="dict in statusOptions"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+            v-for="dict in dict.type.sys_audit_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -61,12 +61,12 @@
       <el-table-column label="服务名称" align="left" prop="serviceName" />
       <el-table-column label="申请类型" align="center" prop="applyType" width="80">
         <template slot-scope="scope">
-          <dict-tag :options="applyTypeOptions" :value="scope.row.applyType"/>
+          <dict-tag :options="dict.type.isc_apply_type" :value="scope.row.applyType"/>
         </template>
       </el-table-column>
       <el-table-column label="审核状态" align="center" prop="status" width="80">
         <template slot-scope="scope">
-          <dict-tag :options="statusOptions" :value="scope.row.status"/>
+          <dict-tag :options="dict.type.sys_audit_status" :value="scope.row.status"/>
         </template>
       </el-table-column>
       <el-table-column label="续期时长(月)" align="center" prop="renewalDuration" width="100"/>
@@ -123,13 +123,13 @@
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">申请类型</el-col>
           <el-col :span="18" class="col-content">
-            <dict-tag :options="applyTypeOptions" :value="this.viewData.applyType"/>
+            <dict-tag :options="dict.type.isc_apply_type" :value="this.viewData.applyType"/>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" class="col-title">审核状态</el-col>
           <el-col :span="18" class="col-content">
-            <dict-tag :options="statusOptions" :value="this.viewData.status"/>
+            <dict-tag :options="dict.type.sys_audit_status" :value="this.viewData.status"/>
           </el-col>
         </el-row>
         <el-row :gutter="20">
@@ -184,6 +184,7 @@ import { listServiceapply, getServiceapply, auditServiceapply } from "@/api/isc/
 
 export default {
   name: "Serviceapply",
+  dicts: ['isc_apply_type', 'sys_audit_status'],
   data() {
     return {
       // 按钮loading
@@ -212,10 +213,6 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 申请类型(0申请 1续期)字典
-      applyTypeOptions: [],
-      // 审核状态字典
-      statusOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -239,12 +236,6 @@ export default {
   },
   created() {
     this.getList();
-    this.getDicts("isc_apply_type").then(response => {
-      this.applyTypeOptions = response.data;
-    });
-    this.getDicts("sys_audit_status").then(response => {
-      this.statusOptions = response.data;
-    });
   },
   methods: {
     /** 查询应用服务申请信息列表 */
@@ -348,7 +339,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.downLoadExcel('/isc/serviceapply/export', this.queryParams);
+      this.$download.excel('/isc/serviceapply/export', this.queryParams);
     }
   }
 };
