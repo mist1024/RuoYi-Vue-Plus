@@ -38,7 +38,7 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-#elseif($column.htmlType == "datetime" && $column.queryType != "BETWEEN")
+#elseif(($column.htmlType == "datetime" || $column.htmlType == "date") && $column.queryType != "BETWEEN")
       <el-form-item label="${comment}" prop="${column.javaField}">
         <el-date-picker clearable size="small"
           v-model="queryParams.${column.javaField}"
@@ -47,7 +47,7 @@
           placeholder="选择${comment}">
         </el-date-picker>
       </el-form-item>
-#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#elseif(($column.htmlType == "datetime" || $column.htmlType == "date") && $column.queryType == "BETWEEN")
       <el-form-item label="${comment}">
         <el-date-picker
           v-model="daterange${AttrName}"
@@ -99,7 +99,7 @@
 #set($comment=$column.columnComment)
 #end
 #if($column.pk)
-#elseif($column.list && $column.htmlType == "datetime")
+#elseif($column.list && ($column.htmlType == "datetime" || $column.htmlType == "date"))
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
@@ -231,7 +231,7 @@
             <el-radio label="1">请选择字典生成</el-radio>
           </el-radio-group>
         </el-form-item>
-#elseif($column.htmlType == "datetime")
+#elseif($column.htmlType == "datetime" || $column.htmlType == "date")
         <el-form-item label="${comment}" prop="${field}">
           <el-date-picker clearable size="small"
             v-model="form.${field}"
@@ -286,7 +286,7 @@ export default {
       // 是否显示弹出层
       open: false,
 #foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#if(($column.htmlType == "datetime" || $column.htmlType == "date") && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       // $comment时间范围
       daterange${AttrName}: [],
@@ -330,13 +330,13 @@ export default {
     getList() {
       this.loading = true;
 #foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#if(($column.htmlType == "datetime" || $column.htmlType == "date") && $column.queryType == "BETWEEN")
       this.queryParams.params = {};
 #break
 #end
 #end
 #foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#if(($column.htmlType == "datetime" || $column.htmlType == "date") && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       if (null != this.daterange${AttrName} && '' != this.daterange${AttrName}) {
         this.queryParams.params["begin${AttrName}"] = this.daterange${AttrName}[0];
@@ -399,7 +399,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
 #foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#if(($column.htmlType == "datetime" || $column.htmlType == "date") && $column.queryType == "BETWEEN")
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       this.daterange${AttrName} = [];
 #end
@@ -473,7 +473,7 @@ export default {
     handleDelete(row) {
       this.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + row.${pkColumn.javaField} + '"的数据项？').then(() => {
         this.loading = true;
-        return del${BusinessName}(row.${pkColumn.javaField});
+        return del${BusinessName}(row.${pkColumn.javaField})
       }).then(() => {
         this.loading = false;
         this.getList();

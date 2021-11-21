@@ -137,6 +137,10 @@ public class DataScopeAspect {
 			if (params instanceof BaseEntity) {
 				BaseEntity baseEntity = (BaseEntity) params;
 				baseEntity.getParams().put(DATA_SCOPE, sql);
+			} else if (params instanceof Map) {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = (Map<String, Object>) params;
+				map.put(DATA_SCOPE, sql);
 			} else {
 				Map<String, Object> invoke = ReflectUtils.invokeGetter(params, "params");
 				invoke.put(DATA_SCOPE, sql);
