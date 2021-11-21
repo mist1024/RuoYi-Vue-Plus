@@ -16,7 +16,6 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据过滤处理
@@ -139,11 +138,9 @@ public class DataScopeAspect {
 				BaseEntity baseEntity = (BaseEntity) params;
 				baseEntity.getParams().put(DATA_SCOPE, sql);
 			} else if (params instanceof Map) {
-				Map<?, ?> tempMap = (Map<?, ?>) params;
-				Map<String, Object> paramMap = new ConcurrentHashMap<>(tempMap.size() + 1);
-				tempMap.forEach((k, v) -> paramMap.put((String) k, v));
-				paramMap.put(DATA_SCOPE, sql);
-				joinPoint.getArgs()[0] = paramMap;
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = (Map<String, Object>) params;
+				map.put(DATA_SCOPE, sql);
 			} else {
 				Map<String, Object> invoke = ReflectUtils.invokeGetter(params, "params");
 				invoke.put(DATA_SCOPE, sql);
