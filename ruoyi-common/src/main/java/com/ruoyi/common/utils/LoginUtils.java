@@ -27,25 +27,15 @@ public class LoginUtils {
      * 针对一套用户体系
      * @param userId 用户id
      */
-    public static void loginByDevice(Long userId, UserType userType, DeviceType deviceType) {
-        StpUtil.login(userType.getUserType() + userId, deviceType.getDevice());
+    public static void loginByDevice(Long userId, UserType userType, String deviceType) {
+        StpUtil.login(userType.getUserType() + userId, deviceType);
     }
 
     /**
      * 获取用户id
      */
     public static Long getUserId() {
-        String loginId = StpUtil.getLoginIdAsString();
-        String userId;
-        String replace = "";
-        if (StringUtils.contains(loginId, UserType.SYS_USER.getUserType())) {
-            userId = StringUtils.replace(loginId, UserType.SYS_USER.getUserType(), replace);
-        } else if (StringUtils.contains(loginId, UserType.APP_USER.getUserType())){
-            userId = StringUtils.replace(loginId, UserType.APP_USER.getUserType(), replace);
-        } else {
-            throw new UtilException("登录用户: LoginId异常 => " + loginId);
-        }
-        return Long.parseLong(userId);
+        return parseUserId(StpUtil.getLoginIdAsString());
     }
 
     /**
@@ -56,14 +46,26 @@ public class LoginUtils {
         return getUserType(loginId);
     }
 
+    /**
+     * 根据登录ID获取用户类型
+	 *
+     * @param loginId 登录ID
+     * @return 用户类型
+     */
     public static UserType getUserType(Object loginId) {
-        if (StringUtils.contains(loginId.toString(), UserType.SYS_USER.getUserType())) {
-            return UserType.SYS_USER;
-        } else if (StringUtils.contains(loginId.toString(), UserType.APP_USER.getUserType())){
-            return UserType.APP_USER;
-        } else {
-            throw new UtilException("登录用户: LoginId异常 => " + loginId);
+        for (UserType userType : UserType.values()) {
+            if (StringUtils.startsWith(loginId.toString(), userType.getUserType())) {
+                return userType;
+            }
         }
+        throw new UtilException("登录用户: LoginId异常 => " + loginId);
     }
 
+    /**
+     * 获取用户ID
+     */
+    public static Long parseUserId(Object loginId) {
+        UserType userType = getUserType(loginId);
+        return Long.parseLong(StringUtils.replace(loginId.toString(), userType.getUserType(), StringUtils.EMPTY));
+    }
 }

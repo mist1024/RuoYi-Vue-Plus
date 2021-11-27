@@ -4,7 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.LogininforService;
-import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.ServiceException;
@@ -14,7 +13,6 @@ import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +44,7 @@ public class SysLoginService {
      * @param uuid     唯一标识
      * @return 结果
      */
-    public String login(String username, String password, String code, String uuid) {
+    public String login(String username, String password, String code, String uuid, UserType userType, String deviceType) {
         HttpServletRequest request = ServletUtils.getRequest();
         boolean captchaOnOff = configService.selectCaptchaOnOff();
         // 验证码开关
@@ -72,7 +70,7 @@ public class SysLoginService {
 		asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
         recordLoginInfo(user.getUserId(), username);
         // 生成token
-        LoginUtils.loginByDevice(user.getUserId(), UserType.SYS_USER, DeviceType.PC);
+        LoginUtils.loginByDevice(user.getUserId(), userType, deviceType);
         return StpUtil.getTokenValue();
     }
 

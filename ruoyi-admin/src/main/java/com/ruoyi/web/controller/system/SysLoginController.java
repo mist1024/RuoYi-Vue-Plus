@@ -10,7 +10,7 @@ import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
-import com.ruoyi.system.service.SysLoginService;
+import com.ruoyi.system.service.SaUserServices;
 import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +38,7 @@ import java.util.Set;
 @RestController
 public class SysLoginController {
 
-    private final SysLoginService loginService;
+    private final SaUserServices userServices;
     private final ISysMenuService menuService;
     private final SysPermissionService permissionService;
 
@@ -53,8 +53,7 @@ public class SysLoginController {
     public AjaxResult<Map<String, Object>> login(@RequestBody LoginBody loginBody) {
         Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
-        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
-                loginBody.getUuid());
+        String token = userServices.login(loginBody);
         ajax.put(Constants.TOKEN, token);
         return AjaxResult.success(ajax);
     }
