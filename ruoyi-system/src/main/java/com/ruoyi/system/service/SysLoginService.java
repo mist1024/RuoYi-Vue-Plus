@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -14,7 +15,6 @@ import com.ruoyi.common.exception.user.UserPasswordNotMatchException;
 import com.ruoyi.common.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,6 +73,9 @@ public class SysLoginService {
         recordLoginInfo(user.getUserId(), username);
         // 生成token
         LoginUtils.loginByDevice(user.getUserId(), UserType.SYS_USER, DeviceType.PC);
+        // 保存用户信息到UserSession
+        SaSession session = StpUtil.getSession(true);
+        session.set("currentUser", user);
         return StpUtil.getTokenValue();
     }
 
