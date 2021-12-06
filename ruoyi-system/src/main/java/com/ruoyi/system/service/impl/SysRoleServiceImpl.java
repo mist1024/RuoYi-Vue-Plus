@@ -1,8 +1,10 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
@@ -45,8 +47,9 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
 
     @Override
     @DataScope(deptAlias = "d")
-    public TableDataInfo<SysRole> selectPageRoleList(SysRole role) {
-        return PageUtils.buildDataInfo(baseMapper.selectPageRoleList(PageUtils.buildPage(), role));
+    public TableDataInfo<SysRole> selectPageRoleList(SysRole role, PageQuery pageQuery) {
+        Page<SysRole> page = baseMapper.selectPageRoleList(PageUtils.buildPage(pageQuery), role);
+        return PageUtils.buildDataInfo(page);
     }
 
     /**
@@ -215,7 +218,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int insertRole(SysRole role) {
         // 新增角色信息
         baseMapper.insert(role);
@@ -229,7 +232,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int updateRole(SysRole role) {
         // 修改角色信息
         baseMapper.updateById(role);
@@ -256,7 +259,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int authDataScope(SysRole role) {
         // 修改角色信息
         baseMapper.updateById(role);
@@ -315,7 +318,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int deleteRoleById(Long roleId) {
         // 删除角色与菜单关联
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId));
@@ -331,7 +334,7 @@ public class SysRoleServiceImpl extends ServicePlusImpl<SysRoleMapper, SysRole, 
      * @return 结果
      */
     @Override
-    @Transactional(rollbackFor = { Exception.class })
+    @Transactional(rollbackFor = Exception.class)
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
             checkRoleAllowed(new SysRole(roleId));
