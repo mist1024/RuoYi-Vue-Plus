@@ -102,6 +102,7 @@ public class PlusDataPermissionHandler implements DataPermissionHandler {
                 throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
             }
             if (type == DataScopeType.DATA_SCOPE_ALL) {
+                sqlString = new StringBuilder();
                 break;
             }
             org.springframework.expression.Expression expression = parser.parseExpression(type.getSql(), parserContext);
