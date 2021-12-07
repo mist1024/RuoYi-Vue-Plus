@@ -14,15 +14,11 @@ public @interface DataScope {
     /**
      * 部门表的别名
      */
-    String deptAlias() default "";
+    String deptName() default "";
 
     /**
      * 用户表的别名
      */
-    String userAlias() default "";
+    String userName() default "";
 
-    /**
-     * 是否过滤用户权限
-     */
-    boolean isUser() default false;
 }

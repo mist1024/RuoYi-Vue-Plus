@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.ruoyi.common.core.mybatisplus.methods.InsertAll;
 import com.ruoyi.framework.handler.CreateAndUpdateMetaObjectHandler;
+import com.ruoyi.framework.handler.PlusDataPermissionHandler;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,12 +32,23 @@ public class MybatisPlusConfig {
 	@Bean
 	public MybatisPlusInterceptor mybatisPlusInterceptor() {
 		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 数据权限处理
+        interceptor.addInnerInterceptor(dataPermissionInterceptor());
 		// 分页插件
 		interceptor.addInnerInterceptor(paginationInnerInterceptor());
 		// 乐观锁插件
 		interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
 		return interceptor;
 	}
+
+    /**
+     * 分页插件，自动识别数据库类型
+     */
+    public DataPermissionInterceptor dataPermissionInterceptor() {
+        DataPermissionInterceptor dataPermissionInterceptor = new DataPermissionInterceptor();
+        dataPermissionInterceptor.setDataPermissionHandler(new PlusDataPermissionHandler());
+        return dataPermissionInterceptor;
+    }
 
 	/**
 	 * 分页插件，自动识别数据库类型

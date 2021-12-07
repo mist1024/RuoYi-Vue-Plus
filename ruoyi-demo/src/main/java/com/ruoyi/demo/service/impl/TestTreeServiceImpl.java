@@ -3,7 +3,6 @@ package com.ruoyi.demo.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.demo.domain.TestTree;
@@ -33,7 +32,6 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 	}
 
 //	@DataSource(DataSourceType.SLAVE) // 切换从库查询
-	@DataScope(isUser = true)
 	@Override
 	public List<TestTreeVo> queryList(TestTreeBo bo) {
         LambdaQueryWrapper<TestTree> lqw = buildQueryWrapper(bo);

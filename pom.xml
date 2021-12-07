@@ -25,6 +25,7 @@
         <poi.version>4.1.2</poi.version>
         <easyexcel.version>2.2.11</easyexcel.version>
         <cglib.version>3.3.0</cglib.version>
+        <common-text.version>1.9</common-text.version>
         <velocity.version>2.3</velocity.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <p6spy.version>3.9.1</p6spy.version>
@@ -119,6 +120,12 @@
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>${cglib.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${common-text.version}</version>
             </dependency>
 
             <!-- velocity代码生成使用模板 -->
