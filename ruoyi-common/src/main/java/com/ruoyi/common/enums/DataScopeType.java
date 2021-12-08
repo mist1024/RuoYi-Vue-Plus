@@ -23,22 +23,22 @@ public enum DataScopeType {
     /**
      * 自定数据权限
      */
-    DATA_SCOPE_CUSTOM("2", " OR #{#deptName} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = #{#roleId} ) "),
+    DATA_SCOPE_CUSTOM("2", " #{#deptName} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = #{#roleId} ) "),
 
     /**
      * 部门数据权限
      */
-    DATA_SCOPE_DEPT("3", " OR #{#deptName} = #{#deptId} "),
+    DATA_SCOPE_DEPT("3", " #{#deptName} = #{#deptId} "),
 
     /**
      * 部门及以下数据权限
      */
-    DATA_SCOPE_DEPT_AND_CHILD("4", " OR #{#deptName} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = #{#deptId} OR find_in_set( #{#deptId} , ancestors ) )"),
+    DATA_SCOPE_DEPT_AND_CHILD("4", " #{#deptName} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = #{#deptId} OR find_in_set( #{#deptId} , ancestors ) )"),
 
     /**
      * 仅本人数据权限
      */
-    DATA_SCOPE_SELF("5", " OR #{#userName?:1} = #{#userId?:0} ");
+    DATA_SCOPE_SELF("5", " #{#userName?:1} = #{#userId?:0} ");
 
     private final String code;
 

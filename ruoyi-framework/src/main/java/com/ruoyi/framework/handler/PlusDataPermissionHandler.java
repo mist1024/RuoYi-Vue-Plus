@@ -4,7 +4,6 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
 import com.ruoyi.common.annotation.DataColumn;
 import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysRole;
@@ -37,13 +36,12 @@ import java.util.stream.Collectors;
  * @author Lion Li
  */
 @Slf4j
-public class PlusDataPermissionHandler implements DataPermissionHandler {
+public class PlusDataPermissionHandler {
 
     private final ExpressionParser parser = new SpelExpressionParser();
     private final TemplateParserContext parserContext = new TemplateParserContext();
 
-    @Override
-    public Expression getSqlSegment(Expression where, String mappedStatementId) {
+    public Expression getSqlSegment(Expression where, String mappedStatementId, boolean isSelect) {
         DataColumn[] dataColumns = findAnnotation(mappedStatementId);
         if (ArrayUtil.isEmpty(dataColumns)) {
             return where;
@@ -53,7 +51,7 @@ public class PlusDataPermissionHandler implements DataPermissionHandler {
         if (StringUtils.isNull(currentUser) || currentUser.isAdmin()) {
             return where;
         }
-        String dataFilterSql = buildDataFilter(currentUser, dataColumns);
+        String dataFilterSql = buildDataFilter(currentUser, dataColumns, isSelect);
         if (StringUtils.isBlank(dataFilterSql)) {
             return where;
         }
@@ -72,7 +70,7 @@ public class PlusDataPermissionHandler implements DataPermissionHandler {
     /**
      * 构造数据过滤sql
      */
-    private String buildDataFilter(SysUser user, DataColumn[] dataColumns) {
+    private String buildDataFilter(SysUser user, DataColumn[] dataColumns, boolean isSelect) {
         StringBuilder sqlString = new StringBuilder();
 
         EvaluationContext context = new StandardEvaluationContext();
@@ -93,6 +91,12 @@ public class PlusDataPermissionHandler implements DataPermissionHandler {
                 if (type == DataScopeType.DATA_SCOPE_ALL) {
                     return "";
                 }
+                // 不包含 key 变量 则不处理
+                if (!StringUtils.contains(type.getSql(), "#" + dataColumn.key())) {
+                    continue;
+                }
+                // 更新或删除需满足所有条件
+                sqlString.append(isSelect ? " OR " : " AND ");
                 // 解析sql模板并填充
                 String sql = parser.parseExpression(type.getSql(), parserContext).getValue(context, String.class);
                 sqlString.append(sql);
@@ -100,7 +104,7 @@ public class PlusDataPermissionHandler implements DataPermissionHandler {
         }
 
         if (StringUtils.isNotBlank(sqlString.toString())) {
-            return sqlString.substring(4);
+            return sqlString.substring(isSelect ? 4 : 5);
         }
         return "";
     }

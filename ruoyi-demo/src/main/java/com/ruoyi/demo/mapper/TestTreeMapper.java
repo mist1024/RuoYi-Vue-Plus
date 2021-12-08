@@ -8,6 +8,8 @@ import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import com.ruoyi.demo.domain.TestTree;
 import org.apache.ibatis.annotations.Param;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,4 +26,18 @@ public interface TestTreeMapper extends BaseMapperPlus<TestTree> {
         @DataColumn(key = "userName", value = "user_id")
     })
     List<TestTree> selectList(@Param(Constants.WRAPPER) Wrapper<TestTree> queryWrapper);
+
+    @Override
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    int updateById(@Param(Constants.ENTITY) TestTree entity);
+
+    @Override
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    int deleteBatchIds(@Param(Constants.COLLECTION) Collection<? extends Serializable> idList);
 }
