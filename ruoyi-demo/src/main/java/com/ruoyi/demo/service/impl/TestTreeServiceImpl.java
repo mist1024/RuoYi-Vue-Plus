@@ -40,13 +40,10 @@ public class TestTreeServiceImpl extends ServicePlusImpl<TestTreeMapper, TestTre
 
 	private LambdaQueryWrapper<TestTree> buildQueryWrapper(TestTreeBo bo) {
 		Map<String, Object> params = bo.getParams();
-		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestTree> lqw = Wrappers.lambdaQuery();
 		lqw.like(StringUtils.isNotBlank(bo.getTreeName()), TestTree::getTreeName, bo.getTreeName());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
 			TestTree::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.apply(dataScope != null && StringUtils.isNotBlank(dataScope.toString()),
-			dataScope != null ? dataScope.toString() : null);
 		return lqw;
 	}
 

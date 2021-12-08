@@ -59,14 +59,11 @@ public class TestDemoServiceImpl extends ServicePlusImpl<TestDemoMapper, TestDem
 
 	private LambdaQueryWrapper<TestDemo> buildQueryWrapper(TestDemoBo bo) {
 		Map<String, Object> params = bo.getParams();
-		Object dataScope = params.get("dataScope");
 		LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
 		lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
 		lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
 		lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
 			TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-		lqw.apply(dataScope != null && StringUtils.isNotBlank(dataScope.toString()),
-			dataScope != null ? dataScope.toString() : null);
 		return lqw;
 	}
 

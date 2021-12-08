@@ -2,7 +2,8 @@ package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.annotation.DataColumn;
+import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
@@ -22,11 +23,15 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept> {
      * @param dept 部门信息
      * @return 部门信息集合
      */
-    @DataScope(deptName = "d.dept_id")
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id")
+    })
     List<SysDept> selectDeptList(SysDept dept);
 
     @Override
-    @DataScope(deptName = "dept_id")
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id")
+    })
     List<SysDept> selectList(@Param(Constants.WRAPPER) Wrapper<SysDept> queryWrapper);
 
     /**

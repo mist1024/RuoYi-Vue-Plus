@@ -1,10 +1,12 @@
 package com.ruoyi.framework.handler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
-import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.annotation.DataColumn;
+import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.service.UserService;
@@ -26,7 +28,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,29 +39,73 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PlusDataPermissionHandler implements DataPermissionHandler {
 
+    private final ExpressionParser parser = new SpelExpressionParser();
+    private final TemplateParserContext parserContext = new TemplateParserContext();
+
     @Override
     public Expression getSqlSegment(Expression where, String mappedStatementId) {
-        DataScope dataScope = findDataScopeAnnotation(mappedStatementId);
-        if (ObjectUtil.isNull(dataScope)) {
+        DataColumn[] dataColumns = findAnnotation(mappedStatementId);
+        if (ArrayUtil.isEmpty(dataColumns)) {
             return where;
         }
         SysUser currentUser = SpringUtils.getBean(UserService.class).selectUserById(SecurityUtils.getUserId());
         // 如果是超级管理员，则不过滤数据
-        if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin()) {
-            String dataScopeSql = dataScopeFilter(currentUser, dataScope);
-            if (StringUtils.isNotBlank(dataScopeSql)) {
-                try {
-                    Expression expression = CCJSqlParserUtil.parseExpression(dataScopeSql);
-                    return new AndExpression(where, expression);
-                } catch (JSQLParserException e) {
-                    throw new ServiceException("数据权限解析异常 => " + e.getMessage());
-                }
-            }
+        if (StringUtils.isNull(currentUser) || currentUser.isAdmin()) {
+            return where;
         }
-        return where;
+        String dataFilterSql = buildDataFilter(currentUser, dataColumns);
+        if (StringUtils.isBlank(dataFilterSql)) {
+            return where;
+        }
+        try {
+            Expression expression = CCJSqlParserUtil.parseExpression(dataFilterSql);
+            if (ObjectUtil.isNotNull(where)) {
+                return new AndExpression(where, expression);
+            } else {
+                return expression;
+            }
+        } catch (JSQLParserException e) {
+            throw new ServiceException("数据权限解析异常 => " + e.getMessage());
+        }
     }
 
-    private DataScope findDataScopeAnnotation(String mappedStatementId) {
+    /**
+     * 构造数据过滤sql
+     */
+    private String buildDataFilter(SysUser user, DataColumn[] dataColumns) {
+        StringBuilder sqlString = new StringBuilder();
+
+        EvaluationContext context = new StandardEvaluationContext();
+        context.setVariable("userId", user.getUserId());
+        context.setVariable("deptId", user.getDeptId());
+
+        for (DataColumn dataColumn : dataColumns) {
+            // 设置注解变量 key 为表达式变量 value 为变量值
+            context.setVariable(dataColumn.key(), dataColumn.value());
+            for (SysRole role : user.getRoles()) {
+                context.setVariable("roleId", role.getRoleId());
+                // 获取角色权限泛型
+                DataScopeType type = DataScopeType.findCode(role.getDataScope());
+                if (ObjectUtil.isNull(type)) {
+                    throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
+                }
+                // 全部数据权限直接返回
+                if (type == DataScopeType.DATA_SCOPE_ALL) {
+                    return "";
+                }
+                // 解析sql模板并填充
+                String sql = parser.parseExpression(type.getSql(), parserContext).getValue(context, String.class);
+                sqlString.append(sql);
+            }
+        }
+
+        if (StringUtils.isNotBlank(sqlString.toString())) {
+            return sqlString.substring(4);
+        }
+        return "";
+    }
+
+    private DataColumn[] findAnnotation(String mappedStatementId) {
         StringBuilder sb = new StringBuilder(mappedStatementId);
         int index = sb.lastIndexOf(".");
         String clazzName = sb.substring(0, index);
@@ -68,51 +113,13 @@ public class PlusDataPermissionHandler implements DataPermissionHandler {
         Class<?> clazz = ClassUtil.loadClass(clazzName);
         List<Method> methods = Arrays.stream(ClassUtil.getDeclaredMethods(clazz))
             .filter(method -> method.getName().equals(methodName)).collect(Collectors.toList());
-        DataScope dataScope = null;
+        DataPermission dataPermission;
         for (Method method : methods) {
-            if (AnnotationUtil.hasAnnotation(method, DataScope.class)) {
-                dataScope = AnnotationUtil.getAnnotation(method, DataScope.class);
-                break;
+            if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
+                dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
+                return dataPermission.value();
             }
         }
-        return dataScope;
-    }
-
-    /**
-     * 数据范围过滤
-     *
-     * @param user      用户
-     */
-    public static String dataScopeFilter(SysUser user, DataScope annotation) {
-        StringBuilder sqlString = new StringBuilder();
-
-        ExpressionParser parser = new SpelExpressionParser();
-        TemplateParserContext parserContext = new TemplateParserContext();
-        EvaluationContext context = new StandardEvaluationContext(new HashMap<>());
-        context.setVariable("deptName", annotation.deptName());
-        context.setVariable("userName", annotation.userName());
-        context.setVariable("userId", user.getUserId());
-        context.setVariable("deptId", user.getDeptId());
-
-
-        for (SysRole role : user.getRoles()) {
-            context.setVariable("roleId", role.getRoleId());
-            DataScopeType type = DataScopeType.findCode(role.getDataScope());
-            if (ObjectUtil.isNull(type)) {
-                throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
-            }
-            if (type == DataScopeType.DATA_SCOPE_ALL) {
-                sqlString = new StringBuilder();
-                break;
-            }
-            org.springframework.expression.Expression expression = parser.parseExpression(type.getSql(), parserContext);
-            String sql = expression.getValue(context, String.class);
-            sqlString.append(sql);
-        }
-
-        if (StringUtils.isNotBlank(sqlString.toString())) {
-            return sqlString.substring(4);
-        }
-        return "";
+        return null;
     }
 }

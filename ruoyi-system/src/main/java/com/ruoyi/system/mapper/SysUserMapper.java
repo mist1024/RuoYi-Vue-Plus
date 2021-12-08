@@ -1,7 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.annotation.DataColumn;
+import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +16,10 @@ import java.util.List;
  */
 public interface SysUserMapper extends BaseMapperPlus<SysUser> {
 
-    @DataScope(deptName = "d.dept_id", userName = "u.user_id")
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id"),
+        @DataColumn(key = "userName", value = "u.user_id")
+    })
     Page<SysUser> selectPageUserList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
 
     /**
@@ -24,7 +28,10 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param sysUser 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptName = "d.dept_id", userName = "u.user_id")
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id"),
+        @DataColumn(key = "userName", value = "u.user_id")
+    })
     List<SysUser> selectUserList(SysUser sysUser);
 
     /**
@@ -33,7 +40,10 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptName = "d.dept_id", userName = "u.user_id")
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id"),
+        @DataColumn(key = "userName", value = "u.user_id")
+    })
     Page<SysUser> selectAllocatedList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
 
     /**
@@ -42,7 +52,10 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser> {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptName = "d.dept_id", userName = "u.user_id")
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id"),
+        @DataColumn(key = "userName", value = "u.user_id")
+    })
     Page<SysUser> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param("user") SysUser user);
 
     /**
