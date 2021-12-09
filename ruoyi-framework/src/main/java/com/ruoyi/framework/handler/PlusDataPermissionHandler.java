@@ -88,7 +88,7 @@ public class PlusDataPermissionHandler {
                     throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
                 }
                 // 全部数据权限直接返回
-                if (type == DataScopeType.DATA_SCOPE_ALL) {
+                if (type == DataScopeType.ALL) {
                     return "";
                 }
                 // 不包含 key 变量 则不处理

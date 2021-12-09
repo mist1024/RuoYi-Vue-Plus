@@ -9,6 +9,8 @@ import lombok.Getter;
  *
  * 语法支持 spel 模板表达式
  *
+ * 内置数据 当前用户的 deptId 部门id roleId 角色id userId 用户id
+ *
  * @author Lion Li
  */
 @Getter
@@ -18,27 +20,27 @@ public enum DataScopeType {
     /**
      * 全部数据权限
      */
-    DATA_SCOPE_ALL("1", ""),
+    ALL("1", ""),
 
     /**
      * 自定数据权限
      */
-    DATA_SCOPE_CUSTOM("2", " #{#deptName} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = #{#roleId} ) "),
+    CUSTOM("2", " #{#deptName} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = #{#roleId} ) "),
 
     /**
      * 部门数据权限
      */
-    DATA_SCOPE_DEPT("3", " #{#deptName} = #{#deptId} "),
+    DEPT("3", " #{#deptName} = #{#deptId} "),
 
     /**
      * 部门及以下数据权限
      */
-    DATA_SCOPE_DEPT_AND_CHILD("4", " #{#deptName} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = #{#deptId} OR find_in_set( #{#deptId} , ancestors ) )"),
+    DEPT_AND_CHILD("4", " #{#deptName} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = #{#deptId} OR find_in_set( #{#deptId} , ancestors ) )"),
 
     /**
      * 仅本人数据权限
      */
-    DATA_SCOPE_SELF("5", " #{#userName?:1} = #{#userId?:0} ");
+    SELF("5", " #{#userName?:1} = #{#userId} ");
 
     private final String code;
 

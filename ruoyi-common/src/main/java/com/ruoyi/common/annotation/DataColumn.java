@@ -12,8 +12,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface DataColumn {
 
-    String key();
+    String key() default "deptName";
 
-    String value();
+    String value() default "dept_id";
 
 }
