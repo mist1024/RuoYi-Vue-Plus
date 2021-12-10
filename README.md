@@ -4,22 +4,22 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=RuoYi-Vue-Plus)
 <br>
-[![RuoYi-Vue-Plus](https://img.shields.io/badge/RuoYi_Vue_Plus-3.4.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+[![RuoYi-Vue-Plus](https://img.shields.io/badge/ruoyi_Vue_Plus-3.4.0-success.svg)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.5-blue.svg)]()
 [![JDK-8+](https://img.shields.io/badge/JDK-8-green.svg)]()
 [![JDK-11](https://img.shields.io/badge/JDK-11-green.svg)]()
 [![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
 
-> RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 `分布式集群` 场景升级(不兼容原框架)
+> RuoYi-Vue-Plus 是基于 ruoyi-Vue 针对 `分布式集群` 场景升级(不兼容原框架)
 
 > 系统演示: [传送门](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/系统演示?sort_id=4836388)
 
 | 功能介绍 | 使用技术 | 文档地址 | 特性注意事项 |
 |---|---|---|---|
-| 当前框架 | RuoYi-Vue-Plus | [RuoYi-Vue-Plus文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages) | 重写RuoYi-Vue全方位升级(不兼容原框架) |
+| 当前框架 | RuoYi-Vue-Plus | [RuoYi-Vue-Plus文档](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/wikis/pages) | 重写ruoyi-Vue全方位升级(不兼容原框架) |
 | satoken分支 | RuoYi-Vue-Plus-satoken | [satoken分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/) | 使用satoken重构权限鉴权(公测 可尝试上生产) |
 | 单体分支 | RuoYi-Vue-Plus-fast | [fast分支地址](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/) | 单体应用结构 |
-| 原框架 | RuoYi-Vue | [RuoYi-Vue官网](http://ruoyi.vip/) | 定期同步需要的功能 |
+| 原框架 | ruoyi-Vue | [ruoyi-Vue官网](http://ruoyi.vip/) | 定期同步需要的功能 |
 | 前端开发框架 | Vue、Element UI | [Element UI官网](https://element.eleme.cn/#/zh-CN) | |
 | 后端开发框架 | SpringBoot | [SpringBoot官网](https://spring.io/projects/spring-boot/#learn) | |
 | 容器框架 | Undertow | [Undertow官网](https://undertow.io/) | 基于 Netty 的高性能容器 |
@@ -71,7 +71,7 @@
 
 ### 其他
 
-* 同步升级 RuoYi-Vue
+* 同步升级 ruoyi-Vue
 * GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/JavaLionLi/RuoYi-Vue-Plus)
 * 单模块 fast 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/fast/)
 * satoken 分支 [RuoYi-Vue-Plus-satoken](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/)

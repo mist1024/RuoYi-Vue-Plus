@@ -28,7 +28,7 @@ services:
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.36
 
   nginx-web:
@@ -52,7 +52,7 @@ services:
     privileged: true
     restart: always
     networks:
-      - ruoyi_net
+      - wild_net
 
   redis:
     image: redis:6.2.6
@@ -71,7 +71,7 @@ services:
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.48
 
   minio:
@@ -86,9 +86,9 @@ services:
       # 时区上海
       TZ: Asia/Shanghai
       # 管理后台用户名
-      MINIO_ACCESS_KEY: ruoyi
+      MINIO_ACCESS_KEY: wild
       # 管理后台密码，最小8个字符
-      MINIO_SECRET_KEY: ruoyi123
+      MINIO_SECRET_KEY: wild123
     volumes:
       # 映射当前目录下的data目录至容器内/data目录
       - /docker/minio/data:/data
@@ -98,71 +98,71 @@ services:
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.54
 
-  ruoyi-server1:
-    image: "ruoyi/ruoyi-server:3.4.0"
-    container_name: ruoyi-server1
+  wild-server1:
+    image: "wild/wild-server:3.4.0"
+    container_name: wild-server1
     environment:
       # 时区上海
       TZ: Asia/Shanghai
     volumes:
       # 配置文件
-      - /docker/server1/logs/:/ruoyi/server/logs/
+      - /docker/server1/logs/:/wild/server/logs/
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.60
 
-  ruoyi-server2:
-    image: "ruoyi/ruoyi-server:3.4.0"
-    container_name: ruoyi-server2
+  wild-server2:
+    image: "wild/wild-server:3.4.0"
+    container_name: wild-server2
     environment:
       # 时区上海
       TZ: Asia/Shanghai
     volumes:
       # 配置文件
-      - /docker/server2/logs/:/ruoyi/server/logs/
+      - /docker/server2/logs/:/wild/server/logs/
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.61
 
-  ruoyi-monitor-admin:
-    image: "ruoyi/ruoyi-monitor-admin:3.4.0"
-    container_name: ruoyi-monitor-admin
+  wild-monitor-admin:
+    image: "wild/wild-monitor-admin:3.4.0"
+    container_name: wild-monitor-admin
     environment:
       # 时区上海
       TZ: Asia/Shanghai
     volumes:
       # 配置文件
-      - /docker/monitor/logs/:/ruoyi/monitor/logs
+      - /docker/monitor/logs/:/wild/monitor/logs
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.90
 
-  ruoyi-xxl-job-admin:
-    image: "ruoyi/ruoyi-xxl-job-admin:3.4.0"
-    container_name: ruoyi-xxl-job-admin
+  wild-xxl-job-admin:
+    image: "wild/wild-xxl-job-admin:3.4.0"
+    container_name: wild-xxl-job-admin
     environment:
       # 时区上海
       TZ: Asia/Shanghai
     volumes:
       # 配置文件
-      - /docker/xxljob/logs/:/ruoyi/xxljob/logs
+      - /docker/xxljob/logs/:/wild/xxljob/logs
     privileged: true
     restart: always
     networks:
-      ruoyi_net:
+      wild_net:
         ipv4_address: 172.30.0.92
 
 networks:
-  ruoyi_net:
+  wild_net:
     driver: bridge
     ipam:
       config:

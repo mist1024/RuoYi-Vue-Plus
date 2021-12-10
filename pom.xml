@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ruoyi</groupId>
-    <artifactId>ruoyi-vue-plus</artifactId>
+    <groupId>com.wild</groupId>
+    <artifactId>wild-vue-plus</artifactId>
     <version>3.4.0</version>
 
-    <name>RuoYi-Vue-Plus</name>
-    <url>https://gitee.com/JavaLionLi/RuoYi-Vue-Plus</url>
-    <description>RuoYi-Vue-Plus后台管理系统</description>
+    <name>wild-vue-plus</name>
+    <url>https://gitee.com/JavaLionLi/wild-vue-plus</url>
+    <description>wild-vue-plus后台管理系统</description>
 
     <properties>
-        <ruoyi-vue-plus.version>3.4.0</ruoyi-vue-plus.version>
+        <wild-vue-plus.version>3.4.0</wild-vue-plus.version>
         <spring-boot.version>2.5.7</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -49,7 +49,7 @@
         <!-- docker 配置 -->
         <docker.registry.url>localhost</docker.registry.url>
         <docker.registry.host>http://${docker.registry.url}:2375</docker.registry.host>
-        <docker.namespace>ruoyi</docker.namespace>
+        <docker.namespace>wild</docker.namespace>
         <docker.plugin.version>1.2.2</docker.plugin.version>
 
     </properties>
@@ -232,66 +232,66 @@
 
             <!-- 定时任务 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-job</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-job</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
             <!-- 代码生成-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-generator</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-generator</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
             <!-- 核心模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-framework</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-framework</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
             <!-- 系统模块-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-system</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-system</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-common</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
             <!-- OSS对象存储模块 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-oss</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-oss</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
             <!-- demo模块 -->
             <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-demo</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
+                <groupId>com.wild</groupId>
+                <artifactId>wild-demo</artifactId>
+                <version>${wild-vue-plus.version}</version>
             </dependency>
 
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>ruoyi-admin</module>
-        <module>ruoyi-framework</module>
-        <module>ruoyi-system</module>
-        <module>ruoyi-job</module>
-        <module>ruoyi-generator</module>
-        <module>ruoyi-common</module>
-        <module>ruoyi-demo</module>
-        <module>ruoyi-extend</module>
-        <module>ruoyi-oss</module>
+        <module>wild-admin</module>
+        <module>wild-framework</module>
+        <module>wild-system</module>
+        <module>wild-job</module>
+        <module>wild-generator</module>
+        <module>wild-common</module>
+        <module>wild-demo</module>
+        <module>wild-extend</module>
+        <module>wild-oss</module>
     </modules>
     <packaging>pom</packaging>
 

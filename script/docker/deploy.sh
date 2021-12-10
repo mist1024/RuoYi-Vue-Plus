@@ -45,17 +45,17 @@ base(){
 
 #启动监控模块
 monitor(){
-	docker-compose up -d ruoyi-monitor-admin
+	docker-compose up -d wild-monitor-admin
 }
 
 #启动程序模块
 start(){
-	docker-compose up -d ruoyi-xxl-job-admin ruoyi-server1 ruoyi-server2
+	docker-compose up -d wild-xxl-job-admin wild-server1 wild-server2
 }
 
 #停止程序模块
 stop(){
-	docker-compose stop ruoyi-xxl-job-admin ruoyi-server1 ruoyi-server2
+	docker-compose stop wild-xxl-job-admin wild-server1 wild-server2
 }
 
 #关闭所有模块
