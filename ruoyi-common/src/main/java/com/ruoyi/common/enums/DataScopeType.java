@@ -9,7 +9,10 @@ import lombok.Getter;
  *
  * 语法支持 spel 模板表达式
  *
- * 内置数据 当前用户的 deptId 部门id roleId 角色id userId 用户id
+ * 内置数据 user 当前用户 内容参考 SysUser
+ * 如需扩展数据 需往 SysUser 内注入
+ * 内置服务 sdss 系统数据权限服务 内容参考 SysDataScopeService
+ * 如需扩展更多自定义服务 可以参考 sdss 自行编写
  *
  * @author Lion Li
  */
@@ -25,22 +28,22 @@ public enum DataScopeType {
     /**
      * 自定数据权限
      */
-    CUSTOM("2", " #{#deptName} IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = #{#roleId} ) "),
+    CUSTOM("2", " #{#deptName} IN ( #{@sdss.getRoleCustom( #user.roleId )} ) "),
 
     /**
      * 部门数据权限
      */
-    DEPT("3", " #{#deptName} = #{#deptId} "),
+    DEPT("3", " #{#deptName} = #{#user.deptId} "),
 
     /**
      * 部门及以下数据权限
      */
-    DEPT_AND_CHILD("4", " #{#deptName} IN ( SELECT dept_id FROM sys_dept WHERE dept_id = #{#deptId} OR find_in_set( #{#deptId} , ancestors ) )"),
+    DEPT_AND_CHILD("4", " #{#deptName} IN ( #{@sdss.getDeptAndChild( #user.deptId )} )"),
 
     /**
      * 仅本人数据权限
      */
-    SELF("5", " #{#userName?:1} = #{#userId} ");
+    SELF("5", " #{#userName?:1} = #{#user.userId} ");
 
     private final String code;
 

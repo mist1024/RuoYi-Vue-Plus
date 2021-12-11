@@ -19,7 +19,8 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import org.springframework.expression.EvaluationContext;
+import org.springframework.context.expression.BeanFactoryResolver;
+import org.springframework.expression.BeanResolver;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
@@ -41,6 +42,7 @@ public class PlusDataPermissionHandler {
 
     private final ExpressionParser parser = new SpelExpressionParser();
     private final ParserContext parserContext = new TemplateParserContext();
+    private final BeanResolver beanResolver = new BeanFactoryResolver(SpringUtils.getBeanFactory());
 
     public Expression getSqlSegment(Expression where, String mappedStatementId, boolean isSelect) {
         DataColumn[] dataColumns = findAnnotation(mappedStatementId);
@@ -74,15 +76,16 @@ public class PlusDataPermissionHandler {
     private String buildDataFilter(SysUser user, DataColumn[] dataColumns, boolean isSelect) {
         StringBuilder sqlString = new StringBuilder();
 
-        EvaluationContext context = new StandardEvaluationContext();
-        context.setVariable("userId", user.getUserId());
-        context.setVariable("deptId", user.getDeptId());
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        context.setBeanResolver(beanResolver);
+        context.setVariable("user", user);
 
         for (DataColumn dataColumn : dataColumns) {
             // 设置注解变量 key 为表达式变量 value 为变量值
             context.setVariable(dataColumn.key(), dataColumn.value());
             for (SysRole role : user.getRoles()) {
-                context.setVariable("roleId", role.getRoleId());
+                user.setRoleId(role.getRoleId());
+
                 // 获取角色权限泛型
                 DataScopeType type = DataScopeType.findCode(role.getDataScope());
                 if (ObjectUtil.isNull(type)) {
