@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.system.domain.SysRoleDept;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("sdss")
 public class SysDataScopeServiceImpl implements SysDataScopeService {
@@ -28,7 +29,7 @@ public class SysDataScopeServiceImpl implements SysDataScopeService {
                 .select(SysRoleDept::getDeptId)
                 .eq(SysRoleDept::getRoleId, roleId));
         if (CollUtil.isNotEmpty(list)) {
-            return StrUtil.join(",", list);
+            return list.stream().map(rd -> Convert.toStr(rd.getDeptId())).collect(Collectors.joining(","));
         }
         return null;
     }
@@ -41,7 +42,7 @@ public class SysDataScopeServiceImpl implements SysDataScopeService {
             .or()
             .apply("find_in_set({0},ancestors)", deptId));
         if (CollUtil.isNotEmpty(list)) {
-            return StrUtil.join(",", list);
+            return list.stream().map(d -> Convert.toStr(d.getDeptId())).collect(Collectors.joining(","));
         }
         return null;
     }
