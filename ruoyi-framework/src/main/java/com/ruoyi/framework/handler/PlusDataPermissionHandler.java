@@ -21,6 +21,8 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -38,6 +40,7 @@ import java.util.stream.Collectors;
 public class PlusDataPermissionHandler {
 
     private final ExpressionParser parser = new SpelExpressionParser();
+    private final ParserContext parserContext = new TemplateParserContext();
 
     public Expression getSqlSegment(Expression where, String mappedStatementId, boolean isSelect) {
         DataColumn[] dataColumns = findAnnotation(mappedStatementId);
@@ -96,7 +99,7 @@ public class PlusDataPermissionHandler {
                 // 更新或删除需满足所有条件
                 sqlString.append(isSelect ? " OR " : " AND ");
                 // 解析sql模板并填充
-                String sql = parser.parseExpression(type.getSql()).getValue(context, String.class);
+                String sql = parser.parseExpression(type.getSql(), parserContext).getValue(context, String.class);
                 sqlString.append(sql);
             }
         }
