@@ -12,8 +12,14 @@ import java.lang.annotation.*;
 @Documented
 public @interface DataColumn {
 
+    /**
+     * 占位符关键字
+     */
     String key() default "deptName";
 
+    /**
+     * 占位符替换值
+     */
     String value() default "dept_id";
 
 }
