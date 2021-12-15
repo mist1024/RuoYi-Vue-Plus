@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
@@ -13,7 +12,6 @@ import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.UserService;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -54,10 +52,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     private SysUserPostMapper userPostMapper;
 
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery) {
-        Page<SysUser> page = baseMapper.selectPageUserList(PageUtils.buildPage(pageQuery), user);
-        return PageUtils.buildDataInfo(page);
+        Page<SysUser> page = baseMapper.selectPageUserList(pageQuery.build(), user);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -67,7 +64,6 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public List<SysUser> selectUserList(SysUser user) {
         return baseMapper.selectUserList(user);
     }
@@ -79,10 +75,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public TableDataInfo<SysUser> selectAllocatedList(SysUser user, PageQuery pageQuery) {
-        Page<SysUser> page = baseMapper.selectAllocatedList(PageUtils.buildPage(pageQuery), user);
-        return PageUtils.buildDataInfo(page);
+        Page<SysUser> page = baseMapper.selectAllocatedList(pageQuery.build(), user);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -92,10 +87,9 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u", isUser = true)
     public TableDataInfo<SysUser> selectUnallocatedList(SysUser user, PageQuery pageQuery) {
-        Page<SysUser> page = baseMapper.selectUnallocatedList(PageUtils.buildPage(pageQuery), user);
-        return PageUtils.buildDataInfo(page);
+        Page<SysUser> page = baseMapper.selectUnallocatedList(pageQuery.build(), user);
+        return TableDataInfo.build(page);
     }
 
     /**
