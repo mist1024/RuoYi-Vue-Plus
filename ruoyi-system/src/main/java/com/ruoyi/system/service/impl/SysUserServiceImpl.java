@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.text.StrJoiner;
-import cn.hutool.core.text.StrPool;
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -31,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -129,8 +129,10 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public String selectUserRoleGroup(String userName) {
         List<SysRole> list = roleMapper.selectRolesByUserName(userName);
-        String idsStr = StrJoiner.of(StrPool.COMMA).append(list, (role) -> { return role.getRoleName(); }).toString();
-        return idsStr;
+        if (CollUtil.isEmpty(list)) {
+            return StringUtils.EMPTY;
+        }
+        return list.stream().map(SysRole::getRoleName).collect(Collectors.joining(","));
     }
 
     /**
@@ -142,8 +144,10 @@ public class SysUserServiceImpl extends ServicePlusImpl<SysUserMapper, SysUser, 
     @Override
     public String selectUserPostGroup(String userName) {
         List<SysPost> list = postMapper.selectPostsByUserName(userName);
-        String idsStr = StrJoiner.of(StrPool.COMMA).append(list, (post) -> { return post.getPostName(); }).toString();
-        return idsStr;
+        if (CollUtil.isEmpty(list)) {
+            return StringUtils.EMPTY;
+        }
+        return list.stream().map(SysPost::getPostName).collect(Collectors.joining(","));
     }
 
     /**
