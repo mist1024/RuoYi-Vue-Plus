@@ -47,7 +47,7 @@ import java.util.Map;
  */
 @Validated
 @Api(value = "OSS对象存储控制器", tags = {"OSS对象存储管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss")
 public class SysOssController extends BaseController {

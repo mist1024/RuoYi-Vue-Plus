@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  */
 @Validated
 @Api(value = "用户信息控制器", tags = {"用户信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user")
 public class SysUserController extends BaseController {

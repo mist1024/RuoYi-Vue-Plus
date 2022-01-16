@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @Validated
 @Api(value = "部门控制器", tags = {"部门管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dept")
 public class SysDeptController extends BaseController {

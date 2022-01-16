@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Validated
 @Api(value = "测试单表控制器", tags = {"测试单表管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/demo")
 public class TestDemoController extends BaseController {

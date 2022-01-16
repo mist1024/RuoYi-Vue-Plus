@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @Api(value = "优先队列 演示案例", tags = {"优先队列"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/queue/priority")
 public class PriorityQueueController {

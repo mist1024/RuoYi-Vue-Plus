@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Lion Li
  */
 @Api(value = "首页控制器", tags = {"首页管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 public class SysIndexController {
 

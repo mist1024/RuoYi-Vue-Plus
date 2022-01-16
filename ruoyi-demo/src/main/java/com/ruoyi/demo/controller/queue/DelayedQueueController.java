@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Api(value = "延迟队列 演示案例", tags = {"延迟队列"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/queue/delayed")
 public class DelayedQueueController {

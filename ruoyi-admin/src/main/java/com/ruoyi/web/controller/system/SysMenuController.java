@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Validated
 @Api(value = "菜单信息控制器", tags = {"菜单信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/menu")
 public class SysMenuController extends BaseController {

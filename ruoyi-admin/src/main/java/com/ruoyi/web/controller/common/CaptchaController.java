@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * @author Lion Li
  */
 @Api(value = "验证码操作处理", tags = {"验证码管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 public class CaptchaController {
 

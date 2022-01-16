@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Validated
 @Api(value = "数据字典信息控制器", tags = {"数据字典信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/dict/type")
 public class SysDictTypeController extends BaseController {

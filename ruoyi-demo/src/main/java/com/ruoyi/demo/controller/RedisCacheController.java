@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 // 类级别 缓存统一配置
 //@CacheConfig(cacheNames = "redissonCacheMap")
 @Api(value = "spring-cache 演示案例", tags = {"spring-cache 演示案例"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/cache")
 public class RedisCacheController {

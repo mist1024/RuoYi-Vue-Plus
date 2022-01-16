@@ -35,7 +35,7 @@ import java.util.Arrays;
  */
 @Validated
 @Api(value = "对象存储配置控制器", tags = {"对象存储配置管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss/config")
 public class SysOssConfigController extends BaseController {

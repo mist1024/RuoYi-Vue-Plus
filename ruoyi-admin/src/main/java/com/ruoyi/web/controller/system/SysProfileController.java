@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Validated
 @Api(value = "个人信息控制器", tags = {"个人信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/user/profile")
 public class SysProfileController extends BaseController {

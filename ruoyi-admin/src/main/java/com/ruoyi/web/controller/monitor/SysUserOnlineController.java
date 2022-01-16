@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * @author Lion Li
  */
 @Api(value = "在线用户监控", tags = {"在线用户监控管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/online")
 public class SysUserOnlineController extends BaseController {

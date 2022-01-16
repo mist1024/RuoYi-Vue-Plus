@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Validated
 @Api(value = "操作日志记录", tags = {"操作日志记录管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/operlog")
 public class SysOperlogController extends BaseController {

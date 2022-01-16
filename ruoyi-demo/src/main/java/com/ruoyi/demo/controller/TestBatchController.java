@@ -24,7 +24,7 @@ import java.util.List;
  * @date 2021-05-30
  */
 @Api(value = "测试批量方法", tags = {"测试批量方法"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/demo/batch")
 public class TestBatchController extends BaseController {

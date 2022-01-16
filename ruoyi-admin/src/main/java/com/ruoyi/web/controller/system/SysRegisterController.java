@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Validated
 @Api(value = "注册验证控制器", tags = {"注册验证管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 public class SysRegisterController extends BaseController {
 

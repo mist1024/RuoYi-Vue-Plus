@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Validated
 @Api(value = "岗位信息控制器", tags = {"岗位信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/post")
 public class SysPostController extends BaseController {

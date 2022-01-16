@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Validated
 @Api(value = "公告信息控制器", tags = {"公告信息管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/notice")
 public class SysNoticeController extends BaseController {

@@ -6,6 +6,8 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DeviceType;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.UtilException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * 登录鉴权工具
@@ -13,9 +15,10 @@ import com.ruoyi.common.exception.UtilException;
  *
  * @author Lion Li
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginUtils {
 
-    private final static String LOGIN_USER_KEY = "loginUser";
+    private static final String LOGIN_USER_KEY = "loginUser";
 
     /**
      * 登录系统

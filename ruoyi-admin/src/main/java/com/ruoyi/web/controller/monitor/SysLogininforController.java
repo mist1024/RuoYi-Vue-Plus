@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Validated
 @Api(value = "系统访问记录", tags = {"系统访问记录管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/monitor/logininfor")
 public class SysLogininforController extends BaseController {
