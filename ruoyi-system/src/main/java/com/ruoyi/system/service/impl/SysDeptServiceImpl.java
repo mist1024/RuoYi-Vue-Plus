@@ -92,14 +92,14 @@ public class SysDeptServiceImpl implements ISysDeptService {
     }
 
     /**
-     * 根据ID查询所有子部门是否存在（正常状态）
+     * 根据ID查询所有子部门数（正常状态）
      *
      * @param deptId 部门ID
      * @return 子部门数
      */
     @Override
-    public boolean checkNormalChildrenDeptById(Long deptId) {
-        return baseMapper.exists(new LambdaQueryWrapper<SysDept>()
+    public long selectNormalChildrenDeptById(Long deptId) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<SysDept>()
             .eq(SysDept::getStatus, UserConstants.DEPT_NORMAL)
             .apply("find_in_set({0}, ancestors)", deptId));
     }

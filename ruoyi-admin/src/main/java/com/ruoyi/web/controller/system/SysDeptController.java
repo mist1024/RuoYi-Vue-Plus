@@ -121,7 +121,7 @@ public class SysDeptController extends BaseController {
         } else if (dept.getParentId().equals(dept.getDeptId())) {
             return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
-            && deptService.checkNormalChildrenDeptById(dept.getDeptId())) {
+            && deptService.selectNormalChildrenDeptById(dept.getDeptId()) > 0) {
             return AjaxResult.error("该部门包含未停用的子部门！");
         }
         return toAjax(deptService.updateDept(dept));

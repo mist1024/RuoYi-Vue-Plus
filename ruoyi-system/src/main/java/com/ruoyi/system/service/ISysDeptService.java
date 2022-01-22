@@ -44,12 +44,12 @@ public interface ISysDeptService {
     SysDept selectDeptById(Long deptId);
 
     /**
-     * 根据ID查询所有子部门是否存在（正常状态）
+     * 根据ID查询所有子部门数（正常状态）
      *
      * @param deptId 部门ID
      * @return 子部门数
      */
-    boolean checkNormalChildrenDeptById(Long deptId);
+    long selectNormalChildrenDeptById(Long deptId);
 
     /**
      * 是否存在部门子节点
