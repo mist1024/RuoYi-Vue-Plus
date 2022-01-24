@@ -5,10 +5,15 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.service.LogininforService;
+import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
-import com.ruoyi.common.utils.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ruoyi.common.utils.MessageUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.redis.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,23 +21,23 @@ import org.springframework.stereotype.Service;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service
 public class SysRegisterService {
 
-    @Autowired
-    private ISysUserService userService;
-
-    @Autowired
-    private ISysConfigService configService;
-
-    @Autowired
-    private LogininforService asyncService;
+    private final ISysUserService userService;
+    private final ISysConfigService configService;
+    private final LogininforService asyncService;
 
     /**
      * 注册
      */
     public String register(RegisterBody registerBody) {
-        String msg = "", username = registerBody.getUsername(), password = registerBody.getPassword();
+        String msg = "";
+        String username = registerBody.getUsername();
+        String password = registerBody.getPassword();
+        // 校验用户类型是否存在
+        String userType = UserType.getUserType(registerBody.getUserType()).getUserType();
 
         boolean captchaOnOff = configService.selectCaptchaOnOff();
         // 验证码开关
@@ -45,10 +50,10 @@ public class SysRegisterService {
         } else if (StringUtils.isEmpty(password)) {
             msg = "用户密码不能为空";
         } else if (username.length() < UserConstants.USERNAME_MIN_LENGTH
-                || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
+            || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
             msg = "账户长度必须在2到20个字符之间";
         } else if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
-                || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
+            || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
             msg = "密码长度必须在5到20个字符之间";
         } else if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(username))) {
             msg = "保存用户'" + username + "'失败，注册账号已存在";
@@ -57,12 +62,13 @@ public class SysRegisterService {
             sysUser.setUserName(username);
             sysUser.setNickName(username);
             sysUser.setPassword(SecurityUtils.encryptPassword(registerBody.getPassword()));
+            sysUser.setUserType(userType);
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag) {
                 msg = "注册失败,请联系系统管理人员";
             } else {
                 asyncService.recordLogininfor(username, Constants.REGISTER,
-                        MessageUtils.message("user.register.success"), ServletUtils.getRequest());
+                    MessageUtils.message("user.register.success"), ServletUtils.getRequest());
             }
         }
         return msg;

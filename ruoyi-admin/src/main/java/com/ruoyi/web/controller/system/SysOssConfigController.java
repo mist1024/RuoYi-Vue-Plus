@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
@@ -17,8 +18,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,7 @@ import java.util.Arrays;
  */
 @Validated
 @Api(value = "对象存储配置控制器", tags = {"对象存储配置管理"})
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss/config")
 public class SysOssConfigController extends BaseController {
@@ -46,7 +45,7 @@ public class SysOssConfigController extends BaseController {
      * 查询对象存储配置列表
      */
     @ApiOperation("查询对象存储配置列表")
-    @PreAuthorize("@ss.hasPermi('system:oss:list')")
+    @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
     public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo, PageQuery pageQuery) {
         return iSysOssConfigService.queryPageList(bo, pageQuery);
@@ -56,7 +55,7 @@ public class SysOssConfigController extends BaseController {
      * 获取对象存储配置详细信息
      */
     @ApiOperation("获取对象存储配置详细信息")
-    @PreAuthorize("@ss.hasPermi('system:oss:query')")
+    @SaCheckPermission("system:oss:query")
     @GetMapping("/{ossConfigId}")
     public AjaxResult<SysOssConfigVo> getInfo(@ApiParam("OSS配置ID")
                                               @NotNull(message = "主键不能为空")
@@ -68,7 +67,7 @@ public class SysOssConfigController extends BaseController {
      * 新增对象存储配置
      */
     @ApiOperation("新增对象存储配置")
-    @PreAuthorize("@ss.hasPermi('system:oss:add')")
+    @SaCheckPermission("system:oss:add")
     @Log(title = "对象存储配置", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
@@ -80,7 +79,7 @@ public class SysOssConfigController extends BaseController {
      * 修改对象存储配置
      */
     @ApiOperation("修改对象存储配置")
-    @PreAuthorize("@ss.hasPermi('system:oss:edit')")
+    @SaCheckPermission("system:oss:edit")
     @Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
@@ -92,7 +91,7 @@ public class SysOssConfigController extends BaseController {
      * 删除对象存储配置
      */
     @ApiOperation("删除对象存储配置")
-    @PreAuthorize("@ss.hasPermi('system:oss:remove')")
+    @SaCheckPermission("system:oss:remove")
     @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossConfigIds}")
     public AjaxResult<Void> remove(@ApiParam("OSS配置ID串")
@@ -105,7 +104,7 @@ public class SysOssConfigController extends BaseController {
      * 状态修改
      */
     @ApiOperation("状态修改")
-    @PreAuthorize("@ss.hasPermi('system:oss:edit')")
+    @SaCheckPermission("system:oss:edit")
     @Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult<Void> changeStatus(@RequestBody SysOssConfigBo bo) {

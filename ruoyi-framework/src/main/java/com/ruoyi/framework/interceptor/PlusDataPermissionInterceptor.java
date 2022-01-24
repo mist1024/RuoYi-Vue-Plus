@@ -24,15 +24,27 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * 数据权限拦截器
+ *
+ * @author Lion Li
+ * @version 3.5.0
+ */
 public class PlusDataPermissionInterceptor extends JsqlParserSupport implements InnerInterceptor {
 
     private final PlusDataPermissionHandler dataPermissionHandler = new PlusDataPermissionHandler();
 
     @Override
     public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+        // 检查忽略注解
         if (InterceptorIgnoreHelper.willIgnoreDataPermission(ms.getId())) {
             return;
         }
+        // 检查是否无效 无数据权限注解
+        if (dataPermissionHandler.isInvalid(ms.getId())) {
+            return;
+        }
+        // 解析 sql 分配对应方法
         PluginUtils.MPBoundSql mpBs = PluginUtils.mpBoundSql(boundSql);
         mpBs.sql(parserSingle(mpBs.sql(), ms.getId()));
     }
