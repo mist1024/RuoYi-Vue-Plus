@@ -46,7 +46,7 @@ public class SysMenu extends TreeEntity {
 	 */
 	@ApiModelProperty(value = "显示顺序")
 	@NotBlank(message = "显示顺序不能为空")
-	private String orderNum;
+	private Integer orderNum;
 
 	/**
 	 * 路由地址
