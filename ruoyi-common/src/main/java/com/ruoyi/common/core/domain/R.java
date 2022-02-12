@@ -21,7 +21,7 @@ public class R<T> implements Serializable {
     /**
      * 成功
      */
-    public static final int SUCCESS = 200;
+    public static final int OK = 200;
 
     /**
      * 失败
@@ -38,46 +38,46 @@ public class R<T> implements Serializable {
     private T data;
 
     public static <T> R<T> ok() {
-        return restResult(null, SUCCESS, null);
+        return restResult(OK, null,null);
     }
 
     public static <T> R<T> ok(T data) {
-        return restResult(data, SUCCESS, null);
+        return restResult(OK, null,data);
     }
 
     public static <T> R<T> ok(String msg) {
-        return restResult(null, SUCCESS, msg);
+        return restResult( OK, msg,null);
     }
 
     public static <T> R<T> ok(String msg, T data) {
-        return restResult(data, SUCCESS, msg);
+        return restResult(OK, msg,data);
     }
 
     public static <T> R<T> fail() {
-        return restResult(null, FAIL, null);
+        return restResult( FAIL, null,null);
     }
 
     public static <T> R<T> fail(String msg) {
-        return restResult(null, FAIL, msg);
+        return restResult( FAIL, msg,null);
     }
 
     public static <T> R<T> fail(T data) {
-        return restResult(data, FAIL, null);
+        return restResult(FAIL, null,data);
     }
 
     public static <T> R<T> fail(String msg, T data) {
-        return restResult(data, FAIL, msg);
+        return restResult(FAIL, msg,data);
     }
 
     public static <T> R<T> fail(int code, String msg) {
-        return restResult(null, code, msg);
+        return restResult( code, msg,null);
     }
 
-    private static <T> R<T> restResult(T data, int code, String msg) {
+    private static <T> R<T> restResult(int code, String msg, T data) {
         R<T> r = new R<>();
         r.setCode(code);
-        r.setData(data);
         r.setMsg(msg);
+        r.setData(data);
         return r;
     }
 
