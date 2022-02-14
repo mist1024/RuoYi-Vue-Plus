@@ -219,12 +219,13 @@ swagger:
   enabled: true
   # 请求前缀
   pathMapping: /dev-api
-  # 标题
-  title: '标题：${ruoyi.name}后台管理系统_接口文档'
-  # 描述
-  description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
-  # 版本
-  version: '版本号: ${ruoyi-vue-plus.version}'
+  info:
+    # 标题
+    title: '标题：${ruoyi.name}后台管理系统_接口文档'
+    # 描述
+    description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
+    # 版本
+    version: '版本号: ${ruoyi-vue-plus.version}'
   # 作者信息
   contact:
     name: Lion Li
@@ -233,6 +234,18 @@ swagger:
   groups:
     - name: 1.演示案例
       basePackage: com.ruoyi.demo
+      info:
+        # 标题
+        title: '标题：${ruoyi.name}后台管理系统_案例演示'
+        # 描述
+        description: '描述：用于演示框架各种常用功能'
+        # 版本
+        version: '版本号: ${ruoyi-vue-plus.version}'
+      # 作者信息
+      contact:
+        name: Lion Li, Xiao Xie
+        email: crazylionli@163.com
+        url: https://gitee.com/JavaLionLi/RuoYi-Vue-Plus
     - name: 2.系统模块
       basePackage: com.ruoyi.web
     - name: 3.代码生成模块

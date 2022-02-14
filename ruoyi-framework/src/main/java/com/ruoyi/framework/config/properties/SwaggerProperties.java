@@ -18,25 +18,19 @@ import java.util.List;
 public class SwaggerProperties {
 
     /**
-     * 验证码类型
+     * API文档开关
      */
     private Boolean enabled;
+
     /**
      * 设置请求的统一前缀
      */
     private String pathMapping;
+
     /**
-     * 验证码类别
+     * 文档基本信息
      */
-    private String title;
-    /**
-     * 数字验证码位数
-     */
-    private String description;
-    /**
-     * 字符验证码长度
-     */
-    private String version;
+    private Info info;
 
     /**
      * 联系方式
@@ -47,6 +41,23 @@ public class SwaggerProperties {
      * 组配置
      */
     private List<Groups> groups;
+
+    @Data
+    @NoArgsConstructor
+    public static class Info {
+        /**
+         * API文档标题
+         */
+        private String title = "";
+        /**
+         * 摘要
+         */
+        private String description="";
+        /**
+         * 版本
+         */
+        private String version="";
+    }
 
     @Data
     @NoArgsConstructor
@@ -82,6 +93,16 @@ public class SwaggerProperties {
          * 基础包路径
          */
         private String basePackage;
+
+        /**
+         * 模块基本信息
+         */
+        private Info info;
+
+        /**
+         * 联系方式
+         */
+        private Contact contact;
 
     }
 
