@@ -84,7 +84,7 @@ public class SwaggerConfig {
             Docket docket = new Docket(DocumentationType.OAS_30)
                 .enable(swaggerProperties.getEnabled())
                 // 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
-                .apiInfo(apiInfo())
+                .apiInfo(apiInfo(group.getInfo(), group.getContact()))
                 // 设置哪些接口暴露给Swagger展示
                 .select()
                 // 扫描所有有注解的api，用这种方式更灵活
@@ -143,18 +143,18 @@ public class SwaggerConfig {
     /**
      * 添加摘要信息
      */
-    private ApiInfo apiInfo() {
+    private ApiInfo apiInfo(SwaggerProperties.Info info, SwaggerProperties.Contact contact) {
+        info = info != null ? info : swaggerProperties.getInfo();
         // 用ApiInfoBuilder进行定制
-        SwaggerProperties.Contact contact = swaggerProperties.getContact();
-        return new ApiInfoBuilder()
+        contact = contact != null ? contact : swaggerProperties.getContact();return new ApiInfoBuilder()
             // 设置标题
-            .title(swaggerProperties.getTitle())
+            .title(info.getTitle())
             // 描述
-            .description(swaggerProperties.getDescription())
+            .description(info.getDescription())
             // 作者信息
             .contact(new Contact(contact.getName(), contact.getUrl(), contact.getEmail()))
             // 版本
-            .version(swaggerProperties.getVersion())
+            .version(info.getVersion())
             .build();
     }
 }
