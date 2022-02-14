@@ -18,7 +18,7 @@ import java.util.List;
 public class SwaggerProperties {
 
     /**
-     * 验证码类型
+     * 接口文档开关
      */
     private Boolean enabled;
     /**
@@ -26,15 +26,15 @@ public class SwaggerProperties {
      */
     private String pathMapping;
     /**
-     * 验证码类别
+     * 项目标题
      */
     private String title;
     /**
-     * 数字验证码位数
+     * 项目描述
      */
     private String description;
     /**
-     * 字符验证码长度
+     * 项目版本
      */
     private String version;
 
