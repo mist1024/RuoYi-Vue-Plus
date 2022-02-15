@@ -122,5 +122,15 @@ public interface Constants {
      */
     String SYS_DICT_KEY = "sys_dict:";
 
+    /**
+     * Long数据类型默认根节点
+     */
+    Long LongRootId = 0L;
+
+    /**
+     * String数据类型默认根节点
+     */
+    String StringRootId = "0";
+
 }
 
