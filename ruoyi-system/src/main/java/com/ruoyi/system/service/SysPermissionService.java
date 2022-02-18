@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.helper.LoginHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class SysPermissionService {
     public Set<String> getRolePermission(SysUser user) {
         Set<String> roles = new HashSet<String>();
         // 管理员拥有所有权限
-        if (user.isAdmin()) {
+        if (LoginHelper.isAdmin(user.getUserId())) {
             roles.add("admin");
         } else {
             roles.addAll(roleService.selectRolePermissionByUserId(user.getUserId()));
@@ -45,7 +46,7 @@ public class SysPermissionService {
     public Set<String> getMenuPermission(SysUser user) {
         Set<String> perms = new HashSet<String>();
         // 管理员拥有所有权限
-        if (user.isAdmin()) {
+        if (LoginHelper.isAdmin(user.getUserId())) {
             perms.add("*:*:*");
         } else {
             perms.addAll(menuService.selectMenuPermsByUserId(user.getUserId()));

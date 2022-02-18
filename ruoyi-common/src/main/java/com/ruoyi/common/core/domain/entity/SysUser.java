@@ -183,13 +183,4 @@ public class SysUser extends BaseEntity {
         this.userId = userId;
     }
 
-    @ApiModelProperty(value = "是否管理员")
-    public boolean isAdmin() {
-        return isAdmin(this.userId);
-    }
-
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
-    }
-
 }
