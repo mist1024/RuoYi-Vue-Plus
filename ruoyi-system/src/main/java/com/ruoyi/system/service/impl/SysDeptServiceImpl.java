@@ -14,7 +14,6 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TreeBuildUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
@@ -22,6 +21,7 @@ import com.ruoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +46,15 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public List<SysDept> selectDeptList(SysDept dept) {
-        return baseMapper.selectDeptList(dept);
+        LambdaQueryWrapper<SysDept> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(SysDept::getDelFlag, "0")
+            .eq(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId())
+            .eq(ObjectUtil.isNotNull(dept.getParentId()), SysDept::getParentId, dept.getParentId())
+            .like(StringUtils.isNotBlank(dept.getDeptName()), SysDept::getDeptName, dept.getDeptName())
+            .eq(StringUtils.isNotBlank(dept.getStatus()), SysDept::getStatus, dept.getStatus())
+            .orderByAsc(SysDept::getParentId)
+            .orderByAsc(SysDept::getOrderNum);
+        return baseMapper.selectDeptList(lqw);
     }
 
     /**
@@ -155,7 +163,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         if (!LoginHelper.isAdmin()) {
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);
-            List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
+            List<SysDept> depts = this.selectDeptList(dept);
             if (CollUtil.isEmpty(depts)) {
                 throw new ServiceException("没有权限访问部门数据！");
             }
@@ -227,11 +235,15 @@ public class SysDeptServiceImpl implements ISysDeptService {
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors) {
         List<SysDept> children = baseMapper.selectList(new LambdaQueryWrapper<SysDept>()
             .apply("find_in_set({0},ancestors)", deptId));
+        List<SysDept> list = new ArrayList<>();
         for (SysDept child : children) {
-            child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            SysDept dept = new SysDept();
+            dept.setDeptId(child.getDeptId());
+            dept.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            list.add(dept);
         }
-        if (children.size() > 0) {
-            baseMapper.updateDeptChildren(children);
+        if (list.size() > 0) {
+            baseMapper.updateBatchById(list);
         }
     }
 
