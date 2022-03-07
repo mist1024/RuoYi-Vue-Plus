@@ -68,11 +68,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDbTableListByNames" resultMap="GenTableResult">
         select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
         from user_tables dt, user_tab_comments dtc, user_objects uo
-        where dt.table_name = dtc.table_name
-        and dt.table_name = uo.object_name
+        where dt.table_name = dtc.table_name and dt.table_name = uo.object_name
         and uo.object_type = 'TABLE'
-        AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
-        AND dt.table_name NOT IN (select table_name from gen_table)
+        and dt.table_name not like 'XXL_JOB_%' and dt.table_name not like 'GEN_%'
+        and not exists (select (1) from gen_table gt where gt.table_name = lower(dt.table_name))
         and lower(dt.table_name) in
         <foreach collection="array" item="name" open="(" separator="," close=")">
             #{name}
@@ -82,11 +81,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectTableByName" parameterType="String" resultMap="GenTableResult">
         select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
         from user_tables dt, user_tab_comments dtc, user_objects uo
-        where dt.table_name = dtc.table_name
-        and dt.table_name = uo.object_name
+        where dt.table_name = dtc.table_name and dt.table_name = uo.object_name
         and uo.object_type = 'TABLE'
-        AND dt.table_name NOT LIKE 'XXL_JOB_%' AND dt.table_name NOT LIKE 'GEN_%'
-        AND dt.table_name NOT IN (select table_name from gen_table)
+        and dt.table_name not like 'XXL_JOB_%' and dt.table_name not like 'GEN_%'
+        and not exists (select (1) from gen_table gt where gt.table_name = lower(dt.table_name))
         and lower(dt.table_name) = #{tableName}
     </select>
 

@@ -127,9 +127,9 @@ public class OracleGenTableServiceImpl extends BaseGenTableServiceImpl {
         wrapper.apply("dt.table_name = dtc.table_name")
             .apply("dt.table_name = uo.object_name")
             .eq("uo.object_type ", "TABLE")
-            .notLike("dt.table_name", "XXL_JOB_")
-            .notLike("dt.table_name", "GEN_")
-            .notInSql("lower(dt.table_name)", "select table_name from gen_table")
+            .apply("dt.table_name not like 'XXL_JOB_%'")
+            .apply("dt.table_name not like 'GEN_%'")
+            .apply("not exists (select (1) from gen_table gt where gt.table_name = lower(dt.table_name))")
             .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(dt.table_name)", StringUtils.lowerCase(genTable.getTableName()))
             .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(dt.table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
             .between(params.get("beginTime") != null && params.get("endTime") != null,
