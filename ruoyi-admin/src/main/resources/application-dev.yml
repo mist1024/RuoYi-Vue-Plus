@@ -70,6 +70,9 @@ spring:
 #          url: jdbc:oracle:thin:@//localhost:1521/XE?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
 #          username: ROOT
 #          password: root
+#          druid:
+#            # 物理连接初始化的时候执行的 sql，设置 Oracle 默认的 Date 类型格式化，简化时间查询
+#            initConnectionSqls: ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
       druid:
         # 初始连接数
         initialSize: 5
@@ -92,6 +95,8 @@ spring:
         testOnReturn: false
         # 注意这个值和druid原生不一致，默认启动了stat
         filters: stat
+        # 物理连接初始化的时候执行的 sql
+        initConnectionSqls:
 
 --- # druid 配置
 spring:
