@@ -213,7 +213,7 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      const obj = { path: "/tool/gen", query: { t: Date.now(), pageNum: this.$route.query.pageNum } };
+      const obj = { name: "Gen", query: { t: Date.now(), pageNum: this.$route.query.pageNum } };
       this.$tab.closeOpenPage(obj);
     }
   },

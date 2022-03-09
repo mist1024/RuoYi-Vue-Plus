@@ -327,7 +327,7 @@ export default {
     },
     /** 返回按钮操作 */
     handleClose() {
-      const obj = { path: "/system/dict" };
+      const obj = { name: "Dict" };
       this.$tab.closeOpenPage(obj);
     },
     /** 重置按钮操作 */
