@@ -74,8 +74,10 @@ service.interceptors.response.use(res => {
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
     // 二进制数据则直接返回
-    if(res.request.responseType ===  'blob' || res.request.responseType ===  'arraybuffer'){
+    if(res.request.responseType ===  'arraybuffer'){
       return res.data
+    } else if(res.request.responseType ===  'blob' ){
+      return res
     }
     if (code === 401) {
       if (!isRelogin.show) {
@@ -97,6 +99,7 @@ service.interceptors.response.use(res => {
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
       Message({
+        dangerouslyUseHTMLString: true,
         message: msg,
         type: 'error'
       })
@@ -138,10 +141,17 @@ export function download(url, params, filename) {
     transformRequest: [(params) => { return tansParams(params) }],
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     responseType: 'blob'
-  }).then(async (data) => {
+  }).then(async (response) => {
+    let data = response.data
     const isLogin = await blobValidate(data);
     if (isLogin) {
       const blob = new Blob([data])
+      // 后台设置的下载文件名称
+      let downloadFileName = response['headers']["download-filename"];
+      // 如果前端不自定义文件名称，则使用后台设置的名称
+      if (!filename && downloadFileName) {
+        filename = decodeURI(downloadFileName);
+      }
       saveAs(blob, filename)
     } else {
       const resText = await data.text();
