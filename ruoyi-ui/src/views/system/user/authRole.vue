@@ -109,7 +109,7 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      const obj = { path: "/system/user" };
+      const obj = { name: "User" };
       this.$tab.closeOpenPage(obj);
     },
   },
