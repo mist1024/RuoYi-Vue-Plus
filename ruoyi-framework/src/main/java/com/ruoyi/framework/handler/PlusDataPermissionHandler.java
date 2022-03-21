@@ -7,9 +7,8 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.DataColumn;
 import com.ruoyi.common.annotation.DataPermission;
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.service.UserService;
+import com.ruoyi.common.core.domain.dto.RoleDTO;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.DataScopeType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.DataPermissionHelper;
@@ -74,13 +73,13 @@ public class PlusDataPermissionHandler {
             inavlidCacheSet.add(mappedStatementId);
             return where;
         }
-        SysUser currentUser = DataPermissionHelper.getVariable("user");
+        LoginUser currentUser = DataPermissionHelper.getVariable("user");
         if (ObjectUtil.isNull(currentUser)) {
-            currentUser = SpringUtils.getBean(UserService.class).selectUserById(LoginHelper.getUserId());
+            currentUser = LoginHelper.getLoginUser();
             DataPermissionHelper.setVariable("user", currentUser);
         }
         // 如果是超级管理员，则不过滤数据
-        if (ObjectUtil.isNull(currentUser) || currentUser.isAdmin()) {
+        if (LoginHelper.isAdmin()) {
             return where;
         }
         String dataFilterSql = buildDataFilter(dataColumns, isSelect);
@@ -108,11 +107,11 @@ public class PlusDataPermissionHandler {
         StringBuilder sqlString = new StringBuilder();
         // 更新或删除需满足所有条件
         String joinStr = isSelect ? " OR " : " AND ";
-        SysUser user = DataPermissionHelper.getVariable("user");
+        LoginUser user = DataPermissionHelper.getVariable("user");
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(beanResolver);
         DataPermissionHelper.getContext().forEach(context::setVariable);
-        for (SysRole role : user.getRoles()) {
+        for (RoleDTO role : user.getRoles()) {
             user.setRoleId(role.getRoleId());
             // 获取角色权限泛型
             DataScopeType type = DataScopeType.findCode(role.getDataScope());
@@ -160,13 +159,13 @@ public class PlusDataPermissionHandler {
         DataPermission dataPermission;
         // 获取方法注解
         for (Method method : methods) {
-            dataPermission = dataPermissionCacheMap.get(method.getName());
+            dataPermission = dataPermissionCacheMap.get(mappedStatementId);
             if (ObjectUtil.isNotNull(dataPermission)) {
                 return dataPermission.value();
             }
             if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
                 dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
-                dataPermissionCacheMap.put(method.getName(), dataPermission);
+                dataPermissionCacheMap.put(mappedStatementId, dataPermission);
                 return dataPermission.value();
             }
         }

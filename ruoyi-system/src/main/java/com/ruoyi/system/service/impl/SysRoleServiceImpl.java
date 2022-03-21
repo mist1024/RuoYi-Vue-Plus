@@ -2,16 +2,18 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysRoleDept;
 import com.ruoyi.system.domain.SysRoleMenu;
 import com.ruoyi.system.domain.SysUserRole;
@@ -42,7 +44,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public TableDataInfo<SysRole> selectPageRoleList(SysRole role, PageQuery pageQuery) {
-        Page<SysRole> page = baseMapper.selectPageRoleList(pageQuery.build(), role);
+        Page<SysRole> page = baseMapper.selectPageRoleList(pageQuery.build(), this.buildQueryWrapper(role));
         return TableDataInfo.build(page);
     }
 
@@ -54,7 +56,21 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public List<SysRole> selectRoleList(SysRole role) {
-        return baseMapper.selectRoleList(role);
+        return baseMapper.selectRoleList(this.buildQueryWrapper(role));
+    }
+
+    private Wrapper<SysRole> buildQueryWrapper(SysRole role) {
+        Map<String, Object> params = role.getParams();
+        QueryWrapper<SysRole> wrapper = Wrappers.query();
+        wrapper.eq("r.del_flag", UserConstants.ROLE_NORMAL)
+            .eq(ObjectUtil.isNotNull(role.getRoleId()), "r.role_id", role.getRoleId())
+            .like(StringUtils.isNotBlank(role.getRoleName()), "r.role_name", role.getRoleName())
+            .eq(StringUtils.isNotBlank(role.getStatus()), "r.status", role.getStatus())
+            .like(StringUtils.isNotBlank(role.getRoleKey()), "r.role_key", role.getRoleKey())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                "r.create_time", params.get("beginTime"), params.get("endTime"))
+            .orderByAsc("r.role_sort");
+        return wrapper;
     }
 
     /**
@@ -103,7 +119,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public List<SysRole> selectRoleAll() {
-        return SpringUtils.getAopProxy(this).selectRoleList(new SysRole());
+        return this.selectRoleList(new SysRole());
     }
 
     /**
@@ -181,10 +197,10 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleDataScope(Long roleId) {
-        if (!SysUser.isAdmin(LoginHelper.getUserId())) {
+        if (!LoginHelper.isAdmin()) {
             SysRole role = new SysRole();
             role.setRoleId(roleId);
-            List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
+            List<SysRole> roles = this.selectRoleList(role);
             if (CollUtil.isEmpty(roles)) {
                 throw new ServiceException("没有权限访问角色数据！");
             }
@@ -329,6 +345,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int deleteRoleByIds(Long[] roleIds) {
         for (Long roleId : roleIds) {
             checkRoleAllowed(new SysRole(roleId));
+            checkRoleDataScope(roleId);
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
@@ -373,7 +390,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 批量选择授权用户角色
      *
      * @param roleId  角色ID
-     * @param userIds 需要删除的用户数据ID
+     * @param userIds 需要授权的用户数据ID
      * @return 结果
      */
     @Override

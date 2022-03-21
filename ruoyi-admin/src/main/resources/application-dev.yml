@@ -9,7 +9,7 @@ spring:
         # 设置 Spring Boot Admin Server 地址
         url: http://localhost:9090/admin
         instance:
-          prefer-ip: true # 注册实例时，优先使用 IP
+          service-host-type: IP
         username: ruoyi
         password: 123456
 
@@ -63,6 +63,23 @@ spring:
           url:
           username:
           password:
+#        oracle:
+#          driverClassName: oracle.jdbc.OracleDriver
+#          url: jdbc:oracle:thin:@//localhost:1521/XE
+#          username: ROOT
+#          password: root
+#          druid:
+#            validationQuery: SELECT 1 FROM DUAL
+#        postgres:
+#          driverClassName: org.postgresql.Driver
+#          url: jdbc:postgresql://localhost:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
+#          username: root
+#          password: root
+#        sqlserver:
+#          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#          url: jdbc:sqlserver://localhost:1433;DatabaseName=tempdb;SelectMethod=cursor;rewriteBatchedStatements=true
+#          username: SA
+#          password: root
       druid:
         # 初始连接数
         initialSize: 5
@@ -79,7 +96,7 @@ spring:
         # 配置一个连接在池中最大生存的时间，单位是毫秒
         maxEvictableIdleTimeMillis: 900000
         # 配置检测连接是否有效
-        validationQuery: SELECT 1 FROM DUAL
+        validationQuery: SELECT 1
         testWhileIdle: true
         testOnBorrow: false
         testOnReturn: false
@@ -150,11 +167,5 @@ redisson:
     retryAttempts: 3
     # 命令重试发送时间间隔，单位：毫秒
     retryInterval: 1500
-    # 发布和订阅连接的最小空闲连接数
-    subscriptionConnectionMinimumIdleSize: 1
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
-    # 单个连接最大订阅数量
-    subscriptionsPerConnection: 5
-    # DNS监测时间间隔，单位：毫秒
-    dnsMonitoringInterval: 5000

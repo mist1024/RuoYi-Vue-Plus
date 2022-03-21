@@ -1,14 +1,11 @@
 package com.ruoyi.generator.domain;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.utils.StringUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.validation.Valid;
@@ -23,7 +20,6 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("gen_table")
 public class GenTable extends BaseEntity {
 
@@ -104,6 +100,7 @@ public class GenTable extends BaseEntity {
     /**
      * 生成路径（不填默认项目路径）
      */
+    @TableField(updateStrategy = FieldStrategy.NOT_EMPTY)
     private String genPath;
 
     /**
@@ -152,6 +149,12 @@ public class GenTable extends BaseEntity {
      */
     @TableField(exist = false)
     private String treeName;
+
+    /*
+     * 菜单id列表
+     */
+    @TableField(exist = false)
+    private List<Long> menuIds;
 
     /**
      * 上级菜单ID字段

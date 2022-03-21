@@ -136,7 +136,13 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public int updateConfig(SysConfig config) {
-        int row = baseMapper.updateById(config);
+        int row = 0;
+        if (config.getConfigId() != null) {
+            row = baseMapper.updateById(config);
+        } else {
+            row = baseMapper.update(config, new LambdaQueryWrapper<SysConfig>()
+                .eq(SysConfig::getConfigKey, config.getConfigKey()));
+        }
         if (row > 0) {
             RedisUtils.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
         }
@@ -147,7 +153,6 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * 批量删除参数信息
      *
      * @param configIds 需要删除的参数ID
-     * @return 结果
      */
     @Override
     public void deleteConfigByIds(Long[] configIds) {

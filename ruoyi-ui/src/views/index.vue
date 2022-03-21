@@ -9,7 +9,7 @@
           * 前端开发框架 Vue、Element UI<br/>
           * 后端开发框架 Spring Boot<br/>
           * 容器框架 Undertow 基于 Netty 的高性能容器<br/>
-          * 权限认证框架 Spring Security、Jwt 支持多终端认证系统<br/>
+          * 权限认证框架 Sa-Token 支持多终端认证系统<br/>
           * 关系数据库 MySQL 适配 8.X 最低 5.7<br/>
           * 缓存数据库 Redis 适配 6.X 最低 4.X<br/>
           * 数据库框架 Mybatis-Plus 快速 CRUD 增加开发效率<br/>
@@ -101,6 +101,93 @@
             <span>更新日志</span>
           </div>
           <el-collapse accordion>
+            <el-collapse-item title="v4.0.1 - 2022-03-01">
+              <ol>
+                <li>update 图片上传 文件上传 支持并发上传</li>
+                <li>update 组件ImageUpload支持多图同时选择上传</li>
+                <li>udpate 组件fileUpload支持多文件同时选择上传</li>
+                <li>update springboot 2.6.3 => 2.6.4</li>
+                <li>update hutool 5.7.20 => 5.7.21</li>
+                <li>update qiniu 7.9.2 => 7.9.3</li>
+                <li>update minio 8.3.5 => 8.3.7</li>
+                <li>update 优化 R 默认返回 msg</li>
+                <li>update 增加 用户注册 用户类型默认值</li>
+                <li>update 增加用户登出日志</li>
+                <li>update 更新 多用户多设备的注释说明</li>
+                <li>update 优化 是否为管理员的判断</li>
+                <li>update 优化 页面若未匹配到字典标签则返回原字典值</li>
+                <li>update 调整用户登录 将日志调整到最后 防止获取不到用户警告</li>
+                <li>update 优化随机数生成方式 避免容易生成两个相同随机数的问题</li>
+                <li>fix 修复代码生成 基于路径生成 路径为空问题</li>
+                <li>fix 恢复误删 @Async 注解线程池配置类</li>
+                <li>fix 修复 minio 适配 https 导致的问题</li>
+                <li>fix 修复分页组件请求两次问题</li>
+              </ol>
+            </el-collapse-item>
+            <el-collapse-item title="v4.0.0 - 2022-02-18">
+              <ol>
+                <li>[重大更新] 重写项目整体结构 数据处理下沉至Mapper符合MVC规范 减少循环依赖</li>
+                <li>[重磅更新] 主分支与satoken分支合并 权限统一使用 sa-token</li>
+                <li>[重磅更新] 适配升级 SpringBoot 2.6</li>
+                <li>[重磅更新] EasyExcel大版本升级3.X</li>
+                <li>[重磅更新] 移除链式调用注解 因链式调用不符合java规范 导致很多问题</li>
+                <li>[重磅更新] 增加 轻量级 分布式队列 支持</li>
+                <li>[重磅更新] 增加 数据脱敏注解 使用序列化控制脱敏 支持多种表达式</li>
+                <li>[重磅更新] 重构 使用 Spring 简化 oss 模块代码</li>
+                <li>[重磅更新] 重构 调整返回类型为 R 精简 Controller 代码</li>
+                <li>update springboot 2.5.8 => 2.6.3</li>
+                <li>update mybatis-plus 3.4.3.4 => 3.5.1</li>
+                <li>update maven-jar-plugin 3.2.0 => 3.2.2</li>
+                <li>update maven-war-plugin 3.2.0 => 3.2.2</li>
+                <li>update maven-compiler-plugin 3.1 => 3.9.0</li>
+                <li>update hutool 5.7.18 => 5.7.20</li>
+                <li>update springboot-admin 2.6.0 => 2.6.2</li>
+                <li>update redisson 3.16.7 => 3.16.8</li>
+                <li>update qiniu 7.9.0 => 7.9.2</li>
+                <li>update aliyun 3.13.1 => 3.14.0</li>
+                <li>update qcloud 5.6.58 => 5.6.68</li>
+                <li>update minio 8.3.4 => 8.3.5</li>
+                <li>update 用户管理部门查询选择节点后分页参数初始</li>
+                <li>update 防重复提交标识组合（key + url + header）</li>
+                <li>update 接口文档增加 basic 账号密码验证</li>
+                <li>update 用户修改减少一次角色列表关联查询</li>
+                <li>update 优化部门修改缩放后出现的错位问题</li>
+                <li>update 指定 maven 资源过滤为具体文件 防止错误过滤</li>
+                <li>update hutool 引入改为 bom 依赖项引入</li>
+                <li>update 降低开发环境 redis连接池数量</li>
+                <li>update 升级 springboot 2.6.X 解决 springfox 兼容性问题</li>
+                <li>update 优化多用户体系处理 更名 LoginUtils 为 LoginHelper 支持 LoginUser 多级缓存</li>
+                <li>update 优化加载字典缓存数据</li>
+                <li>update 数据库更改 对接多用户体系</li>
+                <li>update 移除掉 StringUtils 语义不明确的api方法 使用特定工具替换</li>
+                <li>update 优化登录、注册在接口通过`@Validated`注解进行数据基础校验</li>
+                <li>update 优化 查询登录用户数据 统一走缓存</li>
+                <li>update 优化 redisson 配置 去除掉不常用的配置 使用默认配置</li>
+                <li>update 用户访问控制时校验数据权限，防止越权</li>
+                <li>update 修改用户注册报未登录警告</li>
+                <li>update 调整oss预览开关 使用前端直接调用更改配置参数</li>
+                <li>update 使用 satoken 自带的 BCrypt 工具 替换 Security 加密工具 减少依赖</li>
+                <li>update 优化 TreeBuildUtils 工具 使用反射自动获取顶级父id</li>
+                <li>update 使用 hutool Dict 优化 JsonUtils 防止类型解析异常</li>
+                <li>update 优化代码生成 使用新 JsonUtils.parseMap 方法</li>
+                <li>update 更新 所有 oss 均支持 https 配置</li>
+                <li>add 增加 RedisUtils 工具 hasKey 检查key存在方法</li>
+                <li>add 增加 监控中心 自定义事件通知</li>
+                <li>add 增加 3.X update 4.0 更新sql</li>
+                <li>fix 修复登录失效后多次请求提示多次弹窗问题</li>
+                <li>fix 修复 StringUtils 通配符匹配无效</li>
+                <li>fix 修复选项卡点击右键刷新丢失参数问题</li>
+                <li>fix 修复 数据权限 缓存方法名错误问题</li>
+                <li>fix 修复自定义组件`file-upload`无法显示第一个文件，列表显示的文件比实际文件少一个的问题</li>
+                <li>fix 修复因升级 sa-token 导致 doLogin 无法获取 token 问题</li>
+                <li>fix 修复分页组件请求两次问题</li>
+                <li>remove 移除过期代码 分页工具相关</li>
+                <li>remove 移除过期代码 多数据源切换</li>
+                <li>remove 移除过期代码 数据权限</li>
+                <li>3.X 版本进入维护阶段 不进行更新 只修复bug 持续维护到2022年10月</li>
+                <li>4.X 版本公测将近一个月 大部分bug已修复 官网主分支更改为 4.X 版本 推荐使用</li>
+              </ol>
+            </el-collapse-item>
             <el-collapse-item title="v3.5.0 - 2021-12-28">
               <ol>
                 <li>[重大更新] 重写数据权限实现</li>
@@ -644,7 +731,7 @@ export default {
   data() {
     return {
       // 版本号
-      version: "3.5.0",
+      version: "4.0.1",
     };
   },
   methods: {

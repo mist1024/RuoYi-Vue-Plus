@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -25,7 +24,6 @@ import javax.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_dict_data")
 @ExcelIgnoreUnannotated
 @ApiModel("字典数据业务对象")
@@ -44,7 +42,7 @@ public class SysDictData extends BaseEntity {
      */
     @ApiModelProperty(value = "字典排序")
     @ExcelProperty(value = "字典排序")
-    private Long dictSort;
+    private Integer dictSort;
 
     /**
      * 字典标签

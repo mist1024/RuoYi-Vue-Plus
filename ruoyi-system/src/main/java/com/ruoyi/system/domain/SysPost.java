@@ -12,9 +12,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -25,7 +25,6 @@ import javax.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_post")
 @ExcelIgnoreUnannotated
 @ApiModel("岗位信息业务对象")
@@ -62,8 +61,8 @@ public class SysPost extends BaseEntity {
      */
     @ApiModelProperty(value = "岗位排序")
     @ExcelProperty(value = "岗位排序")
-    @NotBlank(message = "显示顺序不能为空")
-    private String postSort;
+    @NotNull(message = "显示顺序不能为空")
+    private Integer postSort;
 
     /**
      * 状态（0正常 1停用）

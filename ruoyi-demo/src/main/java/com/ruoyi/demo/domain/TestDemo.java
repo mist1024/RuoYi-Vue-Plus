@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * 测试单表对象 test_demo
@@ -14,7 +13,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("test_demo")
 public class TestDemo extends BaseEntity {
 
@@ -41,7 +39,7 @@ public class TestDemo extends BaseEntity {
      * 排序号
      */
     @OrderBy(asc = false, sort = 1)
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * key键

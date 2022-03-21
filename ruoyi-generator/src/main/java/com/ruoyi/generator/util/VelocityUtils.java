@@ -2,8 +2,10 @@ package com.ruoyi.generator.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.GenConstants;
+import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -78,14 +80,14 @@ public class VelocityUtils {
 
     public static void setMenuVelocityContext(VelocityContext context, GenTable genTable) {
         String options = genTable.getOptions();
-        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
+        Dict paramsObj = JsonUtils.parseMap(options);
         String parentMenuId = getParentMenuId(paramsObj);
         context.put("parentMenuId", parentMenuId);
     }
 
     public static void setTreeVelocityContext(VelocityContext context, GenTable genTable) {
         String options = genTable.getOptions();
-        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
+        Dict paramsObj = JsonUtils.parseMap(options);
         String treeCode = getTreecode(paramsObj);
         String treeParentCode = getTreeParentCode(paramsObj);
         String treeName = getTreeName(paramsObj);
@@ -134,7 +136,15 @@ public class VelocityUtils {
         templates.add("vm/java/serviceImpl.java.vm");
         templates.add("vm/java/controller.java.vm");
         templates.add("vm/xml/mapper.xml.vm");
-        templates.add("vm/sql/sql.vm");
+        if (DataBaseHelper.isOracle()) {
+            templates.add("vm/sql/oracle/sql.vm");
+        } else if (DataBaseHelper.isPostgerSql()) {
+            templates.add("vm/sql/postgres/sql.vm");
+        } else if (DataBaseHelper.isSqlServer()) {
+            templates.add("vm/sql/sqlserver/sql.vm");
+        } else {
+            templates.add("vm/sql/sql.vm");
+        }
         templates.add("vm/js/api.js.vm");
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
             templates.add("vm/vue/index.vue.vm");
@@ -207,8 +217,7 @@ public class VelocityUtils {
      */
     public static String getPackagePrefix(String packageName) {
         int lastIndex = packageName.lastIndexOf(".");
-        String basePackage = StringUtils.substring(packageName, 0, lastIndex);
-        return basePackage;
+        return StringUtils.substring(packageName, 0, lastIndex);
     }
 
     /**
@@ -244,14 +253,28 @@ public class VelocityUtils {
     public static String getDicts(GenTable genTable) {
         List<GenTableColumn> columns = genTable.getColumns();
         Set<String> dicts = new HashSet<String>();
+        addDicts(dicts, columns);
+        if (ObjectUtil.isNotNull(genTable.getSubTable())) {
+            List<GenTableColumn> subColumns = genTable.getSubTable().getColumns();
+            addDicts(dicts, subColumns);
+        }
+        return StringUtils.join(dicts, ", ");
+    }
+
+    /**
+     * 添加字典列表
+     *
+     * @param dicts 字典列表
+     * @param columns 列集合
+     */
+    public static void addDicts(Set<String> dicts, List<GenTableColumn> columns) {
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && StringUtils.isNotEmpty(column.getDictType()) && StringUtils.equalsAny(
                 column.getHtmlType(),
-                new String[]{GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX})) {
+                new String[] { GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX })) {
                 dicts.add("'" + column.getDictType() + "'");
             }
         }
-        return StringUtils.join(dicts, ", ");
     }
 
     /**
@@ -271,10 +294,10 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 上级菜单ID字段
      */
-    public static String getParentMenuId(Map<String, Object> paramsObj) {
+    public static String getParentMenuId(Dict paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
-            && StringUtils.isNotEmpty(Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID)))) {
-            return Convert.toStr(paramsObj.get(GenConstants.PARENT_MENU_ID));
+            && StringUtils.isNotEmpty(paramsObj.getStr(GenConstants.PARENT_MENU_ID))) {
+            return paramsObj.getStr(GenConstants.PARENT_MENU_ID);
         }
         return DEFAULT_PARENT_MENU_ID;
     }
@@ -298,9 +321,9 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 树父编码
      */
-    public static String getTreeParentCode(Map<String, Object> paramsObj) {
+    public static String getTreeParentCode(Dict paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE)) {
-            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_PARENT_CODE)));
+            return StringUtils.toCamelCase(paramsObj.getStr(GenConstants.TREE_PARENT_CODE));
         }
         return StringUtils.EMPTY;
     }
@@ -311,9 +334,9 @@ public class VelocityUtils {
      * @param paramsObj 生成其他选项
      * @return 树名称
      */
-    public static String getTreeName(Map<String, Object> paramsObj) {
+    public static String getTreeName(Dict paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME)) {
-            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_NAME)));
+            return StringUtils.toCamelCase(paramsObj.getStr(GenConstants.TREE_NAME));
         }
         return StringUtils.EMPTY;
     }
@@ -326,8 +349,8 @@ public class VelocityUtils {
      */
     public static int getExpandColumn(GenTable genTable) {
         String options = genTable.getOptions();
-        Map<String, Object> paramsObj = JsonUtils.parseMap(options);
-        String treeName = Convert.toStr(paramsObj.get(GenConstants.TREE_NAME));
+        Dict paramsObj = JsonUtils.parseMap(options);
+        String treeName = paramsObj.getStr(GenConstants.TREE_NAME);
         int num = 0;
         for (GenTableColumn column : genTable.getColumns()) {
             if (column.isList()) {

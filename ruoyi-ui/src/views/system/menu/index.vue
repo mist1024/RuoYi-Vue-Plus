@@ -1,17 +1,16 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="菜单名称" prop="menuName">
         <el-input
           v-model="queryParams.menuName"
           placeholder="请输入菜单名称"
           clearable
-          size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
+        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable>
           <el-option
             v-for="dict in dict.type.sys_normal_disable"
             :key="dict.value"
@@ -78,7 +77,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button 
+          <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
@@ -199,7 +198,7 @@
             <el-form-item>
               <el-input v-model="form.perms" placeholder="请输入权限标识" maxlength="100" />
               <span slot="label">
-                <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)" placement="top">
+                <el-tooltip content="控制器中定义的权限字符，如：@SaCheckPermission('system:user:list')" placement="top">
                 <i class="el-icon-question"></i>
                 </el-tooltip>
                 权限字符
@@ -208,7 +207,7 @@
           </el-col>
           <el-col :span="12" v-if="form.menuType == 'C'">
             <el-form-item>
-              <el-input v-model="form.query" placeholder="请输入路由参数" maxlength="255" />
+              <el-input v-model="form.queryParam" placeholder="请输入路由参数" maxlength="255" />
               <span slot="label">
                 <el-tooltip content='访问路由的默认传递参数，如：`{"id": 1, "name": "ry"}`' placement="top">
                 <i class="el-icon-question"></i>

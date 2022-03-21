@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.annotation.Sensitive;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.enums.SensitiveStrategy;
 import com.ruoyi.common.xss.Xss;
@@ -12,7 +13,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -29,7 +29,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_user")
 @ApiModel("用户信息业务对象")
 public class SysUser extends BaseEntity {
@@ -187,11 +186,7 @@ public class SysUser extends BaseEntity {
 
     @ApiModelProperty(value = "是否管理员")
     public boolean isAdmin() {
-        return isAdmin(this.userId);
-    }
-
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
+        return UserConstants.ADMIN_ID.equals(this.userId);
     }
 
 }

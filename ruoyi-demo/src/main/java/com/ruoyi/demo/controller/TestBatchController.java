@@ -2,7 +2,7 @@ package com.ruoyi.demo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
 import io.swagger.annotations.Api;
@@ -41,10 +41,14 @@ public class TestBatchController extends BaseController {
     @ApiOperation(value = "新增批量方法")
     @PostMapping("/add")
 //    @DS("slave")
-    public AjaxResult<Void> add() {
+    public R<Void> add() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            list.add(new TestDemo().setOrderNum(-1L).setTestKey("批量新增").setValue("测试新增"));
+            TestDemo testDemo = new TestDemo();
+            testDemo.setOrderNum(-1);
+            testDemo.setTestKey("批量新增");
+            testDemo.setValue("测试新增");
+            list.add(testDemo);
         }
         return toAjax(testDemoMapper.insertBatch(list) ? 1 : 0);
     }
@@ -57,15 +61,19 @@ public class TestBatchController extends BaseController {
     @ApiOperation(value = "新增或更新批量方法")
     @PostMapping("/addOrUpdate")
 //    @DS("slave")
-    public AjaxResult<Void> addOrUpdate() {
+    public R<Void> addOrUpdate() {
         List<TestDemo> list = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
-            list.add(new TestDemo().setOrderNum(-1L).setTestKey("批量新增").setValue("测试新增"));
-        }
+            TestDemo testDemo = new TestDemo();
+            testDemo.setOrderNum(-1);
+            testDemo.setTestKey("批量新增");
+            testDemo.setValue("测试新增");
+            list.add(testDemo);        }
         testDemoMapper.insertBatch(list);
         for (int i = 0; i < list.size(); i++) {
             TestDemo testDemo = list.get(i);
-            testDemo.setTestKey("批量新增或修改").setValue("批量新增或修改");
+            testDemo.setTestKey("批量新增或修改");
+            testDemo.setValue("批量新增或修改");
             if (i % 2 == 0) {
                 testDemo.setId(null);
             }
@@ -79,7 +87,7 @@ public class TestBatchController extends BaseController {
     @ApiOperation(value = "删除批量方法")
     @DeleteMapping()
 //    @DS("slave")
-    public AjaxResult<Void> remove() {
+    public R<Void> remove() {
         return toAjax(testDemoMapper.delete(new LambdaQueryWrapper<TestDemo>()
             .eq(TestDemo::getOrderNum, -1L)));
     }

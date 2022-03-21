@@ -7,18 +7,14 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpUtil;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.oss.constant.OssConstant;
-import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
@@ -45,7 +41,7 @@ import java.util.Map;
  * @author Lion Li
  */
 @Validated
-@Api(value = "OSS对象存储控制器", tags = {"OSS对象存储管理"})
+@Api(value = "对象存储控制器", tags = {"对象存储管理"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/oss")
@@ -69,13 +65,12 @@ public class SysOssController extends BaseController {
      */
     @ApiOperation("上传OSS对象存储")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "file", value = "文件", dataTypeClass = File.class, required = true),
+        @ApiImplicitParam(name = "file", value = "文件", paramType = "query", dataTypeClass = File.class, required = true)
     })
     @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
-    @RepeatSubmit
     @PostMapping("/upload")
-    public AjaxResult<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
+    public R<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
         if (ObjectUtil.isNull(file)) {
             throw new ServiceException("上传文件不能为空");
         }
@@ -83,7 +78,7 @@ public class SysOssController extends BaseController {
         Map<String, String> map = new HashMap<>(2);
         map.put("url", oss.getUrl());
         map.put("fileName", oss.getFileName());
-        return AjaxResult.success(map);
+        return R.ok(map);
     }
 
     @ApiOperation("下载OSS对象存储")
@@ -117,24 +112,10 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:remove")
     @Log(title = "OSS对象存储", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossIds}")
-    public AjaxResult<Void> remove(@ApiParam("OSS对象ID串")
+    public R<Void> remove(@ApiParam("OSS对象ID串")
                                    @NotEmpty(message = "主键不能为空")
                                    @PathVariable Long[] ossIds) {
         return toAjax(iSysOssService.deleteWithValidByIds(Arrays.asList(ossIds), true) ? 1 : 0);
-    }
-
-    /**
-     * 变更图片列表预览状态
-     */
-    @ApiOperation("变更图片列表预览状态")
-    @SaCheckPermission("system:oss:edit")
-    @Log(title = "OSS对象存储", businessType = BusinessType.UPDATE)
-    @PutMapping("/changePreviewListResource")
-    public AjaxResult<Void> changePreviewListResource(@RequestBody String body) {
-        Map<String, Boolean> map = JsonUtils.parseMap(body);
-        SysConfig config = iSysConfigService.getOne(new SysConfig().setConfigKey(OssConstant.PEREVIEW_LIST_RESOURCE_KEY));
-        config.setConfigValue(map.get("previewListResource").toString());
-        return toAjax(iSysConfigService.updateConfig(config));
     }
 
 }

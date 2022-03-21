@@ -7,13 +7,12 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -37,8 +36,7 @@ public class QiniuOssStrategy extends AbstractOssStrategy {
         try {
             Configuration config = new Configuration(getRegion(properties.getRegion()));
             // https设置
-            config.useHttpsDomains = false;
-            config.useHttpsDomains = "Y".equals(properties.getIsHttps());
+            config.useHttpsDomains = OssConstant.IS_HTTPS.equals(properties.getIsHttps());
             uploadManager = new UploadManager(config);
             auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
             bucketManager = new BucketManager(auth, config);
@@ -78,7 +76,7 @@ public class QiniuOssStrategy extends AbstractOssStrategy {
         } catch (Exception e) {
             throw new OssException("上传文件失败，请核对七牛配置信息:[" + e.getMessage() + "]");
         }
-        return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
+        return UploadResult.builder().url(getEndpointLink() + "/" + path).filename(path).build();
     }
 
     @Override

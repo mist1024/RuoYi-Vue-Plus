@@ -8,13 +8,12 @@ import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.OssEnumd;
 import com.ruoyi.oss.exception.OssException;
-import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.oss.service.abstractd.AbstractOssStrategy;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -40,7 +39,7 @@ public class QcloudOssStrategy extends AbstractOssStrategy {
             ClientConfig clientConfig = new ClientConfig();
             // 设置bucket所在的区域，华南：gz 华北：tj 华东：sh
             clientConfig.setRegion(new Region(properties.getRegion()));
-            if ("Y".equals(properties.getIsHttps())) {
+            if (OssConstant.IS_HTTPS.equals(properties.getIsHttps())) {
                 clientConfig.setHttpProtocol(HttpProtocol.https);
             } else {
                 clientConfig.setHttpProtocol(HttpProtocol.http);
@@ -87,7 +86,7 @@ public class QcloudOssStrategy extends AbstractOssStrategy {
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查腾讯云配置信息:[" + e.getMessage() + "]");
         }
-        return new UploadResult().setUrl(getEndpointLink() + "/" + path).setFilename(path);
+        return UploadResult.builder().url(getEndpointLink() + "/" + path).filename(path).build();
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.ruoyi.system.service;
 
+import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.core.domain.dto.RoleDTO;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.service.LogininforService;
@@ -12,13 +15,17 @@ import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.*;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.MessageUtils;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,7 +69,7 @@ public class SysLoginService {
 
         SysUser user = loadUserByUsername(username);
 
-        if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
+        if (!BCrypt.checkpw(password, user.getPassword())) {
             // 是否第一次
             errorNumber = ObjectUtil.isNull(errorNumber) ? 1 : errorNumber + 1;
             // 达到规定错误次数 则锁定登录
@@ -80,14 +87,17 @@ public class SysLoginService {
 
         // 登录成功 清空错误次数
         RedisUtils.deleteObject(Constants.LOGIN_ERROR + username);
-        asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
-        recordLoginInfo(user.getUserId(), username);
-
         LoginUser loginUser = buildLoginUser(user);
-
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
+
+        asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"), request);
+        recordLoginInfo(user.getUserId(), username);
         return StpUtil.getTokenValue();
+    }
+
+    public void logout(String loginName) {
+        asyncService.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
     }
 
     /**
@@ -98,7 +108,7 @@ public class SysLoginService {
      * @param uuid     唯一标识
      */
     public void validateCaptcha(String username, String code, String uuid, HttpServletRequest request) {
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
+        String verifyKey = Constants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
@@ -137,6 +147,9 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
+        loginUser.setDeptName(user.getDept().getDeptName());
+        List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
+        loginUser.setRoles(roles);
         return loginUser;
     }
 

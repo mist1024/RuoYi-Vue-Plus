@@ -4,19 +4,16 @@ import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.dto.UserOnlineDTO;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.service.UserService;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -44,20 +41,18 @@ public class UserActionListener implements SaTokenListener {
         if (userType == UserType.SYS_USER) {
             UserAgent userAgent = UserAgentUtil.parse(ServletUtils.getRequest().getHeader("User-Agent"));
             String ip = ServletUtils.getClientIP();
-            SysUser user = SpringUtils.getBean(UserService.class).selectUserById(LoginHelper.getUserId());
-            String tokenValue = StpUtil.getTokenValue();
-            UserOnlineDTO userOnlineDTO = new UserOnlineDTO()
-                .setIpaddr(ip)
-                .setLoginLocation(AddressUtils.getRealAddressByIP(ip))
-                .setBrowser(userAgent.getBrowser().getName())
-                .setOs(userAgent.getOs().getName())
-                .setLoginTime(System.currentTimeMillis())
-                .setTokenId(tokenValue)
-                .setUserName(user.getUserName());
-            if (ObjectUtil.isNotNull(user.getDept())) {
-                userOnlineDTO.setDeptName(user.getDept().getDeptName());
-            }
-            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, userOnlineDTO, tokenConfig.getTimeout(), TimeUnit.SECONDS);
+            LoginUser user = LoginHelper.getLoginUser();
+            String tokenValue = StpUtil.getTokenValueByLoginId(loginId);
+            UserOnlineDTO dto = new UserOnlineDTO();
+            dto.setIpaddr(ip);
+            dto.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
+            dto.setBrowser(userAgent.getBrowser().getName());
+            dto.setOs(userAgent.getOs().getName());
+            dto.setLoginTime(System.currentTimeMillis());
+            dto.setTokenId(tokenValue);
+            dto.setUserName(user.getUsername());
+            dto.setDeptName(user.getDeptName());
+            RedisUtils.setCacheObject(Constants.ONLINE_TOKEN_KEY + tokenValue, dto, tokenConfig.getTimeout(), TimeUnit.SECONDS);
             log.info("user doLogin, useId:{}, token:{}", loginId, tokenValue);
         } else if (userType == UserType.APP_USER) {
             // app端 自行根据业务编写
