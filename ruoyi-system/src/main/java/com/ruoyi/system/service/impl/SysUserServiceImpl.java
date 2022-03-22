@@ -488,4 +488,15 @@ public class SysUserServiceImpl implements ISysUserService {
         return baseMapper.deleteBatchIds(ids);
     }
 
+    /**
+     * 根据用户编号查询用户
+     *
+     * @param userIdList 用户编号
+     * @return 用户列表
+     */
+    @Override
+    public List<SysUser> selectUserByUserIds(List<Long> userIdList) {
+        return baseMapper.selectUserByUserIdList(userIdList);
+    }
+
 }

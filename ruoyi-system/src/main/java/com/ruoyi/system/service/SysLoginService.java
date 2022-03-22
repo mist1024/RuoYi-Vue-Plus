@@ -139,7 +139,7 @@ public class SysLoginService {
     /**
      * 构建登录用户
      */
-    private LoginUser buildLoginUser(SysUser user) {
+    public LoginUser buildLoginUser(SysUser user) {
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(user.getUserId());
         loginUser.setDeptId(user.getDeptId());

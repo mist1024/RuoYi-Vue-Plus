@@ -200,4 +200,12 @@ public interface ISysUserService {
      */
     int deleteUserByIds(Long[] userIds);
 
+    /**
+     * 根据用户编号查询用户
+     *
+     * @param userIdList 用户编号
+     * @return 用户列表
+     */
+    List<SysUser> selectUserByUserIds(List<Long> userIdList);
+
 }
