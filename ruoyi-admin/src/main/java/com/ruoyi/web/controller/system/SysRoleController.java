@@ -1,22 +1,25 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.util.ObjectUtil;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.service.SysLoginService;
 import com.ruoyi.system.service.SysPermissionService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 角色信息
@@ -41,6 +45,8 @@ public class SysRoleController extends BaseController {
     private final ISysRoleService roleService;
     private final ISysUserService userService;
     private final SysPermissionService permissionService;
+    private final SysUserRoleMapper sysUserRoleMapper;
+    private final SysLoginService loginService;
 
     @ApiOperation("查询角色信息列表")
     @SaCheckPermission("system:role:list")
@@ -104,12 +110,19 @@ public class SysRoleController extends BaseController {
 
         if (roleService.updateRole(role) > 0) {
             // 更新缓存用户权限
-            LoginUser loginUser = getLoginUser();
-            SysUser sysUser = userService.selectUserById(loginUser.getUserId());
-            if (ObjectUtil.isNotNull(sysUser) && !sysUser.isAdmin()) {
-                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));
-                LoginHelper.setLoginUser(loginUser);
-            }
+            List<Long> userIdList = sysUserRoleMapper.selectList(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, role.getRoleId()))
+                .stream().map(SysUserRole::getUserId).collect(Collectors.toList());
+            userService.selectUserByUserIds(userIdList).forEach(sysUser -> {
+                // 存储在saToken的用户key值
+                String userId = sysUser.getUserType() + StrUtil.COLON + sysUser.getUserId();
+                // 获取对应用户的token
+                String token = StpUtil.getTokenValueByLoginId(userId);
+                if (StrUtil.isBlank(token)) {
+                    return;
+                }
+                // 更新用户缓存
+                LoginHelper.setLoginUserByToken(token, loginService.buildLoginUser(sysUser));
+            });
             return R.ok();
         }
         return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");

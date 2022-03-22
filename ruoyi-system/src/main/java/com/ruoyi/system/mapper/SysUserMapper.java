@@ -76,4 +76,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      */
     SysUser selectUserById(Long userId);
 
+    /**
+     * 根据用户编号查询用户
+     *
+     * @param userIdList 用户编号
+     * @return 用户列表
+     */
+    List<SysUser> selectUserByUserIdList(@Param("userIdList") List<Long> userIdList);
+
 }
