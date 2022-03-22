@@ -1,6 +1,10 @@
 package com.ruoyi.framework.config.properties;
 
+import com.ruoyi.common.core.domain.R;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.redisson.config.ReadMode;
 import org.redisson.config.SubscriptionMode;
@@ -19,6 +23,15 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "redisson")
 public class RedissonProperties {
+
+
+    /**
+     * 连接模式
+     */
+    public static final String MODE_SINGLE = "SINGLE";
+    public static final String MODE_SENTINEL = "SENTINEL";
+    public static final String MODE_CLUSTER = "CLUSTER";
+
 
     /**
      * 线程池数量,默认值 = 当前处理核数量 * 2
@@ -49,6 +62,16 @@ public class RedissonProperties {
      * 缓存组
      */
     private List<CacheGroup> cacheGroup;
+
+    /**
+     * 缓存key前缀
+     */
+    private String keyPrefix;
+
+    /**
+     * 配置方式
+     */
+    private RedisMode mode;
 
     @Data
     @NoArgsConstructor
@@ -190,6 +213,23 @@ public class RedissonProperties {
          * 组最大长度
          */
         private int maxSize;
+
+    }
+
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public enum RedisMode {
+        /**
+         * 单机
+         */
+        SINGLE,
+        /**
+         * 集群
+         */
+        CLUSTER,
+        /**
+         * 哨兵
+         */
+        SENTINEL;
 
     }
 
