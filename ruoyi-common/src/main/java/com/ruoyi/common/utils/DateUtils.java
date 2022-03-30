@@ -22,17 +22,17 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
-    public static String YYYY = "yyyy";
+    public static final String YYYY = "yyyy";
 
-    public static String YYYY_MM = "yyyy-MM";
+    public static final String YYYY_MM = "yyyy-MM";
 
-    public static String YYYY_MM_DD = "yyyy-MM-dd";
+    public static final String YYYY_MM_DD = "yyyy-MM-dd";
 
-    public static String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
-    public static String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
-    private static String[] parsePatterns = {
+    private static final String[] PARSE_PATTERNS = {
         "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
         "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
         "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
@@ -107,7 +107,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             return null;
         }
         try {
-            return parseDate(str.toString(), parsePatterns);
+            return parseDate(str.toString(), PARSE_PATTERNS);
         } catch (ParseException e) {
             return null;
         }
@@ -124,8 +124,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 计算相差天数
      */
-    public static int differentDaysByMillisecond(Date date1, Date date2)
-    {
+    public static int differentDaysByMillisecond(Date date1, Date date2) {
         return Math.abs((int) ((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24)));
     }
 
@@ -133,10 +132,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * 计算两个时间差
      */
     public static String getDatePoor(Date endDate, Date nowDate) {
-        long nd = 1000 * 24 * 60 * 60;
-        long nh = 1000 * 60 * 60;
-        long nm = 1000 * 60;
-        // long ns = 1000;
+        long nd = 1000L * 24 * 60 * 60;
+        long nh = 1000L * 60 * 60;
+        long nm = 1000L * 60;
+        // long ns = 1000L;
         // 获得两个时间的毫秒时间差异
         long diff = endDate.getTime() - nowDate.getTime();
         // 计算差多少天

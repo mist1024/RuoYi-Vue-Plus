@@ -89,7 +89,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
 
     @Override
     public void invoke(T data, AnalysisContext context) {
-        if (isValidate) {
+        if (Boolean.TRUE.equals(isValidate)) {
             ValidatorUtils.validate(data);
         }
         excelResult.getList().add(data);
