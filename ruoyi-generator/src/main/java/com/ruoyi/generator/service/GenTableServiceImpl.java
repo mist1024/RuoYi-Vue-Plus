@@ -39,7 +39,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -58,6 +62,21 @@ public class GenTableServiceImpl implements IGenTableService {
 
     private final GenTableMapper baseMapper;
     private final GenTableColumnMapper genTableColumnMapper;
+
+    /**
+     * 获取代码生成地址
+     *
+     * @param table    业务表信息
+     * @param template 模板文件路径
+     * @return 生成地址
+     */
+    public static String getGenPath(GenTable table, String template) {
+        String genPath = table.getGenPath();
+        if (StringUtils.equals(genPath, "/")) {
+            return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
+        }
+        return genPath + File.separator + VelocityUtils.getFileName(template, table);
+    }
 
     /**
      * 查询业务字段列表
@@ -100,7 +119,6 @@ public class GenTableServiceImpl implements IGenTableService {
                 "create_time", params.get("beginTime"), params.get("endTime"));
         return wrapper;
     }
-
 
     @Override
     public TableDataInfo<GenTable> selectPageDbTableList(GenTable genTable, PageQuery pageQuery) {
@@ -294,7 +312,7 @@ public class GenTableServiceImpl implements IGenTableService {
         if (CollUtil.isEmpty(dbTableColumns)) {
             throw new ServiceException("同步数据失败，原表结构不存在");
         }
-        List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
+        Map<String, String> dbTableColumnNameMap = dbTableColumns.stream().collect(Collectors.toMap(GenTableColumn::getColumnName, GenTableColumn::getColumnName));
 
         List<GenTableColumn> saveColumns = new ArrayList<>();
         dbTableColumns.forEach(column -> {
@@ -323,10 +341,9 @@ public class GenTableServiceImpl implements IGenTableService {
             genTableColumnMapper.insertBatch(saveColumns);
         }
 
-        List<GenTableColumn> delColumns = tableColumns.stream().filter(column -> !dbTableColumnNames.contains(column.getColumnName())).collect(Collectors.toList());
-        if (CollUtil.isNotEmpty(delColumns)) {
-            List<Long> ids = delColumns.stream().map(GenTableColumn::getColumnId).collect(Collectors.toList());
-            genTableColumnMapper.deleteBatchIds(ids);
+        List<Long> delColumnIds = tableColumns.stream().filter(column -> !dbTableColumnNameMap.containsKey(column.getColumnName())).map(GenTableColumn::getColumnId).collect(Collectors.toList());
+        if (CollUtil.isNotEmpty(delColumnIds)) {
+            genTableColumnMapper.deleteBatchIds(delColumnIds);
         }
     }
 
@@ -474,21 +491,6 @@ public class GenTableServiceImpl implements IGenTableService {
             genTable.setParentMenuId(parentMenuId);
             genTable.setParentMenuName(parentMenuName);
         }
-    }
-
-    /**
-     * 获取代码生成地址
-     *
-     * @param table    业务表信息
-     * @param template 模板文件路径
-     * @return 生成地址
-     */
-    public static String getGenPath(GenTable table, String template) {
-        String genPath = table.getGenPath();
-        if (StringUtils.equals(genPath, "/")) {
-            return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
-        }
-        return genPath + File.separator + VelocityUtils.getFileName(template, table);
     }
 }
 

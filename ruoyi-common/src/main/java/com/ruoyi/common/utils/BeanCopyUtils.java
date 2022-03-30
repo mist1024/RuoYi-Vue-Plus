@@ -66,10 +66,7 @@ public class BeanCopyUtils {
      * @return desc
      */
     public static <T, V> List<V> copyList(List<T> sourceList, Class<V> desc) {
-        if (ObjectUtil.isNull(sourceList)) {
-            return null;
-        }
-        if (CollUtil.isEmpty(sourceList)) {
+        if (ObjectUtil.isNull(sourceList) || CollUtil.isEmpty(sourceList)) {
             return CollUtil.newArrayList();
         }
         return CglibUtil.copyList(sourceList, () -> ReflectUtil.newInstanceIfPossible(desc));
@@ -83,7 +80,7 @@ public class BeanCopyUtils {
      */
     public static <T> Map<String, Object> copyToMap(T bean) {
         if (ObjectUtil.isNull(bean)) {
-            return null;
+            return MapUtil.newHashMap();
         }
         return CglibUtil.toMap(bean);
     }
