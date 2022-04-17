@@ -511,7 +511,7 @@ function handleUpdate(row) {
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.#[[$]]#refs["${businessName}Ref"].validate(valid => {
+  proxy.#[[$]]#refs["${businessName}Ref"].validate((valid, obj) => {
     if (valid) {
       buttonLoading.value = true;
 #foreach ($column in $columns)
@@ -539,6 +539,13 @@ function submitForm() {
           buttonLoading.value = false;
         });
       }
+    } else {
+        const a = [];
+        for (let key in obj) {
+            a.push(obj[key][0].message);
+        }
+        this.$modal.msgError(a[0]);
+        return false;
     }
   });
 }

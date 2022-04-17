@@ -520,7 +520,7 @@ export default {
     },
     /** 提交按钮 */
     submitForm() {
-      this.#[[$]]#refs["form"].validate(valid => {
+      this.#[[$]]#refs["form"].validate((valid, obj) => {
         if (valid) {
           this.buttonLoading = true;
 #foreach ($column in $columns)
@@ -548,6 +548,13 @@ export default {
               this.buttonLoading = false;
             });
           }
+        } else {
+            const a = [];
+            for (let key in obj) {
+                a.push(obj[key][0].message);
+            }
+            this.$modal.msgError(a[0]);
+            return false;
         }
       });
     },
