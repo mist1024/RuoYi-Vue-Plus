@@ -544,7 +544,7 @@ function submitForm() {
         for (let key in obj) {
             a.push(obj[key][0].message);
         }
-        this.$modal.msgError(a[0]);
+        this.#[[$modal]]#.msgError(a[0]);
         return false;
     }
   });
