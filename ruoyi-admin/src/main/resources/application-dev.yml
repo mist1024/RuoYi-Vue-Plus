@@ -141,7 +141,7 @@ spring:
   mail:
     enabled: false
     # 邮件服务地址 (enabled = true 时打开该配置)
-    #    host: smtp.qq.com
+#    host: smtp.qq.com
     # 用户名
     username: xxx@qq.com
     # 授权码 (设置 - 账户 - POP3/SMTP服务)
