@@ -29,20 +29,13 @@ import java.util.Properties;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MailUtils extends MailUtil {
 
-    private static final JavaMailSenderImpl SENDER = SpringUtils.getBean(JavaMailSenderImpl.class);
-
-    /**
-     * 获取邮件发送实例
-     */
-    public static JavaMailSender getSender() {
-        return SENDER;
-    }
+    private static final MailAccount ACCOUNT = SpringUtils.getBean(MailAccount.class);
 
     /**
      * 获取邮件发送实例
      */
     public static MailAccount getMailAccount() {
-        return getMailAccount(null, null);
+        return ACCOUNT;
     }
 
     /**
@@ -52,19 +45,10 @@ public class MailUtils extends MailUtil {
      * @param password 授权码
      */
     public static MailAccount getMailAccount(String username, String password) {
-        Properties properties = SENDER.getJavaMailProperties();
-
-        MailAccount account = new MailAccount();
-        account.setHost(SENDER.getHost());
-        account.setPort(SENDER.getPort());
-        account.setFrom(StringUtils.blankToDefault(username, SENDER.getUsername()));
-        account.setUser(StringUtils.blankToDefault(username, SENDER.getUsername()));
-        account.setPass(StringUtils.blankToDefault(password, SENDER.getPassword()));
-        account.setAuth((Boolean) properties.get("mail.smtp.auth"));
-        account.setDebug((Boolean) properties.get("mail.debug"));
-        account.setStarttlsEnable((Boolean) properties.get("mail.smtp.starttls.enable"));
-
-        return account;
+        ACCOUNT.setFrom(StringUtils.blankToDefault(username, ACCOUNT.getUser()));
+        ACCOUNT.setUser(StringUtils.blankToDefault(username, ACCOUNT.getUser()));
+        ACCOUNT.setPass(StringUtils.blankToDefault(password, ACCOUNT.getPass()));
+        return ACCOUNT;
     }
 
     /**
