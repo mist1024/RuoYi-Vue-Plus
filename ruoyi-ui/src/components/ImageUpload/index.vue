@@ -1,25 +1,47 @@
 <template>
   <div class="component-upload-image">
-    <el-upload
-      multiple
-      :action="uploadImgUrl"
-      list-type="picture-card"
-      :on-success="handleUploadSuccess"
-      :before-upload="handleBeforeUpload"
-      :limit="limit"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      name="file"
-      :on-remove="handleRemove"
-      :show-file-list="true"
-      :headers="headers"
-      :file-list="fileList"
-      :on-preview="handlePictureCardPreview"
-      :class="{hide: this.fileList.length >= this.limit}"
+    <vuedraggable
+      v-model="fileList"
+      class="vue-draggable"
+      draggable=".draggable-item"
+      tag="ul"
+      @end="onDragEnd"
+      @start="onDragStart"
     >
-      <i class="el-icon-plus"></i>
-    </el-upload>
+      <!-- 拖拽元素 -->
+      <li
+        v-for="item in fileList"
+        :key="item.ossId"
+        :style="{ width: '120px', height: '120px' }"
+        class="draggable-item"
+      >
+        <el-image :preview-src-list="[item.url]" :src="item.url"></el-image>
+        <div class="shadow" @click="handleRemove(item)">
+          <i class="el-icon-delete"></i>
+        </div>
+      </li>
+      <!-- 上传按钮 -->
+      <el-upload
+        multiple
+        :action="uploadImgUrl"
+        list-type="picture-card"
+        :on-success="handleUploadSuccess"
+        :before-upload="handleBeforeUpload"
+        :limit="limit"
+        :on-error="handleUploadError"
+        :on-exceed="handleExceed"
+        name="file"
+        :show-file-list="false"
+        :style="{ width: '120px', height: '120px' }"
+        :headers="headers"
+        :file-list="fileList"
+        slot="footer"
+        :class="{hide: this.fileList.length >= this.limit}"
+      >
+        <i class="el-icon-plus"></i>
+      </el-upload>
 
+    </vuedraggable>
     <!-- 上传提示 -->
     <div class="el-upload__tip" slot="tip" v-if="showTip">
       请上传
@@ -45,8 +67,10 @@
 <script>
 import { getToken } from "@/utils/auth";
 import { delOss } from "@/api/system/oss";
+import vuedraggable from "vuedraggable";
 
 export default {
+  components: {vuedraggable},
   props: {
     value: [String, Object, Array],
     // 图片数量限制
@@ -56,7 +80,7 @@ export default {
     },
     // 大小限制(MB)
     fileSize: {
-       type: Number,
+      type: Number,
       default: 5,
     },
     // 文件类型, 例如['png', 'jpg', 'jpeg']
@@ -113,6 +137,15 @@ export default {
     },
   },
   methods: {
+    // 开始拖动
+    onDragStart(e) {
+      e.target.classList.add('hideShadow');
+    },
+    // 拖动结束
+    onDragEnd(e) {
+      e.target.classList.remove('hideShadow');
+      this.$emit("input", this.fileList);
+    },
     // 删除图片
     handleRemove(file, fileList) {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
@@ -190,17 +223,105 @@ export default {
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
 ::v-deep.hide .el-upload--picture-card {
-    display: none;
+  display: none;
 }
 // 去掉动画效果
 ::v-deep .el-list-enter-active,
 ::v-deep .el-list-leave-active {
-    transition: all 0s;
+  transition: all 0s;
 }
 
 ::v-deep .el-list-enter, .el-list-leave-active {
   opacity: 0;
   transform: translateY(0);
 }
+
+::v-deep .el-upload {
+  width: 100%;
+  height: 100%;
+}
+
+// 上传按钮
+.uploadIcon {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #c0ccda;
+  background-color: #fbfdff;
+  border-radius: 6px;
+  font-size: 20px;
+  color: #999;
+
+  .limitTxt,
+  .uploading {
+    position: absolute;
+    bottom: 10%;
+    left: 0;
+    width: 100%;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+// 拖拽
+.vue-draggable {
+  display: flex;
+  flex-wrap: wrap;
+
+  .draggable-item {
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+
+    .el-image {
+      width: 100%;
+      height: 100%;
+    }
+
+    .shadow {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, .5);
+      opacity: 0;
+      transition: opacity .3s;
+      color: #fff;
+      font-size: 20px;
+      line-height: 20px;
+      padding: 2px;
+      cursor: pointer;
+    }
+
+    &:hover {
+      .shadow {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.hideShadow {
+    .shadow {
+      display: none;
+    }
+  }
+}
+
+// el-image
+.el-image-viewer__wrapper {
+  .el-image-viewer__mask {
+    opacity: .8;
+  }
+
+  .el-icon-circle-close {
+    color: #fff;
+  }
+}
+
 </style>
 
