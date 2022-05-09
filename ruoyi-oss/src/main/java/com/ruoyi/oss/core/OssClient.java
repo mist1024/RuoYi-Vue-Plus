@@ -10,11 +10,15 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.CreateBucketRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
 
@@ -23,7 +27,7 @@ import java.io.InputStream;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
- * 阿里云 腾讯云 华为云 七牛云 minio
+ * 阿里云 腾讯云 七牛云 minio
  *
  * @author Lion Li
  */
@@ -75,6 +79,7 @@ public class OssClient {
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
             createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
             client.createBucket(createBucketRequest);
+            client.setBucketPolicy(bucketName, getPolicy(bucketName, PolicyType.READ));
         } catch (Exception e) {
             throw new OssException("创建Bucket失败, 请核对配置信息:[" + e.getMessage() + "]");
         }
@@ -88,6 +93,7 @@ public class OssClient {
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
+            metadata.setContentLength(inputStream.available());
             client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -117,7 +123,18 @@ public class OssClient {
         if (StringUtils.isNotBlank(domain)) {
             return domain;
         }
-        return properties.getEndpoint();
+        String endpoint = properties.getEndpoint();
+        if (OssConstant.IS_HTTPS.equals(properties.getIsHttps())) {
+            endpoint =  "https://" + endpoint;
+        } else {
+            endpoint =  "http://" + endpoint;
+        }
+        // 云服务商直接返回
+        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
+            return endpoint;
+        }
+        // minio 单独处理
+        return endpoint + "/" + properties.getBucketName();
     }
 
     public String getPath(String prefix, String suffix) {
@@ -134,6 +151,42 @@ public class OssClient {
 
     public String getConfigKey() {
         return configKey;
+    }
+
+    private static String getPolicy(String bucketName, PolicyType policyType) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{\n\"Statement\": [\n{\n\"Action\": [\n");
+        if (policyType == PolicyType.WRITE) {
+            builder.append("\"s3:GetBucketLocation\",\n\"s3:ListBucketMultipartUploads\"\n");
+        } else if (policyType == PolicyType.READ_WRITE) {
+            builder.append("\"s3:GetBucketLocation\",\n\"s3:ListBucket\",\n\"s3:ListBucketMultipartUploads\"\n");
+        } else {
+            builder.append("\"s3:GetBucketLocation\"\n");
+        }
+        builder.append("],\n\"Effect\": \"Allow\",\n\"Principal\": \"*\",\n\"Resource\": \"arn:aws:s3:::");
+        builder.append(bucketName);
+        builder.append("\"\n},\n");
+        if (policyType == PolicyType.READ) {
+            builder.append("{\n\"Action\": [\n\"s3:ListBucket\"\n],\n\"Effect\": \"Deny\",\n\"Principal\": \"*\",\n\"Resource\": \"arn:aws:s3:::");
+            builder.append(bucketName);
+            builder.append("\"\n},\n");
+        }
+        builder.append("{\n\"Action\": ");
+        switch (policyType) {
+            case WRITE:
+                builder.append("[\n\"s3:AbortMultipartUpload\",\n\"s3:DeleteObject\",\n\"s3:ListMultipartUploadParts\",\n\"s3:PutObject\"\n],\n");
+                break;
+            case READ_WRITE:
+                builder.append("[\n\"s3:AbortMultipartUpload\",\n\"s3:DeleteObject\",\n\"s3:GetObject\",\n\"s3:ListMultipartUploadParts\",\n\"s3:PutObject\"\n],\n");
+                break;
+            default:
+                builder.append("\"s3:GetObject\",\n");
+                break;
+        }
+        builder.append("\"Effect\": \"Allow\",\n\"Principal\": \"*\",\n\"Resource\": \"arn:aws:s3:::");
+        builder.append(bucketName);
+        builder.append("/*\"\n}\n],\n\"Version\": \"2012-10-17\"\n}\n");
+        return builder.toString();
     }
 
 }

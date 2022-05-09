@@ -937,7 +937,7 @@ comment on column sys_oss_config.create_time is '创建时间';
 comment on column sys_oss_config.update_by is '更新者';
 comment on column sys_oss_config.update_time is '更新时间';
 
-insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', 'localhost:9000/<桶名>',                '','N', '',            '0', '', NULL, 'admin', sysdate, 'admin', sysdate);
+insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', 'localhost:9000',                      '','N', '',            '0', '', NULL, 'admin', sysdate, 'admin', sysdate);
 insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
 insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', '<桶名>.oss-cn-beijing.aliyuncs.com',   '','N', '',            '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
 insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', '<桶名>.cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',  '1', '', NULL, 'admin', sysdate, 'admin', sysdate);
