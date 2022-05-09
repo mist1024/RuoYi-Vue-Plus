@@ -14,8 +14,8 @@ GO
 UPDATE [sys_oss_config] SET [endpoint] = N's3-cn-north-1.qiniucs.com' WHERE [oss_config_id] = 2
 GO
 
-UPDATE [sys_oss_config] SET [endpoint] = N'<桶名>.oss-cn-beijing.aliyuncs.com' WHERE [oss_config_id] = 3
+UPDATE [sys_oss_config] SET [endpoint] = N'oss-cn-beijing.aliyuncs.com' WHERE [oss_config_id] = 3
 GO
 
-UPDATE [sys_oss_config] SET [endpoint] = N'<桶名>.cos.ap-beijing.myqcloud.com' WHERE [oss_config_id] = 4
+UPDATE [sys_oss_config] SET [endpoint] = N'cos.ap-beijing.myqcloud.com' WHERE [oss_config_id] = 4
 GO
