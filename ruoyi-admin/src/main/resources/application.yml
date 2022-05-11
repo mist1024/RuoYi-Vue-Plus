@@ -282,3 +282,8 @@ management:
   endpoint:
     logfile:
       external-file: ./logs/sys-console.log
+
+# 配置项加密 可参考文档 https://www.helloworld.net/p/0742294590
+jasypt:
+  encryptor:
+    password: RuoYi-Vue-Plus
