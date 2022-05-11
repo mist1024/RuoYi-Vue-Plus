@@ -43,6 +43,8 @@
         <jaxb.version>3.0.1</jaxb.version>
         <!-- 统一 guava 版本 解决隐式漏洞问题 -->
         <guava.version>30.0-jre</guava.version>
+        <!-- 配置项加密 -->
+        <jasypt.version>3.0.4</jasypt.version>
 
         <!-- OSS 配置 -->
         <aws-java-sdk-s3.version>1.12.215</aws-java-sdk-s3.version>
@@ -277,6 +279,13 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+
+            <!-- 配置项加密 -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
             </dependency>
 
             <!-- 定时任务 -->
