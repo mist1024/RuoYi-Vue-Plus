@@ -205,7 +205,8 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
-        loginUser.setDeptName(user.getDept().getDeptName());
+        
+        loginUser.setDeptName(user.getDept()!=null?user.getDept.getDeptName():null);
         List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
         loginUser.setRoles(roles);
         return loginUser;
