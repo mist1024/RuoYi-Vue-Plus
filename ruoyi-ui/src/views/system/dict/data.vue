@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="字典名称" prop="dictType">
-        <el-select v-model="queryParams.dictType">
+        <el-select v-model="queryParams.dictType" @change="handleDictTypeChange">
           <el-option
             v-for="item in typeOptions"
             :key="item.dictId"
@@ -357,6 +357,12 @@ export default {
         this.open = true;
         this.title = "修改字典数据";
       });
+    },
+    /** 字典类型 下拉框变更事件 */
+    handleDictTypeChange(val) {
+      this.queryParams.dictType = val
+
+      this.getList();
     },
     /** 提交按钮 */
     submitForm: function() {
