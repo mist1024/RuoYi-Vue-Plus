@@ -108,14 +108,13 @@ export default {
     this.getCookie();
   },
   methods: {
-    getCode() {
-      getCodeImg().then(res => {
-        this.captchaOnOff = res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
-        if (this.captchaOnOff) {
+     getCode() {
+      if(this.captchaOnOff){
+        getCodeImg().then(res => {
           this.codeUrl = "data:image/gif;base64," + res.data.img;
-          this.loginForm.uuid = res.data.uuid;
-        }
-      });
+          this.loginForm.uuid = res.data.uuid; 
+        });
+      }
     },
     getCookie() {
       const username = Cookies.get("username");
