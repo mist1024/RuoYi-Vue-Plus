@@ -1,7 +1,7 @@
 import axios from 'axios'
 import {Loading, Message} from 'element-ui'
 import { saveAs } from 'file-saver'
-import { getToken } from '@/utils/auth'
+import { getHeader } from "@/utils/auth";
 import errorCode from '@/utils/errorCode'
 import { blobValidate } from "@/utils/ruoyi";
 
@@ -16,7 +16,7 @@ export default {
       method: 'get',
       url: url,
       responseType: 'blob',
-      headers: { 'Authorization': 'Bearer ' + getToken() }
+      headers: getHeader()
     }).then(async (res) => {
       const isLogin = await blobValidate(res.data);
       if (isLogin) {
@@ -39,7 +39,7 @@ export default {
       url: url,
       responseType: 'blob',
       headers: {
-        'Authorization': 'Bearer ' + getToken(),
+        ...getHeader(),
         'datasource': localStorage.getItem("dataName")
       }
     }).then(async (res) => {

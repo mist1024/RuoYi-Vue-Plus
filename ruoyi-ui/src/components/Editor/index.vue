@@ -22,7 +22,7 @@ import Quill from "quill";
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
-import { getToken } from "@/utils/auth";
+import { getHeader } from "@/utils/auth";
 
 export default {
   name: "Editor",
@@ -61,9 +61,7 @@ export default {
   data() {
     return {
       uploadUrl: process.env.VUE_APP_BASE_API + "/system/oss/upload", // 上传的图片服务器地址
-      headers: {
-        Authorization: "Bearer " + getToken()
-      },
+      headers: getHeader(),
       Quill: null,
       currentValue: "",
       options: {
