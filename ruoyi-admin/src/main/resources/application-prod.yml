@@ -142,7 +142,7 @@ spring:
 
 redisson:
   # redis key前缀
-  keyPrefix: ruoyi-vue-plus
+  keyPrefix:
   # 线程池数量
   threads: 16
   # Netty线程池数量

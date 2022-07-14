@@ -12,8 +12,9 @@ public class KeyPrefixHandler implements NameMapper {
   
   private final String keyPrefix;
   
+  //前缀为空 则返回空前缀
   public KeyPrefixHandler(String keyPrefix) {
-    this.keyPrefix = keyPrefix + ":";
+    this.keyPrefix = StringUtils.isBlank(keyPrefix) ? "" : keyPrefix + ":";
   }
   
   //增加前缀
@@ -21,6 +22,9 @@ public class KeyPrefixHandler implements NameMapper {
   public String map(String name) {
     if (StringUtils.isBlank(name)) {
       return null;
+    }
+    if (StringUtils.isBlank(keyPrefix)) {
+      return name;
     }
     if (!name.startsWith(keyPrefix)) {
       return keyPrefix + name;
@@ -34,6 +38,9 @@ public class KeyPrefixHandler implements NameMapper {
   public String unmap(String name) {
     if (StringUtils.isBlank(name)) {
       return null;
+    }
+    if (StringUtils.isBlank(keyPrefix)) {
+      return name;
     }
     if (name.startsWith(keyPrefix)) {
       return name.substring(keyPrefix.length());
