@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.annotation.DataColumn;
 import com.ruoyi.common.annotation.DataPermission;
 import com.ruoyi.common.core.domain.dto.RoleDTO;
@@ -123,6 +124,7 @@ public class PlusDataPermissionHandler {
                 return "";
             }
             boolean isSuccess = false;
+            boolean needParser = false;
             for (DataColumn dataColumn : dataColumns) {
                 // 不包含 key 变量 则不处理
                 if (!StringUtils.contains(type.getSqlTemplate(), "#" + dataColumn.key())) {
@@ -131,13 +133,19 @@ public class PlusDataPermissionHandler {
                 // 设置注解变量 key 为表达式变量 value 为变量值
                 context.setVariable(dataColumn.key(), dataColumn.value());
 
+                 needParser = true;
+               
+            }
+
+             if (needParser) {
                 // 解析sql模板并填充
                 String sql = parser.parseExpression(type.getSqlTemplate(), parserContext).getValue(context, String.class);
                 sqlString.append(joinStr).append(sql);
                 isSuccess = true;
             }
+
             // 未处理成功则填充兜底方案
-            if (!isSuccess) {
+            if (!isSuccess && StrUtil.isNotBlank(type.getElseSql()) ) {
                 sqlString.append(joinStr).append(type.getElseSql());
             }
         }
