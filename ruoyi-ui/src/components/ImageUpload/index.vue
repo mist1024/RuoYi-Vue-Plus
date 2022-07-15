@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { getToken } from "@/utils/auth";
+import { getHeader } from "@/utils/auth";
 import { listByIds, delOss } from "@/api/system/oss";
 
 export default {
@@ -79,9 +79,7 @@ export default {
       hideUpload: false,
       baseUrl: process.env.VUE_APP_BASE_API,
       uploadImgUrl: process.env.VUE_APP_BASE_API + "/system/oss/upload", // 上传的图片服务器地址
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
+      headers: getHeader(),
       fileList: []
     };
   },

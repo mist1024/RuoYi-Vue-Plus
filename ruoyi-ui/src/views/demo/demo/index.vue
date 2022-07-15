@@ -201,7 +201,7 @@
 
 <script>
 import { listDemo, pageDemo, getDemo, delDemo, addDemo, updateDemo } from "@/api/demo/demo";
-import {getToken} from "@/utils/auth";
+import { getHeader } from "@/utils/auth";
 
 export default {
   name: "Demo",
@@ -240,7 +240,7 @@ export default {
         // 是否禁用上传
         isUploading: false,
         // 设置上传的请求头部
-        headers: { Authorization: "Bearer " + getToken() },
+        headers: getHeader(),
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + "/demo/demo/importData"
       },
