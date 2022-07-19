@@ -196,6 +196,7 @@ public class ExcelUtil {
         String filename = encodingFilename(sheetName);
         response.reset();
         FileUtils.setAttachmentResponseHeader(response, filename);
+        response.addHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
     }
 
