@@ -2,6 +2,7 @@ package com.ruoyi.common.core.domain;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.ruoyi.common.constant.Constants;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -55,5 +56,17 @@ public class BaseEntity implements Serializable {
      */
     @TableField(exist = false)
     private Map<String, Object> params = new HashMap<>();
+
+    /**
+     * 逻辑删除：正常标记（0：正常；2：删除；）
+     */
+    @TableField(exist = false)
+    public static final String DEL_FLAG_NORMAL = Constants.DEL_FLAG_NORMAL;
+
+    /**
+     * 逻辑删除：删除标记（0：正常；2：删除；）
+     */
+    @TableField(exist = false)
+    public static final String DEL_FLAG_DELETE = Constants.DEL_FLAG_DELETE;
 
 }
