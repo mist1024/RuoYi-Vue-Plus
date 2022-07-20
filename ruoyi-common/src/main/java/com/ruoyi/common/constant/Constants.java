@@ -77,5 +77,15 @@ public interface Constants {
      */
     String TOKEN = "token";
 
+    /**
+     * 逻辑删除：正常标记（0：正常；2：删除；）
+     */
+    String DEL_FLAG_NORMAL = "0";
+
+    /**
+     * 逻辑删除：删除标记（0：正常；2：删除；）
+     */
+    String DEL_FLAG_DELETE = "2";
+    
 }
 
