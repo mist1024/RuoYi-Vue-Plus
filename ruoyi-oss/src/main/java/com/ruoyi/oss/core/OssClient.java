@@ -97,6 +97,11 @@ public class OssClient {
             client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
+        }finally {
+            //如果是阿里云时，必须关闭数据量大时，否则会出现oom的情况
+            if (client != null) {
+                client.shutdown();
+            }
         }
         return UploadResult.builder().url(getUrl() + "/" + path).filename(path).build();
     }
@@ -107,6 +112,10 @@ public class OssClient {
             client.deleteObject(properties.getBucketName(), path);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
+        }finally {
+            if (client != null) {
+                client.shutdown();
+            }
         }
     }
 
