@@ -25,6 +25,7 @@ import Pagination from "@/components/Pagination";
 import RightToolbar from "@/components/RightToolbar"
 // 富文本组件
 import Editor from "@/components/Editor"
+import Editor from "@/components/WEditor"
 // 文件上传组件
 import FileUpload from "@/components/FileUpload"
 // 图片上传组件
