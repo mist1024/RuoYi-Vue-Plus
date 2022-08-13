@@ -26,8 +26,13 @@ public interface CacheNames {
     String SYS_CONFIG = "sys_config";
 
     /**
-     * 系统字典
+     * 数据字典
      */
     String SYS_DICT = "sys_dict";
+
+    /**
+     * OSS配置
+     */
+    String SYS_OSS_CONFIG = "sys_oss_config";
 
 }

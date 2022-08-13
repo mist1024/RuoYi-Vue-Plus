@@ -24,7 +24,7 @@ public class CacheUtils {
      * @param key        缓存key
      */
     public static Object get(String cacheNames, Object key) {
-        return CACHE_MANAGER.getCache(cacheNames).get(key);
+        return CACHE_MANAGER.getCache(cacheNames).get(key).get();
     }
 
     /**
