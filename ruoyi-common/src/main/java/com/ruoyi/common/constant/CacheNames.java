@@ -20,4 +20,14 @@ public interface CacheNames {
      */
     String DEMO_CACHE = "demo:cache#60s#10m#20";
 
+    /**
+     * 系统配置
+     */
+    String SYS_CONFIG = "sys_config";
+
+    /**
+     * 系统字典
+     */
+    String SYS_DICT = "sys_dict";
+
 }
