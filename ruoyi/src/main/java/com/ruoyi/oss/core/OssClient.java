@@ -185,4 +185,26 @@ public class OssClient {
         return builder.toString();
     }
 
+
+    /**
+    *获取文件大小
+    * ossFileidId为完整文件名称，包含路径
+    /
+    public Long getOssFileSize(String ossFileId){
+        S3Object object = client.getObject(properties.getBucketName(), keyName);
+        return object.getObjectMetadata().getContentLength();
+    }
+    /**
+    *获取文件大小
+    *bucketName 桶名称
+    * ossFileidId为完整文件名称，包含路径
+    /
+    public Long getOssFileSize(String bucketName,String ossFileId){
+
+        S3Object object = client.getObject(bucketName, keyName);
+        return object.getObjectMetadata().getContentLength();
+    }
+
+
+
 }
