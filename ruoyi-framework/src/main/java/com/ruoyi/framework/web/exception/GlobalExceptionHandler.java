@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器
@@ -103,6 +106,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ServiceException.class)
     public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
+        filterStackTrace(e, "com.ruoyi");
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
         return ObjectUtil.isNotNull(code) ? R.fail(code.intValue(), e.getMessage()) : R.fail(e.getMessage());
@@ -164,5 +168,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DemoModeException.class)
     public R<Void> handleDemoModeException(DemoModeException e) {
         return R.fail("演示模式，不允许操作");
+    }
+
+    /**
+     * 根据包名过滤堆栈
+     * @param e Exception
+     * @param packageName 包名
+     */
+    private void filterStackTrace(Exception e, String packageName) {
+        e.setStackTrace(Arrays.stream(e.getStackTrace()).filter(item -> item.getClassName().contains(packageName) && item.getFileName().contains(".java")).toArray(StackTraceElement[]::new));
     }
 }
