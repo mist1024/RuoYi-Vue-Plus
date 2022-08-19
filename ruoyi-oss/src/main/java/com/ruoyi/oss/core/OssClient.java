@@ -118,6 +118,10 @@ public class OssClient {
         return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
     }
 
+    public UploadResult uploadByFolder(byte[] data, String suffix, String contentType,String folder) {
+        return upload(data, getFolderPath(properties.getPrefix(),folder, suffix), contentType);
+    }
+
     /**
      * 获取文件元数据
      *
@@ -153,6 +157,24 @@ public class OssClient {
         String path = DateUtils.datePath() + "/" + uuid;
         if (StringUtils.isNotBlank(prefix)) {
             path = prefix + "/" + path;
+        }
+        return path + suffix;
+    }
+
+    public String getFolderPath(String prefix, String folder, String suffix) {
+        // 生成uuid
+        String uuid = IdUtil.fastSimpleUUID();
+        // 文件路径
+        String path = DateUtils.datePath() + "/" + uuid;
+        if(StringUtils.isNotBlank(prefix) && StringUtils.isNotBlank(folder)){
+            path = prefix + "/" + folder + "/" + path;
+        }else{
+            if(StringUtils.isNotBlank(prefix)){
+                path = folder + "/" + path;
+            }
+            if(StringUtils.isNotBlank(folder)){
+                path = prefix + "/" + path;
+            }
         }
         return path + suffix;
     }
