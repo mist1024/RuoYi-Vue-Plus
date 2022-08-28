@@ -13,6 +13,7 @@ import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.excel.ExcelResult;
+import com.ruoyi.common.excel.model.CommentModel;
 import com.ruoyi.common.utils.ValidatorUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.TestDemo;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -144,5 +146,18 @@ public class TestDemoController extends BaseController {
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
         return toAjax(iTestDemoService.deleteWithValidByIds(Arrays.asList(ids), true) ? 1 : 0);
+    }
+
+    /**
+     * 获取导入模板
+     */
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response) {
+        List<CommentModel> commentList = new ArrayList<>();
+        String sheetName = "组织机构";
+        commentList.add(CommentModel.createCommentModel(sheetName, 0, 0, "部门id不能为空\n换行文本"));
+        commentList.add(CommentModel.createCommentModel(sheetName, 0, 1, "用户id不能为空\n换行文本"));
+        commentList.add(CommentModel.createCommentModel(sheetName, 0, 2, "排序好不能为空\n换行文本"));
+        ExcelUtil.exportExcelCommentTemplate(new ArrayList<>(),commentList, sheetName, TestDemoImportVo.class, response);
     }
 }
