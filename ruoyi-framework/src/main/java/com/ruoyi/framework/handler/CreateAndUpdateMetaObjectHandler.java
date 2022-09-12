@@ -17,27 +17,32 @@ import java.util.Date;
  * MP注入处理器
  *
  * @author Lion Li
+ * @author Charles7c
  * @date 2021/4/25
  */
 @Slf4j
 public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
 
+    /** 创建人 */
+    private static final String CREATE_BY = "createBy";
+    /** 创建时间 */
+    private static final String CREATE_TIME = "createTime";
+    /** 更新人 */
+    private static final String UPDATE_BY = "updateBy";
+    /** 更新时间 */
+    private static final String UPDATE_TIME = "updateTime";
+
     @Override
     public void insertFill(MetaObject metaObject) {
         try {
-            if (ObjectUtil.isNotNull(metaObject) && metaObject.getOriginalObject() instanceof BaseEntity) {
-                BaseEntity baseEntity = (BaseEntity) metaObject.getOriginalObject();
-                Date current = ObjectUtil.isNotNull(baseEntity.getCreateTime())
-                    ? baseEntity.getCreateTime() : new Date();
-                baseEntity.setCreateTime(current);
-                baseEntity.setUpdateTime(current);
-                String username = StringUtils.isNotBlank(baseEntity.getCreateBy())
-                    ? baseEntity.getCreateBy() : getLoginUsername();
-                // 当前已登录 且 创建人为空 则填充
-                baseEntity.setCreateBy(username);
-                // 当前已登录 且 更新人为空 则填充
-                baseEntity.setUpdateBy(username);
+            if (ObjectUtil.isNull(metaObject)) {
+                return;
             }
+
+            this.fillFieldValue(metaObject, CREATE_BY, this.getLoginUsername(), false);
+            this.fillFieldValue(metaObject, CREATE_TIME, new Date(), false);
+            this.fillFieldValue(metaObject, UPDATE_BY, this.getLoginUsername(), false);
+            this.fillFieldValue(metaObject, UPDATE_TIME, new Date(), false);
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
         }
@@ -46,19 +51,29 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         try {
-            if (ObjectUtil.isNotNull(metaObject) && metaObject.getOriginalObject() instanceof BaseEntity) {
-                BaseEntity baseEntity = (BaseEntity) metaObject.getOriginalObject();
-                Date current = new Date();
-                // 更新时间填充(不管为不为空)
-                baseEntity.setUpdateTime(current);
-                String username = getLoginUsername();
-                // 当前已登录 更新人填充(不管为不为空)
-                if (StringUtils.isNotBlank(username)) {
-                    baseEntity.setUpdateBy(username);
-                }
+            if (ObjectUtil.isNull(metaObject)) {
+                return;
             }
+
+            this.fillFieldValue(metaObject, UPDATE_BY, this.getLoginUsername(), true);
+            this.fillFieldValue(metaObject, UPDATE_TIME, new Date(), true);
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
+        }
+    }
+
+    /**
+     * 填充（注入）属性值
+     *
+     * @param metaObject     元数据对象
+     * @param fieldName      要填充的属性名
+     * @param fillFieldValue 要填充的属性值
+     * @param isOverride     如果属性值不为空，是否覆盖（true 覆盖、false 不覆盖）
+     */
+    private void fillFieldValue(MetaObject metaObject, String fieldName, Object fillFieldValue, boolean isOverride) {
+        if (metaObject.hasSetter(fieldName)) {
+            Object fieldValue = metaObject.getValue(fieldName);
+            setFieldValByName(fieldName, ObjectUtil.isNotNull(fieldValue) && !isOverride ? fieldValue : fillFieldValue, metaObject);
         }
     }
 
@@ -75,5 +90,4 @@ public class CreateAndUpdateMetaObjectHandler implements MetaObjectHandler {
         }
         return loginUser.getUsername();
     }
-
 }
