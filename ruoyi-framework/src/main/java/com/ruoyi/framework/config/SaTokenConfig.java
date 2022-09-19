@@ -34,14 +34,12 @@ public class SaTokenConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册路由拦截器，自定义验证规则
         registry.addInterceptor(new SaInterceptor(handler -> {
-            ExcludeUrlProperties excludeUrlProperties = SpringUtils.getBean(ExcludeUrlProperties.class);
             // 登录验证 -- 排除多个路径
             SaRouter
                 // 获取所有的
                 .match("/**")
                 // 排除下不需要拦截的
                 .notMatch(securityProperties.getExcludes())
-                .notMatch(excludeUrlProperties.getExcludes())
                 // 对未排除的路径进行检查
                 .check(() -> {
                     // 检查是否登录 是否有token
