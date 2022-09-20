@@ -118,7 +118,8 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
+    <el-table v-loading="loading" :data="ossList" @selection-change="handleSelectionChange"
+              :default-sort="defaultSort" @sort-change="handleSortChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="对象存储主键" align="center" prop="ossId" v-if="false"/>
       <el-table-column label="文件名" align="center" prop="fileName" />
@@ -135,13 +136,15 @@
                 v-if="!checkFileSuffix(scope.row.fileSuffix) || !previewListResource"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" sortable="custom" :sort-orders="['descending', 'ascending']" width="180">
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180"
+                       sortable="custom" :sort-orders="['descending', 'ascending']">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="上传人" align="center" prop="createBy" />
-      <el-table-column label="服务商" align="center" prop="service" sortable="custom" :sort-orders="['descending', 'ascending']" />
+      <el-table-column label="服务商" align="center" prop="service"
+                       sortable="custom" :sort-orders="['descending', 'ascending']"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -293,6 +296,7 @@ export default {
     resetQuery() {
       this.daterangeCreateTime = [];
       this.resetForm("queryForm");
+      this.$refs.tables.sort(this.defaultSort.prop, this.defaultSort.order)
       this.handleQuery();
     },
     // 多选框选中数据
@@ -302,9 +306,21 @@ export default {
       this.multiple = !selection.length
     },
     /** 排序触发事件 */
-    handleSortChange(column, prop, order) {
-      this.queryParams.orderByColumn = column.prop;
-      this.queryParams.isAsc = column.order;
+    handleSortChange({column, prop, order}) {
+      let orderByArr = this.queryParams.orderByColumn ? this.queryParams.orderByColumn.split(",") : [];
+      let isAscArr = this.queryParams.isAsc ? this.queryParams.isAsc.split(",") : [];
+      let propIndex = orderByArr.indexOf(prop)
+      if (propIndex !== -1) {
+        //排序里已存在 只修改排序
+        isAscArr[propIndex] = order;
+      } else {
+        //排序里不存在则新增排序
+        orderByArr.push(prop);
+        isAscArr.push(order);
+      }
+      //合并排序
+      this.queryParams.orderByColumn = orderByArr.join(",");
+      this.queryParams.isAsc = isAscArr.join(",");
       this.getList();
     },
     /** 任务日志列表查询 */
