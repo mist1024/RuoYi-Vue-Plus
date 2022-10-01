@@ -125,6 +125,8 @@ public class SysLoginService {
      */
     public void logout() {
         try {
+            //此处应该先检查token是否有效  否则getUsername 可能会抛异常
+            StpUtil.checkLogin();
             String username = LoginHelper.getUsername();
             StpUtil.logout();
             asyncService.recordLogininfor(username, Constants.LOGOUT, MessageUtils.message("user.logout.success"), ServletUtils.getRequest());
