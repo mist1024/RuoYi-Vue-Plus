@@ -2,6 +2,7 @@ package com.ruoyi.oss.core;
 
 import cn.hutool.core.util.IdUtil;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -10,7 +11,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -22,6 +22,9 @@ import com.ruoyi.oss.properties.OssProperties;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
@@ -52,16 +55,12 @@ public class OssClient {
             } else {
                 clientConfig.setProtocol(Protocol.HTTP);
             }
-            AmazonS3ClientBuilder build = AmazonS3Client.builder()
+            this.client = AmazonS3Client.builder()
                 .withEndpointConfiguration(endpointConfig)
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
-                .disableChunkedEncoding();
-            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)){
-                // minio 使用https限制使用域名访问 需要此配置 站点填域名
-                build.enablePathStyleAccess();
-            }
-            this.client = build.build();
+                .disableChunkedEncoding()
+                .build();
 
             createBucket();
         } catch (Exception e) {
@@ -96,10 +95,7 @@ public class OssClient {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
             metadata.setContentLength(inputStream.available());
-            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
-            // 设置上传对象的 Acl 为公共读
-            putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
-            client.putObject(putObjectRequest);
+            client.putObject(new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata));
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -123,31 +119,18 @@ public class OssClient {
         return upload(inputStream, getPath(properties.getPrefix(), suffix), contentType);
     }
 
-    /**
-     * 获取文件元数据
-     *
-     * @param path 完整文件路径
-     */
-    public ObjectMetadata getObjectMetadata(String path) {
-        S3Object object = client.getObject(properties.getBucketName(), path);
-        return object.getObjectMetadata();
-    }
-
     public String getUrl() {
         String domain = properties.getDomain();
+        if (StringUtils.isNotBlank(domain)) {
+            return domain;
+        }
         String endpoint = properties.getEndpoint();
         String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
-            if (StringUtils.isNotBlank(domain)) {
-                return header + domain;
-            }
+        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
             return header + properties.getBucketName() + "." + endpoint;
         }
         // minio 单独处理
-        if (StringUtils.isNotBlank(domain)) {
-            return header + domain + "/" + properties.getBucketName();
-        }
         return header + endpoint + "/" + properties.getBucketName();
     }
 
@@ -165,6 +148,16 @@ public class OssClient {
 
     public String getConfigKey() {
         return configKey;
+    }
+
+    public String getPrivateUrl(String objectKey, Integer second) {
+//        objectKey = "file/2022/10/13/81eef51cb0734dedbfa616493a021fe4.jpg";
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+            new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
+                .withMethod(HttpMethod.GET)
+                .withExpiration(new Date(Instant.now().toEpochMilli() + 1000 * second));
+        URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {

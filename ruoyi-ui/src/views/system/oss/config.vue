@@ -151,6 +151,16 @@
             >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
+
+        <el-form-item label="AccessPolicy">
+          <el-radio-group v-model="form.accessPolicy">
+            <el-radio
+              v-for="dict in dict.type.access_policy"
+              :key="dict.value"
+              :label="dict.value"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="域" prop="region">
           <el-input v-model="form.region" placeholder="请输入域" />
         </el-form-item>
@@ -179,7 +189,7 @@ import {
 
 export default {
   name: "OssConfig",
-  dicts: ['sys_yes_no', 'sys_normal_disable'],
+  dicts: ['sys_yes_no', 'sys_normal_disable','access_policy'],
   data() {
     return {
       // 按钮loading
