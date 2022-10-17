@@ -172,11 +172,10 @@ public class OssClient {
     }
 
     public String getPrivateUrl(String objectKey, Integer second) {
-//        objectKey = "file/2022/10/13/81eef51cb0734dedbfa616493a021fe4.jpg";
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
                 .withMethod(HttpMethod.GET)
-                .withExpiration(new Date(Instant.now().toEpochMilli() + 1000 * second));
+                .withExpiration(new Date(System.currentTimeMillis() + 1000 * second));
         URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
     }

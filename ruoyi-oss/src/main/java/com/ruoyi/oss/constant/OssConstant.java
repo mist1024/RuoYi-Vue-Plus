@@ -11,11 +11,6 @@ import java.util.List;
 public interface OssConstant {
 
     /**
-     * OSS模块KEY
-     */
-    String SYS_OSS_KEY = "sys_oss:";
-
-    /**
      * 默认配置KEY
      */
     String DEFAULT_CONFIG_KEY = "sys_oss:default_config";

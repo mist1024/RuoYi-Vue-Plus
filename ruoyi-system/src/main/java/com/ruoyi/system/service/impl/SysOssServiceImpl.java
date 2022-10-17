@@ -1,6 +1,9 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpException;
+import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,10 +13,13 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.common.utils.redis.CacheUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.core.OssClient;
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.AccessPolicyType;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.oss.properties.OssProperties;
@@ -24,9 +30,11 @@ import com.ruoyi.system.mapper.SysOssMapper;
 import com.ruoyi.system.service.ISysOssService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,19 +57,7 @@ public class SysOssServiceImpl implements ISysOssService {
     public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
         Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
-        List<SysOssVo> filterResult = result.getRecords().stream().map(o -> {
-            Object json = RedisUtils.getCacheObject(OssConstant.SYS_OSS_KEY + o.getService());
-            OssProperties properties = JsonUtils.parseObject(json.toString(), OssProperties.class);
-            if (properties == null) {
-                throw new OssException("系统异常, '" + o.getService() + "'配置信息不存在!");
-            }
-            String privateFlag = "0";
-            if (properties.getAccessPolicy().equals(privateFlag)) {
-                OssClient storage = OssFactory.instance(o.getService());
-                o.setUrl(storage.getPrivateUrl(o.getFileName(), 100));
-            }
-            return o;
-        }).collect(Collectors.toList());
+        List<SysOssVo> filterResult = result.getRecords().stream().map(this::matchingUrl).collect(Collectors.toList());
         result.setRecords(filterResult);
         return TableDataInfo.build(result);
     }
@@ -99,6 +95,27 @@ public class SysOssServiceImpl implements ISysOssService {
     }
 
     @Override
+    public void download(Long ossId, HttpServletResponse response) throws IOException {
+        SysOssVo sysOss = this.matchingUrl(this.getById(ossId));
+        if (ObjectUtil.isNull(sysOss)) {
+            throw new ServiceException("文件数据不存在!");
+        }
+        FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
+        long data;
+        try {
+            data = HttpUtil.download(sysOss.getUrl(), response.getOutputStream(), false);
+        } catch (HttpException e) {
+            if (e.getMessage().contains("403")) {
+                throw new ServiceException("无读取权限, 请在对应的OSS开启'公有读'权限!");
+            } else {
+                throw new ServiceException(e.getMessage());
+            }
+        }
+        response.setContentLength(Convert.toInt(data));
+    }
+
+    @Override
     public SysOss upload(MultipartFile file) {
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
@@ -133,4 +150,24 @@ public class SysOssServiceImpl implements ISysOssService {
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 
+    /**
+     * 匹配Url
+     *
+     * @param oss OSS对象
+     * @return oss 匹配Url的OSS对象
+     */
+    private SysOssVo matchingUrl(SysOssVo oss) {
+        OssProperties properties = JsonUtils.parseObject(
+            CacheUtils.get(CacheNames.SYS_OSS_CONFIG, oss.getService()).toString(),
+            OssProperties.class
+        );
+        if (properties == null) {
+            throw new OssException("系统异常, '" + oss.getService() + "'配置信息不存在!");
+        }
+        if (StringUtils.equals(AccessPolicyType.PRIVATE.getType(), properties.getAccessPolicy())) {
+            OssClient storage = OssFactory.instance(oss.getService());
+            oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 100));
+        }
+        return oss;
+    }
 }

@@ -31,9 +31,14 @@
         <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />
         <el-table-column label="手机" prop="phonenumber" :show-overflow-tooltip="true" />
         <el-table-column label="状态" align="center" prop="status">
-          <template slot-scope="scope">
-            <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status"/>
-          </template>
+          <!-- <template slot-scope="scope"> -->
+            <div slot="status" slot-scope="text, record">
+            <a v-if="record.status == 1" style="color: #000000d9">待审核</a>
+            <a v-if="record.status == 2" style="color: #000000d9">正常</a>
+            <a v-if="record.status == 3" style="color: #f36e48">已驳回</a>
+            <a v-if="record.status == 4" style="color: #000000d9">已禁用</a>
+          </div>
+          <!-- </template> -->
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
           <template slot-scope="scope">
