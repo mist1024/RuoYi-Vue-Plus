@@ -82,7 +82,7 @@ public class SysOssController extends BaseController {
         if (ObjectUtil.isNull(file)) {
             throw new ServiceException("上传文件不能为空");
         }
-        SysOss oss = iSysOssService.upload(file);
+        SysOssVo oss = iSysOssService.upload(file);
         Map<String, String> map = new HashMap<>(2);
         map.put("url", oss.getUrl());
         map.put("fileName", oss.getOriginalName());

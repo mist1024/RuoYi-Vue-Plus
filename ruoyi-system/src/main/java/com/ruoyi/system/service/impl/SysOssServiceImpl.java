@@ -11,6 +11,7 @@ import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
@@ -68,7 +69,7 @@ public class SysOssServiceImpl implements ISysOssService {
         for (Long id : ossIds) {
             SysOssVo vo = getById(id);
             if (ObjectUtil.isNotNull(vo)) {
-                list.add(vo);
+                list.add(this.matchingUrl(vo));
             }
         }
         return list;
@@ -116,7 +117,7 @@ public class SysOssServiceImpl implements ISysOssService {
     }
 
     @Override
-    public SysOss upload(MultipartFile file) {
+    public SysOssVo upload(MultipartFile file) {
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient storage = OssFactory.instance();
@@ -134,7 +135,9 @@ public class SysOssServiceImpl implements ISysOssService {
         oss.setOriginalName(originalfileName);
         oss.setService(storage.getConfigKey());
         baseMapper.insert(oss);
-        return oss;
+        SysOssVo sysOssVo = new SysOssVo();
+        BeanCopyUtils.copy(oss,sysOssVo);
+        return this.matchingUrl(sysOssVo);
     }
 
     @Override

@@ -25,7 +25,7 @@ public interface ISysOssService {
 
     SysOssVo getById(Long ossId);
 
-    SysOss upload(MultipartFile file);
+    SysOssVo upload(MultipartFile file);
 
     void download(Long ossId, HttpServletResponse response) throws IOException;
 
