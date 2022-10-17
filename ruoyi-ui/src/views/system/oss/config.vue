@@ -80,6 +80,7 @@
       <el-table-column label="桶名称" align="center" prop="bucketName" />
       <el-table-column label="前缀" align="center" prop="prefix" />
       <el-table-column label="域" align="center" prop="region" />
+      <el-table-column label="桶权限类型" align="center" prop="accessPolicy" :formatter = "accessPolicyStateFormat" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <el-switch
@@ -151,6 +152,13 @@
             >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="桶权限类型">
+          <el-radio-group v-model="form.accessPolicy">
+                <el-radio label="0">private</el-radio>
+                <el-radio label="1">public</el-radio>
+                <el-radio label="2">custom</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="域" prop="region">
           <el-input v-model="form.region" placeholder="请输入域" />
         </el-form-item>
@@ -208,6 +216,21 @@ export default {
       isHttpsOptions: [],
       // 状态(0正常 1停用)字典
       statusOptions: [],
+      // 桶权限类型
+      accessPolicyOptions: [
+        {
+          label: 'private',
+          value: 0
+        },
+        {
+          label: 'public',
+          value: 1
+        },
+        {
+          label: 'custom',
+          value: 2
+        }
+      ],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -382,7 +405,17 @@ export default {
       }).catch(() => {
         row.status = row.status === "0" ? "1" : "0";
       })
-    }
+    },
+    accessPolicyStateFormat(row) {
+        if (row.accessPolicy === "0") {
+          return <span class="el-tag el-tag--warning el-tag--medium el-tag--light" > private </span>
+        } else if (row.accessPolicy === "1") {
+          return <span class="el-tag el-tag--success el-tag--medium el-tag--light" > public </span>
+        } else if (row.accessPolicy === "2") {
+          return <span class="el-tag el-tag--medium el-tag--light" > constum </span>
+        }
+
+      }
   }
 };
 </script>

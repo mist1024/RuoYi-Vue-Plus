@@ -2,6 +2,7 @@ package com.ruoyi.oss.core;
 
 import cn.hutool.core.util.IdUtil;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -22,6 +23,9 @@ import com.ruoyi.oss.properties.OssProperties;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
@@ -165,6 +169,15 @@ public class OssClient {
 
     public String getConfigKey() {
         return configKey;
+    }
+
+    public String getPrivateUrl(String objectKey, Integer second) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+            new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
+                .withMethod(HttpMethod.GET)
+                .withExpiration(new Date(System.currentTimeMillis() + 1000 * second));
+        URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {
