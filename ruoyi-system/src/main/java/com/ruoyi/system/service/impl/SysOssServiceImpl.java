@@ -98,7 +98,7 @@ public class SysOssServiceImpl implements ISysOssService {
 
     @Override
     public void download(Long ossId, HttpServletResponse response) throws IOException {
-        SysOssVo sysOss = SpringUtils.getAopProxy(this).matchingUrl(this.getById(ossId));
+        SysOssVo sysOss = this.matchingUrl(SpringUtils.getAopProxy(this).getById(ossId));
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }
