@@ -61,7 +61,7 @@ public class OssClient {
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
                 .disableChunkedEncoding();
-            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)){
+            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
                 // minio 使用https限制使用域名访问 需要此配置 站点填域名
                 build.enablePathStyleAccess();
             }
@@ -142,7 +142,7 @@ public class OssClient {
         String endpoint = properties.getEndpoint();
         String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
+        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
             if (StringUtils.isNotBlank(domain)) {
                 return header + domain;
             }
@@ -178,6 +178,15 @@ public class OssClient {
                 .withExpiration(new Date(System.currentTimeMillis() + 1000 * second));
         URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
+    }
+
+    /**
+     * 获取当前桶权限类型
+     *
+     * @return 当前桶权限类型code
+     */
+    public String getAccessPolicy() {
+        return properties.getAccessPolicy();
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {

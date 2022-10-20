@@ -17,6 +17,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.redis.CacheUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.core.OssClient;
 import com.ruoyi.oss.entity.UploadResult;
@@ -97,7 +98,7 @@ public class SysOssServiceImpl implements ISysOssService {
 
     @Override
     public void download(Long ossId, HttpServletResponse response) throws IOException {
-        SysOssVo sysOss = this.matchingUrl(this.getById(ossId));
+        SysOssVo sysOss = SpringUtils.getAopProxy(this).matchingUrl(this.getById(ossId));
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }
@@ -160,15 +161,11 @@ public class SysOssServiceImpl implements ISysOssService {
      * @return oss 匹配Url的OSS对象
      */
     private SysOssVo matchingUrl(SysOssVo oss) {
-        OssProperties properties = JsonUtils.parseObject(
-            CacheUtils.get(CacheNames.SYS_OSS_CONFIG, oss.getService()).toString(),
-            OssProperties.class
-        );
-        if (properties == null) {
-            throw new OssException("系统异常, '" + oss.getService() + "'配置信息不存在!");
-        }
-        if (StringUtils.equals(AccessPolicyType.PRIVATE.getType(), properties.getAccessPolicy())) {
-            OssClient storage = OssFactory.instance(oss.getService());
+        OssClient storage = OssFactory.instance(oss.getService());
+        /**
+         * 仅修改桶类型为 private 的 url
+         */
+        if (StringUtils.equals(AccessPolicyType.PRIVATE.getType(), storage.getAccessPolicy())) {
             oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 100));
         }
         return oss;
