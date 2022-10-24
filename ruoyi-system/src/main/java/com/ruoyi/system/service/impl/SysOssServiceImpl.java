@@ -137,7 +137,7 @@ public class SysOssServiceImpl implements ISysOssService {
         oss.setService(storage.getConfigKey());
         baseMapper.insert(oss);
         SysOssVo sysOssVo = new SysOssVo();
-        BeanCopyUtils.copy(oss,sysOssVo);
+        BeanCopyUtils.copy(oss, sysOssVo);
         return this.matchingUrl(sysOssVo);
     }
 
@@ -163,9 +163,9 @@ public class SysOssServiceImpl implements ISysOssService {
     private SysOssVo matchingUrl(SysOssVo oss) {
         OssClient storage = OssFactory.instance(oss.getService());
         /**
-         * 仅修改桶类型为 private 的 url
+         * 仅修改桶类型为 private 的URL，临时URL时长为100s
          */
-        if (StringUtils.equals(AccessPolicyType.PRIVATE.getType(), storage.getAccessPolicy())) {
+        if (AccessPolicyType.PRIVATE == storage.getAccessPolicy()) {
             oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 100));
         }
         return oss;

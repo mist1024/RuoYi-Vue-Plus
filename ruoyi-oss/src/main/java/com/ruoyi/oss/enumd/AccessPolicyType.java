@@ -1,5 +1,6 @@
 package com.ruoyi.oss.enumd;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,21 +16,26 @@ public enum AccessPolicyType {
     /**
      * private
      */
-    PRIVATE("0"),
+    PRIVATE("0", CannedAccessControlList.Private),
 
     /**
      * public
      */
-    PUBLIC("1"),
+    PUBLIC("1", CannedAccessControlList.PublicRead),
 
     /**
      * constum
      */
-    CONSTUM("2");
+    CONSTUM("2",CannedAccessControlList.PublicRead);
 
     /**
-     * 类型
+     * 桶 权限类型
      */
     private final String type;
+
+    /**
+     * 文件对象 权限类型
+     */
+    private final CannedAccessControlList acl;
 
 }

@@ -282,6 +282,9 @@ export default {
             trigger: "blur",
           },
         ],
+        accessPolicy:[
+          { required: true, message: "accessPolicy不能为空", trigger: "blur" }
+        ]
       },
     };
   },
@@ -315,6 +318,7 @@ export default {
         endpoint: undefined,
         domain: undefined,
         isHttps: "N",
+        accessPolicy: "1",
         region: undefined,
         status: "1",
         remark: undefined,

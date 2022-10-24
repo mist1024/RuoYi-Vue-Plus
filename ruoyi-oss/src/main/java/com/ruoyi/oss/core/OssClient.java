@@ -17,6 +17,7 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.AccessPolicyType;
 import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
@@ -24,7 +25,7 @@ import com.ruoyi.oss.properties.OssProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -83,7 +84,7 @@ public class OssClient {
                 return;
             }
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
-            createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            createBucketRequest.setCannedAcl(AccessPolicyType.PUBLIC.getAcl());
             client.createBucket(createBucketRequest);
             client.setBucketPolicy(bucketName, getPolicy(bucketName, PolicyType.READ));
         } catch (Exception e) {
@@ -102,7 +103,7 @@ public class OssClient {
             metadata.setContentLength(inputStream.available());
             PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
             // 设置上传对象的 Acl 为公共读
-            putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            putObjectRequest.setCannedAcl(AccessPolicyType.PUBLIC.getAcl());
             client.putObject(putObjectRequest);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -185,8 +186,10 @@ public class OssClient {
      *
      * @return 当前桶权限类型code
      */
-    public String getAccessPolicy() {
-        return properties.getAccessPolicy();
+    public AccessPolicyType getAccessPolicy() {
+        return Arrays.stream(AccessPolicyType.values())
+            .filter(n->StringUtils.equals(n.getType(),properties.getAccessPolicy()))
+            .findFirst().get();
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {
