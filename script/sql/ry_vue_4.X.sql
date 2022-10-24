@@ -674,6 +674,7 @@ create table sys_oss_config (
   domain           varchar(255)           default ''      comment '自定义域名',
   is_https         char(1)                default 'N'     comment '是否https（Y=是,N=否）',
   region           varchar(255)           default ''      comment '域',
+  access_policy    char(1)      not null       default '1'    comment '桶权限类型(0=private 1=public 2=custom)',
   status           char(1)                default '1'     comment '状态（0=正常,1=停用）',
   ext1             varchar(255)           default ''      comment '扩展字段',
   create_by       varchar(64)             default ''      comment '创建者',
@@ -681,7 +682,6 @@ create table sys_oss_config (
   update_by       varchar(64)             default ''      comment '更新者',
   update_time     datetime                default null    comment '更新时间',
   remark           varchar(500)           default null    comment '备注',
-  access_policy    int      not null       default '1'    comment '桶权限类型(0=private 1=public 2=custom)',
   primary key (oss_config_id)
 ) engine=innodb comment='对象存储配置表';
 
