@@ -2,6 +2,7 @@ package com.ruoyi.oss.core;
 
 import cn.hutool.core.util.IdUtil;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -16,12 +17,16 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.entity.UploadResult;
+import com.ruoyi.oss.enumd.AccessPolicyType;
 import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
@@ -57,7 +62,7 @@ public class OssClient {
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
                 .disableChunkedEncoding();
-            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)){
+            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
                 // minio 使用https限制使用域名访问 需要此配置 站点填域名
                 build.enablePathStyleAccess();
             }
@@ -79,7 +84,7 @@ public class OssClient {
                 return;
             }
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
-            createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            createBucketRequest.setCannedAcl(AccessPolicyType.PUBLIC.getAcl());
             client.createBucket(createBucketRequest);
             client.setBucketPolicy(bucketName, getPolicy(bucketName, PolicyType.READ));
         } catch (Exception e) {
@@ -98,7 +103,7 @@ public class OssClient {
             metadata.setContentLength(inputStream.available());
             PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
             // 设置上传对象的 Acl 为公共读
-            putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            putObjectRequest.setCannedAcl(AccessPolicyType.PUBLIC.getAcl());
             client.putObject(putObjectRequest);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -138,7 +143,7 @@ public class OssClient {
         String endpoint = properties.getEndpoint();
         String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
         // 云服务商直接返回
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)){
+        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
             if (StringUtils.isNotBlank(domain)) {
                 return header + domain;
             }
@@ -165,6 +170,26 @@ public class OssClient {
 
     public String getConfigKey() {
         return configKey;
+    }
+
+    public String getPrivateUrl(String objectKey, Integer second) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+            new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
+                .withMethod(HttpMethod.GET)
+                .withExpiration(new Date(System.currentTimeMillis() + 1000 * second));
+        URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
+    /**
+     * 获取当前桶权限类型
+     *
+     * @return 当前桶权限类型code
+     */
+    public AccessPolicyType getAccessPolicy() {
+        return Arrays.stream(AccessPolicyType.values())
+            .filter(n->StringUtils.equals(n.getType(),properties.getAccessPolicy()))
+            .findFirst().get();
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {
