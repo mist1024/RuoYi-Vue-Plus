@@ -12,20 +12,13 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.BeanCopyUtils;
-import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.common.utils.redis.CacheUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.oss.constant.OssConstant;
 import com.ruoyi.oss.core.OssClient;
 import com.ruoyi.oss.entity.UploadResult;
 import com.ruoyi.oss.enumd.AccessPolicyType;
-import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.factory.OssFactory;
-import com.ruoyi.oss.properties.OssProperties;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.bo.SysOssBo;
 import com.ruoyi.system.domain.vo.SysOssVo;
@@ -163,11 +156,9 @@ public class SysOssServiceImpl implements ISysOssService {
      */
     private SysOssVo matchingUrl(SysOssVo oss) {
         OssClient storage = OssFactory.instance(oss.getService());
-        /**
-         * 仅修改桶类型为 private 的URL，临时URL时长为100s
-         */
+        // 仅修改桶类型为 private 的URL，临时URL时长为120s
         if (AccessPolicyType.PRIVATE == storage.getAccessPolicy()) {
-            oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 100));
+            oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 120));
         }
         return oss;
     }

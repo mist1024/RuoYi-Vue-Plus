@@ -25,7 +25,6 @@ import com.ruoyi.oss.properties.OssProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -84,9 +83,10 @@ public class OssClient {
                 return;
             }
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucketName);
-            createBucketRequest.setCannedAcl(AccessPolicyType.PUBLIC.getAcl());
+            AccessPolicyType accessPolicy = getAccessPolicy();
+            createBucketRequest.setCannedAcl(accessPolicy.getAcl());
             client.createBucket(createBucketRequest);
-            client.setBucketPolicy(bucketName, getPolicy(bucketName, PolicyType.READ));
+            client.setBucketPolicy(bucketName, getPolicy(bucketName, accessPolicy.getPolicyType()));
         } catch (Exception e) {
             throw new OssException("创建Bucket失败, 请核对配置信息:[" + e.getMessage() + "]");
         }
@@ -103,7 +103,7 @@ public class OssClient {
             metadata.setContentLength(inputStream.available());
             PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
             // 设置上传对象的 Acl 为公共读
-            putObjectRequest.setCannedAcl(AccessPolicyType.PUBLIC.getAcl());
+            putObjectRequest.setCannedAcl(getAccessPolicy().getAcl());
             client.putObject(putObjectRequest);
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -176,7 +176,7 @@ public class OssClient {
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
                 .withMethod(HttpMethod.GET)
-                .withExpiration(new Date(System.currentTimeMillis() + 1000 * second));
+                .withExpiration(new Date(System.currentTimeMillis() + 1000L * second));
         URL url = client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
     }
@@ -187,9 +187,7 @@ public class OssClient {
      * @return 当前桶权限类型code
      */
     public AccessPolicyType getAccessPolicy() {
-        return Arrays.stream(AccessPolicyType.values())
-            .filter(n->StringUtils.equals(n.getType(),properties.getAccessPolicy()))
-            .findFirst().get();
+        return AccessPolicyType.getByType(properties.getAccessPolicy());
     }
 
     private static String getPolicy(String bucketName, PolicyType policyType) {
