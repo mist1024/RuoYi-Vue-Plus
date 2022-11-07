@@ -64,8 +64,6 @@ spring:
 #          url: jdbc:oracle:thin:@//localhost:1521/XE
 #          username: ROOT
 #          password: root
-#          druid:
-#            validationQuery: SELECT 1 FROM DUAL
 #        postgres:
 #          driverClassName: org.postgresql.Driver
 #          url: jdbc:postgresql://localhost:5432/postgres?useUnicode=true&characterEncoding=utf8&useSSL=true&autoReconnect=true&reWriteBatchedInserts=true
