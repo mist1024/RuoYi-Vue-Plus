@@ -1,9 +1,9 @@
 <template>
   <el-image
-    :src="`${realSrc}`"
-    fit="cover"
-    :style="`width:${realWidth};height:${realHeight};`"
     :preview-src-list="realSrcList"
+    :src="`${realSrc}`"
+    :style="`width:${realWidth};height:${realHeight};`"
+    fit="cover"
   >
     <div slot="error" class="image-slot">
       <i class="el-icon-picture-outline"></i>
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import {listByIds} from "@/api/system/oss";
 
 export default {
   name: "ImagePreview",
@@ -29,24 +30,38 @@ export default {
       default: ""
     }
   },
+  data() {
+    return {
+      fileList: []
+    }
+  },
+  watch: {
+    src: {
+      async handler(val) {
+        if (val) {
+          await listByIds(this.src).then(res => {
+            res.data.forEach(item => {
+              this.fileList.push(item.url);
+            });
+          })
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   computed: {
     realSrc() {
-      if (!this.src) {
+      if (!this.fileList) {
         return;
       }
-      let real_src = this.src.split(",")[0];
-      return real_src;
+      return this.fileList[0];
     },
     realSrcList() {
-      if (!this.src) {
+      if (!this.fileList) {
         return;
       }
-      let real_src_list = this.src.split(",");
-      let srcList = [];
-      real_src_list.forEach(item => {
-        return srcList.push(item);
-      });
-      return srcList;
+      return this.fileList;
     },
     realWidth() {
       return typeof this.width == "string" ? this.width : `${this.width}px`;
@@ -63,13 +78,16 @@ export default {
   border-radius: 5px;
   background-color: #ebeef5;
   box-shadow: 0 0 5px 1px #ccc;
+
   ::v-deep .el-image__inner {
     transition: all 0.3s;
     cursor: pointer;
+
     &:hover {
       transform: scale(1.2);
     }
   }
+
   ::v-deep .image-slot {
     display: flex;
     justify-content: center;
