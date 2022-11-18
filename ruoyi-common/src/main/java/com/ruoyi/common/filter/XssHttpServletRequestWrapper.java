@@ -51,7 +51,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         }
 
         // 为空，直接返回
-        String json = StrUtil.str(IoUtil.readBytes(super.getInputStream(),false),  StandardCharsets.UTF_8);
+        String json = StrUtil.str(IoUtil.readBytes(super.getInputStream(), false), StandardCharsets.UTF_8);
         if (StringUtils.isEmpty(json)) {
             return super.getInputStream();
         }
@@ -89,7 +89,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      * 是否是Json请求
-     *
      */
     public boolean isJsonRequest() {
         String header = super.getHeader(HttpHeaders.CONTENT_TYPE);
