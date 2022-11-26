@@ -24,9 +24,19 @@ public enum DeviceType {
     APP("app"),
 
     /**
+     * "移动端"
+     */
+    H5("h5"),
+
+    /**
      * 小程序端
      */
-    XCX("xcx");
+    XCX("xcx"),
+
+    /**
+     * "未知"
+     */
+    UNKNOWN("unknown");
 
     private final String device;
 }
