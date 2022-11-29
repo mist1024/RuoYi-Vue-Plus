@@ -50,12 +50,10 @@ public class TableDataInfo<T> implements Serializable {
         this.total = total;
     }
 
-    public static <T> TableDataInfo<T> build(IPage<T> page) {
+    public static <T> TableDataInfo<T> build() {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
         rspData.setMsg("查询成功");
-        rspData.setRows(page.getRecords());
-        rspData.setTotal(page.getTotal());
         return rspData;
     }
 
@@ -68,10 +66,48 @@ public class TableDataInfo<T> implements Serializable {
         return rspData;
     }
 
-    public static <T> TableDataInfo<T> build() {
+    public static <T> TableDataInfo<T> build(IPage<T> page) {
         TableDataInfo<T> rspData = new TableDataInfo<>();
         rspData.setCode(HttpStatus.HTTP_OK);
         rspData.setMsg("查询成功");
+        rspData.setRows(page.getRecords());
+        rspData.setTotal(page.getTotal());
+        return rspData;
+    }
+
+    public static <T> TableDataInfo<T> build(List<T> list, long total) {
+        TableDataInfo<T> rspData = new TableDataInfo<>();
+        rspData.setCode(HttpStatus.HTTP_OK);
+        rspData.setMsg("查询成功");
+        rspData.setRows(list);
+        rspData.setTotal(total);
+        return rspData;
+    }
+    
+    public static <T> TableDataInfo<T> build(List<?> list, long total, Class<T> clazz) {
+        TableDataInfo<T> rspData = new TableDataInfo<>();
+        rspData.setCode(HttpStatus.HTTP_OK);
+        rspData.setMsg("查询成功");
+        rspData.setTotal(total);
+        rspData.setRows(BeanUtil.copyToList(list, clazz));
+        return rspData;
+    }
+
+    public static <T> TableDataInfo<T> build(Page<?> page, Class<T> clazz) {
+        TableDataInfo<T> rspData = new TableDataInfo<>();
+        rspData.setCode(HttpStatus.HTTP_OK);
+        rspData.setMsg("查询成功");
+        rspData.setTotal(page.getTotal());
+        rspData.setRows(BeanUtil.copyToList(page.getRecords(), clazz));
+        return rspData;
+    }
+
+    public static <T> TableDataInfo<T> convert(TableDataInfo<?> tableDataInfo, Class<T> clazz) {
+        TableDataInfo<T> rspData = new TableDataInfo<>();
+        rspData.setCode(tableDataInfo.getCode());
+        rspData.setMsg(tableDataInfo.getMsg());
+        rspData.setTotal(tableDataInfo.getTotal());
+        rspData.setRows(BeanUtil.copyToList(tableDataInfo.getRows(), clazz));
         return rspData;
     }
 
