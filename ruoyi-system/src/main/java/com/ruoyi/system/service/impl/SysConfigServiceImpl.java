@@ -39,13 +39,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
 
     @Override
     public TableDataInfo<SysConfig> selectPageConfigList(SysConfig config, PageQuery pageQuery) {
-        Map<String, Object> params = config.getParams();
-        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-            .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-            .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-            .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
+        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(config);
         Page<SysConfig> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -101,13 +95,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public List<SysConfig> selectConfigList(SysConfig config) {
-        Map<String, Object> params = config.getParams();
-        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<SysConfig>()
-            .like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName())
-            .eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType())
-            .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"));
+        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(config);
         return baseMapper.selectList(lqw);
     }
 
@@ -140,7 +128,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
         if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
             CacheUtils.evict(CacheNames.SYS_CONFIG, temp.getConfigKey());
         }
-        int row = 0;
+        int row;
         if (config.getConfigId() != null) {
             row = baseMapper.updateById(config);
         } else {
@@ -205,11 +193,16 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      */
     @Override
     public String checkConfigKeyUnique(SysConfig config) {
-        Long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
-        SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
-        if (ObjectUtil.isNotNull(info) && info.getConfigId().longValue() != configId.longValue()) {
+        boolean exists = baseMapper.exists(
+            new LambdaQueryWrapper<SysConfig>()
+                .eq(SysConfig::getConfigKey, config.getConfigKey())
+                .ne(ObjectUtil.isNotNull(config.getConfigId()), SysConfig::getConfigId, config.getConfigId())
+        );
+
+        if (exists) {
             return UserConstants.NOT_UNIQUE;
         }
+
         return UserConstants.UNIQUE;
     }
 
@@ -222,6 +215,19 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @Override
     public String getConfigValue(String configKey) {
         return SpringUtils.getAopProxy(this).selectConfigByKey(configKey);
+    }
+
+    private LambdaQueryWrapper<SysConfig> buildQueryWrapper(SysConfig config) {
+        Map<String, Object> params = config.getParams();
+        Object beginTime = params.get("beginTime");
+        Object endTime = params.get("endTime");
+
+        LambdaQueryWrapper<SysConfig> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(StringUtils.isNotBlank(config.getConfigType()), SysConfig::getConfigType, config.getConfigType());
+        lqw.like(StringUtils.isNotBlank(config.getConfigName()), SysConfig::getConfigName, config.getConfigName());
+        lqw.like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey());
+        lqw.between(beginTime != null && endTime != null, SysConfig::getCreateTime, beginTime, endTime);
+        return lqw;
     }
 
 }
