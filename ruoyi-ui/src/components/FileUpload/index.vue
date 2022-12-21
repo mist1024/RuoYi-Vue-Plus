@@ -91,7 +91,7 @@ export default {
           if (Array.isArray(val)) {
             list = val;
           } else {
-            await listByIds(val).then(res => {
+            await listByIds([val.ossId]).then(res => {
               list = res.data.map(oss => {
                 oss = { name: oss.originalName, url: oss.url, ossId: oss.ossId };
                 return oss;
