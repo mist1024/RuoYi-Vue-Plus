@@ -71,6 +71,15 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- common 的依赖配置-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-bom</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-webmvc-core</artifactId>
