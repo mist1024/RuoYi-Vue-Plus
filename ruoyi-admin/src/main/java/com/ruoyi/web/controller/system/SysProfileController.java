@@ -11,7 +11,6 @@ import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.file.MimeTypeUtils;
-import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
 import com.ruoyi.system.service.ISysUserService;
@@ -24,9 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.ruoyi.common.satoken.utils.LoginHelper.getUserId;
-import static com.ruoyi.common.satoken.utils.LoginHelper.getUsername;
 
 /**
  * 个人信息 业务处理
@@ -47,7 +43,7 @@ public class SysProfileController extends BaseController {
      */
     @GetMapping
     public R<Map<String, Object>> profile() {
-        SysUser user = userService.selectUserById(getUserId());
+        SysUser user = userService.selectUserById(LoginHelper.getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("user", user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
@@ -69,7 +65,7 @@ public class SysProfileController extends BaseController {
             && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setUserId(getUserId());
+        user.setUserId(LoginHelper.getUserId());
         user.setUserName(null);
         user.setPassword(null);
         user.setAvatar(null);
@@ -121,7 +117,7 @@ public class SysProfileController extends BaseController {
             }
             SysOssVo oss = iSysOssService.upload(avatarfile);
             String avatar = oss.getUrl();
-            if (userService.updateUserAvatar(getUsername(), avatar)) {
+            if (userService.updateUserAvatar(LoginHelper.getUsername(), avatar)) {
                 ajax.put("imgUrl", avatar);
                 return R.ok(ajax);
             }

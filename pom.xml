@@ -256,6 +256,13 @@
                 <version>${snakeyaml.version}</version>
             </dependency>
 
+            <!-- 定时任务 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-job</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
             <!-- 代码生成-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -292,6 +299,7 @@
         <module>ruoyi-system</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
+        <module>ruoyi-job</module>
         <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
     </modules>

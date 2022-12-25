@@ -62,7 +62,7 @@
 
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-job</artifactId>
+            <artifactId>ruoyi-job</artifactId>
         </dependency>
 
         <dependency>

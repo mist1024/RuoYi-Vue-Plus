@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.ruoyi.common.satoken.utils.LoginHelper.getLoginUser;
-
 /**
  * 角色信息
  *
@@ -112,7 +110,7 @@ public class SysRoleController extends BaseController {
 
         if (roleService.updateRole(role) > 0) {
             // 更新缓存用户权限
-            LoginUser loginUser = getLoginUser();
+            LoginUser loginUser = LoginHelper.getLoginUser();
             SysUser sysUser = userService.selectUserById(loginUser.getUserId());
             if (ObjectUtil.isNotNull(sysUser) && !sysUser.isAdmin()) {
                 loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser));

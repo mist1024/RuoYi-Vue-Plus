@@ -50,13 +50,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- 定时任务 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common-job</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- 日志记录 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>

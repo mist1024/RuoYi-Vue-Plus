@@ -40,8 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.ruoyi.common.satoken.utils.LoginHelper.getUserId;
-
 /**
  * 用户信息
  *
@@ -181,7 +179,7 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
     public R<Void> remove(@PathVariable Long[] userIds) {
-        if (ArrayUtil.contains(userIds, getUserId())) {
+        if (ArrayUtil.contains(userIds, LoginHelper.getUserId())) {
             return R.fail("当前用户不能删除");
         }
         return toAjax(userService.deleteUserByIds(userIds));

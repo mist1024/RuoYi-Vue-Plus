@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ruoyi</groupId>
-        <artifactId>ruoyi-common</artifactId>
+        <artifactId>ruoyi-vue-plus</artifactId>
         <version>4.4.0</version>
     </parent>
 
-    <artifactId>ruoyi-common-job</artifactId>
+    <artifactId>ruoyi-job</artifactId>
 
     <description>
-        ruoyi-common-job 定时任务
+        任务调度
     </description>
 
     <dependencies>
@@ -21,20 +21,10 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-        </dependency>
-
         <!-- xxl-job-core -->
         <dependency>
             <groupId>com.xuxueli</groupId>
             <artifactId>xxl-job-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 
