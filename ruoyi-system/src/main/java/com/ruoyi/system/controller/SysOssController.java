@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.system;
+package com.ruoyi.system.controller;
 
 
 import cn.dev33.satoken.annotation.SaCheckPermission;

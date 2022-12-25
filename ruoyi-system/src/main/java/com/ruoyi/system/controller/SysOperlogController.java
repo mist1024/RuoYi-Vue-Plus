@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.monitor;
+package com.ruoyi.system.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.log.annotation.Log;
