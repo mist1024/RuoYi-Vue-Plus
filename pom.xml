@@ -133,6 +133,13 @@
                 <artifactId>sa-token-spring-boot-starter</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-core</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+
             <!-- Sa-Token 整合 jwt -->
             <dependency>
                 <groupId>cn.dev33</groupId>
@@ -161,6 +168,11 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <!-- sql性能分析插件 -->
@@ -244,24 +256,10 @@
                 <version>${snakeyaml.version}</version>
             </dependency>
 
-            <!-- 定时任务 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-job</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
-
             <!-- 代码生成-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-generator</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
-
-            <!-- 核心模块-->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-framework</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
@@ -279,20 +277,6 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
-            <!-- OSS对象存储模块 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-oss</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
-
-            <!-- SMS短信模块 -->
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-sms</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
-
             <!-- demo模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -305,15 +289,11 @@
 
     <modules>
         <module>ruoyi-admin</module>
-        <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
-        <module>ruoyi-job</module>
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-demo</module>
         <module>ruoyi-extend</module>
-        <module>ruoyi-oss</module>
-        <module>ruoyi-sms</module>
     </modules>
     <packaging>pom</packaging>
 

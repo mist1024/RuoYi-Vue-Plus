@@ -14,8 +14,16 @@
         <module>ruoyi-common-core</module>
         <module>ruoyi-common-datasource</module>
         <module>ruoyi-common-dict</module>
-        <module>ruoyi-common-satoken</module>
+        <module>ruoyi-common-doc</module>
+        <module>ruoyi-common-excel</module>
+        <module>ruoyi-common-job</module>
+        <module>ruoyi-common-log</module>
+        <module>ruoyi-common-mail</module>
+        <module>ruoyi-common-oss</module>
         <module>ruoyi-common-redis</module>
+        <module>ruoyi-common-sms</module>
+        <module>ruoyi-common-satoken</module>
+        <module>ruoyi-common-web</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>
@@ -24,31 +32,5 @@
     <description>
         common通用模块
     </description>
-
-    <dependencies>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>easyexcel</artifactId>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webmvc-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-javadoc</artifactId>
-        </dependency>
-
-    </dependencies>
 
 </project>

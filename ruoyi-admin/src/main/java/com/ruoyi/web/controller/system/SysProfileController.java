@@ -2,15 +2,15 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.io.FileUtil;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.MimeTypeUtils;
+import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.system.domain.SysUser;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.utils.file.MimeTypeUtils;
 import com.ruoyi.system.domain.SysOss;
 import com.ruoyi.system.domain.vo.SysOssVo;
 import com.ruoyi.system.service.ISysOssService;
@@ -24,6 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.ruoyi.common.satoken.utils.LoginHelper.getUserId;
+import static com.ruoyi.common.satoken.utils.LoginHelper.getUsername;
 
 /**
  * 个人信息 业务处理

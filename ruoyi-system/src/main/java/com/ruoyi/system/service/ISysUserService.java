@@ -1,8 +1,8 @@
 package com.ruoyi.system.service;
 
-import com.ruoyi.common.core.domain.PageQuery;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.datasource.core.page.PageQuery;
+import com.ruoyi.common.datasource.core.page.TableDataInfo;
+import com.ruoyi.system.domain.SysUser;
 
 import java.util.List;
 

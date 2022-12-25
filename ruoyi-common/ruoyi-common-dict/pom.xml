@@ -11,5 +11,15 @@
 
     <artifactId>ruoyi-common-dict</artifactId>
 
+    <description>
+        ruoyi-common-dict 字典
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-core</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

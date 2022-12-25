@@ -1,9 +1,7 @@
 package com.ruoyi.common.core.web.controller;
 
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.core.utils.StringUtils;
 
 /**
  * web层通用数据处理
@@ -39,31 +37,4 @@ public class BaseController {
         return StringUtils.format("redirect:{}", url);
     }
 
-    /**
-     * 获取用户缓存信息
-     */
-    public LoginUser getLoginUser() {
-        return LoginHelper.getLoginUser();
-    }
-
-    /**
-     * 获取登录用户id
-     */
-    public Long getUserId() {
-        return LoginHelper.getUserId();
-    }
-
-    /**
-     * 获取登录部门id
-     */
-    public Long getDeptId() {
-        return LoginHelper.getDeptId();
-    }
-
-    /**
-     * 获取登录用户名
-     */
-    public String getUsername() {
-        return LoginHelper.getUsername();
-    }
 }

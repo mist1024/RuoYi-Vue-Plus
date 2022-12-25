@@ -36,9 +36,45 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- 接口模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-common-satoken</artifactId>
+                <artifactId>ruoyi-common-doc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- excel -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-excel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 定时任务 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-job</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 日志记录 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-log</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 邮件服务 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-mail</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- OSS -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-oss</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -46,6 +82,27 @@
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-common-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 安全模块 satoken -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-satoken</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 短信模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-sms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- web服务 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-common-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

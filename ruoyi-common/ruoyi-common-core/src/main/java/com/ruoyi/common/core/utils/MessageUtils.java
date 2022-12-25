@@ -1,6 +1,5 @@
 package com.ruoyi.common.core.utils;
 
-import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.context.MessageSource;
