@@ -36,7 +36,11 @@
         </dependency>
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-datasource</artifactId>
+            <artifactId>ruoyi-common-idempotent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-mybatis</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ruoyi</groupId>
@@ -49,6 +53,10 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-rateLimiter</artifactId>
         </dependency>
 
         <!-- 短信 用哪个导入哪个依赖 -->

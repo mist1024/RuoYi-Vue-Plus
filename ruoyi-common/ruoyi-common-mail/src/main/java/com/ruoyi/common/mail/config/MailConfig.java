@@ -2,20 +2,22 @@ package com.ruoyi.common.mail.config;
 
 import cn.hutool.extra.mail.MailAccount;
 import com.ruoyi.common.mail.config.properties.MailProperties;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * JavaMail 配置
  *
  * @author Michelle.Chung
  */
-@Configuration
+@AutoConfiguration
+@ConditionalOnProperty(value = "mail.enabled", havingValue = "true")
+@EnableConfigurationProperties(MailProperties.class)
 public class MailConfig {
 
     @Bean
-    @ConditionalOnProperty(value = "mail.enabled", havingValue = "true")
     public MailAccount mailAccount(MailProperties mailProperties) {
         MailAccount account = new MailAccount();
         account.setHost(mailProperties.getHost());

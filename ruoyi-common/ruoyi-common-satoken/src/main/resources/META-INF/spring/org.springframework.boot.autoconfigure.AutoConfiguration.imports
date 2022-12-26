@@ -1,3 +1,2 @@
 com.ruoyi.common.satoken.core.dao.PlusSaTokenDao
 com.ruoyi.common.satoken.core.service.SaPermissionImpl
-com.ruoyi.common.satoken.config.SaTokenConfig

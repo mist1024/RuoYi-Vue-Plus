@@ -4,7 +4,7 @@ import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.UserConstants;
-import com.ruoyi.common.core.domain.event.LogininforEvent;
+import com.ruoyi.common.log.event.LogininforEvent;
 import com.ruoyi.common.core.enums.UserType;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.common.core.domain.model.RegisterBody;

@@ -9,11 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * redis配置
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Lion Li
  */
 @Slf4j
-@Configuration
+@AutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(RedissonProperties.class)
 public class RedisConfig {

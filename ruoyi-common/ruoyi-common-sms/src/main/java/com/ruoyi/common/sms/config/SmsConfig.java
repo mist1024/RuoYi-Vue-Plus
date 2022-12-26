@@ -4,8 +4,10 @@ import com.ruoyi.common.sms.config.properties.SmsProperties;
 import com.ruoyi.common.sms.core.AliyunSmsTemplate;
 import com.ruoyi.common.sms.core.SmsTemplate;
 import com.ruoyi.common.sms.core.TencentSmsTemplate;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +17,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Lion Li
  * @version 4.2.0
  */
-@Configuration
+@AutoConfiguration
+@EnableConfigurationProperties(SmsProperties.class)
 public class SmsConfig {
 
     @Configuration
