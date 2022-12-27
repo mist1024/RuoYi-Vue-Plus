@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>ruoyi-vue-plus</artifactId>
         <groupId>com.ruoyi</groupId>
+        <artifactId>ruoyi-vue-plus</artifactId>
         <version>4.4.0</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <packaging>jar</packaging>
+
     <artifactId>ruoyi-job</artifactId>
 
     <description>
@@ -16,11 +16,9 @@
     </description>
 
     <dependencies>
-
-        <!-- 通用工具-->
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common</artifactId>
+            <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
         <!-- xxl-job-core -->
@@ -28,8 +26,6 @@
             <groupId>com.xuxueli</groupId>
             <artifactId>xxl-job-core</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>
-
