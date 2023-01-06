@@ -83,6 +83,9 @@ spring:
     restart:
       # 热部署开关
       enabled: true
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
   jackson:
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
@@ -129,6 +132,10 @@ security:
     - /favicon.ico
     - /*/api-docs
     - /*/api-docs/**
+    - /swagger-ui/**
+    - /webjars/**
+    - /swagger-ui.html
+    - /doc.html
     # actuator 监控配置
     - /actuator
     - /actuator/**
@@ -202,6 +209,9 @@ swagger:
         name: ${sa-token.token-name}
 
 springdoc:
+  swagger-ui:
+    # 持久化认证数据
+    persistAuthorization: true
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
