@@ -82,7 +82,7 @@ public class LoginHelper {
         if (ObjectUtil.isNull(loginUser)) {
             String loginId = StpUtil.getLoginIdAsString();
             String[] strs = StringUtils.split(loginId, JOIN_CODE);
-            if (!ArrayUtil.containsAny(strs, UserType.values())) {
+            if (!ArrayUtil.containsAny(strs, UserType.getUserTypeValue())) {
                 throw new UtilException("登录用户: LoginId异常 => " + loginId);
             }
             // 用户id在总是在最后
