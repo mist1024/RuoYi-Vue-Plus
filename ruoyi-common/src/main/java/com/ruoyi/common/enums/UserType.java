@@ -34,4 +34,8 @@ public enum UserType {
         }
         throw new RuntimeException("'UserType' not found By " + str);
     }
+
+    public static String[] getUserTypeValue() {
+        return new String[]{SYS_USER.getUserType(), APP_USER.getUserType()};
+    }
 }
