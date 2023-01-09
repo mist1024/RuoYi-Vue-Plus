@@ -183,9 +183,11 @@ mybatis-plus:
       updateStrategy: NOT_NULL
       # 字段验证策略之 select,在 select 的时候的字段验证策略既 wrapper 根据内部 entity 生成的 where 条件
       where-strategy: NOT_NULL
-  # 扫描自定义TypeHandler
+--- # 数据库字段加密配置
+mybatis-plus:
+  # 扫描加密 TypeHandler
   type-handlers-package: com.ruoyi.common.encrypt
-  encrypt-field:
+  encrypt:
     # 字段加密算法，可自定义算法。目前支持：base64、aes、rsa、sm2、sm4。
     # 其中base64不需要公钥私钥；ras、sm2需要公私钥信息；
     # aes采用AES/CBC/PKCS5Padding，需要secretKey和ivKey；
