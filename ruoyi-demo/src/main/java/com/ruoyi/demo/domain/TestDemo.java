@@ -2,6 +2,7 @@ package com.ruoyi.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.common.encrypt.EncryptTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +14,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("test_demo")
+@TableName(value = "test_demo", autoResultMap = true)
 public class TestDemo extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -44,11 +45,13 @@ public class TestDemo extends BaseEntity {
     /**
      * key键
      */
+    @TableField(typeHandler = EncryptTypeHandler.class)
     private String testKey;
 
     /**
      * 值
      */
+    @TableField(typeHandler = EncryptTypeHandler.class)
     private String value;
 
     /**
