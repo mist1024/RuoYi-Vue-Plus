@@ -17,7 +17,7 @@ public class EncryptFieldProperties {
     /**
      * 算法名称
      */
-    private String algorithm;
+    private AlgorithmType algorithm;
 
     /**
      * 字符串的编码方式
