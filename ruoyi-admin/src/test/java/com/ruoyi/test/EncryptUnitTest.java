@@ -1,5 +1,6 @@
 package com.ruoyi.test;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.demo.domain.TestDemo;
 import com.ruoyi.demo.mapper.TestDemoMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
  * @date 2023-01-12 08:53
  */
 @SpringBootTest
+@SaIgnore
 @DisplayName("加密测试")
 public class EncryptUnitTest {
 

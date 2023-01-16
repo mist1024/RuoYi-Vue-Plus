@@ -52,7 +52,7 @@ public class TestDemo extends BaseEntity {
     /**
      * 值
      */
-    @EncryptField(algorithm=AlgorithmType.AES, password = "10rfylhtccpuyke5")
+    @EncryptField(algorithm = AlgorithmType.AES, password = "10rfylhtccpuyke5")
     private String value;
 
     /**

@@ -48,7 +48,7 @@ public class Sm2Encryptor implements IEncryptor {
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.sm2)) {
+        if (ObjectUtil.isNotNull(this.sm2)) {
             if (encodeType == EncodeType.HEX) {
                 return sm2.encryptHex(value, KeyType.PublicKey);
             } else {
@@ -70,7 +70,7 @@ public class Sm2Encryptor implements IEncryptor {
      */
     @Override
     public String decrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.sm2)) {
+        if (ObjectUtil.isNotNull(this.sm2)) {
             return this.sm2.decryptStr(value, KeyType.PrivateKey);
         }
         return value;

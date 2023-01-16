@@ -15,18 +15,22 @@ public enum AlgorithmType {
      * base64
      */
     BASE64("base64"),
+
     /**
      * aes
      */
     AES("aes"),
+
     /**
      * rsa
      */
     RSA("rsa"),
+
     /**
      * sm2
      */
     SM2("sm2"),
+
     /**
      * sm4
      */

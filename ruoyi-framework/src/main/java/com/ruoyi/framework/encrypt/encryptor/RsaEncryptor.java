@@ -47,7 +47,7 @@ public class RsaEncryptor implements IEncryptor {
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.rsa)) {
+        if (ObjectUtil.isNotNull(this.rsa)) {
             if (encodeType == EncodeType.HEX) {
                 return rsa.encryptHex(value, KeyType.PublicKey);
             } else {
@@ -68,7 +68,7 @@ public class RsaEncryptor implements IEncryptor {
      */
     @Override
     public String decrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.rsa)) {
+        if (ObjectUtil.isNotNull(this.rsa)) {
             return this.rsa.decryptStr(value, KeyType.PrivateKey);
         }
         return value;

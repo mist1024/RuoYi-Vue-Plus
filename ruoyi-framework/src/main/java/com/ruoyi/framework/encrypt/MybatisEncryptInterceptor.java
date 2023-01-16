@@ -13,6 +13,8 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -33,6 +35,8 @@ import java.util.Set;
     method = "setParameters",
     args = {PreparedStatement.class})
 })
+@ConditionalOnProperty(value = "mybatis-encryptor.enabled", havingValue = "true")
+@Component
 public class MybatisEncryptInterceptor implements Interceptor {
 
     private final EncryptorManager encryptorManager = SpringUtils.getBean(EncryptorManager.class);
@@ -49,7 +53,7 @@ public class MybatisEncryptInterceptor implements Interceptor {
             // 进行加密操作
             ParameterHandler parameterHandler = (ParameterHandler) target;
             Object parameterObject = parameterHandler.getParameterObject();
-            if(ObjectUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)){
+            if (ObjectUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
                 this.encryptHandler(parameterObject);
             }
         }
@@ -61,7 +65,7 @@ public class MybatisEncryptInterceptor implements Interceptor {
      *
      * @param sourceObject 待加密对象
      */
-    private void encryptHandler (Object sourceObject) {
+    private void encryptHandler(Object sourceObject) {
         if (sourceObject instanceof Map) {
             ((Map<?, Object>) sourceObject).values().forEach(this::encryptHandler);
             return;
@@ -69,7 +73,7 @@ public class MybatisEncryptInterceptor implements Interceptor {
         if (sourceObject instanceof List) {
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = ((List<?>) sourceObject).get(0);
-            if(CollectionUtil.isEmpty(EncryptedFieldsCacheHelper.get(firstItem.getClass()))) {
+            if (CollectionUtil.isEmpty(EncryptedFieldsCacheHelper.get(firstItem.getClass()))) {
                 return;
             }
             ((List<?>) sourceObject).forEach(this::encryptHandler);
@@ -98,9 +102,9 @@ public class MybatisEncryptInterceptor implements Interceptor {
         properties.setEnabled(true);
         properties.setAlgorithm(encryptField.algorithm());
         properties.setEncode(encryptField.encode());
-        properties.setPassword(StringUtils.isEmpty(encryptField.password())?defaultProperties.getPassword():encryptField.password());
-        properties.setPrivateKey(StringUtils.isEmpty(encryptField.privateKey())?defaultProperties.getPrivateKey():encryptField.privateKey());
-        properties.setPublicKey(StringUtils.isEmpty(encryptField.publicKey())?defaultProperties.getPublicKey():encryptField.publicKey());
+        properties.setPassword(StringUtils.isEmpty(encryptField.password()) ? defaultProperties.getPassword() : encryptField.password());
+        properties.setPrivateKey(StringUtils.isEmpty(encryptField.privateKey()) ? defaultProperties.getPrivateKey() : encryptField.privateKey());
+        properties.setPublicKey(StringUtils.isEmpty(encryptField.publicKey()) ? defaultProperties.getPublicKey() : encryptField.publicKey());
         this.encryptorManager.registAndGetEncryptor(properties);
         return this.encryptorManager.encrypt(value, properties);
     }

@@ -47,7 +47,7 @@ public class Sm4Encryptor implements IEncryptor {
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.sm4)) {
+        if (ObjectUtil.isNotNull(this.sm4)) {
             if (encodeType == EncodeType.HEX) {
                 return sm4.encryptHex(value);
             } else {
@@ -69,7 +69,7 @@ public class Sm4Encryptor implements IEncryptor {
      */
     @Override
     public String decrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.sm4)) {
+        if (ObjectUtil.isNotNull(this.sm4)) {
             return this.sm4.decryptStr(value);
         }
         return value;

@@ -9,6 +9,8 @@ import com.ruoyi.framework.config.properties.EncryptorProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.sql.Statement;
@@ -26,6 +28,8 @@ import java.util.*;
     method = "handleResultSets",
     args = {Statement.class})
 })
+@ConditionalOnProperty(value = "mybatis-encryptor.enabled", havingValue = "true")
+@Component
 public class MybatisDecryptInterceptor implements Interceptor {
 
     private final EncryptorManager encryptorManager = SpringUtils.getBean(EncryptorManager.class);
@@ -47,7 +51,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
      *
      * @param sourceObject 待加密对象
      */
-    private void decryptHandler (Object sourceObject) {
+    private void decryptHandler(Object sourceObject) {
         if (sourceObject instanceof Map) {
             ((Map<?, Object>) sourceObject).values().forEach(this::decryptHandler);
             return;
@@ -55,7 +59,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
         if (sourceObject instanceof List) {
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = ((List<?>) sourceObject).get(0);
-            if(CollectionUtil.isEmpty(EncryptedFieldsCacheHelper.get(firstItem.getClass()))) {
+            if (CollectionUtil.isEmpty(EncryptedFieldsCacheHelper.get(firstItem.getClass()))) {
                 return;
             }
             ((List<?>) sourceObject).forEach(this::decryptHandler);
@@ -84,9 +88,9 @@ public class MybatisDecryptInterceptor implements Interceptor {
         properties.setEnabled(true);
         properties.setAlgorithm(encryptField.algorithm());
         properties.setEncode(encryptField.encode());
-        properties.setPassword(StringUtils.isEmpty(encryptField.password())?defaultProperties.getPassword():encryptField.password());
-        properties.setPrivateKey(StringUtils.isEmpty(encryptField.privateKey())?defaultProperties.getPrivateKey():encryptField.privateKey());
-        properties.setPublicKey(StringUtils.isEmpty(encryptField.publicKey())?defaultProperties.getPublicKey():encryptField.publicKey());
+        properties.setPassword(StringUtils.isEmpty(encryptField.password()) ? defaultProperties.getPassword() : encryptField.password());
+        properties.setPrivateKey(StringUtils.isEmpty(encryptField.privateKey()) ? defaultProperties.getPrivateKey() : encryptField.privateKey());
+        properties.setPublicKey(StringUtils.isEmpty(encryptField.publicKey()) ? defaultProperties.getPublicKey() : encryptField.publicKey());
         this.encryptorManager.registAndGetEncryptor(properties);
         return this.encryptorManager.decrypt(value, properties);
     }

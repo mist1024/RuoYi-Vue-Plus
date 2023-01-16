@@ -6,6 +6,7 @@ import cn.hutool.crypto.symmetric.AES;
 import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -45,14 +46,14 @@ public class AesEncryptor implements IEncryptor {
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.aes)) {
-            if(encodeType == EncodeType.HEX) {
+        if (ObjectUtil.isNotNull(this.aes)) {
+            if (encodeType == EncodeType.HEX) {
                 return aes.encryptHex(value);
-            }else {
+            } else {
                 return aes.encryptBase64(value);
             }
         }
-       return value;
+        return value;
     }
 
     /**
@@ -65,8 +66,8 @@ public class AesEncryptor implements IEncryptor {
      * @date 2023/1/10 16:38
      */
     @Override
-    public String decrypt(String value,EncodeType encodeType) throws Exception {
-        if(ObjectUtil.isNotNull(this.aes)) {
+    public String decrypt(String value, EncodeType encodeType) throws Exception {
+        if (ObjectUtil.isNotNull(this.aes)) {
             return this.aes.decryptStr(value);
         }
         return value;

@@ -2,6 +2,7 @@ package com.ruoyi.common.annotation;
 
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
+
 import java.lang.annotation.*;
 
 /**
