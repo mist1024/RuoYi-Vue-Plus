@@ -1,7 +1,9 @@
 package com.ruoyi.demo.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.ruoyi.common.annotation.EncryptField;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.common.enums.AlgorithmType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -44,11 +46,13 @@ public class TestDemo extends BaseEntity {
     /**
      * key键
      */
+    @EncryptField(algorithm=AlgorithmType.SM2, privateKey = "MIGTAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBHkwdwIBAQQgZSlOvw8FBiH+aFJWLYZP/VRjg9wjfRarTkGBZd/T3N+gCgYIKoEcz1UBgi2hRANCAAR5DGuQwJqkxnbCsP+iPSDoHWIF4RwcR5EsSvT8QPxO1wRkR2IhCkzvRb32x2CUgJFdvoqVqfApFDPZzShqzBwX", publicKey = "MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAEeQxrkMCapMZ2wrD/oj0g6B1iBeEcHEeRLEr0/ED8TtcEZEdiIQpM70W99sdglICRXb6KlanwKRQz2c0oaswcFw==")
     private String testKey;
 
     /**
      * 值
      */
+    @EncryptField(algorithm=AlgorithmType.AES, password = "10rfylhtccpuyke5")
     private String value;
 
     /**
