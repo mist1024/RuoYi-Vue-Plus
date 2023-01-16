@@ -1,7 +1,6 @@
 package com.ruoyi.framework.encrypt;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.EncryptField;
 import com.ruoyi.common.utils.StringUtils;
@@ -13,8 +12,6 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -35,8 +32,6 @@ import java.util.Set;
     method = "setParameters",
     args = {PreparedStatement.class})
 })
-@ConditionalOnProperty(value = "mybatis-encryptor.enabled", havingValue = "true")
-@Component
 public class MybatisEncryptInterceptor implements Interceptor {
 
     private final EncryptorManager encryptorManager = SpringUtils.getBean(EncryptorManager.class);
@@ -85,7 +80,7 @@ public class MybatisEncryptInterceptor implements Interceptor {
                 field.set(sourceObject, this.encryptField(String.valueOf(field.get(sourceObject)), field));
             }
         } catch (Exception e) {
-            log.error("处理加密字段时出错：{}", ExceptionUtil.getSimpleMessage(e));
+            log.error("处理加密字段时出错", e);
         }
     }
 

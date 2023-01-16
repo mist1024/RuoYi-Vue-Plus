@@ -1,7 +1,6 @@
 package com.ruoyi.framework.encrypt;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.exceptions.ExceptionUtil;
 import com.ruoyi.common.annotation.EncryptField;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -9,12 +8,13 @@ import com.ruoyi.framework.config.properties.EncryptorProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.*;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.sql.Statement;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * 出参解密拦截器
@@ -28,8 +28,6 @@ import java.util.*;
     method = "handleResultSets",
     args = {Statement.class})
 })
-@ConditionalOnProperty(value = "mybatis-encryptor.enabled", havingValue = "true")
-@Component
 public class MybatisDecryptInterceptor implements Interceptor {
 
     private final EncryptorManager encryptorManager = SpringUtils.getBean(EncryptorManager.class);
@@ -71,7 +69,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
                 field.set(sourceObject, this.decryptField(String.valueOf(field.get(sourceObject)), field));
             }
         } catch (Exception e) {
-            log.error("处理加密字段时出错：{}", ExceptionUtil.getSimpleMessage(e));
+            log.error("处理解密字段时出错", e);
         }
     }
 

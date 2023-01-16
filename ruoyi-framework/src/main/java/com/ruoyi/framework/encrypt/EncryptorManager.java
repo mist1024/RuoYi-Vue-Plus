@@ -53,7 +53,7 @@ public class EncryptorManager {
                 encryptorMap.put(encryptorKey, new Sm4Encryptor(properties.getPassword()));
                 break;
             default:
-                AesEncryptor defaultEncryptor = new AesEncryptor(properties.getPassword());
+                Base64Encryptor defaultEncryptor = new Base64Encryptor();
                 encryptorMap.put(encryptorKey, defaultEncryptor);
         }
         return encryptorMap.get(encryptorKey);

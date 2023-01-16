@@ -19,7 +19,7 @@ public @interface EncryptField {
     /**
      * 加密算法
      */
-    AlgorithmType algorithm() default AlgorithmType.AES;
+    AlgorithmType algorithm() default AlgorithmType.BASE64;
 
     /**
      * 秘钥。AES、SM4需要
