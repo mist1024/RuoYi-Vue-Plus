@@ -1,5 +1,7 @@
 package com.ruoyi.common.enums;
 
+import com.ruoyi.common.encrypt.IEncryptor;
+import com.ruoyi.common.encrypt.encryptor.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,27 +16,27 @@ public enum AlgorithmType {
     /**
      * base64
      */
-    BASE64("com.ruoyi.common.encrypt.encryptor.Base64Encryptor"),
+    BASE64(Base64Encryptor.class),
 
     /**
      * aes
      */
-    AES("com.ruoyi.common.encrypt.encryptor.AesEncryptor"),
+    AES(AesEncryptor.class),
 
     /**
      * rsa
      */
-    RSA("com.ruoyi.common.encrypt.encryptor.RsaEncryptor"),
+    RSA(RsaEncryptor.class),
 
     /**
      * sm2
      */
-    SM2("com.ruoyi.common.encrypt.encryptor.Sm2Encryptor"),
+    SM2(Sm2Encryptor.class),
 
     /**
      * sm4
      */
-    SM4("com.ruoyi.common.encrypt.encryptor.Sm4Encryptor");
+    SM4(Sm4Encryptor.class);
 
-    private final String clazz;
+    private final Class<? extends IEncryptor> clazz;
 }

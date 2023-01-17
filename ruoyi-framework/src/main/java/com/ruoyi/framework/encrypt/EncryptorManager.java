@@ -6,7 +6,6 @@ import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.EncryptorProperties;
-import jodd.util.ClassLoaderUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -44,16 +43,7 @@ public class EncryptorManager {
         encryptContext.setPrivateKey(properties.getPrivateKey());
         encryptContext.setPublicKey(properties.getPublicKey());
         encryptContext.setEncode(properties.getEncode());
-        Class<IEncryptor> clazz = null;
-        try {
-            clazz = ClassLoaderUtil.loadClass(properties.getAlgorithm().getClazz());
-        } catch (ClassNotFoundException e) {
-            log.error("没有找到配置中指定的加密执行者", e);
-        }
-        if(ObjectUtil.isNull(clazz)) {
-            return null;
-        }
-        IEncryptor encryptor = ReflectUtil.newInstance(clazz, encryptContext);
+        IEncryptor encryptor = ReflectUtil.newInstance(properties.getAlgorithm().getClazz(), encryptContext);
         encryptorMap.put(encryptorKey, encryptor);
         return encryptorMap.get(encryptorKey);
     }
