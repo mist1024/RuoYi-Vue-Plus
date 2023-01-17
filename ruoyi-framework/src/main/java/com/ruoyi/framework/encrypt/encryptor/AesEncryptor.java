@@ -1,8 +1,11 @@
 package com.ruoyi.framework.encrypt.encryptor;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
+import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
@@ -19,10 +22,6 @@ public class AesEncryptor implements IEncryptor {
 
     private AES aes = null;
 
-    public AesEncryptor(String password) {
-        aes = SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8));
-    }
-
     /**
      * 获得当前算法
      *
@@ -33,6 +32,27 @@ public class AesEncryptor implements IEncryptor {
     @Override
     public AlgorithmType algorithm() {
         return AlgorithmType.AES;
+    }
+
+    /**
+     * 初始化加密者
+     *
+     * @param context 加密上下文
+     * @author 老马
+     * @date 2023/1/17 09:01
+     */
+    @Override
+    public void init(EncryptContext context) throws Exception {
+        String password = context.getPassword();
+        if (StrUtil.isBlank(password)) {
+            throw new RuntimeException("aes没有获得秘钥信息");
+        }
+        // aes算法的秘钥要求是16位、24位、32位
+        int[] array = {16, 24, 32};
+        if(!ArrayUtil.contains(array, password.length())) {
+            throw new RuntimeException("aes秘钥长度应该为16位、24位、32位，实际为"+password.length()+"位");
+        }
+        aes = SecureUtil.aes(context.getPassword().getBytes(StandardCharsets.UTF_8));
     }
 
     /**

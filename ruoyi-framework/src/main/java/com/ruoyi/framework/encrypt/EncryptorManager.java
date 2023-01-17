@@ -1,9 +1,11 @@
 package com.ruoyi.framework.encrypt;
 
+import cn.hutool.core.util.ReflectUtil;
+import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.encrypt.IEncryptor;
+import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.EncryptorProperties;
-import com.ruoyi.framework.encrypt.encryptor.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -36,26 +38,14 @@ public class EncryptorManager {
         if (encryptorMap.containsKey(encryptorKey)) {
             return encryptorMap.get(encryptorKey);
         }
-        switch (properties.getAlgorithm()) {
-            case BASE64:
-                encryptorMap.put(encryptorKey, new Base64Encryptor());
-                break;
-            case AES:
-                encryptorMap.put(encryptorKey, new AesEncryptor(properties.getPassword()));
-                break;
-            case RSA:
-                encryptorMap.put(encryptorKey, new RsaEncryptor(properties.getPrivateKey(), properties.getPublicKey()));
-                break;
-            case SM2:
-                encryptorMap.put(encryptorKey, new Sm2Encryptor(properties.getPrivateKey(), properties.getPublicKey()));
-                break;
-            case SM4:
-                encryptorMap.put(encryptorKey, new Sm4Encryptor(properties.getPassword()));
-                break;
-            default:
-                Base64Encryptor defaultEncryptor = new Base64Encryptor();
-                encryptorMap.put(encryptorKey, defaultEncryptor);
+        EncryptContext encryptContext = BeanCopyUtils.copy(properties, EncryptContext.class);
+        IEncryptor encryptor = ReflectUtil.newInstance(properties.getAlgorithm().getClazz());
+        try {
+            encryptor.init(encryptContext);
+        } catch (Exception e) {
+            log.error("加密执行者注册失败。", e);
         }
+        encryptorMap.put(encryptorKey, encryptor);
         return encryptorMap.get(encryptorKey);
     }
 
@@ -118,7 +108,7 @@ public class EncryptorManager {
      * @date 2023/1/11 17:39
      */
     private String getEncryptorKeyFromProperties(EncryptorProperties properties) {
-        return properties.getAlgorithm().getAlgorithm() + StringUtils.defaultString(properties.getPassword()) +
+        return properties.getAlgorithm() + StringUtils.defaultString(properties.getPassword()) +
             StringUtils.defaultString(properties.getPublicKey()) + StringUtils.defaultString(properties.getPrivateKey());
     }
 

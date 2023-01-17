@@ -21,6 +21,16 @@ public interface IEncryptor {
     AlgorithmType algorithm();
 
     /**
+     * 初始化加密者
+     *
+     * @param context 加密上下文
+     * @throws Exception 抛出异常
+     * @author 老马
+     * @date 2023/1/17 09:01
+     */
+    void init(EncryptContext context) throws Exception;
+
+    /**
      * 加密
      *
      * @param value      待加密字符串
