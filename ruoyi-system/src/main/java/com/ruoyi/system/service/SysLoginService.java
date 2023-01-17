@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
@@ -130,7 +129,7 @@ public class SysLoginService {
             LoginUser loginUser = LoginHelper.getLoginUser();
             StpUtil.logout();
             recordLogininfor(loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
-        } catch (NotLoginException ignored) {
+        } catch (Exception ignored) {
         }
     }
 
