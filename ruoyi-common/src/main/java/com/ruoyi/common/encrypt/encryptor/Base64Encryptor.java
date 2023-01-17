@@ -13,7 +13,7 @@ import com.ruoyi.common.enums.EncodeType;
  */
 public class Base64Encryptor extends AbstractEncryptor {
 
-    public Base64Encryptor(EncryptContext context) throws Exception {
+    public Base64Encryptor(EncryptContext context) {
         super(context);
     }
 

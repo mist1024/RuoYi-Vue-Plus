@@ -21,7 +21,7 @@ public class Sm2Encryptor extends AbstractEncryptor {
 
     private SM2 sm2 = null;
 
-    public Sm2Encryptor(EncryptContext context) throws Exception {
+    public Sm2Encryptor(EncryptContext context) {
         super(context);
         String privateKey = context.getPrivateKey();
         String publicKey = context.getPublicKey();

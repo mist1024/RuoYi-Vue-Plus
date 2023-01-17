@@ -21,7 +21,7 @@ public class RsaEncryptor extends AbstractEncryptor {
 
     private RSA rsa = null;
 
-    public RsaEncryptor(EncryptContext context) throws Exception {
+    public RsaEncryptor(EncryptContext context) {
         super(context);
         String privateKey = context.getPrivateKey();
         String publicKey = context.getPublicKey();

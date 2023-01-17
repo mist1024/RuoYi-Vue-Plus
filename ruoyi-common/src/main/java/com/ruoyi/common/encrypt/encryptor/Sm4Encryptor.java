@@ -20,7 +20,7 @@ public class Sm4Encryptor extends AbstractEncryptor {
 
     private SM4 sm4 = null;
 
-    public Sm4Encryptor(EncryptContext context) throws Exception {
+    public Sm4Encryptor(EncryptContext context) {
         super(context);
         String password = context.getPassword();
         if (StrUtil.isBlank(password)) {

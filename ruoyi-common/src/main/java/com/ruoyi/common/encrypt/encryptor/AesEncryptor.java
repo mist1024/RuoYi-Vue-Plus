@@ -21,7 +21,7 @@ public class AesEncryptor extends AbstractEncryptor {
 
     private AES aes = null;
 
-    public AesEncryptor(EncryptContext context) throws Exception{
+    public AesEncryptor(EncryptContext context) {
         super(context);
         String password = context.getPassword();
         if (StrUtil.isBlank(password)) {
