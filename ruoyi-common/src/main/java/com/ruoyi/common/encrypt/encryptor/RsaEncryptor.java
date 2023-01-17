@@ -1,34 +1,34 @@
-package com.ruoyi.framework.encrypt.encryptor;
-
+package com.ruoyi.common.encrypt.encryptor;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.crypto.SmUtil;
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.asymmetric.SM2;
+import cn.hutool.crypto.asymmetric.RSA;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
 import com.ruoyi.common.utils.StringUtils;
 
+
 /**
- * sm2算法实现
+ * RSA算法实现
  *
  * @author 老马
- * @date 2023-01-06 17:13
+ * @date 2023-01-06 09:37
  */
-public class Sm2Encryptor extends AbstractEncryptor {
+public class RsaEncryptor extends AbstractEncryptor {
 
-    private SM2 sm2 = null;
+    private RSA rsa = null;
 
-    public Sm2Encryptor(EncryptContext context) throws Exception {
+    public RsaEncryptor(EncryptContext context) throws Exception {
         super(context);
         String privateKey = context.getPrivateKey();
         String publicKey = context.getPublicKey();
         if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
-            throw new RuntimeException("sm2公私钥均需要提供，公钥加密，私钥解密。");
+            throw new RuntimeException("rsa公私钥均需要提供，公钥加密，私钥解密。");
         }
-        this.sm2 = SmUtil.sm2(Base64.decode(privateKey), Base64.decode(publicKey));
+        this.rsa = SecureUtil.rsa(Base64.decode(privateKey), Base64.decode(publicKey));
     }
 
     /**
@@ -40,7 +40,7 @@ public class Sm2Encryptor extends AbstractEncryptor {
      */
     @Override
     public AlgorithmType algorithm() {
-        return AlgorithmType.SM2;
+        return AlgorithmType.RSA;
     }
 
     /**
@@ -49,17 +49,16 @@ public class Sm2Encryptor extends AbstractEncryptor {
      * @param value      待加密字符串
      * @param encodeType 加密后的编码格式
      * @return java.lang.String
-     * @throws Exception 抛出异常
      * @author 老马
      * @date 2023/1/10 16:38
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) throws Exception {
-        if (ObjectUtil.isNotNull(this.sm2)) {
+        if (ObjectUtil.isNotNull(this.rsa)) {
             if (encodeType == EncodeType.HEX) {
-                return sm2.encryptHex(value, KeyType.PublicKey);
+                return rsa.encryptHex(value, KeyType.PublicKey);
             } else {
-                return sm2.encryptBase64(value, KeyType.PublicKey);
+                return rsa.encryptBase64(value, KeyType.PublicKey);
             }
         }
         return value;
@@ -71,14 +70,13 @@ public class Sm2Encryptor extends AbstractEncryptor {
      * @param value      待加密字符串
      * @param encodeType 加密后的编码格式
      * @return java.lang.String
-     * @throws Exception 抛出异常
      * @author 老马
      * @date 2023/1/10 16:38
      */
     @Override
     public String decrypt(String value, EncodeType encodeType) throws Exception {
-        if (ObjectUtil.isNotNull(this.sm2)) {
-            return this.sm2.decryptStr(value, KeyType.PrivateKey);
+        if (ObjectUtil.isNotNull(this.rsa)) {
+            return this.rsa.decryptStr(value, KeyType.PrivateKey);
         }
         return value;
     }

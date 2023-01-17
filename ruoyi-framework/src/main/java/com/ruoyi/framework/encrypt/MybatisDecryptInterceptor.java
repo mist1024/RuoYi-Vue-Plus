@@ -57,13 +57,13 @@ public class MybatisDecryptInterceptor implements Interceptor {
         if (sourceObject instanceof List) {
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = ((List<?>) sourceObject).get(0);
-            if (CollectionUtil.isEmpty(EncryptedFieldsCacheHelper.get(firstItem.getClass()))) {
+            if (CollectionUtil.isEmpty(EncryptedFieldsCache.get(firstItem.getClass()))) {
                 return;
             }
             ((List<?>) sourceObject).forEach(this::decryptHandler);
             return;
         }
-        Set<Field> fields = EncryptedFieldsCacheHelper.get(sourceObject.getClass());
+        Set<Field> fields = EncryptedFieldsCache.get(sourceObject.getClass());
         try {
             for (Field field : fields) {
                 field.set(sourceObject, this.decryptField(String.valueOf(field.get(sourceObject)), field));

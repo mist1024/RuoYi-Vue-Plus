@@ -12,7 +12,6 @@ import lombok.Data;
  * @date 2023-01-17 08:31
  */
 @Data
-@Builder
 public class EncryptContext {
     /**
      * 安全秘钥

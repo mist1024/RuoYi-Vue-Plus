@@ -39,12 +39,11 @@ public class EncryptorManager {
         if (encryptorMap.containsKey(encryptorKey)) {
             return encryptorMap.get(encryptorKey);
         }
-        EncryptContext encryptContext = EncryptContext.builder()
-            .password(properties.getPassword())
-            .privateKey(properties.getPrivateKey())
-            .publicKey(properties.getPublicKey())
-            .encode(properties.getEncode())
-            .build();
+        EncryptContext encryptContext = new EncryptContext();
+        encryptContext.setPassword(properties.getPassword());
+        encryptContext.setPrivateKey(properties.getPrivateKey());
+        encryptContext.setPublicKey(properties.getPublicKey());
+        encryptContext.setEncode(properties.getEncode());
         Class<IEncryptor> clazz = null;
         try {
             clazz = ClassLoaderUtil.loadClass(properties.getAlgorithm().getClazz());

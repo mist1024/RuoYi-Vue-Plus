@@ -14,27 +14,27 @@ public enum AlgorithmType {
     /**
      * base64
      */
-    BASE64("com.ruoyi.framework.encrypt.encryptor.Base64Encryptor"),
+    BASE64("com.ruoyi.common.encrypt.encryptor.Base64Encryptor"),
 
     /**
      * aes
      */
-    AES("com.ruoyi.framework.encrypt.encryptor.AesEncryptor"),
+    AES("com.ruoyi.common.encrypt.encryptor.AesEncryptor"),
 
     /**
      * rsa
      */
-    RSA("com.ruoyi.framework.encrypt.encryptor.RsaEncryptor"),
+    RSA("com.ruoyi.common.encrypt.encryptor.RsaEncryptor"),
 
     /**
      * sm2
      */
-    SM2("com.ruoyi.framework.encrypt.encryptor.Sm2Encryptor"),
+    SM2("com.ruoyi.common.encrypt.encryptor.Sm2Encryptor"),
 
     /**
      * sm4
      */
-    SM4("com.ruoyi.framework.encrypt.encryptor.Sm4Encryptor");
+    SM4("com.ruoyi.common.encrypt.encryptor.Sm4Encryptor");
 
     private final String clazz;
 }

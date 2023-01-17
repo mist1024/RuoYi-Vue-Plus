@@ -1,4 +1,4 @@
-package com.ruoyi.framework.encrypt.encryptor;
+package com.ruoyi.common.encrypt.encryptor;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;

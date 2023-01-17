@@ -1,4 +1,4 @@
-package com.ruoyi.framework.encrypt.encryptor;
+package com.ruoyi.common.encrypt.encryptor;
 
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.encrypt.IEncryptor;

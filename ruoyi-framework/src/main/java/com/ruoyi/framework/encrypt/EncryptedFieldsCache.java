@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @author 老马
  * @date 2023-01-12 11:07
  */
-public class EncryptedFieldsCacheHelper {
+public class EncryptedFieldsCache {
     private static final Map<Class<?>, Set<Field>> ENCRYPTED_FIELD_CACHE = new ConcurrentHashMap<>();
 
     public static Set<Field> get(Class<?> sourceClazz) {

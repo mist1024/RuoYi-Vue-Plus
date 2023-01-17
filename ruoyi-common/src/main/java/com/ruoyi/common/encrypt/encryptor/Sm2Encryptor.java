@@ -1,38 +1,34 @@
-package com.ruoyi.framework.encrypt.encryptor;
+package com.ruoyi.common.encrypt.encryptor;
 
-import cn.hutool.core.util.ArrayUtil;
+
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.symmetric.AES;
+import cn.hutool.crypto.SmUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.SM2;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
-
-import java.nio.charset.StandardCharsets;
+import com.ruoyi.common.utils.StringUtils;
 
 /**
- * AES算法实现
+ * sm2算法实现
  *
  * @author 老马
- * @date 2023-01-06 11:39
+ * @date 2023-01-06 17:13
  */
-public class AesEncryptor extends AbstractEncryptor {
+public class Sm2Encryptor extends AbstractEncryptor {
 
-    private AES aes = null;
+    private SM2 sm2 = null;
 
-    public AesEncryptor(EncryptContext context) throws Exception{
+    public Sm2Encryptor(EncryptContext context) throws Exception {
         super(context);
-        String password = context.getPassword();
-        if (StrUtil.isBlank(password)) {
-            throw new RuntimeException("aes没有获得秘钥信息");
+        String privateKey = context.getPrivateKey();
+        String publicKey = context.getPublicKey();
+        if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
+            throw new RuntimeException("sm2公私钥均需要提供，公钥加密，私钥解密。");
         }
-        // aes算法的秘钥要求是16位、24位、32位
-        int[] array = {16, 24, 32};
-        if(!ArrayUtil.contains(array, password.length())) {
-            throw new RuntimeException("aes秘钥长度应该为16位、24位、32位，实际为"+password.length()+"位");
-        }
-        aes = SecureUtil.aes(context.getPassword().getBytes(StandardCharsets.UTF_8));
+        this.sm2 = SmUtil.sm2(Base64.decode(privateKey), Base64.decode(publicKey));
     }
 
     /**
@@ -44,7 +40,7 @@ public class AesEncryptor extends AbstractEncryptor {
      */
     @Override
     public AlgorithmType algorithm() {
-        return AlgorithmType.AES;
+        return AlgorithmType.SM2;
     }
 
     /**
@@ -53,16 +49,17 @@ public class AesEncryptor extends AbstractEncryptor {
      * @param value      待加密字符串
      * @param encodeType 加密后的编码格式
      * @return java.lang.String
+     * @throws Exception 抛出异常
      * @author 老马
      * @date 2023/1/10 16:38
      */
     @Override
     public String encrypt(String value, EncodeType encodeType) throws Exception {
-        if (ObjectUtil.isNotNull(this.aes)) {
+        if (ObjectUtil.isNotNull(this.sm2)) {
             if (encodeType == EncodeType.HEX) {
-                return aes.encryptHex(value);
+                return sm2.encryptHex(value, KeyType.PublicKey);
             } else {
-                return aes.encryptBase64(value);
+                return sm2.encryptBase64(value, KeyType.PublicKey);
             }
         }
         return value;
@@ -74,13 +71,14 @@ public class AesEncryptor extends AbstractEncryptor {
      * @param value      待加密字符串
      * @param encodeType 加密后的编码格式
      * @return java.lang.String
+     * @throws Exception 抛出异常
      * @author 老马
      * @date 2023/1/10 16:38
      */
     @Override
     public String decrypt(String value, EncodeType encodeType) throws Exception {
-        if (ObjectUtil.isNotNull(this.aes)) {
-            return this.aes.decryptStr(value);
+        if (ObjectUtil.isNotNull(this.sm2)) {
+            return this.sm2.decryptStr(value, KeyType.PrivateKey);
         }
         return value;
     }
