@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.symmetric.SM4;
 import com.ruoyi.common.encrypt.EncryptContext;
-import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
 
@@ -17,9 +16,22 @@ import java.nio.charset.StandardCharsets;
  * @author 老马
  * @date 2023-01-06 17:40
  */
-public class Sm4Encryptor implements IEncryptor {
+public class Sm4Encryptor extends AbstractEncryptor {
 
     private SM4 sm4 = null;
+
+    public Sm4Encryptor(EncryptContext context) throws Exception {
+        super(context);
+        String password = context.getPassword();
+        if (StrUtil.isBlank(password)) {
+            throw new RuntimeException("sm4没有获得秘钥信息");
+        }
+        // sm4算法的秘钥要求是16位长度
+        if (16 != password.length()) {
+            throw new RuntimeException("sm4秘钥长度应该为16位，实际为" + password.length() + "位");
+        }
+        this.sm4 = SmUtil.sm4(password.getBytes(StandardCharsets.UTF_8));
+    }
 
     /**
      * 获得当前算法
@@ -31,27 +43,6 @@ public class Sm4Encryptor implements IEncryptor {
     @Override
     public AlgorithmType algorithm() {
         return AlgorithmType.SM4;
-    }
-
-    /**
-     * 初始化加密者
-     *
-     * @param context 加密上下文
-     * @throws Exception 抛出异常
-     * @author 老马
-     * @date 2023/1/17 09:01
-     */
-    @Override
-    public void init(EncryptContext context) throws Exception {
-        String password = context.getPassword();
-        if (StrUtil.isBlank(password)) {
-            throw new RuntimeException("sm4没有获得秘钥信息");
-        }
-        // sm4算法的秘钥要求是16位长度
-        if (16 != password.length()) {
-            throw new RuntimeException("sm4秘钥长度应该为16位，实际为" + password.length() + "位");
-        }
-        this.sm4 = SmUtil.sm4(password.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

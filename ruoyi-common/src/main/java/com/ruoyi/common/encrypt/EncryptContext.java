@@ -1,6 +1,7 @@
 package com.ruoyi.common.encrypt;
 
 import com.ruoyi.common.enums.EncodeType;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Data;
  * @date 2023-01-17 08:31
  */
 @Data
+@Builder
 public class EncryptContext {
     /**
      * 安全秘钥

@@ -6,7 +6,6 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import com.ruoyi.common.encrypt.EncryptContext;
-import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
 import com.ruoyi.common.utils.StringUtils;
@@ -18,9 +17,19 @@ import com.ruoyi.common.utils.StringUtils;
  * @author 老马
  * @date 2023-01-06 09:37
  */
-public class RsaEncryptor implements IEncryptor {
+public class RsaEncryptor extends AbstractEncryptor {
 
     private RSA rsa = null;
+
+    public RsaEncryptor(EncryptContext context) throws Exception {
+        super(context);
+        String privateKey = context.getPrivateKey();
+        String publicKey = context.getPublicKey();
+        if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
+            throw new RuntimeException("rsa公私钥均需要提供，公钥加密，私钥解密。");
+        }
+        this.rsa = SecureUtil.rsa(Base64.decode(privateKey), Base64.decode(publicKey));
+    }
 
     /**
      * 获得当前算法
@@ -32,24 +41,6 @@ public class RsaEncryptor implements IEncryptor {
     @Override
     public AlgorithmType algorithm() {
         return AlgorithmType.RSA;
-    }
-
-    /**
-     * 初始化加密者
-     *
-     * @param context 加密上下文
-     * @throws Exception 抛出异常
-     * @author 老马
-     * @date 2023/1/17 09:01
-     */
-    @Override
-    public void init(EncryptContext context) throws Exception {
-        String privateKey = context.getPrivateKey();
-        String publicKey = context.getPublicKey();
-        if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
-            throw new RuntimeException("rsa公私钥均需要提供，公钥加密，私钥解密。");
-        }
-        this.rsa = SecureUtil.rsa(Base64.decode(privateKey), Base64.decode(publicKey));
     }
 
     /**

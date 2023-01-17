@@ -2,7 +2,6 @@ package com.ruoyi.framework.encrypt.encryptor;
 
 import cn.hutool.core.codec.Base64;
 import com.ruoyi.common.encrypt.EncryptContext;
-import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
 
@@ -12,7 +11,12 @@ import com.ruoyi.common.enums.EncodeType;
  * @author 老马
  * @date 2023-01-06 10:00
  */
-public class Base64Encryptor implements IEncryptor {
+public class Base64Encryptor extends AbstractEncryptor {
+
+    public Base64Encryptor(EncryptContext context) throws Exception {
+        super(context);
+    }
+
     /**
      * 获得当前算法
      *
@@ -23,18 +27,6 @@ public class Base64Encryptor implements IEncryptor {
     @Override
     public AlgorithmType algorithm() {
         return AlgorithmType.BASE64;
-    }
-
-    /**
-     * 初始化加密者
-     *
-     * @param context 加密上下文
-     * @author 老马
-     * @date 2023/1/17 09:01
-     */
-    @Override
-    public void init(EncryptContext context) {
-        // 无需初始化
     }
 
     /**

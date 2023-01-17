@@ -1,11 +1,12 @@
 package com.ruoyi.framework.encrypt;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.ruoyi.common.encrypt.EncryptContext;
 import com.ruoyi.common.encrypt.IEncryptor;
-import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.properties.EncryptorProperties;
+import jodd.util.ClassLoaderUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -38,13 +39,22 @@ public class EncryptorManager {
         if (encryptorMap.containsKey(encryptorKey)) {
             return encryptorMap.get(encryptorKey);
         }
-        EncryptContext encryptContext = BeanCopyUtils.copy(properties, EncryptContext.class);
-        IEncryptor encryptor = ReflectUtil.newInstance(properties.getAlgorithm().getClazz());
+        EncryptContext encryptContext = EncryptContext.builder()
+            .password(properties.getPassword())
+            .privateKey(properties.getPrivateKey())
+            .publicKey(properties.getPublicKey())
+            .encode(properties.getEncode())
+            .build();
+        Class<IEncryptor> clazz = null;
         try {
-            encryptor.init(encryptContext);
-        } catch (Exception e) {
-            log.error("加密执行者注册失败。", e);
+            clazz = ClassLoaderUtil.loadClass(properties.getAlgorithm().getClazz());
+        } catch (ClassNotFoundException e) {
+            log.error("没有找到配置中指定的加密执行者", e);
         }
+        if(ObjectUtil.isNull(clazz)) {
+            return null;
+        }
+        IEncryptor encryptor = ReflectUtil.newInstance(clazz, encryptContext);
         encryptorMap.put(encryptorKey, encryptor);
         return encryptorMap.get(encryptorKey);
     }
@@ -72,6 +82,9 @@ public class EncryptorManager {
     public String encrypt(String value, EncryptorProperties properties) {
         try {
             IEncryptor encryptor = this.registAndGetEncryptor(properties);
+            if(ObjectUtil.isNull(encryptor)){
+                return value;
+            }
             return encryptor.encrypt(value, properties.getEncode());
         } catch (Exception e) {
             log.error("字段加密异常,原样返回", e);
@@ -91,6 +104,9 @@ public class EncryptorManager {
     public String decrypt(String value, EncryptorProperties properties) {
         try {
             IEncryptor encryptor = this.registAndGetEncryptor(properties);
+            if(ObjectUtil.isNull(encryptor)){
+                return value;
+            }
             return encryptor.decrypt(value, properties.getEncode());
         } catch (Exception e) {
             log.error("字段解密异常,原样返回", e);

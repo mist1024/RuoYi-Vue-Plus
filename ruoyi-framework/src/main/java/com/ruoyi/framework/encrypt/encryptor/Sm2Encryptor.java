@@ -7,7 +7,6 @@ import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.SM2;
 import com.ruoyi.common.encrypt.EncryptContext;
-import com.ruoyi.common.encrypt.IEncryptor;
 import com.ruoyi.common.enums.AlgorithmType;
 import com.ruoyi.common.enums.EncodeType;
 import com.ruoyi.common.utils.StringUtils;
@@ -18,9 +17,19 @@ import com.ruoyi.common.utils.StringUtils;
  * @author 老马
  * @date 2023-01-06 17:13
  */
-public class Sm2Encryptor implements IEncryptor {
+public class Sm2Encryptor extends AbstractEncryptor {
 
     private SM2 sm2 = null;
+
+    public Sm2Encryptor(EncryptContext context) throws Exception {
+        super(context);
+        String privateKey = context.getPrivateKey();
+        String publicKey = context.getPublicKey();
+        if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
+            throw new RuntimeException("sm2公私钥均需要提供，公钥加密，私钥解密。");
+        }
+        this.sm2 = SmUtil.sm2(Base64.decode(privateKey), Base64.decode(publicKey));
+    }
 
     /**
      * 获得当前算法
@@ -32,24 +41,6 @@ public class Sm2Encryptor implements IEncryptor {
     @Override
     public AlgorithmType algorithm() {
         return AlgorithmType.SM2;
-    }
-
-    /**
-     * 初始化加密者
-     *
-     * @param context 加密上下文
-     * @throws Exception 抛出异常
-     * @author 老马
-     * @date 2023/1/17 09:01
-     */
-    @Override
-    public void init(EncryptContext context) throws Exception {
-        String privateKey = context.getPrivateKey();
-        String publicKey = context.getPublicKey();
-        if (StringUtils.isAnyEmpty(privateKey, publicKey)) {
-            throw new RuntimeException("sm2公私钥均需要提供，公钥加密，私钥解密。");
-        }
-        this.sm2 = SmUtil.sm2(Base64.decode(privateKey), Base64.decode(publicKey));
     }
 
     /**
