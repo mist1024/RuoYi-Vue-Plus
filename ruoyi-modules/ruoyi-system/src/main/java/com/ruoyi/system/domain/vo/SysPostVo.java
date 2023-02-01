@@ -11,49 +11,50 @@ import java.io.Serializable;
 import java.util.Date;
 
 
+
 /**
- * 参数配置视图对象 sys_config
+ * 岗位信息视图对象 sys_post
  *
  * @author ruoyi
- * @date 2023-01-31
+ * @date 2023-02-01
  */
 @Data
 @ExcelIgnoreUnannotated
-public class SysConfigVo implements Serializable {
+public class SysPostVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 参数主键
+     * 岗位ID
      */
-    @ExcelProperty(value = "参数主键")
-    private Long configId;
+    @ExcelProperty(value = "岗位序号")
+    private Long postId;
 
     /**
-     * 参数名称
+     * 岗位编码
      */
-    @ExcelProperty(value = "参数名称")
-    private String configName;
+    @ExcelProperty(value = "岗位编码")
+    private String postCode;
 
     /**
-     * 参数键名
+     * 岗位名称
      */
-    @ExcelProperty(value = "参数键名")
-    private String configKey;
+    @ExcelProperty(value = "岗位名称")
+    private String postName;
 
     /**
-     * 参数键值
+     * 显示顺序
      */
-    @ExcelProperty(value = "参数键值")
-    private String configValue;
+    @ExcelProperty(value = "岗位排序")
+    private Integer postSort;
 
     /**
-     * 系统内置（Y是 N否）
+     * 状态（0正常 1停用）
      */
-    @ExcelProperty(value = "系统内置", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_yes_no")
-    private String configType;
+    @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_normal_disable")
+    private String status;
 
     /**
      * 备注

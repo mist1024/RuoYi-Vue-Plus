@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 部门视图对象 sys_dept
@@ -79,5 +80,10 @@ public class SysDeptVo implements Serializable {
     @ExcelDictFormat(dictType = "sys_normal_disable")
     private String status;
 
+    /**
+     * 创建时间
+     */
+    @ExcelProperty(value = "创建时间")
+    private Date createTime;
 
 }

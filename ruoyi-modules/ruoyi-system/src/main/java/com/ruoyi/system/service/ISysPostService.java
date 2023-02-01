@@ -2,7 +2,8 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.system.domain.SysPost;
+import com.ruoyi.system.domain.bo.SysPostBo;
+import com.ruoyi.system.domain.vo.SysPostVo;
 
 import java.util.List;
 
@@ -14,22 +15,22 @@ import java.util.List;
 public interface ISysPostService {
 
 
-    TableDataInfo<SysPost> selectPagePostList(SysPost post, PageQuery pageQuery);
+    TableDataInfo<SysPostVo> selectPagePostList(SysPostBo bo, PageQuery pageQuery);
 
     /**
      * 查询岗位信息集合
      *
-     * @param post 岗位信息
+     * @param bo 岗位信息
      * @return 岗位列表
      */
-    List<SysPost> selectPostList(SysPost post);
+    List<SysPostVo> selectPostList(SysPostBo bo);
 
     /**
      * 查询所有岗位
      *
      * @return 岗位列表
      */
-    List<SysPost> selectPostAll();
+    List<SysPostVo> selectPostAll();
 
     /**
      * 通过岗位ID查询岗位信息
@@ -37,7 +38,7 @@ public interface ISysPostService {
      * @param postId 岗位ID
      * @return 角色对象信息
      */
-    SysPost selectPostById(Long postId);
+    SysPostVo selectPostById(Long postId);
 
     /**
      * 根据用户ID获取岗位选择框列表
@@ -50,18 +51,18 @@ public interface ISysPostService {
     /**
      * 校验岗位名称
      *
-     * @param post 岗位信息
+     * @param bo 岗位信息
      * @return 结果
      */
-    String checkPostNameUnique(SysPost post);
+    String checkPostNameUnique(SysPostBo bo);
 
     /**
      * 校验岗位编码
      *
-     * @param post 岗位信息
+     * @param bo 岗位信息
      * @return 结果
      */
-    String checkPostCodeUnique(SysPost post);
+    String checkPostCodeUnique(SysPostBo bo);
 
     /**
      * 通过岗位ID查询岗位使用数量
@@ -90,16 +91,16 @@ public interface ISysPostService {
     /**
      * 新增保存岗位信息
      *
-     * @param post 岗位信息
+     * @param bo 岗位信息
      * @return 结果
      */
-    int insertPost(SysPost post);
+    int insertPost(SysPostBo bo);
 
     /**
      * 修改保存岗位信息
      *
-     * @param post 岗位信息
+     * @param bo 岗位信息
      * @return 结果
      */
-    int updatePost(SysPost post);
+    int updatePost(SysPostBo bo);
 }
