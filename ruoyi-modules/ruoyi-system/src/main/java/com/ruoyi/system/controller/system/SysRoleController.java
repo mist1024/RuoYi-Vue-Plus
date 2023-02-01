@@ -13,9 +13,10 @@ import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysDept;
-import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.domain.bo.SysRoleBo;
+import com.ruoyi.system.domain.vo.SysRoleVo;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
@@ -49,8 +50,8 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/list")
-    public TableDataInfo<SysRole> list(SysRole role, PageQuery pageQuery) {
-        return roleService.selectPageRoleList(role, pageQuery);
+    public TableDataInfo<SysRoleVo> list(SysRoleBo bo, PageQuery pageQuery) {
+        return roleService.selectPageRoleList(bo, pageQuery);
     }
 
     /**
@@ -59,9 +60,9 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:role:export")
     @PostMapping("/export")
-    public void export(SysRole role, HttpServletResponse response) {
-        List<SysRole> list = roleService.selectRoleList(role);
-        ExcelUtil.exportExcel(list, "角色数据", SysRole.class, response);
+    public void export(SysRoleBo bo, HttpServletResponse response) {
+        List<SysRoleVo> list = roleService.selectRoleList(bo);
+        ExcelUtil.exportExcel(list, "角色数据", SysRoleVo.class, response);
     }
 
     /**
@@ -71,7 +72,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:query")
     @GetMapping(value = "/{roleId}")
-    public R<SysRole> getInfo(@PathVariable Long roleId) {
+    public R<SysRoleVo> getInfo(@PathVariable Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return R.ok(roleService.selectRoleById(roleId));
     }
@@ -82,13 +83,13 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:add")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysRole role) {
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
-            return R.fail("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
-            return R.fail("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
+    public R<Void> add(@Validated @RequestBody SysRoleBo bo) {
+        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(bo))) {
+            return R.fail("新增角色'" + bo.getRoleName() + "'失败，角色名称已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(bo))) {
+            return R.fail("新增角色'" + bo.getRoleName() + "'失败，角色权限已存在");
         }
-        return toAjax(roleService.insertRole(role));
+        return toAjax(roleService.insertRole(bo));
 
     }
 
@@ -98,16 +99,16 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysRole role) {
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
-            return R.fail("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(role))) {
-            return R.fail("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
+    public R<Void> edit(@Validated @RequestBody SysRoleBo bo) {
+        roleService.checkRoleAllowed(bo);
+        roleService.checkRoleDataScope(bo.getRoleId());
+        if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(bo))) {
+            return R.fail("修改角色'" + bo.getRoleName() + "'失败，角色名称已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleKeyUnique(bo))) {
+            return R.fail("修改角色'" + bo.getRoleName() + "'失败，角色权限已存在");
         }
 
-        if (roleService.updateRole(role) > 0) {
+        if (roleService.updateRole(bo) > 0) {
             // 更新缓存用户权限
             LoginUser loginUser = LoginHelper.getLoginUser();
             SysUser sysUser = userService.selectUserById(loginUser.getUserId());
@@ -117,7 +118,7 @@ public class SysRoleController extends BaseController {
             }
             return R.ok();
         }
-        return R.fail("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
+        return R.fail("修改角色'" + bo.getRoleName() + "'失败，请联系管理员");
     }
 
     /**
@@ -126,10 +127,10 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/dataScope")
-    public R<Void> dataScope(@RequestBody SysRole role) {
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        return toAjax(roleService.authDataScope(role));
+    public R<Void> dataScope(@RequestBody SysRoleBo bo) {
+        roleService.checkRoleAllowed(bo);
+        roleService.checkRoleDataScope(bo.getRoleId());
+        return toAjax(roleService.authDataScope(bo));
     }
 
     /**
@@ -138,10 +139,10 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    public R<Void> changeStatus(@RequestBody SysRole role) {
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        return toAjax(roleService.updateRoleStatus(role));
+    public R<Void> changeStatus(@RequestBody SysRoleBo bo) {
+        roleService.checkRoleAllowed(bo);
+        roleService.checkRoleDataScope(bo.getRoleId());
+        return toAjax(roleService.updateRoleStatus(bo));
     }
 
     /**
@@ -161,7 +162,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:query")
     @GetMapping("/optionselect")
-    public R<List<SysRole>> optionselect() {
+    public R<List<SysRoleVo>> optionselect() {
         return R.ok(roleService.selectRoleAll());
     }
 
