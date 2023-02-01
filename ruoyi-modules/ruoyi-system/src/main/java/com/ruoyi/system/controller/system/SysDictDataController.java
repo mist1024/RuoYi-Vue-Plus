@@ -10,6 +10,8 @@ import com.ruoyi.system.domain.SysDictData;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
+import com.ruoyi.system.domain.bo.SysDictDataBo;
+import com.ruoyi.system.domain.vo.SysDictDataVo;
 import com.ruoyi.system.service.ISysDictDataService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +41,8 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
-    public TableDataInfo<SysDictData> list(SysDictData dictData, PageQuery pageQuery) {
-        return dictDataService.selectPageDictDataList(dictData, pageQuery);
+    public TableDataInfo<SysDictDataVo> list(SysDictDataBo bo, PageQuery pageQuery) {
+        return dictDataService.selectPageDictDataList(bo, pageQuery);
     }
 
     /**
@@ -49,9 +51,9 @@ public class SysDictDataController extends BaseController {
     @Log(title = "字典数据", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:dict:export")
     @PostMapping("/export")
-    public void export(SysDictData dictData, HttpServletResponse response) {
-        List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-        ExcelUtil.exportExcel(list, "字典数据", SysDictData.class, response);
+    public void export(SysDictDataBo bo, HttpServletResponse response) {
+        List<SysDictDataVo> list = dictDataService.selectDictDataList(bo);
+        ExcelUtil.exportExcel(list, "字典数据", SysDictDataVo.class, response);
     }
 
     /**
@@ -61,7 +63,7 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:query")
     @GetMapping(value = "/{dictCode}")
-    public R<SysDictData> getInfo(@PathVariable Long dictCode) {
+    public R<SysDictDataVo> getInfo(@PathVariable Long dictCode) {
         return R.ok(dictDataService.selectDictDataById(dictCode));
     }
 
@@ -71,8 +73,8 @@ public class SysDictDataController extends BaseController {
      * @param dictType 字典类型
      */
     @GetMapping(value = "/type/{dictType}")
-    public R<List<SysDictData>> dictType(@PathVariable String dictType) {
-        List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
+    public R<List<SysDictDataVo>> dictType(@PathVariable String dictType) {
+        List<SysDictDataVo> data = dictTypeService.selectDictDataByType(dictType);
         if (ObjectUtil.isNull(data)) {
             data = new ArrayList<>();
         }
@@ -85,8 +87,8 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictData dict) {
-        dictDataService.insertDictData(dict);
+    public R<Void> add(@Validated @RequestBody SysDictDataBo bo) {
+        dictDataService.insertDictData(bo);
         return R.ok();
     }
 
@@ -96,8 +98,8 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictData dict) {
-        dictDataService.updateDictData(dict);
+    public R<Void> edit(@Validated @RequestBody SysDictDataBo bo) {
+        dictDataService.updateDictData(bo);
         return R.ok();
     }
 
