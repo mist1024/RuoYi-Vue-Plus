@@ -15,7 +15,7 @@ import java.util.List;
 public interface ISysConfigService {
 
 
-    TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo bo, PageQuery pageQuery);
+    TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo config, PageQuery pageQuery);
 
     /**
      * 查询参数配置信息
@@ -43,10 +43,10 @@ public interface ISysConfigService {
     /**
      * 查询参数配置列表
      *
-     * @param bo 参数配置信息
+     * @param config 参数配置信息
      * @return 参数配置集合
      */
-    List<SysConfigVo> selectConfigList(SysConfigBo bo);
+    List<SysConfigVo> selectConfigList(SysConfigBo config);
 
     /**
      * 新增参数配置
@@ -89,9 +89,9 @@ public interface ISysConfigService {
     /**
      * 校验参数键名是否唯一
      *
-     * @param bo 参数信息
+     * @param config 参数信息
      * @return 结果
      */
-    String checkConfigKeyUnique(SysConfigBo bo);
+    String checkConfigKeyUnique(SysConfigBo config);
 
 }

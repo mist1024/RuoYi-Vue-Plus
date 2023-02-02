@@ -16,10 +16,10 @@ public interface ISysDeptService {
     /**
      * 查询部门管理数据
      *
-     * @param bo 部门信息
+     * @param dept 部门信息
      * @return 部门信息集合
      */
-    List<SysDeptVo> selectDeptList(SysDeptBo bo);
+    List<SysDeptVo> selectDeptList(SysDeptBo dept);
 
     /**
      * 查询部门树结构信息
@@ -80,10 +80,10 @@ public interface ISysDeptService {
     /**
      * 校验部门名称是否唯一
      *
-     * @param bo 部门信息
+     * @param dept 部门信息
      * @return 结果
      */
-    String checkDeptNameUnique(SysDeptBo bo);
+    String checkDeptNameUnique(SysDeptBo dept);
 
     /**
      * 校验部门是否有数据权限

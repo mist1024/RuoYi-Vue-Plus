@@ -47,20 +47,20 @@ public class SysRoleServiceImpl implements ISysRoleService {
     private final SysRoleDeptMapper roleDeptMapper;
 
     @Override
-    public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleBo bo, PageQuery pageQuery) {
-        Page<SysRoleVo> page = baseMapper.selectPageRoleList(pageQuery.build(), this.buildQueryWrapper(bo));
+    public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleBo role, PageQuery pageQuery) {
+        Page<SysRoleVo> page = baseMapper.selectPageRoleList(pageQuery.build(), this.buildQueryWrapper(role));
         return TableDataInfo.build(page);
     }
 
     /**
      * 根据条件分页查询角色数据
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      * @return 角色数据集合信息
      */
     @Override
-    public List<SysRoleVo> selectRoleList(SysRoleBo bo) {
-        return baseMapper.selectRoleList(this.buildQueryWrapper(bo));
+    public List<SysRoleVo> selectRoleList(SysRoleBo role) {
+        return baseMapper.selectRoleList(this.buildQueryWrapper(role));
     }
 
     private Wrapper<SysRole> buildQueryWrapper(SysRoleBo bo) {
@@ -151,14 +151,14 @@ public class SysRoleServiceImpl implements ISysRoleService {
     /**
      * 校验角色名称是否唯一
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      * @return 结果
      */
     @Override
-    public String checkRoleNameUnique(SysRoleBo bo) {
+    public String checkRoleNameUnique(SysRoleBo role) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
-            .eq(SysRole::getRoleName, bo.getRoleName())
-            .ne(ObjectUtil.isNotNull(bo.getRoleId()), SysRole::getRoleId, bo.getRoleId()));
+            .eq(SysRole::getRoleName, role.getRoleName())
+            .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -168,14 +168,14 @@ public class SysRoleServiceImpl implements ISysRoleService {
     /**
      * 校验角色权限是否唯一
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      * @return 结果
      */
     @Override
-    public String checkRoleKeyUnique(SysRoleBo bo) {
+    public String checkRoleKeyUnique(SysRoleBo role) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysRole>()
-            .eq(SysRole::getRoleKey, bo.getRoleKey())
-            .ne(ObjectUtil.isNotNull(bo.getRoleId()), SysRole::getRoleId, bo.getRoleId()));
+            .eq(SysRole::getRoleKey, role.getRoleKey())
+            .ne(ObjectUtil.isNotNull(role.getRoleId()), SysRole::getRoleId, role.getRoleId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -185,11 +185,11 @@ public class SysRoleServiceImpl implements ISysRoleService {
     /**
      * 校验角色是否允许操作
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      */
     @Override
-    public void checkRoleAllowed(SysRoleBo bo) {
-        if (ObjectUtil.isNotNull(bo.getRoleId()) && bo.isAdmin()) {
+    public void checkRoleAllowed(SysRoleBo role) {
+        if (ObjectUtil.isNotNull(role.getRoleId()) && role.isAdmin()) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
     }

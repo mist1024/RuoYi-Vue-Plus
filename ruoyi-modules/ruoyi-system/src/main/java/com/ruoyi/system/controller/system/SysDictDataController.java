@@ -41,8 +41,8 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
-    public TableDataInfo<SysDictDataVo> list(SysDictDataBo bo, PageQuery pageQuery) {
-        return dictDataService.selectPageDictDataList(bo, pageQuery);
+    public TableDataInfo<SysDictDataVo> list(SysDictDataBo dictData, PageQuery pageQuery) {
+        return dictDataService.selectPageDictDataList(dictData, pageQuery);
     }
 
     /**
@@ -51,8 +51,8 @@ public class SysDictDataController extends BaseController {
     @Log(title = "字典数据", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:dict:export")
     @PostMapping("/export")
-    public void export(SysDictDataBo bo, HttpServletResponse response) {
-        List<SysDictDataVo> list = dictDataService.selectDictDataList(bo);
+    public void export(SysDictDataBo dictData, HttpServletResponse response) {
+        List<SysDictDataVo> list = dictDataService.selectDictDataList(dictData);
         ExcelUtil.exportExcel(list, "字典数据", SysDictDataVo.class, response);
     }
 
@@ -87,8 +87,8 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictDataBo bo) {
-        dictDataService.insertDictData(bo);
+    public R<Void> add(@Validated @RequestBody SysDictDataBo dictData) {
+        dictDataService.insertDictData(dictData);
         return R.ok();
     }
 
@@ -98,8 +98,8 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictDataBo bo) {
-        dictDataService.updateDictData(bo);
+    public R<Void> edit(@Validated @RequestBody SysDictDataBo dictData) {
+        dictDataService.updateDictData(dictData);
         return R.ok();
     }
 

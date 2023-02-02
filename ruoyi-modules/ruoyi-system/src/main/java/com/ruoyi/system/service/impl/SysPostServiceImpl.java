@@ -37,8 +37,8 @@ public class SysPostServiceImpl implements ISysPostService {
     private final SysUserPostMapper userPostMapper;
 
     @Override
-    public TableDataInfo<SysPostVo> selectPagePostList(SysPostBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysPost> lqw = buildQueryWrapper(bo);
+    public TableDataInfo<SysPostVo> selectPagePostList(SysPostBo post, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysPost> lqw = buildQueryWrapper(post);
         Page<SysPostVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -46,12 +46,12 @@ public class SysPostServiceImpl implements ISysPostService {
     /**
      * 查询岗位信息集合
      *
-     * @param bo 岗位信息
+     * @param post 岗位信息
      * @return 岗位信息集合
      */
     @Override
-    public List<SysPostVo> selectPostList(SysPostBo bo) {
-        LambdaQueryWrapper<SysPost> lqw = buildQueryWrapper(bo);
+    public List<SysPostVo> selectPostList(SysPostBo post) {
+        LambdaQueryWrapper<SysPost> lqw = buildQueryWrapper(post);
         return baseMapper.selectVoList(lqw);
     }
 
@@ -99,14 +99,14 @@ public class SysPostServiceImpl implements ISysPostService {
     /**
      * 校验岗位名称是否唯一
      *
-     * @param bo 岗位信息
+     * @param post 岗位信息
      * @return 结果
      */
     @Override
-    public String checkPostNameUnique(SysPostBo bo) {
+    public String checkPostNameUnique(SysPostBo post) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
-            .eq(SysPost::getPostName, bo.getPostName())
-            .ne(ObjectUtil.isNotNull(bo.getPostId()), SysPost::getPostId, bo.getPostId()));
+            .eq(SysPost::getPostName, post.getPostName())
+            .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -116,14 +116,14 @@ public class SysPostServiceImpl implements ISysPostService {
     /**
      * 校验岗位编码是否唯一
      *
-     * @param bo 岗位信息
+     * @param post 岗位信息
      * @return 结果
      */
     @Override
-    public String checkPostCodeUnique(SysPostBo bo) {
+    public String checkPostCodeUnique(SysPostBo post) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
-            .eq(SysPost::getPostCode, bo.getPostCode())
-            .ne(ObjectUtil.isNotNull(bo.getPostId()), SysPost::getPostId, bo.getPostId()));
+            .eq(SysPost::getPostCode, post.getPostCode())
+            .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }

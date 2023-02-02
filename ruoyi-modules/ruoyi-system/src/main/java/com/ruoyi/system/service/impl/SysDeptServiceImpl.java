@@ -46,12 +46,12 @@ public class SysDeptServiceImpl implements ISysDeptService {
     /**
      * 查询部门管理数据
      *
-     * @param bo 部门信息
+     * @param dept 部门信息
      * @return 部门信息集合
      */
     @Override
-    public List<SysDeptVo> selectDeptList(SysDeptBo bo) {
-        LambdaQueryWrapper<SysDept> lqw = buildQueryWrapper(bo);
+    public List<SysDeptVo> selectDeptList(SysDeptBo dept) {
+        LambdaQueryWrapper<SysDept> lqw = buildQueryWrapper(dept);
         return baseMapper.selectDeptList(lqw);
     }
 
@@ -166,15 +166,15 @@ public class SysDeptServiceImpl implements ISysDeptService {
     /**
      * 校验部门名称是否唯一
      *
-     * @param bo 部门信息
+     * @param dept 部门信息
      * @return 结果
      */
     @Override
-    public String checkDeptNameUnique(SysDeptBo bo) {
+    public String checkDeptNameUnique(SysDeptBo dept) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
-            .eq(SysDept::getDeptName, bo.getDeptName())
-            .eq(SysDept::getParentId, bo.getParentId())
-            .ne(ObjectUtil.isNotNull(bo.getDeptId()), SysDept::getDeptId, bo.getDeptId()));
+            .eq(SysDept::getDeptName, dept.getDeptName())
+            .eq(SysDept::getParentId, dept.getParentId())
+            .ne(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }

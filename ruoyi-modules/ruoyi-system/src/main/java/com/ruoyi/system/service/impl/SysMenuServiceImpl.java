@@ -288,15 +288,15 @@ public class SysMenuServiceImpl implements ISysMenuService {
     /**
      * 校验菜单名称是否唯一
      *
-     * @param bo 菜单信息
+     * @param menu 菜单信息
      * @return 结果
      */
     @Override
-    public String checkMenuNameUnique(SysMenuBo bo) {
+    public String checkMenuNameUnique(SysMenuBo menu) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysMenu>()
-            .eq(SysMenu::getMenuName, bo.getMenuName())
-            .eq(SysMenu::getParentId, bo.getParentId())
-            .ne(ObjectUtil.isNotNull(bo.getMenuId()), SysMenu::getMenuId, bo.getMenuId()));
+            .eq(SysMenu::getMenuName, menu.getMenuName())
+            .eq(SysMenu::getParentId, menu.getParentId())
+            .ne(ObjectUtil.isNotNull(menu.getMenuId()), SysMenu::getMenuId, menu.getMenuId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }

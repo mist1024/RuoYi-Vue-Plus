@@ -37,8 +37,8 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:list")
     @GetMapping("/list")
-    public TableDataInfo<SysConfigVo> list(SysConfigBo bo, PageQuery pageQuery) {
-        return configService.selectPageConfigList(bo, pageQuery);
+    public TableDataInfo<SysConfigVo> list(SysConfigBo config, PageQuery pageQuery) {
+        return configService.selectPageConfigList(config, pageQuery);
     }
 
     /**
@@ -47,8 +47,8 @@ public class SysConfigController extends BaseController {
     @Log(title = "参数管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:config:export")
     @PostMapping("/export")
-    public void export(SysConfigBo bo, HttpServletResponse response) {
-        List<SysConfigVo> list = configService.selectConfigList(bo);
+    public void export(SysConfigBo config, HttpServletResponse response) {
+        List<SysConfigVo> list = configService.selectConfigList(config);
         ExcelUtil.exportExcel(list, "参数数据", SysConfigVo.class, response);
     }
 
@@ -79,11 +79,11 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysConfigBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(bo))) {
-            return R.fail("新增参数'" + bo.getConfigName() + "'失败，参数键名已存在");
+    public R<Void> add(@Validated @RequestBody SysConfigBo config) {
+        if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
+            return R.fail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        configService.insertConfig(bo);
+        configService.insertConfig(config);
         return R.ok();
     }
 
@@ -93,11 +93,11 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysConfigBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(bo))) {
-            return R.fail("修改参数'" + bo.getConfigName() + "'失败，参数键名已存在");
+    public R<Void> edit(@Validated @RequestBody SysConfigBo config) {
+        if (UserConstants.NOT_UNIQUE.equals(configService.checkConfigKeyUnique(config))) {
+            return R.fail("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
         }
-        configService.updateConfig(bo);
+        configService.updateConfig(config);
         return R.ok();
     }
 
@@ -107,8 +107,8 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping("/updateByKey")
-    public R<Void> updateByKey(@RequestBody SysConfigBo bo) {
-        configService.updateConfig(bo);
+    public R<Void> updateByKey(@RequestBody SysConfigBo config) {
+        configService.updateConfig(config);
         return R.ok();
     }
 

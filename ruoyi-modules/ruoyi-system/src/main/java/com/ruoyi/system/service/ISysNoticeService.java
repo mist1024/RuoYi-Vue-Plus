@@ -15,7 +15,7 @@ import java.util.List;
 public interface ISysNoticeService {
 
 
-    TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo bo, PageQuery pageQuery);
+    TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo notice, PageQuery pageQuery);
 
     /**
      * 查询公告信息
@@ -28,10 +28,10 @@ public interface ISysNoticeService {
     /**
      * 查询公告列表
      *
-     * @param bo 公告信息
+     * @param notice 公告信息
      * @return 公告集合
      */
-    List<SysNoticeVo> selectNoticeList(SysNoticeBo bo);
+    List<SysNoticeVo> selectNoticeList(SysNoticeBo notice);
 
     /**
      * 新增公告

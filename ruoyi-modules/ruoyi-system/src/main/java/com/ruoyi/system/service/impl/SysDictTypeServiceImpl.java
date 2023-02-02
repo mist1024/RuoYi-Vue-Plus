@@ -49,8 +49,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     private final SysDictDataMapper dictDataMapper;
 
     @Override
-    public TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysDictType> lqw = buildQueryWrapper(bo);
+    public TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeBo dictType, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysDictType> lqw = buildQueryWrapper(dictType);
         Page<SysDictTypeVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -58,12 +58,12 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     /**
      * 根据条件分页查询字典类型
      *
-     * @param bo 字典类型信息
+     * @param dictType 字典类型信息
      * @return 字典类型集合信息
      */
     @Override
-    public List<SysDictTypeVo> selectDictTypeList(SysDictTypeBo bo) {
-        LambdaQueryWrapper<SysDictType> lqw = buildQueryWrapper(bo);
+    public List<SysDictTypeVo> selectDictTypeList(SysDictTypeBo dictType) {
+        LambdaQueryWrapper<SysDictType> lqw = buildQueryWrapper(dictType);
         return baseMapper.selectVoList(lqw);
     }
 
@@ -219,14 +219,14 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     /**
      * 校验字典类型称是否唯一
      *
-     * @param bo 字典类型
+     * @param dictType 字典类型
      * @return 结果
      */
     @Override
-    public String checkDictTypeUnique(SysDictTypeBo bo) {
+    public String checkDictTypeUnique(SysDictTypeBo dictType) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictType>()
-            .eq(SysDictType::getDictType, bo.getDictType())
-            .ne(ObjectUtil.isNotNull(bo.getDictId()), SysDictType::getDictId, bo.getDictId()));
+            .eq(SysDictType::getDictType, dictType.getDictType())
+            .ne(ObjectUtil.isNotNull(dictType.getDictId()), SysDictType::getDictId, dictType.getDictId()));
         if (exist) {
             return UserConstants.NOT_UNIQUE;
         }

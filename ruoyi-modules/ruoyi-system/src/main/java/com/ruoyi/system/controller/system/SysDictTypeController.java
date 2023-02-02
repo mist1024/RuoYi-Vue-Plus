@@ -38,8 +38,8 @@ public class SysDictTypeController extends BaseController {
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
-    public TableDataInfo<SysDictTypeVo> list(SysDictTypeBo bo, PageQuery pageQuery) {
-        return dictTypeService.selectPageDictTypeList(bo, pageQuery);
+    public TableDataInfo<SysDictTypeVo> list(SysDictTypeBo dictType, PageQuery pageQuery) {
+        return dictTypeService.selectPageDictTypeList(dictType, pageQuery);
     }
 
     /**
@@ -70,11 +70,11 @@ public class SysDictTypeController extends BaseController {
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictTypeBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(bo))) {
-            return R.fail("新增字典'" + bo.getDictName() + "'失败，字典类型已存在");
+    public R<Void> add(@Validated @RequestBody SysDictTypeBo dictType) {
+        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dictType))) {
+            return R.fail("新增字典'" + dictType.getDictName() + "'失败，字典类型已存在");
         }
-        dictTypeService.insertDictType(bo);
+        dictTypeService.insertDictType(dictType);
         return R.ok();
     }
 
@@ -84,11 +84,11 @@ public class SysDictTypeController extends BaseController {
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictTypeBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(bo))) {
-            return R.fail("修改字典'" + bo.getDictName() + "'失败，字典类型已存在");
+    public R<Void> edit(@Validated @RequestBody SysDictTypeBo dictType) {
+        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dictType))) {
+            return R.fail("修改字典'" + dictType.getDictName() + "'失败，字典类型已存在");
         }
-        dictTypeService.updateDictType(bo);
+        dictTypeService.updateDictType(dictType);
         return R.ok();
     }
 

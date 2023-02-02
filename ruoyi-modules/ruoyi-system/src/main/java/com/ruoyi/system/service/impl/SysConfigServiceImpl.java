@@ -42,8 +42,8 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     private final SysConfigMapper baseMapper;
 
     @Override
-    public TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(bo);
+    public TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo config, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(config);
         Page<SysConfigVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -94,12 +94,12 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     /**
      * 查询参数配置列表
      *
-     * @param bo 参数配置信息
+     * @param config 参数配置信息
      * @return 参数配置集合
      */
     @Override
-    public List<SysConfigVo> selectConfigList(SysConfigBo bo) {
-        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(bo);
+    public List<SysConfigVo> selectConfigList(SysConfigBo config) {
+        LambdaQueryWrapper<SysConfig> lqw = buildQueryWrapper(config);
         return baseMapper.selectVoList(lqw);
     }
 
@@ -205,13 +205,13 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     /**
      * 校验参数键名是否唯一
      *
-     * @param bo 参数配置信息
+     * @param config 参数配置信息
      * @return 结果
      */
     @Override
-    public String checkConfigKeyUnique(SysConfigBo bo) {
-        long configId = ObjectUtil.isNull(bo.getConfigId()) ? -1L : bo.getConfigId();
-        SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, bo.getConfigKey()));
+    public String checkConfigKeyUnique(SysConfigBo config) {
+        long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
+        SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
         if (ObjectUtil.isNotNull(info) && info.getConfigId() != configId) {
             return UserConstants.NOT_UNIQUE;
         }

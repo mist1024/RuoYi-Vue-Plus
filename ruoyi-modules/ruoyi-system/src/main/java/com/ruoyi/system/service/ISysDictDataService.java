@@ -15,15 +15,15 @@ import java.util.List;
 public interface ISysDictDataService {
 
 
-    TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataBo bo, PageQuery pageQuery);
+    TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataBo dictData, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询字典数据
      *
-     * @param bo 字典数据信息
+     * @param dictData 字典数据信息
      * @return 字典数据集合信息
      */
-    List<SysDictDataVo> selectDictDataList(SysDictDataBo bo);
+    List<SysDictDataVo> selectDictDataList(SysDictDataBo dictData);
 
     /**
      * 根据字典类型和字典键值查询字典数据信息

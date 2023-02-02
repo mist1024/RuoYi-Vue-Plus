@@ -32,8 +32,8 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:list")
     @GetMapping("/list")
-    public TableDataInfo<SysNoticeVo> list(SysNoticeBo bo, PageQuery pageQuery) {
-        return noticeService.selectPageNoticeList(bo, pageQuery);
+    public TableDataInfo<SysNoticeVo> list(SysNoticeBo notice, PageQuery pageQuery) {
+        return noticeService.selectPageNoticeList(notice, pageQuery);
     }
 
     /**
@@ -53,8 +53,8 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysNoticeBo bo) {
-        return toAjax(noticeService.insertNotice(bo));
+    public R<Void> add(@Validated @RequestBody SysNoticeBo notice) {
+        return toAjax(noticeService.insertNotice(notice));
     }
 
     /**
@@ -63,8 +63,8 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysNoticeBo bo) {
-        return toAjax(noticeService.updateNotice(bo));
+    public R<Void> edit(@Validated @RequestBody SysNoticeBo notice) {
+        return toAjax(noticeService.updateNotice(notice));
     }
 
     /**

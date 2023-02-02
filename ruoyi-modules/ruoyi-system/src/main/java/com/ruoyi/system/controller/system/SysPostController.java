@@ -37,8 +37,8 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
-    public TableDataInfo<SysPostVo> list(SysPostBo bo, PageQuery pageQuery) {
-        return postService.selectPagePostList(bo, pageQuery);
+    public TableDataInfo<SysPostVo> list(SysPostBo post, PageQuery pageQuery) {
+        return postService.selectPagePostList(post, pageQuery);
     }
 
     /**
@@ -47,8 +47,8 @@ public class SysPostController extends BaseController {
     @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:post:export")
     @PostMapping("/export")
-    public void export(SysPostBo bo, HttpServletResponse response) {
-        List<SysPostVo> list = postService.selectPostList(bo);
+    public void export(SysPostBo post, HttpServletResponse response) {
+        List<SysPostVo> list = postService.selectPostList(post);
         ExcelUtil.exportExcel(list, "岗位数据", SysPostVo.class, response);
     }
 
@@ -69,13 +69,13 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:add")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysPostBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(bo))) {
-            return R.fail("新增岗位'" + bo.getPostName() + "'失败，岗位名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(bo))) {
-            return R.fail("新增岗位'" + bo.getPostName() + "'失败，岗位编码已存在");
+    public R<Void> add(@Validated @RequestBody SysPostBo post) {
+        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post))) {
+            return R.fail("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post))) {
+            return R.fail("新增岗位'" + post.getPostName() + "'失败，岗位编码已存在");
         }
-        return toAjax(postService.insertPost(bo));
+        return toAjax(postService.insertPost(post));
     }
 
     /**
@@ -84,13 +84,13 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:edit")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysPostBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(bo))) {
-            return R.fail("修改岗位'" + bo.getPostName() + "'失败，岗位名称已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(bo))) {
-            return R.fail("修改岗位'" + bo.getPostName() + "'失败，岗位编码已存在");
+    public R<Void> edit(@Validated @RequestBody SysPostBo post) {
+        if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post))) {
+            return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post))) {
+            return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
         }
-        return toAjax(postService.updatePost(bo));
+        return toAjax(postService.updatePost(post));
     }
 
     /**

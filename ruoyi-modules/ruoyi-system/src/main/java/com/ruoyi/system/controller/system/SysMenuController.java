@@ -83,13 +83,13 @@ public class SysMenuController extends BaseController {
     @SaCheckPermission("system:menu:add")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysMenuBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(bo))) {
-            return R.fail("新增菜单'" + bo.getMenuName() + "'失败，菜单名称已存在");
-        } else if (UserConstants.YES_FRAME.equals(bo.getIsFrame()) && !StringUtils.ishttp(bo.getPath())) {
-            return R.fail("新增菜单'" + bo.getMenuName() + "'失败，地址必须以http(s)://开头");
+    public R<Void> add(@Validated @RequestBody SysMenuBo menu) {
+        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu))) {
+            return R.fail("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
+            return R.fail("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
         }
-        return toAjax(menuService.insertMenu(bo));
+        return toAjax(menuService.insertMenu(menu));
     }
 
     /**
@@ -98,15 +98,15 @@ public class SysMenuController extends BaseController {
     @SaCheckPermission("system:menu:edit")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysMenuBo bo) {
-        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(bo))) {
-            return R.fail("修改菜单'" + bo.getMenuName() + "'失败，菜单名称已存在");
-        } else if (UserConstants.YES_FRAME.equals(bo.getIsFrame()) && !StringUtils.ishttp(bo.getPath())) {
-            return R.fail("修改菜单'" + bo.getMenuName() + "'失败，地址必须以http(s)://开头");
-        } else if (bo.getMenuId().equals(bo.getParentId())) {
-            return R.fail("修改菜单'" + bo.getMenuName() + "'失败，上级菜单不能选择自己");
+    public R<Void> edit(@Validated @RequestBody SysMenuBo menu) {
+        if (UserConstants.NOT_UNIQUE.equals(menuService.checkMenuNameUnique(menu))) {
+            return R.fail("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+        } else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
+            return R.fail("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+        } else if (menu.getMenuId().equals(menu.getParentId())) {
+            return R.fail("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
         }
-        return toAjax(menuService.updateMenu(bo));
+        return toAjax(menuService.updateMenu(menu));
     }
 
     /**

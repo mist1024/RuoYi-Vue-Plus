@@ -17,15 +17,15 @@ import java.util.Set;
 public interface ISysRoleService {
 
 
-    TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleBo bo, PageQuery pageQuery);
+    TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleBo role, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询角色数据
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      * @return 角色数据集合信息
      */
-    List<SysRoleVo> selectRoleList(SysRoleBo bo);
+    List<SysRoleVo> selectRoleList(SysRoleBo role);
 
     /**
      * 根据用户ID查询角色列表
@@ -69,25 +69,25 @@ public interface ISysRoleService {
     /**
      * 校验角色名称是否唯一
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      * @return 结果
      */
-    String checkRoleNameUnique(SysRoleBo bo);
+    String checkRoleNameUnique(SysRoleBo role);
 
     /**
      * 校验角色权限是否唯一
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      * @return 结果
      */
-    String checkRoleKeyUnique(SysRoleBo bo);
+    String checkRoleKeyUnique(SysRoleBo role);
 
     /**
      * 校验角色是否允许操作
      *
-     * @param bo 角色信息
+     * @param role 角色信息
      */
-    void checkRoleAllowed(SysRoleBo bo);
+    void checkRoleAllowed(SysRoleBo role);
 
     /**
      * 校验角色是否有数据权限

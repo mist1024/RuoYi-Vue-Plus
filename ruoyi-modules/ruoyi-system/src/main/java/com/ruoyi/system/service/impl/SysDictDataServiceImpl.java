@@ -33,8 +33,8 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     private final SysDictDataMapper baseMapper;
 
     @Override
-    public TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysDictData> lqw = buildQueryWrapper(bo);
+    public TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataBo dictData, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysDictData> lqw = buildQueryWrapper(dictData);
         Page<SysDictDataVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -42,12 +42,12 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     /**
      * 根据条件分页查询字典数据
      *
-     * @param bo 字典数据信息
+     * @param dictData 字典数据信息
      * @return 字典数据集合信息
      */
     @Override
-    public List<SysDictDataVo> selectDictDataList(SysDictDataBo bo) {
-        LambdaQueryWrapper<SysDictData> lqw = buildQueryWrapper(bo);
+    public List<SysDictDataVo> selectDictDataList(SysDictDataBo dictData) {
+        LambdaQueryWrapper<SysDictData> lqw = buildQueryWrapper(dictData);
         return baseMapper.selectVoList(lqw);
     }
 

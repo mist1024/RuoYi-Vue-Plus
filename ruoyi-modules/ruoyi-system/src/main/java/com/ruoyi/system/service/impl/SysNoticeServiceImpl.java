@@ -31,8 +31,8 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     private final SysNoticeMapper baseMapper;
 
     @Override
-    public TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysNotice> lqw = buildQueryWrapper(bo);
+    public TableDataInfo<SysNoticeVo> selectPageNoticeList(SysNoticeBo notice, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysNotice> lqw = buildQueryWrapper(notice);
         Page<SysNoticeVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }
@@ -51,12 +51,12 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
     /**
      * 查询公告列表
      *
-     * @param bo 公告信息
+     * @param notice 公告信息
      * @return 公告集合
      */
     @Override
-    public List<SysNoticeVo> selectNoticeList(SysNoticeBo bo) {
-        LambdaQueryWrapper<SysNotice> lqw = buildQueryWrapper(bo);
+    public List<SysNoticeVo> selectNoticeList(SysNoticeBo notice) {
+        LambdaQueryWrapper<SysNotice> lqw = buildQueryWrapper(notice);
         return baseMapper.selectVoList(lqw);
     }
 

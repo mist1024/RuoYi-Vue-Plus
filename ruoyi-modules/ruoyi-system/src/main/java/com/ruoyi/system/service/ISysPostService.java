@@ -15,15 +15,15 @@ import java.util.List;
 public interface ISysPostService {
 
 
-    TableDataInfo<SysPostVo> selectPagePostList(SysPostBo bo, PageQuery pageQuery);
+    TableDataInfo<SysPostVo> selectPagePostList(SysPostBo post, PageQuery pageQuery);
 
     /**
      * 查询岗位信息集合
      *
-     * @param bo 岗位信息
+     * @param post 岗位信息
      * @return 岗位列表
      */
-    List<SysPostVo> selectPostList(SysPostBo bo);
+    List<SysPostVo> selectPostList(SysPostBo post);
 
     /**
      * 查询所有岗位
@@ -51,18 +51,18 @@ public interface ISysPostService {
     /**
      * 校验岗位名称
      *
-     * @param bo 岗位信息
+     * @param post 岗位信息
      * @return 结果
      */
-    String checkPostNameUnique(SysPostBo bo);
+    String checkPostNameUnique(SysPostBo post);
 
     /**
      * 校验岗位编码
      *
-     * @param bo 岗位信息
+     * @param post 岗位信息
      * @return 结果
      */
-    String checkPostCodeUnique(SysPostBo bo);
+    String checkPostCodeUnique(SysPostBo post);
 
     /**
      * 通过岗位ID查询岗位使用数量
