@@ -48,8 +48,8 @@ public class SysDictTypeController extends BaseController {
     @Log(title = "字典类型", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:dict:export")
     @PostMapping("/export")
-    public void export(SysDictTypeBo bo, HttpServletResponse response) {
-        List<SysDictTypeVo> list = dictTypeService.selectDictTypeList(bo);
+    public void export(SysDictTypeBo dictType, HttpServletResponse response) {
+        List<SysDictTypeVo> list = dictTypeService.selectDictTypeList(dictType);
         ExcelUtil.exportExcel(list, "字典类型", SysDictTypeVo.class, response);
     }
 
@@ -70,11 +70,11 @@ public class SysDictTypeController extends BaseController {
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictTypeBo dictType) {
-        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dictType))) {
-            return R.fail("新增字典'" + dictType.getDictName() + "'失败，字典类型已存在");
+    public R<Void> add(@Validated @RequestBody SysDictTypeBo dict) {
+        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
+            return R.fail("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dictTypeService.insertDictType(dictType);
+        dictTypeService.insertDictType(dict);
         return R.ok();
     }
 
@@ -84,11 +84,11 @@ public class SysDictTypeController extends BaseController {
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictTypeBo dictType) {
-        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dictType))) {
-            return R.fail("修改字典'" + dictType.getDictName() + "'失败，字典类型已存在");
+    public R<Void> edit(@Validated @RequestBody SysDictTypeBo dict) {
+        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
+            return R.fail("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-        dictTypeService.updateDictType(dictType);
+        dictTypeService.updateDictType(dict);
         return R.ok();
     }
 

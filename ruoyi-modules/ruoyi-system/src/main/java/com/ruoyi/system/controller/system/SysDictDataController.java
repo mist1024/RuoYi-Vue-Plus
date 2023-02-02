@@ -87,8 +87,8 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    public R<Void> add(@Validated @RequestBody SysDictDataBo dictData) {
-        dictDataService.insertDictData(dictData);
+    public R<Void> add(@Validated @RequestBody SysDictDataBo dict) {
+        dictDataService.insertDictData(dict);
         return R.ok();
     }
 
@@ -98,8 +98,8 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    public R<Void> edit(@Validated @RequestBody SysDictDataBo dictData) {
-        dictDataService.updateDictData(dictData);
+    public R<Void> edit(@Validated @RequestBody SysDictDataBo dict) {
+        dictDataService.updateDictData(dict);
         return R.ok();
     }
 
