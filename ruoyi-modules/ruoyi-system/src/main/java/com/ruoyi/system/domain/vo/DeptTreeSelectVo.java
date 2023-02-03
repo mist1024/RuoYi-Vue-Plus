@@ -21,6 +21,6 @@ public class DeptTreeSelectVo {
     /**
      * 下拉树结构列表
      */
-    List<Tree<Long>> depts;
+    private List<Tree<Long>> depts;
 
 }

@@ -18,6 +18,6 @@ public class CacheListInfoVo {
 
     private Long dbSize;
 
-    List<Map<String, String>> commandStats;
+    private List<Map<String, String>> commandStats;
 
 }
