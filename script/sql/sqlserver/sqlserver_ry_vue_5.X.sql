@@ -689,6 +689,7 @@ GO
 CREATE TABLE [sys_dept]
 (
     [dept_id]     bigint                     NOT NULL,
+    [tenant_id]   nvarchar(20)               NOT NULL,
     [parent_id]   bigint       DEFAULT ((0)) NULL,
     [ancestors]   nvarchar(500)DEFAULT ''    NULL,
     [dept_name]   nvarchar(30) DEFAULT ''    NULL,
@@ -715,6 +716,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dept',
     'COLUMN', N'dept_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_dept',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'父部门id' ,
@@ -806,25 +813,25 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (100, 0, N'0', N'XXX科技', 0, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (100, N'000000', 0, N'0', N'XXX科技', 0, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (101, 100, N'0,100', N'深圳总公司', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (102, 100, N'0,100', N'长沙分公司', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (103, 101, N'0,100,101', N'研发部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (104, 101, N'0,100,101', N'市场部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (105, 101, N'0,100,101', N'测试部门', 3, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (105, N'000000', 101, N'0,100,101', N'测试部门', 3, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (106, 101, N'0,100,101', N'财务部门', 4, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (106, N'000000', 101, N'0,100,101', N'财务部门', 4, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (107, 101, N'0,100,101', N'运维部门', 5, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (107, N'000000', 101, N'0,100,101', N'运维部门', 5, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (108, 102, N'0,100,102', N'市场部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (108, N'000000', 102, N'0,100,102', N'市场部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (109, 102, N'0,100,102', N'财务部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [tenant_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (109, N'000000', 102, N'0,100,102', N'财务部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE [sys_dict_data]
@@ -1115,6 +1122,7 @@ GO
 CREATE TABLE [sys_logininfor]
 (
     [info_id]        bigint                      NOT NULL,
+    [tenant_id]      nvarchar(20)                NOT NULL,
     [user_name]      nvarchar(50)  DEFAULT ''    NULL,
     [ipaddr]         nvarchar(128) DEFAULT ''    NULL,
     [login_location] nvarchar(255) DEFAULT ''    NULL,
@@ -1135,6 +1143,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_logininfor',
     'COLUMN', N'info_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_logininfor',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'用户账号' ,
@@ -1516,6 +1530,7 @@ GO
 CREATE TABLE [sys_notice]
 (
     [notice_id]      bigint                     NOT NULL,
+    [tenant_id]      nvarchar(20)               NOT NULL,
     [notice_title]   nvarchar(50)               NOT NULL,
     [notice_type]    nchar(1)                   NOT NULL,
     [notice_content] nvarchar(max)              NULL,
@@ -1539,6 +1554,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_notice',
     'COLUMN', N'notice_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_notice',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'公告标题' ,
@@ -1606,14 +1627,15 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_notice'
 GO
 
-INSERT [sys_notice] ([notice_id], [notice_title], [notice_type], [notice_content], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'<p>1111111111</p>', N'0', 103, 1, getdate(), 1, getdate(), N'管理员')
+INSERT [sys_notice] ([notice_id], [tenant_id], [notice_title], [notice_type], [notice_content], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'000000', N'温馨提醒：2018-07-01 若依新版本发布啦', N'2', N'新版本内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT [sys_notice] ([notice_id], [notice_title], [notice_type], [notice_content], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'<p><img src="/dev-api/profile/upload/2021/12/04/f1e00aba-0182-46b0-9c65-7804dfd0ea4e.png"></p>', N'0', 103, 1, getdate(), 1, getdate(), N'管理员')
+INSERT [sys_notice] ([notice_id], [tenant_id], [notice_title], [notice_type], [notice_content], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'000000', N'维护通知：2018-07-01 若依系统凌晨维护', N'1', N'维护内容', N'0', 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
 
 CREATE TABLE [sys_oper_log]
 (
     [oper_id]        bigint                       NOT NULL,
+    [tenant_id]      nvarchar(20)                 NOT NULL,
     [title]          nvarchar(50)   DEFAULT ''    NULL,
     [business_type]  int            DEFAULT ((0)) NULL,
     [method]         nvarchar(100)  DEFAULT ''    NULL,
@@ -1641,6 +1663,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oper_log',
     'COLUMN', N'oper_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oper_log',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'模块标题' ,
@@ -1741,6 +1769,7 @@ GO
 CREATE TABLE [sys_post]
 (
     [post_id]     bigint                  NOT NULL,
+    [tenant_id]   nvarchar(20)            NOT NULL,
     [post_code]   nvarchar(64)            NOT NULL,
     [post_name]   nvarchar(50)            NOT NULL,
     [post_sort]   int                     NOT NULL,
@@ -1763,6 +1792,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_post',
     'COLUMN', N'post_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_post',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'岗位编码' ,
@@ -1830,18 +1865,19 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_post'
 GO
 
-INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'ceo', N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT [sys_post] ([post_id], [tenant_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'000000', N'ceo', N'董事长', 1, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'se', N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT [sys_post] ([post_id], [tenant_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'000000', N'se', N'项目经理', 2, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (3, N'hr', N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT [sys_post] ([post_id], [tenant_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (3, N'000000', N'hr', N'人力资源', 3, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
-INSERT [sys_post] ([post_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (4, N'user', N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
+INSERT [sys_post] ([post_id], [tenant_id], [post_code], [post_name], [post_sort], [status], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (4, N'000000', N'user', N'普通员工', 4, N'0', 103, 1, getdate(), NULL, NULL, N'')
 GO
 
 CREATE TABLE [sys_role]
 (
     [role_id]             bigint                     NOT NULL,
+    [tenant_id]           nvarchar(20)               NOT NULL,
     [role_name]           nvarchar(30)               NOT NULL,
     [role_key]            nvarchar(100)              NOT NULL,
     [role_sort]           int                        NOT NULL,
@@ -1868,6 +1904,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_role',
     'COLUMN', N'role_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_role',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'角色名称' ,
@@ -1959,9 +2001,9 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_role'
 GO
 
-INSERT [sys_role] ([role_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'超级管理员', N'admin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
+INSERT [sys_role] ([role_id], [tenant_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'000000', N'超级管理员', N'admin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
 GO
-INSERT [sys_role] ([role_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'普通角色', N'common', 2, N'2', 1, 1, N'0', N'0', 103, 1, getdate(), 1, CAST(N'2021-12-04T15:44:20.0000000' AS DateTime2), N'普通角色')
+INSERT [sys_role] ([role_id], [tenant_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'000000', N'普通角色', N'common', 2, N'2', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'普通角色')
 GO
 
 CREATE TABLE [sys_role_dept]
@@ -2197,6 +2239,7 @@ GO
 CREATE TABLE [sys_user]
 (
     [user_id]     bigint                             NOT NULL,
+    [tenant_id]   nvarchar(20)                       NOT NULL,
     [dept_id]     bigint                             NULL,
     [user_name]   nvarchar(30)                       NOT NULL,
     [nick_name]   nvarchar(30)                       NOT NULL,
@@ -2228,6 +2271,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_user',
     'COLUMN', N'user_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_user',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'部门ID' ,
@@ -2349,9 +2398,9 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user'
 GO
 
-INSERT [sys_user] ([user_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, 103, N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', N'', N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, getdate(), N'管理员')
+INSERT [sys_user] ([user_id], [tenant_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, 103, N'000000', N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', N'', N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
-INSERT [sys_user] ([user_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, 105, N'ry', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@qq.com', N'15666666666', N'1', N'', N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), 1, getdate(), N'测试员')
+INSERT [sys_user] ([user_id], [tenant_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, 105, N'000000', N'lionli', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@qq.com', N'15666666666', N'1', N'', N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'测试员')
 GO
 
 CREATE TABLE [sys_user_post]
@@ -2425,6 +2474,7 @@ GO
 CREATE TABLE [sys_oss]
 (
     [oss_id]        bigint                          NOT NULL,
+    [tenant_id]     nvarchar(20)                    NOT NULL,
     [file_name]     nvarchar(255) DEFAULT ''        NOT NULL,
     [original_name] nvarchar(255) DEFAULT ''        NOT NULL,
     [file_suffix]   nvarchar(10)  DEFAULT ''        NOT NULL,
@@ -2447,6 +2497,12 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss',
     'COLUMN', N'oss_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oss',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'文件名',
@@ -2517,6 +2573,7 @@ GO
 CREATE TABLE [sys_oss_config]
 (
     [oss_config_id] bigint                      NOT NULL,
+    [tenant_id]     nvarchar(20)                NOT NULL,
     [config_key]    nvarchar(20)  DEFAULT ''    NOT NULL,
     [access_key]    nvarchar(255) DEFAULT ''    NULL,
     [secret_key]    nvarchar(255) DEFAULT ''    NULL,
@@ -2547,6 +2604,12 @@ EXEC sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_oss_config',
     'COLUMN', N'oss_config_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_oss_config',
+    'COLUMN', N'tenant_id'
 GO
 EXEC sp_addextendedproperty
     'MS_Description', N'配置key',
@@ -2662,13 +2725,13 @@ EXEC sp_addextendedproperty
     'TABLE', N'sys_oss_config'
 GO
 
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'1', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'1', N'0', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [tenant_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'1', N'000000', N'minio', N'ruoyi',            N'ruoyi123',        N'ruoyi',            N'', N'127.0.0.1:9000',                    N'',N'N', N'',           N'1', N'0', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'2', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [tenant_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'2', N'000000', N'qiniu', N'XXXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N's3-cn-north-1.qiniucs.com',         N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'3', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [tenant_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'3', N'000000', N'aliyun', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi',            N'', N'oss-cn-beijing.aliyuncs.com',       N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'4', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [tenant_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'4', N'000000', N'qcloud', N'XXXXXXXXXXXXXXX', N'XXXXXXXXXXXXXXX', N'ruoyi-1250000000', N'', N'cos.ap-beijing.myqcloud.com',       N'',N'N', N'ap-beijing', N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO
-INSERT INTO [sys_oss_config] ([oss_config_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'5', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
+INSERT INTO [sys_oss_config] ([oss_config_id], [tenant_id], [config_key], [access_key], [secret_key], [bucket_name], [prefix], [endpoint], [domain], [is_https], [region], [access_policy], [status], [ext1], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (N'5', N'000000', N'image',  N'ruoyi',           N'ruoyi123',        N'ruoyi',            N'image', N'127.0.0.1:9000',               N'',N'N', N'',           N'1', N'1', N'', 103, 1, getdate(), 1, getdate(), NULL)
 GO

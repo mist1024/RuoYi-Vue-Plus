@@ -60,6 +60,7 @@ create table sys_tenant_package (
 drop table if exists sys_dept;
 create table sys_dept (
   dept_id           bigint(20)      not null                   comment '部门id',
+  tenant_id         varchar(20)     not null                   comment '租户编号',
   parent_id         bigint(20)      default 0                  comment '父部门id',
   ancestors         varchar(500)    default ''                 comment '祖级列表',
   dept_name         varchar(30)     default ''                 comment '部门名称',
@@ -82,16 +83,16 @@ create table sys_dept (
 -- ----------------------------
 
 
-insert into sys_dept values(100,  0,   '0',          'XXX科技',   0, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(101,  100, '0,100',      '深圳总公司', 1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(102,  100, '0,100',      '长沙分公司', 2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(103,  101, '0,100,101',  '研发部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(104,  101, '0,100,101',  '市场部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(105,  101, '0,100,101',  '测试部门',   3, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(106,  101, '0,100,101',  '财务部门',   4, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(107,  101, '0,100,101',  '运维部门',   5, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(108,  102, '0,100,102',  '市场部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(100, '000000', 0,   '0',          'XXX科技',   0, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(101, '000000', 100, '0,100',      '深圳总公司', 1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(102, '000000', 100, '0,100',      '长沙分公司', 2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(103, '000000', 101, '0,100,101',  '研发部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(104, '000000', 101, '0,100,101',  '市场部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(105, '000000', 101, '0,100,101',  '测试部门',   3, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(106, '000000', 101, '0,100,101',  '财务部门',   4, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(107, '000000', 101, '0,100,101',  '运维部门',   5, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(108, '000000', 102, '0,100,102',  '市场部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(109, '000000', 102, '0,100,102',  '财务部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
 
 
 -- ----------------------------
@@ -100,6 +101,7 @@ insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '疯�
 drop table if exists sys_user;
 create table sys_user (
   user_id           bigint(20)      not null                   comment '用户ID',
+  tenant_id         varchar(20)     not null                   comment '租户编号',
   dept_id           bigint(20)      default null               comment '部门ID',
   user_name         varchar(30)     not null                   comment '用户账号',
   nick_name         varchar(30)     not null                   comment '用户昵称',
@@ -125,8 +127,8 @@ create table sys_user (
 -- ----------------------------
 -- 初始化-用户信息表数据
 -- ----------------------------
-insert into sys_user values(1,  103, 'admin', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), 103, 1, sysdate(), null, null, '管理员');
-insert into sys_user values(2,  105, 'lionli', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@qq.com',  '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), 103, 1, sysdate(), null, null, '测试员');
+insert into sys_user values(1, '000000', 103, 'admin', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), 103, 1, sysdate(), null, null, '管理员');
+insert into sys_user values(2, '000000', 105, 'lionli', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@qq.com',  '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', sysdate(), 103, 1, sysdate(), null, null, '测试员');
 
 
 -- ----------------------------
@@ -136,6 +138,7 @@ drop table if exists sys_post;
 create table sys_post
 (
   post_id       bigint(20)      not null                   comment '岗位ID',
+  tenant_id     varchar(20)     not null                   comment '租户编号',
   post_code     varchar(64)     not null                   comment '岗位编码',
   post_name     varchar(50)     not null                   comment '岗位名称',
   post_sort     int(4)          not null                   comment '显示顺序',
@@ -152,10 +155,10 @@ create table sys_post
 -- ----------------------------
 -- 初始化-岗位信息表数据
 -- ----------------------------
-insert into sys_post values(1, 'ceo',  '董事长',    1, '0', 103, 1, sysdate(), null, null, '');
-insert into sys_post values(2, 'se',   '项目经理',  2, '0', 103, 1, sysdate(), null, null, '');
-insert into sys_post values(3, 'hr',   '人力资源',  3, '0', 103, 1, sysdate(), null, null, '');
-insert into sys_post values(4, 'user', '普通员工',  4, '0', 103, 1, sysdate(), null, null, '');
+insert into sys_post values(1, '000000', 'ceo',  '董事长',    1, '0', 103, 1, sysdate(), null, null, '');
+insert into sys_post values(2, '000000', 'se',   '项目经理',  2, '0', 103, 1, sysdate(), null, null, '');
+insert into sys_post values(3, '000000', 'hr',   '人力资源',  3, '0', 103, 1, sysdate(), null, null, '');
+insert into sys_post values(4, '000000', 'user', '普通员工',  4, '0', 103, 1, sysdate(), null, null, '');
 
 
 -- ----------------------------
@@ -164,6 +167,7 @@ insert into sys_post values(4, 'user', '普通员工',  4, '0', 103, 1, sysdate(
 drop table if exists sys_role;
 create table sys_role (
   role_id              bigint(20)      not null                   comment '角色ID',
+  tenant_id            varchar(20)     not null                   comment '租户编号',
   role_name            varchar(30)     not null                   comment '角色名称',
   role_key             varchar(100)    not null                   comment '角色权限字符串',
   role_sort            int(4)          not null                   comment '显示顺序',
@@ -184,8 +188,8 @@ create table sys_role (
 -- ----------------------------
 -- 初始化-角色信息表数据
 -- ----------------------------
-insert into sys_role values('1', '超级管理员',  'admin',  1, 1, 1, 1, '0', '0', 103, 1, sysdate(), null, null, '超级管理员');
-insert into sys_role values('2', '普通角色',    'common', 2, 2, 1, 1, '0', '0', 103, 1, sysdate(), null, null, '普通角色');
+insert into sys_role values(1, '000000', '超级管理员',  'admin',  1, 1, 1, 1, '0', '0', 103, 1, sysdate(), null, null, '超级管理员');
+insert into sys_role values(2, '000000', '普通角色',    'common', 2, 2, 1, 1, '0', '0', 103, 1, sysdate(), null, null, '普通角色');
 
 
 -- ----------------------------
@@ -477,6 +481,7 @@ insert into sys_user_post values ('2', '2');
 drop table if exists sys_oper_log;
 create table sys_oper_log (
   oper_id           bigint(20)      not null                   comment '日志主键',
+  tenant_id         varchar(20)     not null                   comment '租户编号',
   title             varchar(50)     default ''                 comment '模块标题',
   business_type     int(2)          default 0                  comment '业务类型（0其它 1新增 2修改 3删除）',
   method            varchar(100)    default ''                 comment '方法名称',
@@ -610,6 +615,7 @@ insert into sys_config values(11, 'OSS预览列表资源开关',         'sys.os
 drop table if exists sys_logininfor;
 create table sys_logininfor (
   info_id        bigint(20)     not null                  comment '访问ID',
+  tenant_id      varchar(20)    not null                  comment '租户编号',
   user_name      varchar(50)    default ''                comment '用户账号',
   ipaddr         varchar(128)   default ''                comment '登录IP地址',
   login_location varchar(255)   default ''                comment '登录地点',
@@ -628,6 +634,7 @@ create table sys_logininfor (
 drop table if exists sys_notice;
 create table sys_notice (
   notice_id         bigint(20)      not null                   comment '公告ID',
+  tenant_id         varchar(20)     not null                   comment '租户编号',
   notice_title      varchar(50)     not null                   comment '公告标题',
   notice_type       char(1)         not null                   comment '公告类型（1通知 2公告）',
   notice_content    longblob        default null               comment '公告内容',
@@ -644,8 +651,8 @@ create table sys_notice (
 -- ----------------------------
 -- 初始化-公告信息表数据
 -- ----------------------------
-insert into sys_notice values('1', '温馨提醒：2018-07-01 新版本发布啦', '2', '新版本内容', '0', 103, 1, sysdate(), null, null, '管理员');
-insert into sys_notice values('2', '维护通知：2018-07-01 系统凌晨维护', '1', '维护内容',   '0', 103, 1, sysdate(), null, null, '管理员');
+insert into sys_notice values('1', '000000', '温馨提醒：2018-07-01 新版本发布啦', '2', '新版本内容', '0', 103, 1, sysdate(), null, null, '管理员');
+insert into sys_notice values('2', '000000', '维护通知：2018-07-01 系统凌晨维护', '1', '维护内容',   '0', 103, 1, sysdate(), null, null, '管理员');
 
 
 -- ----------------------------
@@ -715,6 +722,7 @@ create table gen_table_column (
 drop table if exists sys_oss;
 create table sys_oss (
   oss_id          bigint(20)   not null                   comment '对象存储主键',
+  tenant_id       varchar(20)  not null                   comment '租户编号',
   file_name       varchar(255) not null default ''        comment '文件名',
   original_name   varchar(255) not null default ''        comment '原名',
   file_suffix     varchar(10)  not null default ''        comment '文件后缀名',
@@ -733,20 +741,21 @@ create table sys_oss (
 -- ----------------------------
 drop table if exists sys_oss_config;
 create table sys_oss_config (
-  oss_config_id   bigint(20)   not null                   comment '主建',
-  config_key      varchar(20)  not null   default ''      comment '配置key',
+  oss_config_id   bigint(20)    not null                  comment '主建',
+  tenant_id       varchar(20)   not null                  comment '租户编号',
+  config_key      varchar(20)   not null  default ''      comment '配置key',
   access_key      varchar(255)            default ''      comment 'accessKey',
   secret_key      varchar(255)            default ''      comment '秘钥',
   bucket_name     varchar(255)            default ''      comment '桶名称',
-  prefix           varchar(255)           default ''      comment '前缀',
-  endpoint         varchar(255)           default ''      comment '访问站点',
-  domain           varchar(255)           default ''      comment '自定义域名',
-  is_https         char(1)                default 'N'     comment '是否https（Y=是,N=否）',
-  region           varchar(255)           default ''      comment '域',
-  access_policy    char(1)     not null   default '1'     comment '桶权限类型(0=private 1=public 2=custom)',
-  status           char(1)                default '1'     comment '状态（0=正常,1=停用）',
-  ext1             varchar(255)           default ''      comment '扩展字段',
-  create_dept       bigint(20)            default null    comment '创建部门',
+  prefix          varchar(255)            default ''      comment '前缀',
+  endpoint        varchar(255)            default ''      comment '访问站点',
+  domain          varchar(255)            default ''      comment '自定义域名',
+  is_https        char(1)                 default 'N'     comment '是否https（Y=是,N=否）',
+  region          varchar(255)            default ''      comment '域',
+  access_policy   char(1)       not null  default '1'     comment '桶权限类型(0=private 1=public 2=custom)',
+  status          char(1)                 default '1'     comment '状态（0=正常,1=停用）',
+  ext1            varchar(255)            default ''      comment '扩展字段',
+  create_dept     bigint(20)              default null    comment '创建部门',
   create_by       bigint(20)              default null    comment '创建者',
   create_time     datetime                default null    comment '创建时间',
   update_by       bigint(20)              default null    comment '更新者',
@@ -755,8 +764,8 @@ create table sys_oss_config (
   primary key (oss_config_id)
 ) engine=innodb comment='对象存储配置表';
 
-insert into sys_oss_config values (1, 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'0', '', 103, 1, sysdate(), 1, sysdate(), NULL);
-insert into sys_oss_config values (2, 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
-insert into sys_oss_config values (3, 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
-insert into sys_oss_config values (4, 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
-insert into sys_oss_config values (5, 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
+insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'0', '', 103, 1, sysdate(), 1, sysdate(), NULL);
+insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
+insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
+insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
+insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'1', '', 103, 1, sysdate(), 1, sysdate(), NULL);
