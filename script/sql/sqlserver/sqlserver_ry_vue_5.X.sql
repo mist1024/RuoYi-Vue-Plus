@@ -11,6 +11,7 @@ CREATE TABLE [sys_tenant]
     [remark]                nvarchar(200)                   NULL,
     [package_id]            bigint                          NULL,
     [expire_time]           datetime2(7)                    NULL,
+    [account_count]         int             DEFAULT ((-1))  NULL,
     [status]                nchar(1)        DEFAULT ('0')   NULL,
     [del_flag]              nchar(1)        DEFAULT ('0')   NULL,
     [create_dept]           bigint                          NULL,
@@ -92,7 +93,7 @@ EXEC sys.sp_addextendedproperty
     'COLUMN', N'expire_time'
 GO
 EXEC sys.sp_addextendedproperty
-    'MS_Description', N'用户数量' ,
+    'MS_Description', N'用户数量（-1不限制）' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_tenant',
     'COLUMN', N'account_count'
@@ -145,7 +146,7 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_tenant'
 GO
 
-INSERT [sys_tenant] ([id], [tenant_id], [contact_user_name], [contact_phone], [company_name], [license_number], [address], [intro], [remark], [package_id], [expire_time], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (1, '000000', '张三', '13912345678', 'xxx有限公司', 'xxx', 'xxx', 'xxx', 'xxx', NULL, NULL, 10, '0', '0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_tenant] ([id], [tenant_id], [contact_user_name], [contact_phone], [company_name], [license_number], [address], [intro], [remark], [package_id], [expire_time], [account_count], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (1, N'000000', N'管理组', N'15888888888', N'XXX有限公司', NULL, NULL, N'多租户通用后台管理管理系统', NULL, NULL, NULL, -1, N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 
@@ -805,25 +806,25 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_dept'
 GO
 
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (100, 0, N'0', N'若依科技', 0, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (100, 0, N'0', N'XXX科技', 0, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (101, 100, N'0,100', N'深圳总公司', 1, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (101, 100, N'0,100', N'深圳总公司', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (102, 100, N'0,100', N'长沙分公司', 2, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (102, 100, N'0,100', N'长沙分公司', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (103, 101, N'0,100,101', N'研发部门', 1, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (103, 101, N'0,100,101', N'研发部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (104, 101, N'0,100,101', N'市场部门', 2, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (104, 101, N'0,100,101', N'市场部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (105, 101, N'0,100,101', N'测试部门', 3, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (105, 101, N'0,100,101', N'测试部门', 3, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (106, 101, N'0,100,101', N'财务部门', 4, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (106, 101, N'0,100,101', N'财务部门', 4, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (107, 101, N'0,100,101', N'运维部门', 5, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (107, 101, N'0,100,101', N'运维部门', 5, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (108, 102, N'0,100,102', N'市场部门', 1, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (108, 102, N'0,100,102', N'市场部门', 1, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (109, 102, N'0,100,102', N'财务部门', 2, N'若依', N'15888888888', N'ry@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT [sys_dept] ([dept_id], [parent_id], [ancestors], [dept_name], [order_num], [leader], [phone], [email], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (109, 102, N'0,100,102', N'财务部门', 2, N'疯狂的狮子Li', N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 CREATE TABLE [sys_dict_data]

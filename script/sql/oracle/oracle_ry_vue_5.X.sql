@@ -1,6 +1,6 @@
-/*==============================================================*/
-/* Table: sys_tenant 租户表                                     */
-/*==============================================================*/
+-- ----------------------------
+-- 租户表
+-- ----------------------------
 create table sys_tenant (
     id                number(20)    not null,
     tenant_id         varchar2(20)  not null,
@@ -13,7 +13,7 @@ create table sys_tenant (
     remark            varchar2(200) default '',
     package_id        number(20)    default null,
     expire_time       date          default null,
-    account_count     number(4)     default 0,
+    account_count     number(4)     default -1,
     status            char(1)       default '0',
     del_flag          char(1)       default '0',
     create_dept       number(20)    default null,
@@ -36,7 +36,7 @@ comment on column  sys_tenant.intro              is '企业简介';
 comment on column  sys_tenant.remark             is '备注';
 comment on column  sys_tenant.package_id         is '租户套餐编号';
 comment on column  sys_tenant.expire_time        is '过期时间';
-comment on column  sys_tenant.account_count      is '用户数量';
+comment on column  sys_tenant.account_count      is '用户数量（-1不限制）';
 comment on column  sys_tenant.status             is '租户状态（0正常 1停用）';
 comment on column  sys_tenant.del_flag           is '删除标志（0代表存在 2代表删除）';
 comment on column  sys_tenant.create_dept        is '创建部门';
@@ -49,12 +49,12 @@ comment on column  sys_tenant.update_time        is '更新时间';
 -- 初始化-租户表数据
 -- ----------------------------
 
-insert into sys_tenant values (1, '000000', '张三', '13912345678', 'xxx有限公司', 'xxx', 'xxx', 'xxx', 'xxx', null, null, 10, '0', '0', 103, 1, sysdate, null, null);
+insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', null, null, '多租户通用后台管理管理系统', null, null, null, -1, '0', '0', 103, 1, sysdate, null, null);
 
 
-/*==============================================================*/
-/* Table: sys_tenant_package 租户套餐表                         */
-/*==============================================================*/
+-- ----------------------------
+-- 租户套餐表
+-- ----------------------------
 create table sys_tenant_package (
     package_id      number(20)      not null,
     package_name    varchar2(20)    default '',
@@ -128,16 +128,16 @@ comment on column sys_dept.update_time  is '更新时间';
 -- ----------------------------
 -- 初始化-部门表数据
 -- ----------------------------
-insert into sys_dept values(100,  0,   '0',          '若依科技',   0, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(101,  100, '0,100',      '深圳总公司', 1, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(102,  100, '0,100',      '长沙分公司', 2, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(103,  101, '0,100,101',  '研发部门',   1, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(104,  101, '0,100,101',  '市场部门',   2, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(105,  101, '0,100,101',  '测试部门',   3, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(106,  101, '0,100,101',  '财务部门',   4, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(107,  101, '0,100,101',  '运维部门',   5, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(108,  102, '0,100,102',  '市场部门',   1, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
-insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(100,  0,   '0',          'XXX科技',   0, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(101,  100, '0,100',      '深圳总公司', 1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(102,  100, '0,100',      '长沙分公司', 2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(103,  101, '0,100,101',  '研发部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(104,  101, '0,100,101',  '市场部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(105,  101, '0,100,101',  '测试部门',   3, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(106,  101, '0,100,101',  '财务部门',   4, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(107,  101, '0,100,101',  '运维部门',   5, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(108,  102, '0,100,102',  '市场部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
+insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate, null, null);
 
 
 -- ----------------------------

@@ -1,11 +1,11 @@
-/*==============================================================*/
-/* Table: sys_tenant 租户表                                     */
-/*==============================================================*/
+-- ----------------------------
+-- 租户表
+-- ----------------------------
 drop table if exists sys_tenant;
 create table sys_tenant
 (
-    id                bigint(20)    NOT NULL        comment 'id',
-    tenant_id         varchar(20)   NOT NULL        comment '租户编号',
+    id                bigint(20)    not null        comment 'id',
+    tenant_id         varchar(20)   not null        comment '租户编号',
     contact_user_name varchar(20)                   comment '联系人',
     contact_phone     varchar(20)                   comment '联系电话',
     company_name      varchar(50)                   comment '企业名称',
@@ -15,15 +15,15 @@ create table sys_tenant
     remark            varchar(200)                  comment '备注',
     package_id        bigint(20)                    comment '租户套餐编号',
     expire_time       datetime                      comment '过期时间',
-    account_count     int                           comment '用户数量',
-    status            char(1)       DEFAULT '0'     comment '租户状态（0正常 1停用）',
-    del_flag          char(1)       DEFAULT '0'     comment '删除标志（0代表存在 2代表删除）',
+    account_count     int           default -1      comment '用户数量（-1不限制）',
+    status            char(1)       default '0'     comment '租户状态（0正常 1停用）',
+    del_flag          char(1)       default '0'     comment '删除标志（0代表存在 2代表删除）',
     create_dept       bigint(20)                    comment '创建部门',
     create_by         bigint(20)                    comment '创建者',
     create_time       datetime                      comment '创建时间',
     update_by         bigint(20)                    comment '更新者',
     update_time       datetime                      comment '更新时间',
-    PRIMARY KEY (id)
+    primary key (id)
 ) engine=innodb comment = '租户表';
 
 
@@ -31,26 +31,26 @@ create table sys_tenant
 -- 初始化-租户表数据
 -- ----------------------------
 
-INSERT INTO sys_tenant VALUES (1, '000000', '张三', '13912345678', 'XXX有限公司', 'XXX', 'XXX', 'XXX', 'XXX', NULL, NULL, 10, '0', '0', 103, 1, SYSDATE(), NULL, NULL);
+insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', NULL, NULL, '多租户通用后台管理管理系统', NULL, NULL, NULL, -1, '0', '0', 103, 1, sysdate(), NULL, NULL);
 
 
-/*==============================================================*/
-/* Table: sys_tenant_package 租户套餐表                         */
-/*==============================================================*/
+-- ----------------------------
+-- 租户套餐表
+-- ----------------------------
 drop table if exists sys_tenant_package;
-CREATE TABLE sys_tenant_package (
-    package_id   bigint(20)     NOT NULL    comment '租户套餐id',
+create table sys_tenant_package (
+    package_id   bigint(20)     not null    comment '租户套餐id',
     package_name varchar(20)                comment '套餐名称',
     menu_ids     varchar(3000)              comment '关联菜单id',
     remark       varchar(200)               comment '备注',
-    status       char(1)        DEFAULT '0' comment '状态（0正常 1停用）',
-    del_flag     char(1)        DEFAULT '0' comment '删除标志（0代表存在 2代表删除）',
+    status       char(1)        default '0' comment '状态（0正常 1停用）',
+    del_flag     char(1)        default '0' comment '删除标志（0代表存在 2代表删除）',
     create_dept  bigint(20)                 comment '创建部门',
     create_by    bigint(20)                 comment '创建者',
     create_time  datetime                   comment '创建时间',
     update_by    bigint(20)                 comment '更新者',
     update_time  datetime                   comment '更新时间',
-    PRIMARY KEY (package_id)
+    primary key (package_id)
 ) engine=innodb comment = '租户套餐表';
 
 
@@ -82,16 +82,16 @@ create table sys_dept (
 -- ----------------------------
 
 
-insert into sys_dept values(100,  0,   '0',          '若依科技',   0, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(101,  100, '0,100',      '深圳总公司', 1, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(102,  100, '0,100',      '长沙分公司', 2, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(103,  101, '0,100,101',  '研发部门',   1, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(104,  101, '0,100,101',  '市场部门',   2, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(105,  101, '0,100,101',  '测试部门',   3, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(106,  101, '0,100,101',  '财务部门',   4, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(107,  101, '0,100,101',  '运维部门',   5, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(108,  102, '0,100,102',  '市场部门',   1, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
-insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '若依', '15888888888', 'ry@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(100,  0,   '0',          'XXX科技',   0, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(101,  100, '0,100',      '深圳总公司', 1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(102,  100, '0,100',      '长沙分公司', 2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(103,  101, '0,100,101',  '研发部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(104,  101, '0,100,101',  '市场部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(105,  101, '0,100,101',  '测试部门',   3, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(106,  101, '0,100,101',  '财务部门',   4, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(107,  101, '0,100,101',  '运维部门',   5, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(108,  102, '0,100,102',  '市场部门',   1, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
+insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '疯狂的狮子Li', '15888888888', 'xxx@qq.com', '0', '0', 103, 1, sysdate(), null, null);
 
 
 -- ----------------------------
@@ -99,7 +99,7 @@ insert into sys_dept values(109,  102, '0,100,102',  '财务部门',   2, '若�
 -- ----------------------------
 drop table if exists sys_user;
 create table sys_user (
-  user_id           bigint(20)      not null     comment '用户ID',
+  user_id           bigint(20)      not null                   comment '用户ID',
   dept_id           bigint(20)      default null               comment '部门ID',
   user_name         varchar(30)     not null                   comment '用户账号',
   nick_name         varchar(30)     not null                   comment '用户昵称',
