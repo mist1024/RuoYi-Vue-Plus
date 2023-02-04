@@ -1,3 +1,246 @@
+CREATE TABLE [sys_tenant]
+(
+    [id]                    bigint                          NOT NULL,
+    [tenant_id]             nvarchar(20)                    NOT NULL,
+    [contact_user_name]     nvarchar(20)                    NULL,
+    [contact_phone]         nvarchar(20)                    NULL,
+    [company_name]          nvarchar(50)                    NULL,
+    [license_number]        nvarchar(30)                    NULL,
+    [address]               nvarchar(200)                   NULL,
+    [intro]                 nvarchar(200)                   NULL,
+    [remark]                nvarchar(200)                   NULL,
+    [package_id]            bigint                          NULL,
+    [expire_time]           datetime2(7)                    NULL,
+    [status]                nchar(1)        DEFAULT ('0')   NULL,
+    [del_flag]              nchar(1)        DEFAULT ('0')   NULL,
+    [create_dept]           bigint                          NULL,
+    [create_by]             bigint                          NULL,
+    [create_time]           datetime2(7)                    NULL,
+    [update_by]             bigint                          NULL,
+    [update_time]           datetime2(7)                    NULL,
+    CONSTRAINT [PK__sys_tenant__B21E8F2427725F8A] PRIMARY KEY CLUSTERED ([id])
+        WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+        ON [PRIMARY]
+)
+ON [PRIMARY]
+GO
+
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'id' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'tenant_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'联系人' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'contact_user_name'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'联系电话' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'contact_phone'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'企业名称' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'company_name'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'统一社会信用代码' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'license_number'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'地址' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'address'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'企业简介' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'intro'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'备注' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'remark'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户套餐编号' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'package_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'过期时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'expire_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'用户数量' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'account_count'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户状态（0正常 1停用）' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'status'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'删除标志（0代表存在 2代表删除）' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'del_flag'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建部门' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'create_dept'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建者' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'create_by'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'create_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'更新者' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'update_by'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'更新时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'update_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户表' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant'
+GO
+
+INSERT [sys_tenant] ([id], [tenant_id], [contact_user_name], [contact_phone], [company_name], [license_number], [address], [intro], [remark], [package_id], [expire_time], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time]) VALUES (1, '000000', '张三', '13912345678', 'xxx有限公司', 'xxx', 'xxx', 'xxx', 'xxx', NULL, NULL, 10, '0', '0', 103, 1, getdate(), NULL, NULL)
+GO
+
+
+CREATE TABLE [sys_tenant_package]
+(
+    [package_id]            bigint                          NOT NULL,
+    [package_name]          nvarchar(20)                    NOT NULL,
+    [menu_ids]              nvarchar(20)                    NULL,
+    [remark]                nvarchar(200)                   NULL,
+    [status]                nchar(1)        DEFAULT ('0')   NULL,
+    [del_flag]              nchar(1)        DEFAULT ('0')   NULL,
+    [create_dept]           bigint                          NULL,
+    [create_by]             bigint                          NULL,
+    [create_time]           datetime2(7)                    NULL,
+    [update_by]             bigint                          NULL,
+    [update_time]           datetime2(7)                    NULL,
+    CONSTRAINT [PK__sys_tenant_package__B21E8F2427725F8A] PRIMARY KEY CLUSTERED ([package_id])
+        WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+        ON [PRIMARY]
+)
+ON [PRIMARY]
+GO
+
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户套餐id' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'package_id'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'套餐名称' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'package_name'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'关联菜单id' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'menu_ids'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'备注' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'remark'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户状态（0正常 1停用）' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'status'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'删除标志（0代表存在 2代表删除）' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'del_flag'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建部门' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'create_dept'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建者' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'create_by'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'创建时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'create_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'更新者' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'update_by'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'更新时间' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package',
+    'COLUMN', N'update_time'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'租户套餐表' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant_package'
+GO
+
 
 CREATE TABLE [gen_table]
 (

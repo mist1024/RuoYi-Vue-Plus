@@ -1,3 +1,59 @@
+/*==============================================================*/
+/* Table: sys_tenant 租户表                                     */
+/*==============================================================*/
+drop table if exists sys_tenant;
+create table sys_tenant
+(
+    id                bigint(20)    NOT NULL        comment 'id',
+    tenant_id         varchar(20)   NOT NULL        comment '租户编号',
+    contact_user_name varchar(20)                   comment '联系人',
+    contact_phone     varchar(20)                   comment '联系电话',
+    company_name      varchar(50)                   comment '企业名称',
+    license_number    varchar(30)                   comment '统一社会信用代码',
+    address           varchar(200)                  comment '地址',
+    intro             varchar(200)                  comment '企业简介',
+    remark            varchar(200)                  comment '备注',
+    package_id        bigint(20)                    comment '租户套餐编号',
+    expire_time       datetime                      comment '过期时间',
+    account_count     int                           comment '用户数量',
+    status            char(1)       DEFAULT '0'     comment '租户状态（0正常 1停用）',
+    del_flag          char(1)       DEFAULT '0'     comment '删除标志（0代表存在 2代表删除）',
+    create_dept       bigint(20)                    comment '创建部门',
+    create_by         bigint(20)                    comment '创建者',
+    create_time       datetime                      comment '创建时间',
+    update_by         bigint(20)                    comment '更新者',
+    update_time       datetime                      comment '更新时间',
+    PRIMARY KEY (id)
+) engine=innodb comment = '租户表';
+
+
+-- ----------------------------
+-- 初始化-租户表数据
+-- ----------------------------
+
+INSERT INTO sys_tenant VALUES (1, '000000', '张三', '13912345678', 'XXX有限公司', 'XXX', 'XXX', 'XXX', 'XXX', NULL, NULL, 10, '0', '0', 103, 1, SYSDATE(), NULL, NULL);
+
+
+/*==============================================================*/
+/* Table: sys_tenant_package 租户套餐表                         */
+/*==============================================================*/
+drop table if exists sys_tenant_package;
+CREATE TABLE sys_tenant_package (
+    package_id   bigint(20)     NOT NULL    comment '租户套餐id',
+    package_name varchar(20)                comment '套餐名称',
+    menu_ids     varchar(3000)              comment '关联菜单id',
+    remark       varchar(200)               comment '备注',
+    status       char(1)        DEFAULT '0' comment '状态（0正常 1停用）',
+    del_flag     char(1)        DEFAULT '0' comment '删除标志（0代表存在 2代表删除）',
+    create_dept  bigint(20)                 comment '创建部门',
+    create_by    bigint(20)                 comment '创建者',
+    create_time  datetime                   comment '创建时间',
+    update_by    bigint(20)                 comment '更新者',
+    update_time  datetime                   comment '更新时间',
+    PRIMARY KEY (package_id)
+) engine=innodb comment = '租户套餐表';
+
+
 -- ----------------------------
 -- 1、部门表
 -- ----------------------------

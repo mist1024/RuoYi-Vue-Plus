@@ -1,3 +1,95 @@
+/*==============================================================*/
+/* Table: sys_tenant 租户表                                     */
+/*==============================================================*/
+drop table if exists sys_tenant;
+create table if not exists sys_tenant
+(
+    id                int8,
+    tenant_id         varchar(20)   not null,
+    contact_user_name varchar(20)   default null::varchar,
+    contact_phone     varchar(20)   default null::varchar,
+    company_name      varchar(50)   default null::varchar,
+    license_number    varchar(30)   default null::varchar,
+    address           varchar(200)  default null::varchar,
+    intro             varchar(200)  default null::varchar,
+    remark            varchar(200)  default null::varchar,
+    package_id        int8,
+    expire_time       timestamp,
+    account_count     int4          default 0,
+    status            char          default '0'::bpchar,
+    del_flag          char          default '0'::bpchar,
+    create_dept       int8,
+    create_by         int8,
+    create_time       timestamp,
+    update_by         int8,
+    update_time       timestamp,
+    constraint "pk_sys_tenant" primary key (id)
+);
+
+
+comment on table   sys_tenant                    is '租户表';
+comment on column  sys_tenant.tenant_id          is '租户编号';
+comment on column  sys_tenant.contact_phone      is '联系电话';
+comment on column  sys_tenant.company_name       is '企业名称';
+comment on column  sys_tenant.company_name       is '联系人';
+comment on column  sys_tenant.license_number     is '统一社会信用代码';
+comment on column  sys_tenant.address            is '地址';
+comment on column  sys_tenant.intro              is '企业简介';
+comment on column  sys_tenant.remark             is '备注';
+comment on column  sys_tenant.package_id         is '租户套餐编号';
+comment on column  sys_tenant.expire_time        is '过期时间';
+comment on column  sys_tenant.account_count      is '用户数量';
+comment on column  sys_tenant.status             is '租户状态（0正常 1停用）';
+comment on column  sys_tenant.del_flag           is '删除标志（0代表存在 2代表删除）';
+comment on column  sys_tenant.create_dept        is '创建部门';
+comment on column  sys_tenant.create_by          is '创建者';
+comment on column  sys_tenant.create_time        is '创建时间';
+comment on column  sys_tenant.update_by          is '更新者';
+comment on column  sys_tenant.update_time        is '更新时间';
+
+
+-- ----------------------------
+-- 初始化-租户表数据
+-- ----------------------------
+
+insert into sys_tenant values (1, '000000', '张三', '13912345678', 'xxx有限公司', 'xxx', 'xxx', 'xxx', 'xxx', null, null, 10, '0', '0', 103, 1, now(), null, null);
+
+
+/*==============================================================*/
+/* Table: sys_tenant_package 租户套餐表                         */
+/*==============================================================*/
+drop table if exists sys_tenant_package;
+create table if not exists sys_tenant_package
+(
+    package_id      int8,
+    package_name    varchar(20)     default ''::varchar,
+    menu_ids        varchar(3000)   default ''::varchar,
+    remark          varchar(200)    default ''::varchar,
+    status          char            default '0'::bpchar,
+    del_flag        char            default '0'::bpchar,
+    create_dept     int8,
+    create_by       int8,
+    create_time     timestamp,
+    update_by       int8,
+    update_time     timestamp,
+    constraint "pk_sys_tenant_package" primary key (package_id)
+);
+
+
+comment on table   sys_tenant_package                    is '租户套餐表';
+comment on column  sys_tenant_package.package_id         is '租户套餐id';
+comment on column  sys_tenant_package.package_name       is '套餐名称';
+comment on column  sys_tenant_package.menu_ids           is '关联菜单id';
+comment on column  sys_tenant_package.remark             is '备注';
+comment on column  sys_tenant_package.status             is '状态（0正常 1停用）';
+comment on column  sys_tenant_package.del_flag           is '删除标志（0代表存在 2代表删除）';
+comment on column  sys_tenant_package.create_dept        is '创建部门';
+comment on column  sys_tenant_package.create_by          is '创建者';
+comment on column  sys_tenant_package.create_time        is '创建时间';
+comment on column  sys_tenant_package.update_by          is '更新者';
+comment on column  sys_tenant_package.update_time        is '更新时间';
+
+
 -- ----------------------------
 -- 1、部门表
 -- ----------------------------
