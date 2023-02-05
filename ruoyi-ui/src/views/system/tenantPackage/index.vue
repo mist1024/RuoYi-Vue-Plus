@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { listTenantPackage, getTenantPackage, delTenantPackage, addTenantPackage, updateTenantPackage, changePackageStatus } from "@/api/system/tenantPackage";
+import { listTenantPackage, getTenantPackage, delTenantPackage, addTenantPackage, updateTenantPackage, changePackageStatus } from "@/api/system/tenant/package";
 import { treeselect as menuTreeselect, tenantPackageMenuTreeselect } from "@/api/system/menu";
 
 export default {

@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询租户套餐列表
 export function listTenantPackage(query) {
   return request({
-    url: '/system/tenantPackage/list',
+    url: '/system/tenant/package/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listTenantPackage(query) {
 // 查询租户套餐详细
 export function getTenantPackage(packageId) {
   return request({
-    url: '/system/tenantPackage/' + packageId,
+    url: '/system/tenant/package/' + packageId,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getTenantPackage(packageId) {
 // 新增租户套餐
 export function addTenantPackage(data) {
   return request({
-    url: '/system/tenantPackage',
+    url: '/system/tenant/package',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addTenantPackage(data) {
 // 修改租户套餐
 export function updateTenantPackage(data) {
   return request({
-    url: '/system/tenantPackage',
+    url: '/system/tenant/package',
     method: 'put',
     data: data
   })
@@ -42,7 +42,7 @@ export function changePackageStatus(packageId, status) {
     status
   }
   return request({
-    url: '/system/tenantPackage/changeStatus',
+    url: '/system/tenant/package/changeStatus',
     method: 'put',
     data: data
   })
@@ -52,7 +52,7 @@ export function changePackageStatus(packageId, status) {
 // 删除租户套餐
 export function delTenantPackage(packageId) {
   return request({
-    url: '/system/tenantPackage/' + packageId,
+    url: '/system/tenant/package/' + packageId,
     method: 'delete'
   })
 }

@@ -31,7 +31,7 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/tenantPackage")
+@RequestMapping("/system/tenant/package")
 public class SysTenantPackageController extends BaseController {
 
     private final ISysTenantPackageService iSysTenantPackageService;
