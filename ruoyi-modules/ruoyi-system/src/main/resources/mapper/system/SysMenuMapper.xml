@@ -82,4 +82,8 @@
         where m.status = '0' and rm.role_id = #{roleId}
     </select>
 
+    <select id="selectMenuListByTenantPackageId" resultType="java.lang.Long">
+
+    </select>
+
 </mapper>

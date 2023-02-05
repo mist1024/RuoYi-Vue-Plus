@@ -150,6 +150,17 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     /**
+     * 根据租户套餐ID查询菜单树信息
+     *
+     * @param packageId 租户套餐ID
+     * @return 选中菜单列表
+     */
+    @Override
+    public List<Long> selectMenuListByTenantPackageId(Long packageId) {
+        return baseMapper.selectMenuListByTenantPackageId(packageId);
+    }
+
+    /**
      * 构建前端路由所需要的菜单
      *
      * @param menus 菜单列表

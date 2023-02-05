@@ -77,6 +77,20 @@ public class SysMenuController extends BaseController {
     }
 
     /**
+     * 加载对应租户套餐菜单列表树
+     *
+     * @param packageId 租户套餐ID
+     */
+    @GetMapping(value = "/tenantPackageMenuTreeselect/{packageId}")
+    public R<MenuTreeSelectVo> tenantPackageMenuTreeselect(@PathVariable("packageId") Long packageId) {
+        List<SysMenuVo> menus = menuService.selectMenuList(LoginHelper.getUserId());
+        MenuTreeSelectVo selectVo = new MenuTreeSelectVo();
+        selectVo.setCheckedKeys(menuService.selectMenuListByTenantPackageId(packageId));
+        selectVo.setMenus(menuService.buildMenuTreeSelect(menus));
+        return R.ok(selectVo);
+    }
+
+    /**
      * 新增菜单
      */
     @SaCheckPermission("system:menu:add")
