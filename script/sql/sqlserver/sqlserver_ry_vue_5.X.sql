@@ -1393,6 +1393,10 @@ INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [co
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (115, N'代码生成', 3, 2, N'gen', N'tool/gen/index', N'', 1, 0, N'C', N'0', N'0', N'tool:gen:list', N'code', 103, 1, getdate(), NULL, NULL, N'代码生成菜单')
 GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (121, N'租户管理', 1, 2, N'tenant', N'system/tenant/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenant:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户管理菜单')
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (122, N'租户套餐管理', 1, 2, N'tenantPackage', N'system/tenantPackage/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenantPackage:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户套餐管理菜单')
+GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (117, N'Admin监控', 2, 5, N'Admin', N'monitor/admin/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:admin:list', N'dashboard', 103, 1, getdate(), NULL, NULL, N'Admin监控菜单');
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (118, N'文件管理', 1, 10, N'oss', N'system/oss/index', N'', 1, 0, N'C', '0', N'0', N'system:oss:list', N'upload', 103, 1, getdate(), NULL, NULL, N'文件管理菜单');
@@ -1525,6 +1529,28 @@ GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1604, N'配置添加', 118, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:oss:add', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
 INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1605, N'配置编辑', 118, 6, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:oss:edit', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+-- 租户管理相关按钮
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1606, N'租户查询', 121, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1607, N'租户新增', 121, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:add', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1608, N'租户修改', 121, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:edit', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1609, N'租户删除', 121, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1610, N'租户导出', 121, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenant:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+-- 租户套餐管理相关按钮
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1611, N'租户套餐查询', 122, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1612, N'租户套餐新增', 122, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:add', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1613, N'租户套餐修改', 122, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:edit', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1614, N'租户套餐删除', 122, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT [sys_menu] ([menu_id], [menu_name], [parent_id], [order_num], [path], [component], [query_param], [is_frame], [is_cache], [menu_type], [visible], [status], [perms], [icon], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1615, N'租户套餐导出', 122, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
 
 CREATE TABLE [sys_notice]
