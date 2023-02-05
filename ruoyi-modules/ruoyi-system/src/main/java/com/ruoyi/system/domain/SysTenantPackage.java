@@ -10,8 +10,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 /**
  * 租户套餐对象 sys_tenant_package
  *
- * @author ruoyi
- * @date 2023-02-05
+ * @author Michelle.Chung
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

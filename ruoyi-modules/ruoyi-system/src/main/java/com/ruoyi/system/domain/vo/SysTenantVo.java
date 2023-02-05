@@ -14,8 +14,7 @@ import java.io.Serializable;
 /**
  * 租户视图对象 sys_tenant
  *
- * @author ruoyi
- * @date 2023-02-05
+ * @author Michelle.Chung
  */
 @Data
 @ExcelIgnoreUnannotated

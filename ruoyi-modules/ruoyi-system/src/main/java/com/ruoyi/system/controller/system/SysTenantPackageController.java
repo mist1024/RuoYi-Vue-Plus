@@ -23,10 +23,9 @@ import com.ruoyi.system.service.ISysTenantPackageService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
 /**
- * 租户套餐
+ * 租户套餐管理
  *
- * @author ruoyi
- * @date 2023-02-05
+ * @author Michelle.Chung
  */
 @Validated
 @RequiredArgsConstructor

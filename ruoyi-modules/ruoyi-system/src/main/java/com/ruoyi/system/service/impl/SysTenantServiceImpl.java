@@ -14,6 +14,7 @@ import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.domain.SysTenant;
 import com.ruoyi.system.mapper.SysTenantMapper;
 import com.ruoyi.system.service.ISysTenantService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,7 @@ import java.util.Collection;
 /**
  * 租户Service业务层处理
  *
- * @author ruoyi
- * @date 2023-02-05
+ * @author Michelle.Chung
  */
 @RequiredArgsConstructor
 @Service
@@ -79,6 +79,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * 新增租户
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantBo bo) {
         SysTenant add = BeanUtil.toBean(bo, SysTenant.class);
         validEntityBeforeSave(add);
@@ -93,6 +94,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * 修改租户
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysTenantBo bo) {
         SysTenant update = BeanUtil.toBean(bo, SysTenant.class);
         validEntityBeforeSave(update);
@@ -122,6 +124,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * 批量删除租户
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验

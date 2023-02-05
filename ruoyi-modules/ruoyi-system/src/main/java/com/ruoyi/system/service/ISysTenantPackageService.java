@@ -11,8 +11,7 @@ import java.util.List;
 /**
  * 租户套餐Service接口
  *
- * @author ruoyi
- * @date 2023-02-05
+ * @author Michelle.Chung
  */
 public interface ISysTenantPackageService {
 

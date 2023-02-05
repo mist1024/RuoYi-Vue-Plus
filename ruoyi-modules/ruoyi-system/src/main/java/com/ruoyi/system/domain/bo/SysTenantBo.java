@@ -13,8 +13,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 /**
  * 租户业务对象 sys_tenant
  *
- * @author ruoyi
- * @date 2023-02-05
+ * @author Michelle.Chung
  */
 
 @Data
