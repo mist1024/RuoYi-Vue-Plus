@@ -42,6 +42,11 @@ public interface ISysTenantService {
     Boolean updateByBo(SysTenantBo bo);
 
     /**
+     * 修改租户状态
+     */
+    int updateTenantStatus(SysTenantBo bo);
+
+    /**
      * 校验并批量删除租户信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);

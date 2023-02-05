@@ -100,6 +100,18 @@ public class SysTenantServiceImpl implements ISysTenantService {
     }
 
     /**
+     * 修改租户状态
+     *
+     * @param bo 租户信息
+     * @return 结果
+     */
+    @Override
+    public int updateTenantStatus(SysTenantBo bo) {
+        SysTenant tenant = BeanUtil.toBean(bo, SysTenant.class);
+        return baseMapper.updateById(tenant);
+    }
+
+    /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(SysTenant entity){

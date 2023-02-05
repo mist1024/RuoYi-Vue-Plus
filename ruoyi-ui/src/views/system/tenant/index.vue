@@ -87,6 +87,7 @@
 
     <el-table v-loading="loading" :data="tenantList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="id" align="center" prop="id" v-if="false"/>
       <el-table-column label="租户编号" align="center" prop="tenantId" />
       <el-table-column label="联系人" align="center" prop="contactUserName" />
       <el-table-column label="联系电话" align="center" prop="contactPhone" />
@@ -97,7 +98,16 @@
           <span>{{ parseTime(scope.row.expireTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="租户状态" align="center" prop="status" />
+      <el-table-column label="租户状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            active-value="0"
+            inactive-value="1"
+            @change="handleStatusChange(scope.row)"
+          ></el-switch>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -179,7 +189,7 @@
 </template>
 
 <script>
-import { listTenant, getTenant, delTenant, addTenant, updateTenant } from "@/api/system/tenant";
+import { listTenant, getTenant, delTenant, addTenant, updateTenant, changeTenantStatus } from "@/api/system/tenant";
 import { listTenantPackage } from "@/api/system/tenantPackage";
 
 export default {
@@ -264,6 +274,17 @@ export default {
         this.tenantList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    // 租户套餐状态修改
+    handleStatusChange(row) {
+      let text = row.status === "0" ? "启用" : "停用";
+      this.$modal.confirm('确认要"' + text + '""' + row.companyName + '"租户吗？').then(function() {
+        return changeTenantStatus(row.id, row.status);
+      }).then(() => {
+        this.$modal.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.status = row.status === "0" ? "1" : "0";
       });
     },
     // 取消按钮

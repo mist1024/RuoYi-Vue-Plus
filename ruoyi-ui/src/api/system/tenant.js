@@ -35,6 +35,19 @@ export function updateTenant(data) {
   })
 }
 
+// 租户状态修改
+export function changeTenantStatus(id, status) {
+  const data = {
+    id,
+    status
+  }
+  return request({
+    url: '/system/tenant/changeStatus',
+    method: 'put',
+    data: data
+  })
+}
+
 // 删除租户
 export function delTenant(id) {
   return request({
