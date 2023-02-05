@@ -34,7 +34,6 @@ public class SysTenantPackageBo extends BaseEntity {
     /**
      * 关联菜单id
      */
-    @NotBlank(message = "关联菜单id不能为空", groups = { AddGroup.class, EditGroup.class })
     private String menuIds;
 
     /**

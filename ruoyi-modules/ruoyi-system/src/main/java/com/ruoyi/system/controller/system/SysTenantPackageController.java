@@ -91,6 +91,16 @@ public class SysTenantPackageController extends BaseController {
     }
 
     /**
+     * 状态修改
+     */
+    @SaCheckPermission("system:tenantPackage:edit")
+    @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeStatus")
+    public R<Void> changeStatus(@RequestBody SysTenantPackageBo bo) {
+        return toAjax(iSysTenantPackageService.updatePackageStatus(bo));
+    }
+
+    /**
      * 删除租户套餐
      *
      * @param packageIds 主键串

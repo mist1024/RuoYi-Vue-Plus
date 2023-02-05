@@ -42,6 +42,11 @@ public interface ISysTenantPackageService {
     Boolean updateByBo(SysTenantPackageBo bo);
 
     /**
+     * 修改套餐状态
+     */
+    int updatePackageStatus(SysTenantPackageBo bo);
+
+    /**
      * 校验并批量删除租户套餐信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);

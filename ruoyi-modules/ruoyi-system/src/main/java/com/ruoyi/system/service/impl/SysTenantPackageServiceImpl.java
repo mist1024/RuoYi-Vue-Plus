@@ -91,6 +91,18 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     }
 
     /**
+     * 修改套餐状态
+     *
+     * @param bo 套餐信息
+     * @return 结果
+     */
+    @Override
+    public int updatePackageStatus(SysTenantPackageBo bo) {
+        SysTenantPackage tenantPackage = BeanUtil.toBean(bo, SysTenantPackage.class);
+        return baseMapper.updateById(tenantPackage);
+    }
+
+    /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(SysTenantPackage entity){

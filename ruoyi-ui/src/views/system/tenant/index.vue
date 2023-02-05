@@ -213,6 +213,7 @@ import { listTenant, getTenant, delTenant, addTenant, updateTenant } from "@/api
 
 export default {
   name: "Tenant",
+  dicts: ['sys_normal_disable'],
   data() {
     return {
       // 按钮loading

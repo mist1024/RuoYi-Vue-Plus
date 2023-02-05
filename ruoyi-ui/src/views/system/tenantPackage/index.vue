@@ -66,7 +66,16 @@
       <el-table-column label="租户套餐id" align="center" prop="packageId" v-if="true"/>
       <el-table-column label="套餐名称" align="center" prop="packageName" />
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="状态" align="center" prop="status" >
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            active-value="0"
+            inactive-value="1"
+            @change="handleStatusChange(scope.row)"
+          ></el-switch>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -129,7 +138,7 @@
 </template>
 
 <script>
-import { listTenantPackage, getTenantPackage, delTenantPackage, addTenantPackage, updateTenantPackage } from "@/api/system/tenantPackage";
+import { listTenantPackage, getTenantPackage, delTenantPackage, addTenantPackage, updateTenantPackage, changePackageStatus } from "@/api/system/tenantPackage";
 import { treeselect as menuTreeselect, tenantPackageMenuTreeselect } from "@/api/system/menu";
 
 export default {
@@ -218,6 +227,17 @@ export default {
         this.tenantPackageList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    // 租户套餐状态修改
+    handleStatusChange(row) {
+      let text = row.status === "0" ? "启用" : "停用";
+      this.$modal.confirm('确认要"' + text + '""' + row.packageName + '"套餐吗？').then(function() {
+        return changePackageStatus(row.packageId, row.status);
+      }).then(() => {
+        this.$modal.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.status = row.status === "0" ? "1" : "0";
       });
     },
     // 取消按钮

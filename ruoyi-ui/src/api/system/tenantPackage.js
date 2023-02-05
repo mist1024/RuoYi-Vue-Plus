@@ -35,6 +35,20 @@ export function updateTenantPackage(data) {
   })
 }
 
+// 租户套餐状态修改
+export function changePackageStatus(packageId, status) {
+  const data = {
+    packageId,
+    status
+  }
+  return request({
+    url: '/system/tenantPackage/changeStatus',
+    method: 'put',
+    data: data
+  })
+}
+
+
 // 删除租户套餐
 export function delTenantPackage(packageId) {
   return request({
