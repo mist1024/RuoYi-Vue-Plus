@@ -33,30 +33,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="统一社会信用代码" prop="licenseNumber">
-        <el-input
-          v-model="queryParams.licenseNumber"
-          placeholder="请输入统一社会信用代码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="过期时间" prop="expireTime">
-        <el-date-picker clearable
-          v-model="queryParams.expireTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择过期时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="用户数量" prop="accountCount">
-        <el-input
-          v-model="queryParams.accountCount"
-          placeholder="请输入用户数量"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -111,22 +87,16 @@
 
     <el-table v-loading="loading" :data="tenantList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="id" v-if="true"/>
       <el-table-column label="租户编号" align="center" prop="tenantId" />
       <el-table-column label="联系人" align="center" prop="contactUserName" />
       <el-table-column label="联系电话" align="center" prop="contactPhone" />
       <el-table-column label="企业名称" align="center" prop="companyName" />
-      <el-table-column label="统一社会信用代码" align="center" prop="licenseNumber" />
-      <el-table-column label="地址" align="center" prop="address" />
-      <el-table-column label="企业简介" align="center" prop="intro" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="租户套餐编号" align="center" prop="packageId" />
+      <el-table-column label="社会信用代码" align="center" prop="licenseNumber" />
       <el-table-column label="过期时间" align="center" prop="expireTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.expireTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户数量" align="center" prop="accountCount" />
       <el-table-column label="租户状态" align="center" prop="status" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -171,8 +141,8 @@
         <el-form-item label="企业名称" prop="companyName">
           <el-input v-model="form.companyName" placeholder="请输入企业名称" />
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="licenseNumber">
-          <el-input v-model="form.licenseNumber" placeholder="请输入统一社会信用代码" />
+        <el-form-item label="社会信用代码" prop="licenseNumber">
+          <el-input v-model="form.licenseNumber" placeholder="请输入社会信用代码" />
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入地址" />
@@ -210,6 +180,7 @@
 
 <script>
 import { listTenant, getTenant, delTenant, addTenant, updateTenant } from "@/api/system/tenant";
+import { listTenantPackage } from "@/api/system/tenantPackage";
 
 export default {
   name: "Tenant",
@@ -344,6 +315,7 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.getTenantPackage();
       this.open = true;
       this.title = "添加租户";
     },

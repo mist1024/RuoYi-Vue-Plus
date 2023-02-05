@@ -63,7 +63,6 @@
 
     <el-table v-loading="loading" :data="tenantPackageList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="租户套餐id" align="center" prop="packageId" v-if="true"/>
       <el-table-column label="套餐名称" align="center" prop="packageName" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="状态" align="center" prop="status" >
