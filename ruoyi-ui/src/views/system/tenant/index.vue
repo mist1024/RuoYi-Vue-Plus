@@ -139,8 +139,9 @@
     <!-- 添加或修改租户对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="租户编号" prop="tenantId">
-          <el-input v-model="form.tenantId" placeholder="请输入租户编号" />
+
+        <el-form-item label="企业名称" prop="companyName">
+          <el-input v-model="form.companyName" placeholder="请输入企业名称" />
         </el-form-item>
         <el-form-item label="联系人" prop="contactUserName">
           <el-input v-model="form.contactUserName" placeholder="请输入联系人" />
@@ -148,20 +149,8 @@
         <el-form-item label="联系电话" prop="contactPhone">
           <el-input v-model="form.contactPhone" placeholder="请输入联系电话" />
         </el-form-item>
-        <el-form-item label="企业名称" prop="companyName">
-          <el-input v-model="form.companyName" placeholder="请输入企业名称" />
-        </el-form-item>
-        <el-form-item label="社会信用代码" prop="licenseNumber">
-          <el-input v-model="form.licenseNumber" placeholder="请输入社会信用代码" />
-        </el-form-item>
-        <el-form-item label="地址" prop="address">
-          <el-input v-model="form.address" placeholder="请输入地址" />
-        </el-form-item>
-        <el-form-item label="企业简介" prop="intro">
-          <el-input v-model="form.intro" placeholder="请输入企业简介" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
+        <el-form-item label="企业代码" prop="licenseNumber">
+          <el-input v-model="form.licenseNumber" placeholder="请输入统一社会信用代码" />
         </el-form-item>
         <el-form-item label="租户套餐" prop="packageId">
           <el-select v-model="form.packageId" placeholder="请选择租户套餐" clearable size="small" style="width: 100%">
@@ -170,14 +159,23 @@
         </el-form-item>
         <el-form-item label="过期时间" prop="expireTime">
           <el-date-picker clearable
-            v-model="form.expireTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="请选择过期时间">
+                          v-model="form.expireTime"
+                          type="datetime"
+                          value-format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="请选择过期时间">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="用户数量" prop="accountCount">
           <el-input v-model="form.accountCount" placeholder="请输入用户数量" />
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="form.address" placeholder="请输入地址" />
+        </el-form-item>
+        <el-form-item label="企业简介" prop="intro">
+          <el-input type="textarea" v-model="form.intro" placeholder="请输入企业简介" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
