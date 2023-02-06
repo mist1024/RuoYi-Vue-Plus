@@ -71,7 +71,7 @@ public interface ISysMenuService {
      * @param packageId 租户套餐ID
      * @return 选中菜单列表
      */
-    List<Long> selectMenuListByTenantPackageId(Long packageId);
+    List<Long> selectMenuListByPackageId(Long packageId);
 
     /**
      * 构建前端路由所需要的菜单

@@ -80,12 +80,4 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenuMapper, SysMenu, Sy
      */
     List<Long> selectMenuListByRoleId(@Param("roleId") Long roleId, @Param("menuCheckStrictly") boolean menuCheckStrictly);
 
-    /**
-     * 根据租户套餐菜单ID查询菜单树信息
-     *
-     * @param menuIds 租户套餐菜单ID
-     * @return 选中菜单列表
-     */
-    List<Long> selectMenuListByTenantPackageMenuId(@Param("menuIds") String menuIds);
-
 }

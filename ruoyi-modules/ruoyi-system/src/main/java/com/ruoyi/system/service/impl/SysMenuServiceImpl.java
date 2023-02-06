@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -16,6 +17,7 @@ import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysMenu;
 import com.ruoyi.system.domain.SysRole;
 import com.ruoyi.system.domain.SysRoleMenu;
+import com.ruoyi.system.domain.SysTenantPackage;
 import com.ruoyi.system.domain.bo.SysMenuBo;
 import com.ruoyi.system.domain.vo.MetaVo;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -158,10 +160,23 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 选中菜单列表
      */
     @Override
-    public List<Long> selectMenuListByTenantPackageId(Long packageId) {
-        String menuIds = sysTenantPackageMapper.selectMenuIds(packageId);
-        return StringUtils.isNotBlank(menuIds)
-            ? baseMapper.selectMenuListByTenantPackageMenuId(menuIds) : new ArrayList<>();
+    public List<Long> selectMenuListByPackageId(Long packageId) {
+        SysTenantPackage tenantPackage = sysTenantPackageMapper.selectById(packageId);
+        String menuIds = tenantPackage.getMenuIds();
+        if (StringUtils.isBlank(menuIds)) {
+            return List.of();
+        }
+        List<Long> parentIds = null;
+        if (tenantPackage.getMenuCheckStrictly()) {
+            parentIds = baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
+                .select(SysMenu::getParentId)
+                .in(SysMenu::getMenuId, menuIds))
+                .stream().distinct().map(Convert::toLong).toList();
+        }
+        return baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
+            .in(SysMenu::getMenuId, menuIds)
+            .notIn(CollUtil.isNotEmpty(parentIds), SysMenu::getMenuId, parentIds))
+            .stream().map(Convert::toLong).toList();
     }
 
     /**
