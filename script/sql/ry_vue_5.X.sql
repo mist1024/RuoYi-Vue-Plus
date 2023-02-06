@@ -39,17 +39,18 @@ insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有�
 -- ----------------------------
 drop table if exists sys_tenant_package;
 create table sys_tenant_package (
-    package_id   bigint(20)     not null    comment '租户套餐id',
-    package_name varchar(20)                comment '套餐名称',
-    menu_ids     varchar(3000)              comment '关联菜单id',
-    remark       varchar(200)               comment '备注',
-    status       char(1)        default '0' comment '状态（0正常 1停用）',
-    del_flag     char(1)        default '0' comment '删除标志（0代表存在 2代表删除）',
-    create_dept  bigint(20)                 comment '创建部门',
-    create_by    bigint(20)                 comment '创建者',
-    create_time  datetime                   comment '创建时间',
-    update_by    bigint(20)                 comment '更新者',
-    update_time  datetime                   comment '更新时间',
+    package_id              bigint(20)     not null    comment '租户套餐id',
+    package_name            varchar(20)                comment '套餐名称',
+    menu_ids                varchar(3000)              comment '关联菜单id',
+    remark                  varchar(200)               comment '备注',
+    menu_check_strictly     tinyint(1)     default 1   comment '菜单树选择项是否关联显示',
+    status                  char(1)        default '0' comment '状态（0正常 1停用）',
+    del_flag                char(1)        default '0' comment '删除标志（0代表存在 2代表删除）',
+    create_dept             bigint(20)                 comment '创建部门',
+    create_by               bigint(20)                 comment '创建者',
+    create_time             datetime                   comment '创建时间',
+    update_by               bigint(20)                 comment '更新者',
+    update_time             datetime                   comment '更新时间',
     primary key (package_id)
 ) engine=innodb comment = '租户套餐表';
 

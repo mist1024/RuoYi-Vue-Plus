@@ -33,12 +33,17 @@ public class SysTenantPackageBo extends BaseEntity {
     /**
      * 关联菜单id
      */
-    private String menuIds;
+    private Long[] menuIds;
 
     /**
      * 备注
      */
     private String remark;
+
+    /**
+     * 菜单树选择项是否关联显示
+     */
+    private Boolean menuCheckStrictly;
 
     /**
      * 状态（0正常 1停用）

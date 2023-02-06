@@ -61,17 +61,18 @@ insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有�
 drop table if exists sys_tenant_package;
 create table if not exists sys_tenant_package
 (
-    package_id      int8,
-    package_name    varchar(20)     default ''::varchar,
-    menu_ids        varchar(3000)   default ''::varchar,
-    remark          varchar(200)    default ''::varchar,
-    status          char            default '0'::bpchar,
-    del_flag        char            default '0'::bpchar,
-    create_dept     int8,
-    create_by       int8,
-    create_time     timestamp,
-    update_by       int8,
-    update_time     timestamp,
+    package_id          int8,
+    package_name        varchar(20)     default ''::varchar,
+    menu_ids            varchar(3000)   default ''::varchar,
+    remark              varchar(200)    default ''::varchar,
+    menu_check_strictly bool            default true,
+    status              char            default '0'::bpchar,
+    del_flag            char            default '0'::bpchar,
+    create_dept         int8,
+    create_by           int8,
+    create_time         timestamp,
+    update_by           int8,
+    update_time         timestamp,
     constraint "pk_sys_tenant_package" primary key (package_id)
 );
 

@@ -82,8 +82,10 @@
         where m.status = '0' and rm.role_id = #{roleId}
     </select>
 
-    <select id="selectMenuListByTenantPackageId" resultType="java.lang.Long">
-
+    <select id="selectMenuListByTenantPackageMenuId" resultType="java.lang.Long">
+        select m.menu_id
+        from sys_menu m
+        where m.menu_id in (${menuIds})
     </select>
 
 </mapper>

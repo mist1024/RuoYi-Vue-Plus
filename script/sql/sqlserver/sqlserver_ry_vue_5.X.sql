@@ -156,6 +156,7 @@ CREATE TABLE [sys_tenant_package]
     [package_name]          nvarchar(20)                    NOT NULL,
     [menu_ids]              nvarchar(20)                    NULL,
     [remark]                nvarchar(200)                   NULL,
+    [menu_check_strictly]   tinyint         DEFAULT ((1))   NULL,
     [status]                nchar(1)        DEFAULT ('0')   NULL,
     [del_flag]              nchar(1)        DEFAULT ('0')   NULL,
     [create_dept]           bigint                          NULL,

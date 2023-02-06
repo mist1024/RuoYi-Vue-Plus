@@ -247,6 +247,11 @@ export default {
     },
     // 表单重置
     reset() {
+      if (this.$refs.menu != undefined) {
+        this.$refs.menu.setCheckedKeys([]);
+      }
+      this.menuExpand = false;
+      this.menuNodeAll = false;
       this.form = {
         packageId: undefined,
         packageName: undefined,
@@ -335,6 +340,7 @@ export default {
         if (valid) {
           this.buttonLoading = true;
           if (this.form.packageId != null) {
+            this.form.menuIds = this.getMenuAllCheckedKeys();
             updateTenantPackage(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
@@ -343,6 +349,7 @@ export default {
               this.buttonLoading = false;
             });
           } else {
+            this.form.menuIds = this.getMenuAllCheckedKeys();
             addTenantPackage(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;

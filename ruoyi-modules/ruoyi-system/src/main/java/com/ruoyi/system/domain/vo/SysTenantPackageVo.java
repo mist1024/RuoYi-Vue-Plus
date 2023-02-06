@@ -47,6 +47,12 @@ public class SysTenantPackageVo implements Serializable {
     private String remark;
 
     /**
+     * 菜单树选择项是否关联显示
+     */
+    @ExcelProperty(value = "菜单树选择项是否关联显示")
+    private Boolean menuCheckStrictly;
+
+    /**
      * 状态（0正常 1停用）
      */
     @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)

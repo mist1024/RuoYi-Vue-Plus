@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -16,6 +17,7 @@ import com.ruoyi.system.mapper.SysTenantPackageMapper;
 import com.ruoyi.system.service.ISysTenantPackageService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -74,6 +76,13 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     public Boolean insertByBo(SysTenantPackageBo bo) {
         SysTenantPackage add = BeanUtil.toBean(bo, SysTenantPackage.class);
         validEntityBeforeSave(add);
+        // 保存菜单id
+        List<Long> menuIds = Arrays.asList(bo.getMenuIds());
+        if (CollUtil.isNotEmpty(menuIds)) {
+            add.setMenuIds(StringUtils.join(menuIds, ", "));
+        } else {
+            add.setMenuIds("");
+        }
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setPackageId(add.getPackageId());
@@ -89,6 +98,13 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     public Boolean updateByBo(SysTenantPackageBo bo) {
         SysTenantPackage update = BeanUtil.toBean(bo, SysTenantPackage.class);
         validEntityBeforeSave(update);
+        // 保存菜单id
+        List<Long> menuIds = Arrays.asList(bo.getMenuIds());
+        if (CollUtil.isNotEmpty(menuIds)) {
+            update.setMenuIds(StringUtils.join(menuIds, ", "));
+        } else {
+            update.setMenuIds("");
+        }
         return baseMapper.updateById(update) > 0;
     }
 

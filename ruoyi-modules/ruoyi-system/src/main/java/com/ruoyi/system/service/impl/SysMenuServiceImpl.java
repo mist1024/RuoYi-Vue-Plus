@@ -23,6 +23,7 @@ import com.ruoyi.system.domain.vo.SysMenuVo;
 import com.ruoyi.system.mapper.SysMenuMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysRoleMenuMapper;
+import com.ruoyi.system.mapper.SysTenantPackageMapper;
 import com.ruoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     private final SysMenuMapper baseMapper;
     private final SysRoleMapper roleMapper;
     private final SysRoleMenuMapper roleMenuMapper;
+    private final SysTenantPackageMapper sysTenantPackageMapper;
 
     /**
      * 根据用户查询系统菜单列表
@@ -157,7 +159,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public List<Long> selectMenuListByTenantPackageId(Long packageId) {
-        return baseMapper.selectMenuListByTenantPackageId(packageId);
+        String menuIds = sysTenantPackageMapper.selectMenuIds(packageId);
+        return StringUtils.isNotBlank(menuIds)
+            ? baseMapper.selectMenuListByTenantPackageMenuId(menuIds) : new ArrayList<>();
     }
 
     /**

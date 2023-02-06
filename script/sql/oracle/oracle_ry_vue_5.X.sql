@@ -56,17 +56,18 @@ insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有�
 -- 租户套餐表
 -- ----------------------------
 create table sys_tenant_package (
-    package_id      number(20)      not null,
-    package_name    varchar2(20)    default '',
-    menu_ids        varchar2(3000)  default '',
-    remark          varchar2(200)   default '',
-    status          char(1)         default '0',
-    del_flag        char(1)         default '0',
-    create_dept     number(20)      default null,
-    create_by       number(20)      default null,
-    create_time     date,
-    update_by       number(20)      default null,
-    update_time     date
+    package_id              number(20)      not null,
+    package_name            varchar2(20)    default '',
+    menu_ids                varchar2(3000)  default '',
+    remark                  varchar2(200)   default '',
+    menu_check_strictly     number(1)       default 1,
+    status                  char(1)         default '0',
+    del_flag                char(1)         default '0',
+    create_dept             number(20)      default null,
+    create_by               number(20)      default null,
+    create_time             date,
+    update_by               number(20)      default null,
+    update_time             date
 );
 
 alter table sys_tenant_package add constraint pk_sys_tenant_package primary key (package_id);

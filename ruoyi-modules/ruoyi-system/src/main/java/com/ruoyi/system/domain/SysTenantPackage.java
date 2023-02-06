@@ -38,6 +38,10 @@ public class SysTenantPackage extends BaseEntity {
      */
     private String remark;
     /**
+     * 菜单树选择项是否关联显示（ 0：父子不互相关联显示 1：父子互相关联显示）
+     */
+    private Boolean menuCheckStrictly;
+    /**
      * 状态（0正常 1停用）
      */
     private String status;
