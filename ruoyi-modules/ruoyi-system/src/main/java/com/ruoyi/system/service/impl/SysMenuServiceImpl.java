@@ -100,7 +100,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
             if (StringUtils.isNotEmpty(perm)) {
-                permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.trim()));
             }
         }
         return permsSet;
@@ -118,7 +118,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
             if (StringUtils.isNotEmpty(perm)) {
-                permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+                permsSet.addAll(StringUtils.splitList(perm.trim()));
             }
         }
         return permsSet;
