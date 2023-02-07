@@ -10,7 +10,8 @@ import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.redis.utils.RedisUtils;
-import com.ruoyi.system.domain.SysLogininfor;
+import com.ruoyi.system.domain.bo.SysLogininforBo;
+import com.ruoyi.system.domain.vo.SysLogininforVo;
 import com.ruoyi.system.service.ISysLogininforService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +38,7 @@ public class SysLogininforController extends BaseController {
      */
     @SaCheckPermission("monitor:logininfor:list")
     @GetMapping("/list")
-    public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor, PageQuery pageQuery) {
+    public TableDataInfo<SysLogininforVo> list(SysLogininforBo logininfor, PageQuery pageQuery) {
         return logininforService.selectPageLogininforList(logininfor, pageQuery);
     }
 
@@ -47,9 +48,9 @@ public class SysLogininforController extends BaseController {
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @SaCheckPermission("monitor:logininfor:export")
     @PostMapping("/export")
-    public void export(SysLogininfor logininfor, HttpServletResponse response) {
-        List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-        ExcelUtil.exportExcel(list, "登录日志", SysLogininfor.class, response);
+    public void export(SysLogininforBo logininfor, HttpServletResponse response) {
+        List<SysLogininforVo> list = logininforService.selectLogininforList(logininfor);
+        ExcelUtil.exportExcel(list, "登录日志", SysLogininforVo.class, response);
     }
 
     /**

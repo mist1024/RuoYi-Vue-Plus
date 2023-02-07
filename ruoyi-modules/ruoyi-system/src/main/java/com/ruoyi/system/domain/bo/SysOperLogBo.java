@@ -1,30 +1,25 @@
-package com.ruoyi.system.domain;
+package com.ruoyi.system.domain.bo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 操作日志记录表 oper_log
+ * 操作日志记录业务对象 sys_oper_log
  *
- * @author Lion Li
+ * @author Michelle.Chung
+ * @date 2023-02-07
  */
 
 @Data
-@TableName("sys_oper_log")
-public class SysOperLog implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class SysOperLogBo {
 
     /**
      * 日志主键
      */
-    @TableId(value = "oper_id")
     private Long operId;
 
     /**
@@ -33,7 +28,7 @@ public class SysOperLog implements Serializable {
     private String tenantId;
 
     /**
-     * 操作模块
+     * 模块标题
      */
     private String title;
 
@@ -43,7 +38,12 @@ public class SysOperLog implements Serializable {
     private Integer businessType;
 
     /**
-     * 请求方法
+     * 业务类型数组
+     */
+    private Integer[] businessTypes;
+
+    /**
+     * 方法名称
      */
     private String method;
 
@@ -68,12 +68,12 @@ public class SysOperLog implements Serializable {
     private String deptName;
 
     /**
-     * 请求url
+     * 请求URL
      */
     private String operUrl;
 
     /**
-     * 操作地址
+     * 主机地址
      */
     private String operIp;
 
@@ -106,5 +106,11 @@ public class SysOperLog implements Serializable {
      * 操作时间
      */
     private Date operTime;
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params = new HashMap<>();
 
 }
