@@ -1,5 +1,8 @@
-package com.ruoyi.system.service;
+package com.ruoyi.system.service.impl;
 
+import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.system.service.ISysPermissionService;
+import com.ruoyi.system.service.ISysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +16,7 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @Service
-public class SysPermissionService {
+public class SysPermissionServiceImpl implements ISysPermissionService {
 
     private final ISysRoleService roleService;
     private final ISysMenuService menuService;
@@ -25,6 +28,7 @@ public class SysPermissionService {
      * @param isAdmin 是否管理员
      * @return 角色权限信息
      */
+    @Override
     public Set<String> getRolePermission(Long userId, boolean isAdmin) {
         Set<String> roles = new HashSet<>();
         // 管理员拥有所有权限
@@ -43,6 +47,7 @@ public class SysPermissionService {
      * @param isAdmin 是否管理员
      * @return 菜单权限信息
      */
+    @Override
     public Set<String> getMenuPermission(Long userId, boolean isAdmin) {
         Set<String> perms = new HashSet<>();
         // 管理员拥有所有权限

@@ -46,7 +46,7 @@ public class SysLoginService {
 
     private final SysUserMapper userMapper;
     private final ISysConfigService configService;
-    private final SysPermissionService permissionService;
+    private final ISysPermissionService permissionService;
 
     @Value("${user.password.maxRetryCount}")
     private Integer maxRetryCount;
