@@ -1,4 +1,4 @@
-package com.ruoyi.system.service;
+package com.ruoyi.web.service;
 
 import cn.dev33.satoken.secure.BCrypt;
 import com.ruoyi.common.core.constant.CacheConstants;
@@ -16,6 +16,8 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.log.event.LogininforEvent;
 import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.system.domain.bo.SysUserBo;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

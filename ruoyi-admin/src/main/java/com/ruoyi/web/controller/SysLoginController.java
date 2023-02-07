@@ -11,7 +11,7 @@ import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.system.service.SysLoginService;
+import com.ruoyi.web.service.SysLoginService;
 import com.ruoyi.web.domain.vo.LoginVo;
 import com.ruoyi.web.domain.vo.UserInfoVo;
 import jakarta.validation.constraints.NotBlank;

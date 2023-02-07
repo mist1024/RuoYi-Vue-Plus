@@ -1,4 +1,4 @@
-package com.ruoyi.system.service;
+package com.ruoyi.web.service;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
@@ -24,6 +24,8 @@ import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysPermissionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
