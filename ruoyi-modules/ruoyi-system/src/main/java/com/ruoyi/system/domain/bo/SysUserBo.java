@@ -2,7 +2,7 @@ package com.ruoyi.system.domain.bo;
 
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.xss.Xss;
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.common.mybatis.core.domain.TenantEntity;
 import com.ruoyi.common.sensitive.annotation.Sensitive;
 import com.ruoyi.common.sensitive.core.SensitiveStrategy;
 import jakarta.validation.constraints.Email;
@@ -23,7 +23,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SysUserBo extends BaseEntity {
+public class SysUserBo extends TenantEntity {
 
     /**
      * 用户ID
