@@ -23,7 +23,7 @@ public class SysLogininforBo {
     /**
      * 租户编号
      */
-    private String tenantId;
+    private String tenantId = "000000";
 
     /**
      * 用户账号
