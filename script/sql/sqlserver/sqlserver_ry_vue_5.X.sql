@@ -2030,7 +2030,7 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_role'
 GO
 
-INSERT [sys_role] ([role_id], [tenant_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'000000', N'超级管理员', N'admin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
+INSERT [sys_role] ([role_id], [tenant_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, N'000000', N'超级管理员', N'superadmin', 1, N'1', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'超级管理员')
 GO
 INSERT [sys_role] ([role_id], [tenant_id], [role_name], [role_key], [role_sort], [data_scope], [menu_check_strictly], [dept_check_strictly], [status], [del_flag], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, N'000000', N'普通角色', N'common', 2, N'2', 1, 1, N'0', N'0', 103, 1, getdate(), NULL, NULL, N'普通角色')
 GO
@@ -2427,7 +2427,7 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_user'
 GO
 
-INSERT [sys_user] ([user_id], [tenant_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, 103, N'000000', N'superadmin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
+INSERT [sys_user] ([user_id], [tenant_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (1, 103, N'000000', N'admin', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@163.com', N'15888888888', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'管理员')
 GO
 INSERT [sys_user] ([user_id], [tenant_id], [dept_id], [user_name], [nick_name], [user_type], [email], [phonenumber], [sex], [avatar], [password], [status], [del_flag], [login_ip], [login_date], [create_dept], [create_by], [create_time], [update_by], [update_time], [remark]) VALUES (2, 105, N'000000', N'lionli', N'疯狂的狮子Li', N'sys_user', N'crazyLionLi@qq.com', N'15666666666', N'1', NULL, N'$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', N'0', N'0', N'127.0.0.1', getdate(), 103, 1, getdate(), NULL, NULL, N'测试员')
 GO
