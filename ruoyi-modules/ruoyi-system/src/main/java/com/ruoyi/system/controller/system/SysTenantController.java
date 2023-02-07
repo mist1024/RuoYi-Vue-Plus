@@ -2,6 +2,7 @@ package com.ruoyi.system.controller.system;
 
 import java.util.List;
 
+import com.baomidou.lock.annotation.Lock4j;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -72,6 +73,7 @@ public class SysTenantController extends BaseController {
      */
     @SaCheckPermission("system:tenant:add")
     @Log(title = "租户", businessType = BusinessType.INSERT)
+    @Lock4j
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantBo bo) {

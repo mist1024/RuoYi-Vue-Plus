@@ -139,7 +139,6 @@
     <!-- 添加或修改租户对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
         <el-form-item label="企业名称" prop="companyName">
           <el-input v-model="form.companyName" placeholder="请输入企业名称" />
         </el-form-item>
@@ -149,11 +148,14 @@
         <el-form-item label="联系电话" prop="contactPhone">
           <el-input v-model="form.contactPhone" placeholder="请输入联系电话" />
         </el-form-item>
-        <el-form-item label="企业代码" prop="licenseNumber">
-          <el-input v-model="form.licenseNumber" placeholder="请输入统一社会信用代码" />
+        <el-form-item v-if="form.id == undefined" label="用户名" prop="username">
+          <el-input v-model="form.username" placeholder="请输入系统用户名" maxlength="30"/>
+        </el-form-item>
+        <el-form-item v-if="form.id == undefined" label="用户密码" prop="password">
+          <el-input type="password" v-model="form.password" placeholder="请输入系统用户密码" maxlength="20"/>
         </el-form-item>
         <el-form-item label="租户套餐" prop="packageId">
-          <el-select v-model="form.packageId" placeholder="请选择租户套餐" clearable size="small" style="width: 100%">
+          <el-select v-model="form.packageId" :disabled="form.tenantId" placeholder="请选择租户套餐" clearable size="small" style="width: 100%">
             <el-option v-for="item in packageList" :key="item.packageId" :label="item.packageName" :value="item.packageId"/>
           </el-select>
         </el-form-item>
@@ -170,6 +172,9 @@
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入地址" />
+        </el-form-item>
+        <el-form-item label="企业代码" prop="licenseNumber">
+          <el-input v-model="form.licenseNumber" placeholder="请输入统一社会信用代码" />
         </el-form-item>
         <el-form-item label="企业简介" prop="intro">
           <el-input type="textarea" v-model="form.intro" placeholder="请输入企业简介" />
@@ -252,6 +257,17 @@ export default {
         companyName: [
           { required: true, message: "企业名称不能为空", trigger: "blur" }
         ],
+        username: [
+          { required: true, message: "用户名不能为空", trigger: "blur" },
+          { min: 2, max: 20, message: '用户名称长度必须介于 2 和 20 之间', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur" },
+          { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间', trigger: 'blur' }
+        ],
+        packageId: [
+          { required: true, message: "租户套餐不能为空", trigger: "blur" }
+        ]
       }
     };
   },
@@ -297,6 +313,8 @@ export default {
         tenantId: undefined,
         contactUserName: undefined,
         contactPhone: undefined,
+        username: undefined,
+        password: undefined,
         companyName: undefined,
         licenseNumber: undefined,
         address: undefined,

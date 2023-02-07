@@ -29,7 +29,6 @@ public class SysTenantBo extends BaseEntity {
     /**
      * 租户编号
      */
-    @NotBlank(message = "租户编号不能为空", groups = { AddGroup.class, EditGroup.class })
     private String tenantId;
 
     /**
@@ -49,6 +48,18 @@ public class SysTenantBo extends BaseEntity {
      */
     @NotBlank(message = "企业名称不能为空", groups = { AddGroup.class, EditGroup.class })
     private String companyName;
+
+    /**
+     * 用户名（创建系统用户）
+     */
+    @NotBlank(message = "用户名不能为空", groups = { AddGroup.class })
+    private String username;
+
+    /**
+     * 密码（创建系统用户）
+     */
+    @NotBlank(message = "密码不能为空", groups = { AddGroup.class })
+    private String password;
 
     /**
      * 统一社会信用代码
@@ -73,6 +84,7 @@ public class SysTenantBo extends BaseEntity {
     /**
      * 租户套餐编号
      */
+    @NotNull(message = "租户套餐不能为空", groups = { AddGroup.class })
     private Long packageId;
 
     /**
