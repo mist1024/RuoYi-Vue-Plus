@@ -114,9 +114,10 @@ public class SysTenantServiceImpl implements ISysTenantService {
         String tenantId = generateTenantId(tenantIds);
         add.setTenantId(tenantId);
         boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
+        if (!flag) {
+            throw new ServiceException("创建租户失败");
         }
+        bo.setId(add.getId());
 
         // 根据套餐创建角色
         Long roleId = createTenantRole(tenantId, bo.getPackageId());
@@ -125,6 +126,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         SysDept dept = new SysDept();
         dept.setTenantId(tenantId);
         dept.setDeptName(bo.getCompanyName());
+        dept.setParentId(Constants.TOP_PARENT_ID);
         dept.setAncestors(Constants.TOP_PARENT_ID.toString());
         sysDeptMapper.insert(dept);
         Long deptId = dept.getDeptId();
@@ -150,7 +152,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         userRole.setRoleId(roleId);
         sysUserRoleMapper.insert(userRole);
 
-        return flag;
+        return true;
     }
 
     /**
@@ -176,7 +178,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * @param packageId 租户套餐id
      * @return 角色id
      */
-    @Transactional(rollbackFor = Exception.class)
     public Long createTenantRole(String tenantId, Long packageId) {
         // 获取租户套餐
         SysTenantPackage tenantPackage = sysTenantPackageMapper.selectById(packageId);
