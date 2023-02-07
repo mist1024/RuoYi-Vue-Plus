@@ -10,7 +10,6 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * 角色信息视图对象 sys_role
@@ -90,11 +89,6 @@ public class SysRoleVo implements Serializable {
      * 用户是否存在此角色标识 默认不存在
      */
     private boolean flag = false;
-
-    /**
-     * 角色菜单权限
-     */
-    private Set<String> permissions;
 
     public boolean isAdmin() {
         return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);

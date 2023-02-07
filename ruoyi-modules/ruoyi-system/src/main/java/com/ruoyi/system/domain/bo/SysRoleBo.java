@@ -3,11 +3,12 @@ package com.ruoyi.system.domain.bo;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
-
-import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import lombok.NoArgsConstructor;
 
 /**
@@ -71,6 +72,16 @@ public class SysRoleBo extends BaseEntity {
      * 备注
      */
     private String remark;
+
+    /**
+     * 菜单组
+     */
+    private Long[] menuIds;
+
+    /**
+     * 部门组（数据权限）
+     */
+    private Long[] deptIds;
 
     public SysRoleBo(Long roleId) {
         this.roleId = roleId;

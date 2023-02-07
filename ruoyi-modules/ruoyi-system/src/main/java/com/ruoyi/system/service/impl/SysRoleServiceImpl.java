@@ -234,7 +234,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         SysRole role = BeanUtil.toBean(bo, SysRole.class);
         // 新增角色信息
         baseMapper.insert(role);
-        return insertRoleMenu(role);
+        return insertRoleMenu(bo);
     }
 
     /**
@@ -251,7 +251,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         baseMapper.updateById(role);
         // 删除角色与菜单关联
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, role.getRoleId()));
-        return insertRoleMenu(role);
+        return insertRoleMenu(bo);
     }
 
     /**
@@ -281,7 +281,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         // 删除角色与部门关联
         roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().eq(SysRoleDept::getRoleId, role.getRoleId()));
         // 新增角色和部门信息（数据权限）
-        return insertRoleDept(role);
+        return insertRoleDept(bo);
     }
 
     /**
@@ -289,7 +289,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      *
      * @param role 角色对象
      */
-    public int insertRoleMenu(SysRole role) {
+    public int insertRoleMenu(SysRoleBo role) {
         int rows = 1;
         // 新增用户与角色管理
         List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
@@ -310,7 +310,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      *
      * @param role 角色对象
      */
-    public int insertRoleDept(SysRole role) {
+    public int insertRoleDept(SysRoleBo role) {
         int rows = 1;
         // 新增角色与部门（数据权限）管理
         List<SysRoleDept> list = new ArrayList<SysRoleDept>();

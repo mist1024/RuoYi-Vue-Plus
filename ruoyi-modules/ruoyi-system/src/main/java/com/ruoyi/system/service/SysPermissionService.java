@@ -1,12 +1,9 @@
 package com.ruoyi.system.service;
 
-import cn.hutool.core.collection.CollUtil;
-import com.ruoyi.system.domain.vo.SysRoleVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -52,17 +49,7 @@ public class SysPermissionService {
         if (isAdmin) {
             perms.add("*:*:*");
         } else {
-            List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
-            if (CollUtil.isNotEmpty(roles)) {
-                // 多角色设置permissions属性，以便数据权限匹配权限
-                for (SysRoleVo role : roles) {
-                    Set<String> rolePerms = menuService.selectMenuPermsByRoleId(role.getRoleId());
-                    role.setPermissions(rolePerms);
-                    perms.addAll(rolePerms);
-                }
-            } else {
-                perms.addAll(menuService.selectMenuPermsByUserId(userId));
-            }
+            perms.addAll(menuService.selectMenuPermsByUserId(userId));
         }
         return perms;
     }
