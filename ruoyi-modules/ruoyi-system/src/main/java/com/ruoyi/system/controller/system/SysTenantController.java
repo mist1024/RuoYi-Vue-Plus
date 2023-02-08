@@ -39,7 +39,7 @@ import java.util.List;
 @RequestMapping("/system/tenant")
 public class SysTenantController extends BaseController {
 
-    private final ISysTenantService iSysTenantService;
+    private final ISysTenantService sysTenantService;
     private final ISysUserService sysUserService;
 
     /**
@@ -48,7 +48,7 @@ public class SysTenantController extends BaseController {
     @SaCheckPermission("system:tenant:list")
     @GetMapping("/list")
     public TableDataInfo<SysTenantVo> list(SysTenantBo bo, PageQuery pageQuery) {
-        return iSysTenantService.queryPageList(bo, pageQuery);
+        return sysTenantService.queryPageList(bo, pageQuery);
     }
 
     /**
@@ -58,7 +58,7 @@ public class SysTenantController extends BaseController {
     @Log(title = "租户", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(SysTenantBo bo, HttpServletResponse response) {
-        List<SysTenantVo> list = iSysTenantService.queryList(bo);
+        List<SysTenantVo> list = sysTenantService.queryList(bo);
         ExcelUtil.exportExcel(list, "租户", SysTenantVo.class, response);
     }
 
@@ -71,7 +71,7 @@ public class SysTenantController extends BaseController {
     @GetMapping("/{id}")
     public R<SysTenantVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
-        return R.ok(iSysTenantService.queryById(id));
+        return R.ok(sysTenantService.queryById(id));
     }
 
     /**
@@ -89,7 +89,7 @@ public class SysTenantController extends BaseController {
         if (UserConstants.NOT_UNIQUE.equals(sysUserService.checkUserNameUnique(userBo))) {
             throw new ServiceException("新增用户'" + bo.getUsername() + "'失败，登录账号已存在");
         }
-        return toAjax(iSysTenantService.insertByBo(bo));
+        return toAjax(sysTenantService.insertByBo(bo));
     }
 
     /**
@@ -100,7 +100,7 @@ public class SysTenantController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysTenantBo bo) {
-        return toAjax(iSysTenantService.updateByBo(bo));
+        return toAjax(sysTenantService.updateByBo(bo));
     }
 
     /**
@@ -110,7 +110,7 @@ public class SysTenantController extends BaseController {
     @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysTenantBo bo) {
-        return toAjax(iSysTenantService.updateTenantStatus(bo));
+        return toAjax(sysTenantService.updateTenantStatus(bo));
     }
 
     /**
@@ -123,6 +123,6 @@ public class SysTenantController extends BaseController {
     @DeleteMapping("/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
-        return toAjax(iSysTenantService.deleteWithValidByIds(List.of(ids), true));
+        return toAjax(sysTenantService.deleteWithValidByIds(List.of(ids), true));
     }
 }

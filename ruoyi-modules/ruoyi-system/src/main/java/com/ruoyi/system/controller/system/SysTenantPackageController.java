@@ -1,26 +1,27 @@
 package com.ruoyi.system.controller.system;
 
-import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
-import com.ruoyi.common.log.annotation.Log;
-import com.ruoyi.common.web.core.BaseController;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.system.domain.vo.SysTenantPackageVo;
-import com.ruoyi.system.domain.bo.SysTenantPackageBo;
-import com.ruoyi.system.service.ISysTenantPackageService;
+import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.web.core.BaseController;
+import com.ruoyi.system.domain.bo.SysTenantPackageBo;
+import com.ruoyi.system.domain.vo.SysTenantPackageVo;
+import com.ruoyi.system.service.ISysTenantPackageService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 租户套餐管理
@@ -33,7 +34,7 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 @RequestMapping("/system/tenant/package")
 public class SysTenantPackageController extends BaseController {
 
-    private final ISysTenantPackageService iSysTenantPackageService;
+    private final ISysTenantPackageService sysTenantPackageService;
 
     /**
      * 查询租户套餐列表
@@ -41,7 +42,7 @@ public class SysTenantPackageController extends BaseController {
     @SaCheckPermission("system:tenantPackage:list")
     @GetMapping("/list")
     public TableDataInfo<SysTenantPackageVo> list(SysTenantPackageBo bo, PageQuery pageQuery) {
-        return iSysTenantPackageService.queryPageList(bo, pageQuery);
+        return sysTenantPackageService.queryPageList(bo, pageQuery);
     }
 
     /**
@@ -51,7 +52,7 @@ public class SysTenantPackageController extends BaseController {
     @Log(title = "租户套餐", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(SysTenantPackageBo bo, HttpServletResponse response) {
-        List<SysTenantPackageVo> list = iSysTenantPackageService.queryList(bo);
+        List<SysTenantPackageVo> list = sysTenantPackageService.queryList(bo);
         ExcelUtil.exportExcel(list, "租户套餐", SysTenantPackageVo.class, response);
     }
 
@@ -64,7 +65,7 @@ public class SysTenantPackageController extends BaseController {
     @GetMapping("/{packageId}")
     public R<SysTenantPackageVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long packageId) {
-        return R.ok(iSysTenantPackageService.queryById(packageId));
+        return R.ok(sysTenantPackageService.queryById(packageId));
     }
 
     /**
@@ -75,7 +76,7 @@ public class SysTenantPackageController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantPackageBo bo) {
-        return toAjax(iSysTenantPackageService.insertByBo(bo));
+        return toAjax(sysTenantPackageService.insertByBo(bo));
     }
 
     /**
@@ -86,7 +87,7 @@ public class SysTenantPackageController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysTenantPackageBo bo) {
-        return toAjax(iSysTenantPackageService.updateByBo(bo));
+        return toAjax(sysTenantPackageService.updateByBo(bo));
     }
 
     /**
@@ -96,7 +97,7 @@ public class SysTenantPackageController extends BaseController {
     @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysTenantPackageBo bo) {
-        return toAjax(iSysTenantPackageService.updatePackageStatus(bo));
+        return toAjax(sysTenantPackageService.updatePackageStatus(bo));
     }
 
     /**
@@ -109,6 +110,6 @@ public class SysTenantPackageController extends BaseController {
     @DeleteMapping("/{packageIds}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] packageIds) {
-        return toAjax(iSysTenantPackageService.deleteWithValidByIds(List.of(packageIds), true));
+        return toAjax(sysTenantPackageService.deleteWithValidByIds(List.of(packageIds), true));
     }
 }
