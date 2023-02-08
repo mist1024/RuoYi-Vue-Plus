@@ -2,12 +2,15 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.system.domain.SysTenant;
+import com.ruoyi.system.mapper.SysTenantMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.domain.bo.SysTenantPackageBo;
@@ -32,6 +35,7 @@ import java.util.Collection;
 public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
 
     private final SysTenantPackageMapper baseMapper;
+    private final SysTenantMapper tenantMapper;
 
     /**
      * 查询租户套餐
@@ -75,7 +79,6 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantPackageBo bo) {
         SysTenantPackage add = BeanUtil.toBean(bo, SysTenantPackage.class);
-        validEntityBeforeSave(add);
         // 保存菜单id
         List<Long> menuIds = Arrays.asList(bo.getMenuIds());
         if (CollUtil.isNotEmpty(menuIds)) {
@@ -97,7 +100,6 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysTenantPackageBo bo) {
         SysTenantPackage update = BeanUtil.toBean(bo, SysTenantPackage.class);
-        validEntityBeforeSave(update);
         // 保存菜单id
         List<Long> menuIds = Arrays.asList(bo.getMenuIds());
         if (CollUtil.isNotEmpty(menuIds)) {
@@ -121,20 +123,16 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     }
 
     /**
-     * 保存前的数据校验
-     */
-    private void validEntityBeforeSave(SysTenantPackage entity){
-        //TODO 做一些数据校验,如唯一约束
-    }
-
-    /**
      * 批量删除租户套餐
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
+            boolean exists = tenantMapper.exists(new LambdaQueryWrapper<SysTenant>().in(SysTenant::getPackageId, ids));
+            if (exists) {
+                throw new ServiceException("租户套餐已被使用");
+            }
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }

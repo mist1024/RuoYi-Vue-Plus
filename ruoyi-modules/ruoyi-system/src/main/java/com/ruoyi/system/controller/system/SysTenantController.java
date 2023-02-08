@@ -1,27 +1,32 @@
 package com.ruoyi.system.controller.system;
 
-import java.util.List;
-
-import com.baomidou.lock.annotation.Lock4j;
-import lombok.RequiredArgsConstructor;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
-import com.ruoyi.common.log.annotation.Log;
-import com.ruoyi.common.web.core.BaseController;
-import com.ruoyi.common.mybatis.core.page.PageQuery;
+import com.baomidou.lock.annotation.Lock4j;
+import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.system.domain.vo.SysTenantVo;
-import com.ruoyi.system.domain.bo.SysTenantBo;
-import com.ruoyi.system.service.ISysTenantService;
+import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.web.core.BaseController;
+import com.ruoyi.system.domain.bo.SysTenantBo;
+import com.ruoyi.system.domain.bo.SysUserBo;
+import com.ruoyi.system.domain.vo.SysTenantVo;
+import com.ruoyi.system.service.ISysTenantService;
+import com.ruoyi.system.service.ISysUserService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 租户管理
@@ -35,6 +40,7 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 public class SysTenantController extends BaseController {
 
     private final ISysTenantService iSysTenantService;
+    private final ISysUserService sysUserService;
 
     /**
      * 查询租户列表
@@ -77,6 +83,12 @@ public class SysTenantController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantBo bo) {
+        SysUserBo userBo = new SysUserBo();
+        userBo.setUserName(bo.getUsername());
+        // 判断用户名是否重复
+        if (UserConstants.NOT_UNIQUE.equals(sysUserService.checkUserNameUnique(userBo))) {
+            throw new ServiceException("新增用户'" + bo.getUsername() + "'失败，登录账号已存在");
+        }
         return toAjax(iSysTenantService.insertByBo(bo));
     }
 

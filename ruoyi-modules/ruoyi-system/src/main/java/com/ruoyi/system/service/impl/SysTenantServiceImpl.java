@@ -5,30 +5,27 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.system.domain.*;
-import com.ruoyi.system.domain.bo.SysUserBo;
-import com.ruoyi.system.mapper.*;
-import com.ruoyi.system.service.ISysUserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.vo.SysTenantVo;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysTenantService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 租户Service业务层处理
@@ -39,7 +36,6 @@ import java.util.Collection;
 @Service
 public class SysTenantServiceImpl implements ISysTenantService {
 
-    private final ISysUserService iSysUserService;
     private final SysTenantMapper baseMapper;
     private final SysTenantPackageMapper sysTenantPackageMapper;
     private final SysUserMapper sysUserMapper;
@@ -77,7 +73,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
     }
 
     private LambdaQueryWrapper<SysTenant> buildQueryWrapper(SysTenantBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SysTenant> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId());
         lqw.like(StringUtils.isNotBlank(bo.getContactUserName()), SysTenant::getContactUserName, bo.getContactUserName());
@@ -100,13 +95,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantBo bo) {
         SysTenant add = BeanUtil.toBean(bo, SysTenant.class);
-
-        SysUserBo userBo = new SysUserBo();
-        userBo.setUserName(bo.getUsername());
-        // 判断用户名是否重复
-        if (UserConstants.NOT_UNIQUE.equals(iSysUserService.checkUserNameUnique(userBo))) {
-            throw new ServiceException("新增用户'" + bo.getUsername() + "'失败，登录账号已存在");
-        }
 
         // 获取所有租户编号
         List<String> tenantIds = baseMapper.selectObjs(
@@ -214,11 +202,11 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * 修改租户
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysTenantBo bo) {
-        SysTenant update = BeanUtil.toBean(bo, SysTenant.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        SysTenant tenant = BeanUtil.toBean(bo, SysTenant.class);
+        tenant.setTenantId(null);
+        tenant.setPackageId(null);
+        return baseMapper.updateById(tenant) > 0;
     }
 
     /**
@@ -234,20 +222,13 @@ public class SysTenantServiceImpl implements ISysTenantService {
     }
 
     /**
-     * 保存前的数据校验
-     */
-    private void validEntityBeforeSave(SysTenant entity){
-        //TODO 做一些数据校验,如唯一约束
-    }
-
-    /**
      * 批量删除租户
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
+            // 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }
