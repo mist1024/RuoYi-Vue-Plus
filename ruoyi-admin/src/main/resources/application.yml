@@ -136,6 +136,21 @@ security:
     - /actuator
     - /actuator/**
 
+# 多租户配置
+tenant:
+  # 是否开启
+  enable: true
+  # 排除表
+  excludes:
+    - sys_menu
+    - sys_config
+    - sys_dict_type
+    - sys_dict_data
+    - sys_role_dept
+    - sys_role_menu
+    - sys_user_post
+    - sys_user_role
+
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:

@@ -15,6 +15,6 @@ public class TenantEntity extends BaseEntity {
     /**
      * 租户编号
      */
-    private String tenantId = "000000";
+    private String tenantId;
 
 }

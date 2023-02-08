@@ -7,10 +7,14 @@ import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.ruoyi.common.mybatis.handler.InjectionMetaObjectHandler;
+import com.ruoyi.common.mybatis.handler.PlusTenantLineHandler;
 import com.ruoyi.common.mybatis.interceptor.PlusDataPermissionInterceptor;
+import com.ruoyi.common.mybatis.properties.TenantProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -19,14 +23,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *
  * @author Lion Li
  */
+@EnableConfigurationProperties(TenantProperties.class)
 @EnableTransactionManagement(proxyTargetClass = true)
 @AutoConfiguration
 @MapperScan("${mybatis-plus.mapperPackage}")
 public class MybatisPlusConfig {
 
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(TenantProperties tenantProperties) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        if (tenantProperties.getEnable()) {
+            // 多租户插件
+            interceptor.addInnerInterceptor(tenantLineInnerInterceptor(tenantProperties));
+        }
         // 数据权限处理
         interceptor.addInnerInterceptor(dataPermissionInterceptor());
         // 分页插件
@@ -34,6 +43,13 @@ public class MybatisPlusConfig {
         // 乐观锁插件
         interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
         return interceptor;
+    }
+
+    /**
+     * 多租户插件
+     */
+    public TenantLineInnerInterceptor tenantLineInnerInterceptor(TenantProperties tenantProperties) {
+        return new TenantLineInnerInterceptor(new PlusTenantLineHandler(tenantProperties));
     }
 
     /**

@@ -25,7 +25,7 @@ public class SysOperLogBo {
     /**
      * 租户编号
      */
-    private String tenantId = "000000";
+    private String tenantId;
 
     /**
      * 模块标题

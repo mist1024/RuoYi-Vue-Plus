@@ -41,16 +41,18 @@ public class SysLoginController {
     /**
      * 登录方法
      *
-     * @param loginBody 登录信息
+     * @param body 登录信息
      * @return 结果
      */
     @SaIgnore
     @PostMapping("/login")
-    public R<LoginVo> login(@Validated @RequestBody LoginBody loginBody) {
+    public R<LoginVo> login(@Validated @RequestBody LoginBody body) {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
-        String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
-            loginBody.getUuid());
+        String token = loginService.login(
+                body.getTenantId(),
+                body.getUsername(), body.getPassword(),
+                body.getCode(), body.getUuid());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -58,15 +60,15 @@ public class SysLoginController {
     /**
      * 短信登录(示例)
      *
-     * @param smsLoginBody 登录信息
+     * @param body 登录信息
      * @return 结果
      */
     @SaIgnore
     @PostMapping("/smsLogin")
-    public R<LoginVo> smsLogin(@Validated @RequestBody SmsLoginBody smsLoginBody) {
+    public R<LoginVo> smsLogin(@Validated @RequestBody SmsLoginBody body) {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
-        String token = loginService.smsLogin(smsLoginBody.getPhonenumber(), smsLoginBody.getSmsCode());
+        String token = loginService.smsLogin(body.getTenantId(), body.getPhonenumber(), body.getSmsCode());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }

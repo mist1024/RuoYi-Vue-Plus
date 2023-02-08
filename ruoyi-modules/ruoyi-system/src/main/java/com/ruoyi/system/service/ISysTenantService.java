@@ -21,6 +21,11 @@ public interface ISysTenantService {
     SysTenantVo queryById(Long id);
 
     /**
+     * 基于租户ID查询租户
+     */
+    SysTenantVo queryByTenantId(String tenantId);
+
+    /**
      * 查询租户列表
      */
     TableDataInfo<SysTenantVo> queryPageList(SysTenantBo bo, PageQuery pageQuery);

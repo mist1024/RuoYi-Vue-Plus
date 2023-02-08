@@ -2,6 +2,16 @@
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
+      <el-form-item prop="tenantId">
+        <el-input
+            v-model="loginForm.tenantId"
+            type="text"
+            auto-complete="off"
+            placeholder="租户编号"
+        >
+          <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
+        </el-input>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -72,6 +82,7 @@ export default {
     return {
       codeUrl: "",
       loginForm: {
+        tenantId: "000000",
         username: "admin",
         password: "admin123",
         rememberMe: false,
@@ -79,6 +90,9 @@ export default {
         uuid: ""
       },
       loginRules: {
+        tenantId: [
+          { required: true, trigger: "blur", message: "请输入您的租户编号" }
+        ],
         username: [
           { required: true, trigger: "blur", message: "请输入您的账号" }
         ],
@@ -118,10 +132,12 @@ export default {
       });
     },
     getCookie() {
+      const tenantId = Cookies.get("tenantId");
       const username = Cookies.get("username");
       const password = Cookies.get("password");
       const rememberMe = Cookies.get('rememberMe')
       this.loginForm = {
+        tenantId: tenantId === undefined ? this.loginForm.tenantId : tenantId,
         username: username === undefined ? this.loginForm.username : username,
         password: password === undefined ? this.loginForm.password : decrypt(password),
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
@@ -132,10 +148,12 @@ export default {
         if (valid) {
           this.loading = true;
           if (this.loginForm.rememberMe) {
+            Cookies.set("tenantId", this.loginForm.tenantId, { expires: 30 });
             Cookies.set("username", this.loginForm.username, { expires: 30 });
             Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
             Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
           } else {
+            Cookies.remove("tenantId");
             Cookies.remove("username");
             Cookies.remove("password");
             Cookies.remove('rememberMe');

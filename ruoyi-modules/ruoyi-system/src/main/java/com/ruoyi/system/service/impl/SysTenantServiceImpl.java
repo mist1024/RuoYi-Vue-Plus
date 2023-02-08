@@ -53,6 +53,11 @@ public class SysTenantServiceImpl implements ISysTenantService {
         return baseMapper.selectVoById(id);
     }
 
+    @Override
+    public SysTenantVo queryByTenantId(String tenantId) {
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysTenant>().eq(SysTenant::getTenantId, tenantId));
+    }
+
     /**
      * 查询租户列表
      */
