@@ -257,6 +257,7 @@ export default {
         packageName: undefined,
         menuIds: undefined,
         remark: undefined,
+        menuCheckStrictly: true,
         status: undefined,
         delFlag: undefined,
         createDept: undefined,
