@@ -21,6 +21,7 @@
             :label="item.companyName"
             :value="item.tenantId">
           </el-option>
+          <svg-icon slot="prefix" icon-class="company" class="el-input__icon input-icon" />
         </el-select>
 
         <search id="header-search" class="right-menu-item" />
@@ -123,13 +124,15 @@ export default {
     dynamicTenantEvent(tenantId) {
       if (this.companyName != null && this.companyName !== '') {
         dynamicTenant(tenantId).then(res => {
-          this.$router.push("/index");
+          this.$tab.closeAllPage()
+          this.$router.push('/')
         });
       }
     },
     dynamicClearEvent() {
       dynamicClear().then(res => {
-        this.$router.push("/index");
+        this.$tab.closeAllPage()
+        this.$router.push('/')
       });
     },
     // 租户列表
