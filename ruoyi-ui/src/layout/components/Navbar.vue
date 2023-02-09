@@ -74,6 +74,7 @@ import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
 import { tenantList } from "@/api/login";
 import { dynamicClear, dynamicTenant } from "@/api/system/tenant";
+import { listUser } from "@/api/system/user";
 
 export default {
   data() {
@@ -81,7 +82,8 @@ export default {
       userId: this.$store.getters.userId,
       tenantId: undefined,
       companyName: undefined,
-      tenantList: []
+      tenantList: [],
+      userList: []
     }
   },
   components: {
@@ -120,13 +122,21 @@ export default {
   methods: {
     // 动态切换
     dynamicTenantEvent(tenantId) {
-      dynamicTenant(tenantId).then(res => {
-        this.$router.push("/index");
-      });
+      if (this.companyName != null && this.companyName !== '') {
+        dynamicTenant(tenantId).then(res => {
+          this.$router.push("/index");
+        });
+        listUser().then(res => {
+          this.userList = res.rows;
+        })
+      }
     },
-    dynamicClearEvent(tenantId) {
-      dynamicClear(tenantId).then(res => {
+    dynamicClearEvent() {
+      dynamicClear().then(res => {
         this.$router.push("/index");
+        listUser().then(res => {
+          this.userList = res.rows;
+        })
       });
     },
     // 租户列表
