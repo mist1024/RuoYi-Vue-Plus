@@ -312,7 +312,7 @@ public class SysLoginService {
     }
 
     private void checkTenant(String tenantId) {
-        if (TenantHelper.isEnable()) {
+        if (!TenantHelper.isEnable()) {
             return;
         }
         SysTenantVo tenant = tenantService.queryByTenantId(tenantId);
