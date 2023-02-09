@@ -8,6 +8,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
@@ -20,6 +21,8 @@ import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysTenantService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,10 @@ public class SysTenantServiceImpl implements ISysTenantService {
         return baseMapper.selectVoById(id);
     }
 
+    /**
+     * 基于租户ID查询租户
+     */
+    @Cacheable(cacheNames = CacheNames.SYS_TENANT, key = "#tenantId")
     @Override
     public SysTenantVo queryByTenantId(String tenantId) {
         return baseMapper.selectVoOne(new LambdaQueryWrapper<SysTenant>().eq(SysTenant::getTenantId, tenantId));
@@ -206,6 +213,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     /**
      * 修改租户
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_TENANT, key = "#bo.tenantId")
     @Override
     public Boolean updateByBo(SysTenantBo bo) {
         SysTenant tenant = BeanUtil.toBean(bo, SysTenant.class);
@@ -220,6 +228,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * @param bo 租户信息
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_TENANT, key = "#bo.tenantId")
     @Override
     public int updateTenantStatus(SysTenantBo bo) {
         SysTenant tenant = BeanUtil.toBean(bo, SysTenant.class);
@@ -229,8 +238,8 @@ public class SysTenantServiceImpl implements ISysTenantService {
     /**
      * 批量删除租户
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_TENANT, allEntries = true)
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if(isValid){
             // 做一些业务上的校验,判断是否需要校验
