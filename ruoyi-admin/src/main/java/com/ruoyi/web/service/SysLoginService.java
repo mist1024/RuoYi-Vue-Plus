@@ -24,11 +24,11 @@ import com.ruoyi.common.log.event.LogininforEvent;
 import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.common.web.config.properties.CaptchaProperties;
 import com.ruoyi.system.domain.SysUser;
 import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.mapper.SysUserMapper;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysPermissionService;
 import com.ruoyi.system.service.ISysTenantService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,7 +53,7 @@ import java.util.function.Supplier;
 public class SysLoginService {
 
     private final SysUserMapper userMapper;
-    private final ISysConfigService configService;
+    private final CaptchaProperties captchaProperties;
     private final ISysPermissionService permissionService;
     private final ISysTenantService tenantService;
 
@@ -74,7 +74,7 @@ public class SysLoginService {
      */
     public String login(String tenantId, String username, String password, String code, String uuid) {
         HttpServletRequest request = ServletUtils.getRequest();
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
+        boolean captchaEnabled = captchaProperties.getEnable();
         // 验证码开关
         if (captchaEnabled) {
             validateCaptcha(tenantId, username, code, uuid, request);

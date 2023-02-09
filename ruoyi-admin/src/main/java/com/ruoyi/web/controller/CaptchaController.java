@@ -17,8 +17,8 @@ import com.ruoyi.common.sms.core.SmsTemplate;
 import com.ruoyi.common.sms.entity.SmsResult;
 import com.ruoyi.common.web.config.properties.CaptchaProperties;
 import com.ruoyi.common.web.enums.CaptchaType;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.web.domain.vo.CaptchaVo;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
@@ -28,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +46,6 @@ public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
     private final SmsProperties smsProperties;
-    private final ISysConfigService configService;
 
     /**
      * 短信验证码
@@ -82,7 +80,7 @@ public class CaptchaController {
     @GetMapping("/captchaImage")
     public R<CaptchaVo> getCode() {
         CaptchaVo captchaVo = new CaptchaVo();
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
+        boolean captchaEnabled = captchaProperties.getEnable();
         if (!captchaEnabled) {
             captchaVo.setCaptchaEnabled(false);
             return R.ok(captchaVo);

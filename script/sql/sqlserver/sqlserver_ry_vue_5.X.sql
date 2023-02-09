@@ -680,8 +680,6 @@ INSERT sys_config VALUES (2, N'用户管理-账号初始密码', N'sys.user.init
 GO
 INSERT sys_config VALUES (3, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
 GO
-INSERT sys_config VALUES (4, N'账号自助-验证码开关', N'sys.account.captchaEnabled', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启验证码功能（true开启，false关闭）')
-GO
 INSERT sys_config VALUES (5, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
 INSERT sys_config VALUES (11, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
