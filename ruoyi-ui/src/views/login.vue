@@ -10,7 +10,7 @@
             :label="item.companyName"
             :value="item.tenantId">
           </el-option>
-          <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
+          <svg-icon slot="prefix" icon-class="company" class="el-input__icon input-icon" />
         </el-select>
       </el-form-item>
       <el-form-item prop="username">
