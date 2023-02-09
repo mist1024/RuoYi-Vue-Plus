@@ -42,7 +42,7 @@ public class SysDeptBo extends BaseEntity {
      * 显示顺序
      */
     @NotNull(message = "显示顺序不能为空")
-    private Long orderNum;
+    private Integer orderNum;
 
     /**
      * 负责人
