@@ -56,6 +56,11 @@ public interface ISysTenantService {
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
     /**
+     * 校验公司名称是否唯一
+     */
+    String checkCompanyNameUnique(SysTenantBo bo);
+
+    /**
      * 校验账号余额
      */
     String checkAccountBalance(String tenantId);

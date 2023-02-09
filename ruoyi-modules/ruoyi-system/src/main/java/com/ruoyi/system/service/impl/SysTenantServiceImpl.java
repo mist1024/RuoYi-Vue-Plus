@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.TenantConstants;
+import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -58,7 +59,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * 查询租户
      */
     @Override
-    public SysTenantVo queryById(Long id){
+    public SysTenantVo queryById(Long id) {
         return baseMapper.selectVoById(id);
     }
 
@@ -163,9 +164,9 @@ public class SysTenantServiceImpl implements ISysTenantService {
 
         String defaultTenantId = TenantConstants.DEFAULT_TENANT_ID;
         List<SysDictType> dictTypeList = sysDictTypeMapper.selectList(
-                new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getTenantId, defaultTenantId));
+            new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getTenantId, defaultTenantId));
         List<SysDictData> dictDataList = sysDictDataMapper.selectList(
-                new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getTenantId, defaultTenantId));
+            new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getTenantId, defaultTenantId));
         for (SysDictType dictType : dictTypeList) {
             dictType.setDictId(null);
             dictType.setTenantId(tenantId);
@@ -178,7 +179,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         sysDictDataMapper.insertBatch(dictDataList);
 
         List<SysConfig> sysConfigList = sysConfigMapper.selectList(
-                new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getTenantId, defaultTenantId));
+            new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getTenantId, defaultTenantId));
         for (SysConfig config : sysConfigList) {
             config.setConfigId(null);
             config.setTenantId(tenantId);
@@ -275,10 +276,24 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @CacheEvict(cacheNames = CacheNames.SYS_TENANT, allEntries = true)
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
+    }
+
+    /**
+     * 校验公司名称是否唯一
+     */
+    @Override
+    public String checkCompanyNameUnique(SysTenantBo bo) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysTenant>()
+            .eq(SysTenant::getCompanyName, bo.getCompanyName())
+            .ne(ObjectUtil.isNotNull(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId()));
+        if (exist) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 
     /**

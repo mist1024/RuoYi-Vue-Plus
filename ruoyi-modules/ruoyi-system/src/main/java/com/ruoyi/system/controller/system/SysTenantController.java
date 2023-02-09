@@ -91,6 +91,9 @@ public class SysTenantController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysTenantBo bo) {
+        if (UserConstants.NOT_UNIQUE.equals(sysTenantService.checkCompanyNameUnique(bo))) {
+            throw new ServiceException("新增租户'" + bo.getCompanyName() + "'失败，公司名称已存在");
+        }
         SysUserBo userBo = new SysUserBo();
         userBo.setUserName(bo.getUsername());
         // 判断用户名是否重复
@@ -109,6 +112,9 @@ public class SysTenantController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysTenantBo bo) {
+        if (UserConstants.NOT_UNIQUE.equals(sysTenantService.checkCompanyNameUnique(bo))) {
+            throw new ServiceException("修改租户'" + bo.getCompanyName() + "'失败，公司名称已存在");
+        }
         return toAjax(sysTenantService.updateByBo(bo));
     }
 
