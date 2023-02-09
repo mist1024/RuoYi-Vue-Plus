@@ -12,6 +12,7 @@ create table if not exists sys_tenant
     license_number    varchar(30)   default null::varchar,
     address           varchar(200)  default null::varchar,
     intro             varchar(200)  default null::varchar,
+    domain            varchar(200)  default null::varchar,
     remark            varchar(200)  default null::varchar,
     package_id        int8,
     expire_time       timestamp,
@@ -35,6 +36,7 @@ comment on column  sys_tenant.company_name       is '联系人';
 comment on column  sys_tenant.license_number     is '统一社会信用代码';
 comment on column  sys_tenant.address            is '地址';
 comment on column  sys_tenant.intro              is '企业简介';
+comment on column  sys_tenant.domain             is '域名';
 comment on column  sys_tenant.remark             is '备注';
 comment on column  sys_tenant.package_id         is '租户套餐编号';
 comment on column  sys_tenant.expire_time        is '过期时间';
@@ -52,7 +54,7 @@ comment on column  sys_tenant.update_time        is '更新时间';
 -- 初始化-租户表数据
 -- ----------------------------
 
-insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', null, null, '多租户通用后台管理管理系统', null, null, null, -1, '0', '0', 103, 1, now(), null, null);
+insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', null, null, '多租户通用后台管理管理系统', null, null, null, null, -1, '0', '0', 103, 1, now(), null, null);
 
 
 -- ----------------------------

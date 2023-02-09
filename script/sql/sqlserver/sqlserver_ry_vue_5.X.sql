@@ -8,6 +8,7 @@ CREATE TABLE sys_tenant
     license_number        nvarchar(30)                    NULL,
     address               nvarchar(200)                   NULL,
     intro                 nvarchar(200)                   NULL,
+    domain                nvarchar(200)                   NULL,
     remark                nvarchar(200)                   NULL,
     package_id            bigint                          NULL,
     expire_time           datetime2(7)                    NULL,
@@ -73,6 +74,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_tenant',
     'COLUMN', N'intro'
+GO
+EXEC sys.sp_addextendedproperty
+    'MS_Description', N'域名' ,
+    'SCHEMA', N'dbo',
+    'TABLE', N'sys_tenant',
+    'COLUMN', N'domain'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'备注' ,
@@ -146,7 +153,7 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_tenant'
 GO
 
-INSERT sys_tenant VALUES (1, N'000000', N'管理组', N'15888888888', N'XXX有限公司', NULL, NULL, N'多租户通用后台管理管理系统', NULL, NULL, NULL, -1, N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_tenant VALUES (1, N'000000', N'管理组', N'15888888888', N'XXX有限公司', NULL, NULL, N'多租户通用后台管理管理系统', NULL, NULL, NULL, NULL, -1, N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 
 

@@ -10,6 +10,7 @@ create table sys_tenant (
     license_number    varchar2(30)  default '',
     address           varchar2(200) default '',
     intro             varchar2(200) default '',
+    domain            varchar2(200) default '',
     remark            varchar2(200) default '',
     package_id        number(20)    default null,
     expire_time       date          default null,
@@ -49,7 +50,7 @@ comment on column  sys_tenant.update_time        is '更新时间';
 -- 初始化-租户表数据
 -- ----------------------------
 
-insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', null, null, '多租户通用后台管理管理系统', null, null, null, -1, '0', '0', 103, 1, sysdate, null, null);
+insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', null, null, '多租户通用后台管理管理系统', null, null, null, null, -1, '0', '0', 103, 1, sysdate, null, null);
 
 
 -- ----------------------------

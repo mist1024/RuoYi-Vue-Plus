@@ -12,6 +12,7 @@ create table sys_tenant
     license_number    varchar(30)                   comment '统一社会信用代码',
     address           varchar(200)                  comment '地址',
     intro             varchar(200)                  comment '企业简介',
+    domain            varchar(200)                  comment '域名',
     remark            varchar(200)                  comment '备注',
     package_id        bigint(20)                    comment '租户套餐编号',
     expire_time       datetime                      comment '过期时间',
@@ -31,7 +32,7 @@ create table sys_tenant
 -- 初始化-租户表数据
 -- ----------------------------
 
-insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', NULL, NULL, '多租户通用后台管理管理系统', NULL, NULL, NULL, -1, '0', '0', 103, 1, sysdate(), NULL, NULL);
+insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', NULL, NULL, '多租户通用后台管理管理系统', NULL, NULL, NULL, NULL, -1, '0', '0', 103, 1, sysdate(), NULL, NULL);
 
 
 -- ----------------------------

@@ -72,6 +72,11 @@ public class SysTenantBo extends BaseEntity {
     private String address;
 
     /**
+     * 域名
+     */
+    private String domain;
+
+    /**
      * 企业简介
      */
     private String intro;
