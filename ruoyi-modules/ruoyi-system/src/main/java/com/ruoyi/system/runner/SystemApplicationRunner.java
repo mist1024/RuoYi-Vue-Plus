@@ -1,8 +1,7 @@
 package com.ruoyi.system.runner;
 
-import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
-import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.ruoyi.common.core.config.RuoYiConfig;
+import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysOssConfigService;
@@ -29,18 +28,18 @@ public class SystemApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+        TenantHelper.enableIgnore();
         ossConfigService.init();
         log.info("初始化OSS配置成功");
         if (ruoyiConfig.isCacheLazy()) {
-            InterceptorIgnoreHelper.clearIgnoreStrategy();
+            TenantHelper.disableIgnore();
             return;
         }
         configService.loadingConfigCache();
         log.info("加载参数缓存数据成功");
         dictTypeService.loadingDictCache();
         log.info("加载字典缓存数据成功");
-        InterceptorIgnoreHelper.clearIgnoreStrategy();
+        TenantHelper.disableIgnore();
     }
 
 }

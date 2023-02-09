@@ -21,6 +21,7 @@ import com.ruoyi.common.core.exception.user.CaptchaExpireException;
 import com.ruoyi.common.core.exception.user.UserException;
 import com.ruoyi.common.core.utils.*;
 import com.ruoyi.common.log.event.LogininforEvent;
+import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.common.redis.utils.RedisUtils;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysUser;
@@ -61,9 +62,6 @@ public class SysLoginService {
 
     @Value("${user.password.lockTime}")
     private Integer lockTime;
-
-    @Value("${tenant.enable}")
-    private Boolean tenantEnable;
 
     /**
      * 登录验证
@@ -205,7 +203,7 @@ public class SysLoginService {
     private SysUserVo loadUserByUsername(String tenantId, String username) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getUserName, SysUser::getStatus)
-                .eq(tenantEnable, SysUser::getTenantId, tenantId)
+                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
                 .eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
@@ -220,7 +218,7 @@ public class SysLoginService {
     private SysUserVo loadUserByPhonenumber(String tenantId, String phonenumber) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .select(SysUser::getPhonenumber, SysUser::getStatus)
-                .eq(tenantEnable, SysUser::getTenantId, tenantId)
+                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
                 .eq(SysUser::getPhonenumber, phonenumber));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", phonenumber);
@@ -314,7 +312,7 @@ public class SysLoginService {
     }
 
     private void checkTenant(String tenantId) {
-        if (tenantEnable) {
+        if (TenantHelper.isEnable()) {
             return;
         }
         SysTenantVo tenant = tenantService.queryByTenantId(tenantId);
@@ -324,7 +322,8 @@ public class SysLoginService {
         } else if (TenantStatus.DISABLE.getCode().equals(tenant.getStatus())) {
             log.info("登录租户：{} 已被停用.", tenantId);
             throw new TenantException("tenant.blocked");
-        } else if (tenant.getExpireTime() != null && new Date().after(tenant.getExpireTime())) {
+        } else if (ObjectUtil.isNotNull(tenant.getExpireTime())
+                && new Date().after(tenant.getExpireTime())) {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");
         }
