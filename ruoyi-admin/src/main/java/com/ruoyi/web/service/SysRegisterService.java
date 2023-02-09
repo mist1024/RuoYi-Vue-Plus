@@ -51,7 +51,6 @@ public class SysRegisterService {
             validateCaptcha(tenantId, username, registerBody.getCode(), registerBody.getUuid(), request);
         }
         SysUserBo sysUser = new SysUserBo();
-        sysUser.setTenantId(tenantId);
         sysUser.setUserName(username);
         sysUser.setNickName(username);
         sysUser.setPassword(BCrypt.hashpw(password));
@@ -60,7 +59,7 @@ public class SysRegisterService {
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(sysUser))) {
             throw new UserException("user.register.save.error", username);
         }
-        boolean regFlag = userService.registerUser(sysUser);
+        boolean regFlag = userService.registerUser(sysUser, tenantId);
         if (!regFlag) {
             throw new UserException("user.register.error");
         }

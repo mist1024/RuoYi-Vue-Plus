@@ -298,10 +298,11 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 结果
      */
     @Override
-    public boolean registerUser(SysUserBo user) {
+    public boolean registerUser(SysUserBo user, String tenantId) {
         user.setCreateBy(user.getUserId());
         user.setUpdateBy(user.getUserId());
         SysUser sysUser = BeanUtil.copyProperties(user, SysUser.class);
+        sysUser.setTenantId(tenantId);
         return baseMapper.insert(sysUser) > 0;
     }
 

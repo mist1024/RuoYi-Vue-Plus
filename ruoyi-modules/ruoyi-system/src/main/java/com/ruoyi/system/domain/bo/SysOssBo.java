@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain.bo;
 
+import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import com.ruoyi.common.mybatis.core.domain.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +12,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysOssBo extends TenantEntity {
+public class SysOssBo extends BaseEntity {
 
     /**
      * ossId
