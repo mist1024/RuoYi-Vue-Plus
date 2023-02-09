@@ -54,4 +54,14 @@ public interface ISysTenantService {
      * 校验并批量删除租户信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 校验账号余额
+     */
+    String checkAccountBalance(String tenantId);
+
+    /**
+     * 校验有效期
+     */
+    String checkExpireTime(String tenantId);
 }

@@ -10,8 +10,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.Constants;
-import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -190,10 +192,10 @@ public class SysTenantServiceImpl implements ISysTenantService {
         // 创建角色
         SysRole role = new SysRole();
         role.setTenantId(tenantId);
-        role.setRoleName(UserConstants.ADMIN_ROLE_NAME);
-        role.setRoleKey(UserConstants.ADMIN_ROLE_KEY);
-        role.setRoleSort(UserConstants.ADMIN_ROLE_SORT);
-        role.setStatus(UserConstants.NORMAL);
+        role.setRoleName(TenantConstants.ADMIN_ROLE_NAME);
+        role.setRoleKey(TenantConstants.ADMIN_ROLE_KEY);
+        role.setRoleSort(1);
+        role.setStatus(TenantConstants.NORMAL);
         sysRoleMapper.insert(role);
         Long roleId = role.getRoleId();
 
@@ -246,4 +248,40 @@ public class SysTenantServiceImpl implements ISysTenantService {
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }
+
+    /**
+     * 校验账号余额
+     */
+    @Override
+    public String checkAccountBalance(String tenantId) {
+        SysTenantVo tenant = SpringUtils.getAopProxy(this).queryByTenantId(tenantId);
+        // 如果余额为-1代表不限制
+        if (tenant.getAccountCount() == -1) {
+            return TenantConstants.PASS;
+        }
+        Long userNumber = sysUserMapper.selectCount(new LambdaQueryWrapper<>());
+        // 如果余额大于0代表还有可用名额
+        if (tenant.getAccountCount() - userNumber > 0) {
+            return TenantConstants.PASS;
+        }
+        return TenantConstants.NOT_PASS;
+    }
+
+    /**
+     * 校验有效期
+     */
+    @Override
+    public String checkExpireTime(String tenantId) {
+        SysTenantVo tenant = SpringUtils.getAopProxy(this).queryByTenantId(tenantId);
+        // 如果未设置过期时间代表不限制
+        if (ObjectUtil.isNull(tenant.getExpireTime())) {
+            return TenantConstants.PASS;
+        }
+        // 如果当前时间在过期时间之前则通过
+        if (new Date().before(tenant.getExpireTime())) {
+            return TenantConstants.PASS;
+        }
+        return TenantConstants.NOT_PASS;
+    }
+
 }

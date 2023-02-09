@@ -6,6 +6,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StreamUtils;
@@ -16,16 +17,14 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.SysDept;
 import com.ruoyi.system.domain.bo.SysUserBo;
 import com.ruoyi.system.domain.vo.*;
 import com.ruoyi.system.listener.SysUserImportListener;
-import com.ruoyi.system.service.ISysDeptService;
-import com.ruoyi.system.service.ISysPostService;
-import com.ruoyi.system.service.ISysRoleService;
-import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -51,6 +50,7 @@ public class SysUserController extends BaseController {
     private final ISysRoleService roleService;
     private final ISysPostService postService;
     private final ISysDeptService deptService;
+    private final ISysTenantService tenantService;
 
     /**
      * 获取用户列表
@@ -140,6 +140,12 @@ public class SysUserController extends BaseController {
         } else if (StringUtils.isNotEmpty(user.getEmail())
                    && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        if (TenantHelper.isEnable()) {
+            String status = tenantService.checkAccountBalance(LoginHelper.getTenantId());
+            if (TenantConstants.NOT_PASS.equals(status)) {
+                return R.fail("当前租户下用户名额不足，请联系管理员");
+            }
         }
         user.setPassword(BCrypt.hashpw(user.getPassword()));
         return toAjax(userService.insertUser(user));

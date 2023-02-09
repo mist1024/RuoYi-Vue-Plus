@@ -130,24 +130,4 @@ public interface UserConstants {
     int PASSWORD_MIN_LENGTH = 5;
     int PASSWORD_MAX_LENGTH = 20;
 
-    /**
-     * 超级管理员ID
-     */
-    Long SUPER_ADMIN_ID = 1L;
-
-    /**
-     * 管理员角色 roleKey
-     */
-    String ADMIN_ROLE_KEY = "admin";
-
-    /**
-     * 管理员角色名称
-     */
-    String ADMIN_ROLE_NAME = "管理员";
-
-    /**
-     * 管理员角色排序
-     */
-    Integer ADMIN_ROLE_SORT = 5;
-
 }
