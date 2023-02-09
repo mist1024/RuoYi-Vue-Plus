@@ -16,6 +16,7 @@ import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.vo.SysTenantVo;
@@ -49,6 +50,8 @@ public class SysTenantServiceImpl implements ISysTenantService {
     private final SysRoleMenuMapper sysRoleMenuMapper;
     private final SysRoleDeptMapper sysRoleDeptMapper;
     private final SysUserRoleMapper sysUserRoleMapper;
+    private final SysDictTypeMapper sysDictTypeMapper;
+    private final SysDictDataMapper sysDictDataMapper;
 
     /**
      * 查询租户
@@ -108,6 +111,8 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantBo bo) {
+        TenantHelper.enableIgnore();
+
         SysTenant add = BeanUtil.toBean(bo, SysTenant.class);
 
         // 获取所有租户编号
@@ -128,6 +133,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         SysDept dept = new SysDept();
         dept.setTenantId(tenantId);
         dept.setDeptName(bo.getCompanyName());
+        dept.setLeader(bo.getUsername());
         dept.setParentId(Constants.TOP_PARENT_ID);
         dept.setAncestors(Constants.TOP_PARENT_ID.toString());
         sysDeptMapper.insert(dept);
@@ -154,6 +160,20 @@ public class SysTenantServiceImpl implements ISysTenantService {
         userRole.setRoleId(roleId);
         sysUserRoleMapper.insert(userRole);
 
+        List<SysDictType> dictTypeList = sysDictTypeMapper.selectList();
+        List<SysDictData> dictDataList = sysDictDataMapper.selectList();
+        for (SysDictType dictType : dictTypeList) {
+            dictType.setDictId(null);
+            dictType.setTenantId(tenantId);
+        }
+        for (SysDictData dictData : dictDataList) {
+            dictData.setDictCode(null);
+            dictData.setTenantId(tenantId);
+        }
+        sysDictTypeMapper.insertBatch(dictTypeList);
+        sysDictDataMapper.insertBatch(dictDataList);
+
+        TenantHelper.disableIgnore();
         return true;
     }
 
