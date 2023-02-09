@@ -5,8 +5,24 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/>
     <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
 
-    <div class="right-menu">
-      <template v-if="device!=='mobile'">
+    <div class="right-menu flex align-center">
+      <template v-if="device!=='mobile' ">
+        <el-select v-model="companyName"
+                   clearable
+                   filterable
+                   reserve-keyword
+                   placeholder="请选择租户"
+                   v-if="userId === 1"
+                   @change="dynamicTenantEvent"
+                   @clear="dynamicClearEvent">
+          <el-option
+            v-for="item in tenantList"
+            :key="item.tenantId"
+            :label="item.companyName"
+            :value="item.tenantId">
+          </el-option>
+        </el-select>
+
         <search id="header-search" class="right-menu-item" />
 
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
@@ -56,8 +72,18 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import { tenantList } from "@/api/login";
+import { dynamicClear, dynamicTenant } from "@/api/system/tenant";
 
 export default {
+  data() {
+    return {
+      userId: this.$store.getters.userId,
+      tenantId: undefined,
+      companyName: undefined,
+      tenantList: []
+    }
+  },
   components: {
     Breadcrumb,
     TopNav,
@@ -92,6 +118,23 @@ export default {
     }
   },
   methods: {
+    // 动态切换
+    dynamicTenantEvent(tenantId) {
+      dynamicTenant(tenantId).then(res => {
+        this.$router.push("/index");
+      });
+    },
+    dynamicClearEvent(tenantId) {
+      dynamicClear(tenantId).then(res => {
+        this.$router.push("/index");
+      });
+    },
+    // 租户列表
+    getTenantList() {
+      tenantList().then(res => {
+        this.tenantList = res.data;
+      });
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
@@ -111,6 +154,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.flex {
+  display: flex;
+}
+
+.align-center {
+  align-items: center;
+}
+
 .navbar {
   height: 50px;
   overflow: hidden;
