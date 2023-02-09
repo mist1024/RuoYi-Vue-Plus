@@ -1,6 +1,7 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.baomidou.lock.annotation.Lock4j;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
@@ -49,6 +50,15 @@ public class SysTenantController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<SysTenantVo> list(SysTenantBo bo, PageQuery pageQuery) {
         return sysTenantService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 根据关键字查询租户列表
+     */
+    @SaIgnore
+    @GetMapping("/listByWord/{keyword}")
+    public R<List<SysTenantVo>> listByWord(@PathVariable String keyword) {
+        return R.ok(sysTenantService.listByWord(keyword));
     }
 
     /**

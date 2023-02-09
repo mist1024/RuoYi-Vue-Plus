@@ -55,3 +55,11 @@ export function delTenant(id) {
     method: 'delete'
   })
 }
+
+// 根据关键字获取相关企业名称
+export function listByWord(data) {
+  return request({
+    url: '/system/tenant/listByWord/' + data,
+    method: 'get'
+  })
+}

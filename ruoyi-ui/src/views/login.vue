@@ -12,6 +12,25 @@
           <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
+      <el-form-item prop="companyName">
+        <el-select v-if="loginForm.tenantId"
+                   v-model="loginForm.companyName"
+                   filterable
+                   remote
+                   reserve-keyword
+                   placeholder="请输入公司名称"
+                   :remote-method="remoteMethod"
+                   :loading="selectLoading" style="width: 100%">
+          <el-option
+            v-for="item in companyList"
+            :key="item.id"
+            :label="item.companyName"
+            :value="item.tenantId">
+          </el-option>
+          <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
+        </el-select>
+        <span v-else>{{loginForm.companyName}}</span>
+      </el-form-item>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -75,6 +94,7 @@
 import { getCodeImg } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
+import { listByWord } from "@/api/system/tenant";
 
 export default {
   name: "Login",
@@ -106,7 +126,9 @@ export default {
       captchaEnabled: true,
       // 注册开关
       register: false,
-      redirect: undefined
+      redirect: undefined,
+      selectLoading:false,
+      companyList:[]
     };
   },
   watch: {
@@ -130,6 +152,24 @@ export default {
           this.loginForm.uuid = res.data.uuid;
         }
       });
+    },
+    getListByWord(word) {
+      listByWord(word).then(res => {
+        this.selectLoading = false;
+        this.companyList = res.data
+      })
+    },
+    // 搜索公司
+    remoteMethod(query) {
+      if (query !== '') {
+        this.selectLoading = true;
+        setTimeout(() => {
+          this.selectLoading = false;
+          this.getListByWord(query)
+        }, 200);
+      } else {
+        this.companyList = [];
+      }
     },
     getCookie() {
       const tenantId = Cookies.get("tenantId");
