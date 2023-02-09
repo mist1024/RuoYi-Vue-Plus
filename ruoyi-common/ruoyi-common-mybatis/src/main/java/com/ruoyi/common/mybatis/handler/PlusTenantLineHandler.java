@@ -29,7 +29,7 @@ public class PlusTenantLineHandler implements TenantLineHandler {
             return new NullValue();
         }
         String dynamicTenantId = TenantHelper.getDynamic();
-        if (StringUtils.isBlank(dynamicTenantId)) {
+        if (StringUtils.isNotBlank(dynamicTenantId)) {
             // 返回动态租户
             return new LongValue(dynamicTenantId);
         }
