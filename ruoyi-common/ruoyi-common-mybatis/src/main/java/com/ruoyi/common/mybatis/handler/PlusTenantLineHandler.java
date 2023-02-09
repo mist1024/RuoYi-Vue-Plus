@@ -2,6 +2,7 @@ package com.ruoyi.common.mybatis.handler;
 
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.common.mybatis.properties.TenantProperties;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import lombok.AllArgsConstructor;
@@ -24,11 +25,16 @@ public class PlusTenantLineHandler implements TenantLineHandler {
     @Override
     public Expression getTenantId() {
         String tenantId = LoginHelper.getTenantId();
-        if (StringUtils.isNotBlank(tenantId)) {
-            //多租户模式，租户id从当前用户获取
-            return new LongValue(tenantId);
+        if (StringUtils.isBlank(tenantId)) {
+            return new NullValue();
         }
-        return new NullValue();
+        String dynamicTenantId = TenantHelper.getDynamic();
+        if (StringUtils.isBlank(dynamicTenantId)) {
+            // 返回动态租户
+            return new LongValue(dynamicTenantId);
+        }
+        // 返回固定租户
+        return new LongValue(tenantId);
     }
 
     @Override
@@ -36,17 +42,14 @@ public class PlusTenantLineHandler implements TenantLineHandler {
         String tenantId = LoginHelper.getTenantId();
         // 判断是否有租户
         if (StringUtils.isNotBlank(tenantId)) {
-            // 判断是否平台超级管理员，如果是平台超级管理员则拥有所有数据权限
-            if (!LoginHelper.isAdmin()) {
-                // 不需要过滤租户的表
-                List<String> excludes = tenantProperties.getExcludes();
-                // 非业务表
-                excludes.addAll(List.of(
-                        "gen_table",
-                        "gen_table_column"
-                ));
-                return excludes.contains(tableName);
-            }
+            // 不需要过滤租户的表
+            List<String> excludes = tenantProperties.getExcludes();
+            // 非业务表
+            excludes.addAll(List.of(
+                    "gen_table",
+                    "gen_table_column"
+            ));
+            return excludes.contains(tableName);
         }
         return true;
     }

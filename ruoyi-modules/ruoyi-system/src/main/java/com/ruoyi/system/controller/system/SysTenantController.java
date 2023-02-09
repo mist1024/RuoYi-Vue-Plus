@@ -15,6 +15,7 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import com.ruoyi.common.mybatis.helper.TenantHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.bo.SysUserBo;
@@ -22,6 +23,7 @@ import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.service.ISysTenantService;
 import com.ruoyi.system.service.ISysUserService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -134,4 +136,27 @@ public class SysTenantController extends BaseController {
                           @PathVariable Long[] ids) {
         return toAjax(sysTenantService.deleteWithValidByIds(List.of(ids), true));
     }
+
+    /**
+     * 动态切换租户
+     *
+     * @param tenantId 租户ID
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @GetMapping("/dynamic/{tenantId}")
+    public R<Void> dynamicTenant(@NotBlank(message = "租户ID不能为空") @PathVariable String tenantId) {
+        TenantHelper.setDynamic(tenantId);
+        return R.ok();
+    }
+
+    /**
+     * 清除动态租户
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @GetMapping("/dynamic/clear")
+    public R<Void> dynamicClear() {
+        TenantHelper.clearDynamic();
+        return R.ok();
+    }
+
 }
