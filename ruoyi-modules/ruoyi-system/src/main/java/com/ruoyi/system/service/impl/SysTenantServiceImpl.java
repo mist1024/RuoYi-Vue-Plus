@@ -192,8 +192,8 @@ public class SysTenantServiceImpl implements ISysTenantService {
         // 创建角色
         SysRole role = new SysRole();
         role.setTenantId(tenantId);
-        role.setRoleName(TenantConstants.ADMIN_ROLE_NAME);
-        role.setRoleKey(TenantConstants.ADMIN_ROLE_KEY);
+        role.setRoleName(TenantConstants.TENANT_ADMIN_ROLE_NAME);
+        role.setRoleKey(TenantConstants.TENANT_ADMIN_ROLE_KEY);
         role.setRoleSort(1);
         role.setStatus(TenantConstants.NORMAL);
         sysRoleMapper.insert(role);
