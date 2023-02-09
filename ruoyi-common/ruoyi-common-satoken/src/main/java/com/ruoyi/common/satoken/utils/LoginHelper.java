@@ -3,6 +3,7 @@ package com.ruoyi.common.satoken.utils;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.enums.DeviceType;
@@ -11,6 +12,8 @@ import com.ruoyi.common.core.exception.UtilException;
 import com.ruoyi.common.core.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 /**
  * 登录鉴权助手
@@ -132,17 +135,31 @@ public class LoginHelper {
     }
 
     /**
-     * 是否为管理员
+     * 是否为超级管理员
      *
      * @param userId 用户ID
      * @return 结果
      */
-    public static boolean isAdmin(Long userId) {
+    public static boolean isSuperAdmin(Long userId) {
         return UserConstants.SUPER_ADMIN_ID.equals(userId);
     }
 
-    public static boolean isAdmin() {
-        return isAdmin(getUserId());
+    public static boolean isSuperAdmin() {
+        return isSuperAdmin(getUserId());
+    }
+
+    /**
+     * 是否为超级管理员
+     *
+     * @param rolePermission 角色权限标识组
+     * @return 结果
+     */
+    public static boolean isTenantAdmin(Set<String> rolePermission) {
+        return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
+    }
+
+    public static boolean isTenantAdmin() {
+        return isTenantAdmin(getLoginUser().getRolePermission());
     }
 
 }

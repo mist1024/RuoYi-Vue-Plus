@@ -26,7 +26,12 @@ public interface TenantConstants {
     /**
      * 超级管理员ID
      */
-    Long TENANT_SUPER_ADMIN_ID = 1L;
+    Long SUPER_ADMIN_ID = 1L;
+
+    /**
+     * 超级管理员角色 roleKey
+     */
+    String SUPER_ADMIN_ROLE_KEY = "superadmin";
 
     /**
      * 租户管理员角色 roleKey

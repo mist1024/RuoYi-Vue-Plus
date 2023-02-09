@@ -113,8 +113,8 @@ public class SysRoleController extends BaseController {
             // 更新缓存用户权限
             LoginUser loginUser = LoginHelper.getLoginUser();
             SysUserVo sysUser = userService.selectUserById(loginUser.getUserId());
-            if (ObjectUtil.isNotNull(sysUser) && !LoginHelper.isAdmin()) {
-                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser.getUserId(), sysUser.isAdmin()));
+            if (ObjectUtil.isNotNull(sysUser)) {
+                loginUser.setMenuPermission(permissionService.getMenuPermission(sysUser.getUserId()));
                 LoginHelper.setLoginUser(loginUser);
             }
             return R.ok();

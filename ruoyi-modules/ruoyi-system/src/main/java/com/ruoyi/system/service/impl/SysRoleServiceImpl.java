@@ -189,7 +189,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleAllowed(SysRoleBo role) {
-        if (ObjectUtil.isNotNull(role.getRoleId()) && role.isAdmin()) {
+        if (ObjectUtil.isNotNull(role.getRoleId()) && role.isSuperAdmin()) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
     }
@@ -201,7 +201,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleDataScope(Long roleId) {
-        if (!LoginHelper.isAdmin()) {
+        if (!LoginHelper.isSuperAdmin()) {
             SysRoleBo role = new SysRoleBo();
             role.setRoleId(roleId);
             List<SysRoleVo> roles = this.selectRoleList(role);

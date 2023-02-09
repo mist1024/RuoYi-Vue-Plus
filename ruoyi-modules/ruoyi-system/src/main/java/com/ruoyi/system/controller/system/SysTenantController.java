@@ -1,7 +1,9 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.lock.annotation.Lock4j;
+import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.exception.ServiceException;
@@ -45,6 +47,7 @@ public class SysTenantController extends BaseController {
     /**
      * 查询租户列表
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:list")
     @GetMapping("/list")
     public TableDataInfo<SysTenantVo> list(SysTenantBo bo, PageQuery pageQuery) {
@@ -54,6 +57,7 @@ public class SysTenantController extends BaseController {
     /**
      * 导出租户列表
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:export")
     @Log(title = "租户", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -67,6 +71,7 @@ public class SysTenantController extends BaseController {
      *
      * @param id 主键
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:query")
     @GetMapping("/{id}")
     public R<SysTenantVo> getInfo(@NotNull(message = "主键不能为空")
@@ -77,6 +82,7 @@ public class SysTenantController extends BaseController {
     /**
      * 新增租户
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:add")
     @Log(title = "租户", businessType = BusinessType.INSERT)
     @Lock4j
@@ -95,6 +101,7 @@ public class SysTenantController extends BaseController {
     /**
      * 修改租户
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:edit")
     @Log(title = "租户", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
@@ -106,6 +113,7 @@ public class SysTenantController extends BaseController {
     /**
      * 状态修改
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:edit")
     @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
@@ -118,6 +126,7 @@ public class SysTenantController extends BaseController {
      *
      * @param ids 主键串
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:remove")
     @Log(title = "租户", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")

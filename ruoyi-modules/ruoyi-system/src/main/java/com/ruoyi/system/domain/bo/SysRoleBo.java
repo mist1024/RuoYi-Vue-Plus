@@ -87,7 +87,7 @@ public class SysRoleBo extends BaseEntity {
         this.roleId = roleId;
     }
 
-    public boolean isAdmin() {
+    public boolean isSuperAdmin() {
         return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
 

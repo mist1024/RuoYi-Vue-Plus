@@ -1,6 +1,8 @@
 package com.ruoyi.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.ruoyi.common.core.constant.TenantConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -39,6 +41,7 @@ public class SysTenantPackageController extends BaseController {
     /**
      * 查询租户套餐列表
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:list")
     @GetMapping("/list")
     public TableDataInfo<SysTenantPackageVo> list(SysTenantPackageBo bo, PageQuery pageQuery) {
@@ -48,6 +51,7 @@ public class SysTenantPackageController extends BaseController {
     /**
      * 导出租户套餐列表
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:export")
     @Log(title = "租户套餐", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
@@ -61,6 +65,7 @@ public class SysTenantPackageController extends BaseController {
      *
      * @param packageId 主键
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:query")
     @GetMapping("/{packageId}")
     public R<SysTenantPackageVo> getInfo(@NotNull(message = "主键不能为空")
@@ -71,6 +76,7 @@ public class SysTenantPackageController extends BaseController {
     /**
      * 新增租户套餐
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:add")
     @Log(title = "租户套餐", businessType = BusinessType.INSERT)
     @RepeatSubmit()
@@ -82,6 +88,7 @@ public class SysTenantPackageController extends BaseController {
     /**
      * 修改租户套餐
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:edit")
     @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
@@ -93,6 +100,7 @@ public class SysTenantPackageController extends BaseController {
     /**
      * 状态修改
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:edit")
     @Log(title = "租户套餐", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
@@ -105,6 +113,7 @@ public class SysTenantPackageController extends BaseController {
      *
      * @param packageIds 主键串
      */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenantPackage:remove")
     @Log(title = "租户套餐", businessType = BusinessType.DELETE)
     @DeleteMapping("/{packageIds}")

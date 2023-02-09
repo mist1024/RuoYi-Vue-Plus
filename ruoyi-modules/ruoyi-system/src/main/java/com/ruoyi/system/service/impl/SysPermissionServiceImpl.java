@@ -1,5 +1,7 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.core.constant.TenantConstants;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.service.ISysMenuService;
 import com.ruoyi.system.service.ISysPermissionService;
 import com.ruoyi.system.service.ISysRoleService;
@@ -25,15 +27,14 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
      * 获取角色数据权限
      *
      * @param userId  用户id
-     * @param isAdmin 是否管理员
      * @return 角色权限信息
      */
     @Override
-    public Set<String> getRolePermission(Long userId, boolean isAdmin) {
+    public Set<String> getRolePermission(Long userId) {
         Set<String> roles = new HashSet<>();
         // 管理员拥有所有权限
-        if (isAdmin) {
-            roles.add("admin");
+        if (LoginHelper.isSuperAdmin(userId)) {
+            roles.add(TenantConstants.SUPER_ADMIN_ROLE_KEY);
         } else {
             roles.addAll(roleService.selectRolePermissionByUserId(userId));
         }
@@ -44,14 +45,13 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
      * 获取菜单数据权限
      *
      * @param userId  用户id
-     * @param isAdmin 是否管理员
      * @return 菜单权限信息
      */
     @Override
-    public Set<String> getMenuPermission(Long userId, boolean isAdmin) {
+    public Set<String> getMenuPermission(Long userId) {
         Set<String> perms = new HashSet<>();
         // 管理员拥有所有权限
-        if (isAdmin) {
+        if (LoginHelper.isSuperAdmin(userId)) {
             perms.add("*:*:*");
         } else {
             perms.addAll(menuService.selectMenuPermsByUserId(userId));

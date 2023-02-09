@@ -90,7 +90,7 @@ public class SysRoleVo implements Serializable {
      */
     private boolean flag = false;
 
-    public boolean isAdmin() {
+    public boolean isSuperAdmin() {
         return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
 
