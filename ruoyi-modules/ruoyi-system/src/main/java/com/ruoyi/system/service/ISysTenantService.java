@@ -31,11 +31,6 @@ public interface ISysTenantService {
     TableDataInfo<SysTenantVo> queryPageList(SysTenantBo bo, PageQuery pageQuery);
 
     /**
-     * 根据关键字查询租户列表
-     */
-    List<SysTenantVo> listByWord(String keyword);
-
-    /**
      * 查询租户列表
      */
     List<SysTenantVo> queryList(SysTenantBo bo);

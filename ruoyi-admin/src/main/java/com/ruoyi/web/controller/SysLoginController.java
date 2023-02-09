@@ -1,19 +1,24 @@
 package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.hutool.core.bean.BeanUtil;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysMenu;
+import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.vo.RouterVo;
+import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.domain.vo.SysUserVo;
 import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.system.service.ISysTenantService;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.web.service.SysLoginService;
 import com.ruoyi.web.domain.vo.LoginVo;
+import com.ruoyi.web.domain.vo.TenantListVo;
 import com.ruoyi.web.domain.vo.UserInfoVo;
+import com.ruoyi.web.service.SysLoginService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -37,6 +42,7 @@ public class SysLoginController {
     private final SysLoginService loginService;
     private final ISysMenuService menuService;
     private final ISysUserService userService;
+    private final ISysTenantService tenantService;
 
     /**
      * 登录方法
@@ -97,6 +103,19 @@ public class SysLoginController {
     public R<Void> logout() {
         loginService.logout();
         return R.ok("退出成功");
+    }
+
+    /**
+     * 登录页面租户下拉框
+     *
+     * @return 租户列表
+     */
+    @SaIgnore
+    @GetMapping("/tenant/list")
+    public R<List<TenantListVo>> tenantList() {
+        List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantBo());
+        List<TenantListVo> voList = BeanUtil.copyToList(tenantList, TenantListVo.class);
+        return R.ok(voList);
     }
 
     /**

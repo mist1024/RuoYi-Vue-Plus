@@ -70,3 +70,14 @@ export function getCodeSms() {
     timeout: 20000
   })
 }
+
+// 获取租户列表
+export function tenantList() {
+  return request({
+    url: '/tenant/list',
+    headers: {
+      isToken: false
+    },
+    method: 'get'
+  })
+}

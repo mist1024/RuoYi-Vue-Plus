@@ -3,33 +3,15 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">RuoYi-Vue-Plus后台管理系统</h3>
       <el-form-item prop="tenantId">
-        <el-input
-            v-model="loginForm.tenantId"
-            type="text"
-            auto-complete="off"
-            placeholder="租户编号"
-        >
-          <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="companyName">
-        <el-select v-if="loginForm.tenantId"
-                   v-model="loginForm.companyName"
-                   filterable
-                   remote
-                   reserve-keyword
-                   placeholder="请输入公司名称"
-                   :remote-method="remoteMethod"
-                   :loading="selectLoading" style="width: 100%">
+        <el-select v-model="loginForm.tenantId" filterable placeholder="请选择/输入公司名称" style="width: 100%">
           <el-option
-            v-for="item in companyList"
-            :key="item.id"
+            v-for="item in tenantList"
+            :key="item.tenantId"
             :label="item.companyName"
             :value="item.tenantId">
           </el-option>
           <svg-icon slot="prefix" icon-class="input" class="el-input__icon input-icon" />
         </el-select>
-        <span v-else>{{loginForm.companyName}}</span>
       </el-form-item>
       <el-form-item prop="username">
         <el-input
@@ -91,10 +73,9 @@
 </template>
 
 <script>
-import { getCodeImg } from "@/api/login";
+import { getCodeImg, tenantList } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
-import { listByWord } from "@/api/system/tenant";
 
 export default {
   name: "Login",
@@ -127,8 +108,8 @@ export default {
       // 注册开关
       register: false,
       redirect: undefined,
-      selectLoading:false,
-      companyList:[]
+      // 租户列表
+      tenantList:[]
     };
   },
   watch: {
@@ -141,6 +122,7 @@ export default {
   },
   created() {
     this.getCode();
+    this.getTenantList();
     this.getCookie();
   },
   methods: {
@@ -153,23 +135,10 @@ export default {
         }
       });
     },
-    getListByWord(word) {
-      listByWord(word).then(res => {
-        this.selectLoading = false;
-        this.companyList = res.data
-      })
-    },
-    // 搜索公司
-    remoteMethod(query) {
-      if (query !== '') {
-        this.selectLoading = true;
-        setTimeout(() => {
-          this.selectLoading = false;
-          this.getListByWord(query)
-        }, 200);
-      } else {
-        this.companyList = [];
-      }
+    getTenantList() {
+      tenantList().then(res => {
+        this.tenantList = res.data;
+      });
     },
     getCookie() {
       const tenantId = Cookies.get("tenantId");

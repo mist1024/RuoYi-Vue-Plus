@@ -56,10 +56,3 @@ export function delTenant(id) {
   })
 }
 
-// 根据关键字获取相关企业名称
-export function listByWord(data) {
-  return request({
-    url: '/system/tenant/listByWord/' + data,
-    method: 'get'
-  })
-}

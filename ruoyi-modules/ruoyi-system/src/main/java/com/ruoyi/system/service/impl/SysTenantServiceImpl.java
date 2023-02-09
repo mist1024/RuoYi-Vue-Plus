@@ -77,17 +77,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
         return baseMapper.selectVoList(lqw);
     }
 
-    /**
-     * 根据关键字查询租户列表
-     */
-    @Override
-    public List<SysTenantVo> listByWord(String keyword) {
-        SysTenantBo bo = new SysTenantBo();
-        bo.setCompanyName(keyword);
-        LambdaQueryWrapper<SysTenant> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
     private LambdaQueryWrapper<SysTenant> buildQueryWrapper(SysTenantBo bo) {
         LambdaQueryWrapper<SysTenant> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId());
