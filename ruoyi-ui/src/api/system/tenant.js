@@ -56,3 +56,19 @@ export function delTenant(id) {
   })
 }
 
+// 动态切换租户
+export function dynamicTenant(tenantId) {
+  return request({
+    url: '/system/tenant/dynamic/' + tenantId,
+    method: 'get'
+  })
+}
+
+// 清除动态租户
+export function dynamicClear() {
+  return request({
+    url: '/system/tenant/dynamic/clear',
+    method: 'get'
+  })
+}
+
