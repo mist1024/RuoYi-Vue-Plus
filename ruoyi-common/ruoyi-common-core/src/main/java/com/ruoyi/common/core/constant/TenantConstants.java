@@ -43,4 +43,9 @@ public interface TenantConstants {
      */
     String TENANT_ADMIN_ROLE_NAME = "管理员";
 
+    /**
+     * 默认租户ID
+     */
+    String DEFAULT_TENANT_ID = "000000";
+
 }

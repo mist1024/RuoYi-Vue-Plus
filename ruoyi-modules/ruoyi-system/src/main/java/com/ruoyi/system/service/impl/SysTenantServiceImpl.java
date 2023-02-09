@@ -52,6 +52,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     private final SysUserRoleMapper sysUserRoleMapper;
     private final SysDictTypeMapper sysDictTypeMapper;
     private final SysDictDataMapper sysDictDataMapper;
+    private final SysConfigMapper sysConfigMapper;
 
     /**
      * 查询租户
@@ -160,8 +161,11 @@ public class SysTenantServiceImpl implements ISysTenantService {
         userRole.setRoleId(roleId);
         sysUserRoleMapper.insert(userRole);
 
-        List<SysDictType> dictTypeList = sysDictTypeMapper.selectList();
-        List<SysDictData> dictDataList = sysDictDataMapper.selectList();
+        String defaultTenantId = TenantConstants.DEFAULT_TENANT_ID;
+        List<SysDictType> dictTypeList = sysDictTypeMapper.selectList(
+                new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getTenantId, defaultTenantId));
+        List<SysDictData> dictDataList = sysDictDataMapper.selectList(
+                new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getTenantId, defaultTenantId));
         for (SysDictType dictType : dictTypeList) {
             dictType.setDictId(null);
             dictType.setTenantId(tenantId);
@@ -172,6 +176,14 @@ public class SysTenantServiceImpl implements ISysTenantService {
         }
         sysDictTypeMapper.insertBatch(dictTypeList);
         sysDictDataMapper.insertBatch(dictDataList);
+
+        List<SysConfig> sysConfigList = sysConfigMapper.selectList(
+                new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getTenantId, defaultTenantId));
+        for (SysConfig config : sysConfigList) {
+            config.setConfigId(null);
+            config.setTenantId(tenantId);
+        }
+        sysConfigMapper.insertBatch(sysConfigList);
 
         TenantHelper.disableIgnore();
         return true;

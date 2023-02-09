@@ -810,6 +810,7 @@ drop table if exists sys_config;
 create table if not exists sys_config
 (
     config_id    int8,
+    tenant_id    varchar(20)  not null,
     config_name  varchar(100) default ''::varchar,
     config_key   varchar(100) default ''::varchar,
     config_value varchar(500) default ''::varchar,
@@ -825,6 +826,7 @@ create table if not exists sys_config
 
 comment on table sys_config                 is '参数配置表';
 comment on column sys_config.config_id      is '参数主键';
+comment on column sys_config.tenant_id      is '租户编号';
 comment on column sys_config.config_name    is '参数名称';
 comment on column sys_config.config_key     is '参数键名';
 comment on column sys_config.config_value   is '参数键值';
@@ -836,11 +838,11 @@ comment on column sys_config.update_by      is '更新者';
 comment on column sys_config.update_time    is '更新时间';
 comment on column sys_config.remark         is '备注';
 
-insert into sys_config values(1, '主框架页-默认皮肤样式名称',     'sys.index.skinName',            'skin-blue',     'Y', 103, 1, now(), null, null, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow' );
-insert into sys_config values(2, '用户管理-账号初始密码',         'sys.user.initPassword',         '123456',        'Y', 103, 1, now(), null, null, '初始化密码 123456' );
-insert into sys_config values(3, '主框架页-侧边栏主题',           'sys.index.sideTheme',           'theme-dark',    'Y', 103, 1, now(), null, null, '深色主题theme-dark，浅色主题theme-light' );
-insert into sys_config values(5, '账号自助-是否开启用户注册功能',   'sys.account.registerUser',      'false',         'Y', 103, 1, now(), null, null, '是否开启注册用户功能（true开启，false关闭）');
-insert into sys_config values(11, 'OSS预览列表资源开关',          'sys.oss.previewListResource',   'true',          'Y', 103, 1, now(), null, null, 'true:开启, false:关闭');
+insert into sys_config values(1, '000000', '主框架页-默认皮肤样式名称',     'sys.index.skinName',            'skin-blue',     'Y', 103, 1, now(), null, null, '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow' );
+insert into sys_config values(2, '000000', '用户管理-账号初始密码',         'sys.user.initPassword',         '123456',        'Y', 103, 1, now(), null, null, '初始化密码 123456' );
+insert into sys_config values(3, '000000', '主框架页-侧边栏主题',           'sys.index.sideTheme',           'theme-dark',    'Y', 103, 1, now(), null, null, '深色主题theme-dark，浅色主题theme-light' );
+insert into sys_config values(5, '000000', '账号自助-是否开启用户注册功能',   'sys.account.registerUser',      'false',         'Y', 103, 1, now(), null, null, '是否开启注册用户功能（true开启，false关闭）');
+insert into sys_config values(11, '000000', 'OSS预览列表资源开关',          'sys.oss.previewListResource',   'true',          'Y', 103, 1, now(), null, null, 'true:开启, false:关闭');
 
 
 -- ----------------------------

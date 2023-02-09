@@ -585,6 +585,7 @@ GO
 CREATE TABLE sys_config
 (
     config_id    bigint                      NOT NULL,
+    tenant_id    nvarchar(20)                NOT NULL,
     config_name  nvarchar(100) DEFAULT ''    NULL,
     config_key   nvarchar(100) DEFAULT ''    NULL,
     config_value nvarchar(500) DEFAULT ''    NULL,
@@ -607,6 +608,12 @@ EXEC sys.sp_addextendedproperty
     'SCHEMA', N'dbo',
     'TABLE', N'sys_config',
     'COLUMN', N'config_id'
+GO
+EXEC sys.sp_addextendedproperty
+     'MS_Description', N'租户编号' ,
+     'SCHEMA', N'dbo',
+     'TABLE', N'sys_config',
+     'COLUMN', N'tenant_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'参数名称' ,
@@ -674,15 +681,15 @@ EXEC sys.sp_addextendedproperty
     'TABLE', N'sys_config'
 GO
 
-INSERT sys_config VALUES (1, N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 103, 1, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
+INSERT sys_config VALUES (1, N'000000', N'主框架页-默认皮肤样式名称', N'sys.index.skinName', N'skin-blue', N'Y', 103, 1, getdate(), NULL, NULL, N'蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow')
 GO
-INSERT sys_config VALUES (2, N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 103, 1, getdate(), NULL, NULL, N'初始化密码 123456')
+INSERT sys_config VALUES (2, N'000000', N'用户管理-账号初始密码', N'sys.user.initPassword', N'123456', N'Y', 103, 1, getdate(), NULL, NULL, N'初始化密码 123456')
 GO
-INSERT sys_config VALUES (3, N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
+INSERT sys_config VALUES (3, N'000000', N'主框架页-侧边栏主题', N'sys.index.sideTheme', N'theme-dark', N'Y', 103, 1, getdate(), NULL, NULL, N'深色主题theme-dark，浅色主题theme-light')
 GO
-INSERT sys_config VALUES (5, N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
+INSERT sys_config VALUES (5, N'000000', N'账号自助-是否开启用户注册功能', N'sys.account.registerUser', N'false', N'Y', 103, 1, getdate(), NULL, NULL, N'是否开启注册用户功能（true开启，false关闭）')
 GO
-INSERT sys_config VALUES (11, N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
+INSERT sys_config VALUES (11, N'000000', N'OSS预览列表资源开关', N'sys.oss.previewListResource', N'true', N'Y', 103, 1, getdate(), NULL, NULL, N'true:开启, false:关闭');
 GO
 
 CREATE TABLE sys_dept
