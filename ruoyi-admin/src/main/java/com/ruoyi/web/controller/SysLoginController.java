@@ -3,11 +3,11 @@ package com.ruoyi.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.system.domain.SysMenu;
 import com.ruoyi.system.domain.bo.SysTenantBo;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -120,21 +119,11 @@ public class SysLoginController {
     public R<List<TenantListVo>> tenantList(HttpServletRequest request) throws Exception {
         List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantBo());
         List<TenantListVo> voList = BeanUtil.copyToList(tenantList, TenantListVo.class);
-
         // 获取域名
         String host = new URL(request.getRequestURL().toString()).getHost();
         // 根据域名进行筛选
-        List<TenantListVo> list = new ArrayList<>();
-        voList.forEach(vo -> {
-            if (ObjectUtil.equal(vo.getDomain(), host)) {
-                list.add(vo);
-            }
-        });
-        if (CollUtil.isNotEmpty(list)) {
-            return R.ok(list);
-        }
-
-        return R.ok(voList);
+        List<TenantListVo> list = voList.stream().filter(vo -> StringUtils.equals(vo.getDomain(), host)).toList();
+        return R.ok(CollUtil.isNotEmpty(list) ? list : voList);
     }
 
     /**

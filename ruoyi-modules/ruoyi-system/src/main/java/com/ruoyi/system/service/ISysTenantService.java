@@ -56,7 +56,7 @@ public interface ISysTenantService {
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
     /**
-     * 校验公司名称是否唯一
+     * 校验企业名称是否唯一
      */
     String checkCompanyNameUnique(SysTenantBo bo);
 

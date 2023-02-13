@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.constant.CacheNames;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.TenantConstants;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -284,7 +283,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     }
 
     /**
-     * 校验公司名称是否唯一
+     * 校验企业名称是否唯一
      */
     @Override
     public String checkCompanyNameUnique(SysTenantBo bo) {
@@ -292,9 +291,9 @@ public class SysTenantServiceImpl implements ISysTenantService {
             .eq(SysTenant::getCompanyName, bo.getCompanyName())
             .ne(ObjectUtil.isNotNull(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId()));
         if (exist) {
-            return UserConstants.NOT_UNIQUE;
+            return TenantConstants.NOT_PASS;
         }
-        return UserConstants.UNIQUE;
+        return TenantConstants.PASS;
     }
 
     /**
