@@ -1,7 +1,7 @@
 package com.ruoyi.system.runner;
 
 import com.ruoyi.common.core.config.RuoYiConfig;
-import com.ruoyi.common.mybatis.helper.TenantHelper;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysOssConfigService;
@@ -29,7 +29,7 @@ public class SystemApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         TenantHelper.enableIgnore();
-        ossConfigService.init();
+//        ossConfigService.init();
         log.info("初始化OSS配置成功");
         if (ruoyiConfig.isCacheLazy()) {
             TenantHelper.disableIgnore();

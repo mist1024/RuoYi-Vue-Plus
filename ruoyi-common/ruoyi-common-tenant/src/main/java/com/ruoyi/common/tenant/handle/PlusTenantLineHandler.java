@@ -1,10 +1,10 @@
-package com.ruoyi.common.mybatis.handler;
+package com.ruoyi.common.tenant.handle;
 
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.ruoyi.common.core.utils.StringUtils;
-import com.ruoyi.common.mybatis.helper.TenantHelper;
-import com.ruoyi.common.mybatis.properties.TenantProperties;
 import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.common.tenant.helper.TenantHelper;
+import com.ruoyi.common.tenant.properties.TenantProperties;
 import lombok.AllArgsConstructor;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;

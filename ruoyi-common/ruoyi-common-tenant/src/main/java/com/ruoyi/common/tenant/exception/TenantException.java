@@ -1,13 +1,13 @@
-package com.ruoyi.common.core.exception;
+package com.ruoyi.common.tenant.exception;
 
 import com.ruoyi.common.core.exception.base.BaseException;
 
 import java.io.Serial;
 
 /**
- * 用户信息异常类
+ * 租户异常类
  *
- * @author ruoyi
+ * @author Lion Li
  */
 public class TenantException extends BaseException {
 

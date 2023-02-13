@@ -1,4 +1,4 @@
-package com.ruoyi.common.mybatis.properties;
+package com.ruoyi.common.tenant.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

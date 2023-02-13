@@ -15,7 +15,7 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
-import com.ruoyi.common.mybatis.helper.TenantHelper;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.bo.SysUserBo;

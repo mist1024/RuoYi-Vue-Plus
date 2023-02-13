@@ -48,4 +48,6 @@ public interface TenantConstants {
      */
     String DEFAULT_TENANT_ID = "000000";
 
+    String GLOBAL_REDIS_KEY = "global:";
+
 }
