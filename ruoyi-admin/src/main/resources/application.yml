@@ -10,8 +10,6 @@ ruoyi:
   demoEnabled: true
   # 获取ip地址开关
   addressEnabled: true
-  # 缓存懒加载
-  cacheLazy: false
 
 captcha:
   enable: true
