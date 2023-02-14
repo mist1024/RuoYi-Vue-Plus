@@ -1,9 +1,9 @@
 package com.ruoyi.common.tenant.handle;
 
-import com.ruoyi.common.core.constant.TenantConstants;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.redis.handler.KeyPrefixHandler;
-import com.ruoyi.common.satoken.utils.LoginHelper;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 
 /**
  * 多租户redis缓存key前缀处理
@@ -24,10 +24,15 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         if (StringUtils.isBlank(name)) {
             return null;
         }
-        if (StringUtils.contains(name, TenantConstants.GLOBAL_REDIS_KEY)) {
+        if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
             return super.map(name);
         }
-        return super.map(LoginHelper.getTenantId() + ":" + name);
+        String tenantId = TenantHelper.getTenantId();
+        if (StringUtils.startsWith(name, tenantId)) {
+            // 如果存在则直接返回
+            return super.map(name);
+        }
+        return super.map(tenantId + ":" + name);
     }
 
     /**
@@ -39,10 +44,15 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         if (StringUtils.isBlank(unmap)) {
             return null;
         }
-        if (StringUtils.contains(name, TenantConstants.GLOBAL_REDIS_KEY)) {
+        if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
             return super.unmap(name);
         }
-        return unmap.substring((LoginHelper.getTenantId() + ":").length());
+        String tenantId = TenantHelper.getTenantId();
+        if (StringUtils.startsWith(unmap, tenantId)) {
+            // 如果存在则删除
+            return unmap.substring((tenantId + ":").length());
+        }
+        return unmap;
     }
 
 }

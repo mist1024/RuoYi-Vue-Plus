@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.CacheNames;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -34,15 +35,15 @@ public class CacheController {
     private final static List<SysCache> CACHES = new ArrayList<>();
 
     static {
-        CACHES.add(new SysCache(CacheConstants.LOGIN_TOKEN_KEY, "用户信息"));
+        CACHES.add(new SysCache(GlobalConstants.LOGIN_TOKEN_KEY, "用户信息"));
         CACHES.add(new SysCache(CacheConstants.ONLINE_TOKEN_KEY, "在线用户"));
         CACHES.add(new SysCache(CacheNames.SYS_CONFIG, "配置信息"));
         CACHES.add(new SysCache(CacheNames.SYS_DICT, "数据字典"));
-        CACHES.add(new SysCache(CacheConstants.CAPTCHA_CODE_KEY, "验证码"));
-        CACHES.add(new SysCache(CacheConstants.REPEAT_SUBMIT_KEY, "防重提交"));
-        CACHES.add(new SysCache(CacheConstants.RATE_LIMIT_KEY, "限流处理"));
+        CACHES.add(new SysCache(GlobalConstants.CAPTCHA_CODE_KEY, "验证码"));
+        CACHES.add(new SysCache(GlobalConstants.REPEAT_SUBMIT_KEY, "防重提交"));
+        CACHES.add(new SysCache(GlobalConstants.RATE_LIMIT_KEY, "限流处理"));
         CACHES.add(new SysCache(CacheNames.SYS_OSS_CONFIG, "OSS配置"));
-        CACHES.add(new SysCache(CacheConstants.PWD_ERR_CNT_KEY, "密码错误次数"));
+        CACHES.add(new SysCache(GlobalConstants.PWD_ERR_CNT_KEY, "密码错误次数"));
     }
 
     /**

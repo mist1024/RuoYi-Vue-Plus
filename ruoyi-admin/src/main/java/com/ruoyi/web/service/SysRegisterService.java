@@ -1,8 +1,8 @@
 package com.ruoyi.web.service;
 
 import cn.dev33.satoken.secure.BCrypt;
-import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
+import com.ruoyi.common.core.constant.GlobalConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.enums.UserType;
@@ -75,7 +75,7 @@ public class SysRegisterService {
      * @return 结果
      */
     public void validateCaptcha(String tenantId, String username, String code, String uuid, HttpServletRequest request) {
-        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
