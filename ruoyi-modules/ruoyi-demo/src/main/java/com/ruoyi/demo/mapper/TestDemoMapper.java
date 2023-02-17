@@ -1,5 +1,6 @@
 package com.ruoyi.demo.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author Lion Li
  * @date 2021-07-26
  */
+@InterceptorIgnore(tenantLine = "true")
 public interface TestDemoMapper extends BaseMapperPlus<TestDemoMapper, TestDemo, TestDemoVo> {
 
     @DataPermission({
