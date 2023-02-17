@@ -1,5 +1,6 @@
 package com.ruoyi.demo.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.ruoyi.common.mybatis.annotation.DataColumn;
 import com.ruoyi.common.mybatis.annotation.DataPermission;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
@@ -12,6 +13,7 @@ import com.ruoyi.demo.domain.vo.TestTreeVo;
  * @author Lion Li
  * @date 2021-07-26
  */
+@InterceptorIgnore(tenantLine = "true")
 @DataPermission({
     @DataColumn(key = "deptName", value = "dept_id"),
     @DataColumn(key = "userName", value = "user_id")

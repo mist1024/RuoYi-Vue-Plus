@@ -1,5 +1,6 @@
 package com.ruoyi.demo.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 import com.ruoyi.demo.domain.TestDemoEncrypt;
 
@@ -8,6 +9,7 @@ import com.ruoyi.demo.domain.TestDemoEncrypt;
  *
  * @author Lion Li
  */
+@InterceptorIgnore(tenantLine = "true")
 public interface TestDemoEncryptMapper extends BaseMapperPlus<TestDemoEncryptMapper, TestDemoEncrypt, TestDemoEncrypt> {
 
 }
