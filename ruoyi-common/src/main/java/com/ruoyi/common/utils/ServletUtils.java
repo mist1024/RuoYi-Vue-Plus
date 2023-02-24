@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -96,6 +97,8 @@ public class ServletUtils extends ServletUtil {
         for (Map.Entry<String, String[]> entry : getParams(request).entrySet()) {
             params.put(entry.getKey(), StringUtils.join(entry.getValue(), StringUtils.SEPARATOR));
         }
+        Map pathVariables = (Map) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        params.putAll(pathVariables);
         return params;
     }
 
