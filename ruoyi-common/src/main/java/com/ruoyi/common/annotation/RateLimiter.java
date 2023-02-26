@@ -16,7 +16,7 @@ import java.lang.annotation.*;
 public @interface RateLimiter {
     /**
      * 限流key,支持使用Spring el表达式来动态获取方法上的参数值
-     * 格式类似于 #{#code} 请注意格式！！
+     * 格式类似于  #code.id #{#code}
      */
     String key() default CacheConstants.RATE_LIMIT_KEY;
 

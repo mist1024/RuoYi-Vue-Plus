@@ -14,6 +14,10 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RateType;
 import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -30,6 +34,16 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class RateLimiterAspect {
+
+    //定义spel表达式解析器
+    private final ExpressionParser parser = new SpelExpressionParser();
+    //定义spel解析模版
+    private final ParserContext parserContext = new TemplateParserContext();
+    //定义spel上下文对象进行解析
+    private final EvaluationContext context = new StandardEvaluationContext();
+    //方法参数解析器
+    private final ParameterNameDiscoverer pnd = new DefaultParameterNameDiscoverer();
+
 
     @Before("@annotation(rateLimiter)")
     public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws Throwable {
@@ -51,9 +65,9 @@ public class RateLimiterAspect {
             }
             log.info("限制令牌 => {}, 剩余令牌 => {}, 缓存key => '{}'", count, number, combineKey);
         } catch (Exception e) {
-            if(e instanceof ServiceException){
+            if (e instanceof ServiceException) {
                 throw e;
-            }else{
+            } else {
                 throw new RuntimeException("服务器限流异常，请稍候再试");
             }
         }
@@ -65,32 +79,23 @@ public class RateLimiterAspect {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         Class<?> targetClass = method.getDeclaringClass();
-        if(StringUtils.startsWith(key,"#{") && StringUtils.endsWith(key,"}")){
+        //判断是否是spel格式
+        if (StringUtils.containsAny(key, "#")) {
             //获取参数值
             Object[] args = point.getArgs();
             //获取方法上参数的名称
-            /**
-             * 这里的DefaultParameterNameDiscoverers是Spring自带的解析器
-             * 在SpringMvc获取参数的过程中也有用到
-             */
-            String[] parameterNames = new DefaultParameterNameDiscoverer().getParameterNames(method);
-            //使用Spring的el表达式解析
-            SpelExpressionParser parser = new SpelExpressionParser();
-            //注入到上下文对象中进行解析
-            StandardEvaluationContext context = new StandardEvaluationContext();
+            String[] parameterNames = pnd.getParameterNames(method);
             for (int i = 0; i < parameterNames.length; i++) {
-                context.setVariable(parameterNames[i],args[i]);
+                context.setVariable(parameterNames[i], args[i]);
             }
-            //定义解析模版
-            TemplateParserContext parserContent = new TemplateParserContext();
             //解析返回给key
             try {
-                key = parser.parseExpression(key,parserContent).getValue(context,String.class) + "";
-            }catch (Exception e){
+                key = parser.parseExpression(key, parserContext).getValue(context, String.class) + ":";
+            } catch (Exception e) {
                 throw new ServiceException("限流key解析异常!请联系管理员!");
             }
         }
-        StringBuilder stringBuffer = new StringBuilder();
+        StringBuilder stringBuffer = new StringBuilder(key);
         if (rateLimiter.limitType() == LimitType.IP) {
             // 获取请求ip
             stringBuffer.append(ServletUtils.getClientIP()).append("-");
@@ -99,7 +104,6 @@ public class RateLimiterAspect {
             stringBuffer.append(RedisUtils.getClient().getId()).append("-");
         }
         stringBuffer.append(targetClass.getName()).append("-").append(method.getName());
-        stringBuffer.append(":").append(key);
         return stringBuffer.toString();
     }
 }
