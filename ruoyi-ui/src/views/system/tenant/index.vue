@@ -123,7 +123,7 @@
             icon="el-icon-edit"
             @click="handleSyncTenantPackage(scope.row)"
             v-hasPermi="['system:tenant:edit']"
-          >同步租户套餐</el-button>
+          >同步套餐</el-button>
           <el-button
             size="mini"
             type="text"
