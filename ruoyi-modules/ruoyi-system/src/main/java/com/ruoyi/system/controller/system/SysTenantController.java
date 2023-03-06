@@ -122,7 +122,7 @@ public class SysTenantController extends BaseController {
      * 状态修改
      */
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
-    @SaCheckPermission("system:tenantPackage:edit")
+    @SaCheckPermission("system:tenant:edit")
     @Log(title = "租户", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysTenantBo bo) {
