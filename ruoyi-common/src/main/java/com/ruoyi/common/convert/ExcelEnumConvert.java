@@ -10,6 +10,7 @@ import com.alibaba.excel.metadata.data.ReadCellData;
 import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
 import com.ruoyi.common.annotation.ExcelEnumFormat;
+import com.ruoyi.common.utils.reflect.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -36,13 +37,13 @@ public class ExcelEnumConvert implements Converter<Object> {
 
     @Override
     public Object convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        beforeConverter(contentProperty);
+        beforeConvert(contentProperty);
         Object codeValue = cellData.getData();
         // 如果是空值
         if (ObjectUtil.isNull(codeValue)) {
             return null;
         }
-        Map<Object, String> enumValueMap = beforeConverter(contentProperty);
+        Map<Object, String> enumValueMap = beforeConvert(contentProperty);
         String textValue = enumValueMap.get(codeValue);
         return Convert.convert(contentProperty.getField().getType(), textValue);
     }
@@ -52,28 +53,19 @@ public class ExcelEnumConvert implements Converter<Object> {
         if (ObjectUtil.isNull(object)) {
             return new WriteCellData<>("");
         }
-        Map<Object, String> enumValueMap = beforeConverter(contentProperty);
-        String value = Convert.toStr(enumValueMap.get(object));
+        Map<Object, String> enumValueMap = beforeConvert(contentProperty);
+        String value = Convert.toStr(enumValueMap.get(object), "");
         return new WriteCellData<>(value);
     }
 
-    private Map<Object, String> beforeConverter(ExcelContentProperty contentProperty) {
+    private Map<Object, String> beforeConvert(ExcelContentProperty contentProperty) {
         ExcelEnumFormat anno = getAnnotation(contentProperty.getField());
         Map<Object, String> enumValueMap = new HashMap<>();
         Enum<?>[] enumConstants = anno.enumClass().getEnumConstants();
         for (Enum<?> enumConstant : enumConstants) {
-            try {
-                Field codeFieldObj = enumConstant.getClass().getDeclaredField(anno.codeField());
-                codeFieldObj.setAccessible(true);
-                Object codeValue = codeFieldObj.get(enumConstant);
-                Field textFieldObj = enumConstant.getClass().getDeclaredField(anno.textField());
-                textFieldObj.setAccessible(true);
-                String textValue = (String) textFieldObj.get(enumConstant);
-                enumValueMap.put(codeValue, textValue);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                log.error("枚举格式化转换处理异常", e);
-                throw new RuntimeException("枚举格式化转换处理异常");
-            }
+            Object codeValue = ReflectUtils.invokeGetter(enumConstant, anno.codeField());
+            String textValue = ReflectUtils.invokeGetter(enumConstant, anno.textField());
+            enumValueMap.put(codeValue, textValue);
         }
         return enumValueMap;
     }
