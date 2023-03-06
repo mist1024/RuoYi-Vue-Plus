@@ -173,7 +173,7 @@ public class SysTenantController extends BaseController {
      * @param packageId 套餐id
      */
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
-    @SaCheckPermission("system:tenantPackage:edit")
+    @SaCheckPermission("system:tenant:edit")
     @Log(title = "租户", businessType = BusinessType.UPDATE)
     @GetMapping("/syncTenantPackage")
     public R<Void> syncTenantPackage(@NotBlank(message = "租户ID不能为空") String tenantId, @NotBlank(message = "租户ID不能为空") String packageId) {
