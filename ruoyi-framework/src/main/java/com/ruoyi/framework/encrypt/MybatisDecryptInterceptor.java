@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.*;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.sql.Statement;
@@ -60,8 +61,12 @@ public class MybatisDecryptInterceptor implements Interceptor {
             return;
         }
         if (sourceObject instanceof List<?>) {
+            List<?> sourceList = (List<?>) sourceObject;
+            if(CollectionUtils.isEmpty(sourceList)) {
+                return;
+            }
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
-            Object firstItem = ((List<?>) sourceObject).get(0);
+            Object firstItem = sourceList.get(0);
             if (CollectionUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
                 return;
             }
