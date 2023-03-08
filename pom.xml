@@ -327,6 +327,13 @@
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
+			
+			<!-- demodbu -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-dbu</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
