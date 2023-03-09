@@ -271,6 +271,9 @@ export default {
         password: [
           { required: true, message: "密码不能为空", trigger: "blur" },
           { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间', trigger: 'blur' }
+        ],
+        packageId: [
+          { required: true, message: "租户套餐不能为空", trigger: "blur" },
         ]
       }
     };
@@ -401,7 +404,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除租户编号为"' + ids + '"的数据项？').then(() => {
+      this.$modal.confirm('是否确认删除租户编号为"' + row.tenantId + '"的数据项？').then(() => {
         this.loading = true;
         return delTenant(ids);
       }).then(() => {
