@@ -687,18 +687,23 @@ public class WorkComplyUtils {
         if (auditLogs.size()>0) {
             List<AuditLog> collect = auditLogs.stream().filter(a -> e.getStep().equals(a.getStep()) && e.getAudit().equals(a.getAudit())).collect(Collectors.toList());
             collect.forEach(a -> {
-                switch (a.getStatus()) {
-                    case "1":
-                        a.setStatus("审核失败");
-                        break;
-                    case "2":
-                        a.setStatus("审核成功");
-                        break;
-                    default:
-                        a.setStatus("未知状态");
-                        break;
-                } });
+                if (ObjectUtil.isNotNull(a.getStatus())) {
+                    switch (a.getStatus()) {
+                        case "1":
+                            a.setStatus("审核失败");
+                            break;
+                        case "2":
+                            a.setStatus("审核成功");
+                            break;
+                        default:
+                            a.setStatus("未知状态");
+                            break;
+                    }
+                }
+            });
             e.setAuditLogList(collect);
+        }else {
+            e.setAuditLogList(new ArrayList<>());
         }
         if("4".equals(e.getCheckType())){//企业审核
             Map params = e.getParams();

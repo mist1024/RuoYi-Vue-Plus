@@ -73,9 +73,9 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * 查询购房复审登记列表
      */
     @Override
-    public TableDataInfo<HousesReviewVo> queryPageList(HousesReviewBo bo, PageQuery pageQuery) {
+    public TableDataInfo<HousesReview> queryPageList(HousesReviewBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
-        Page<HousesReviewVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<HousesReview> result = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 

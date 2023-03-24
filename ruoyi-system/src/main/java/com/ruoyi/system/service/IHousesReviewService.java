@@ -26,7 +26,7 @@ public interface IHousesReviewService {
     /**
      * 查询购房复审登记列表
      */
-    TableDataInfo<HousesReviewVo> queryPageList(HousesReviewBo bo, PageQuery pageQuery);
+    TableDataInfo<HousesReview> queryPageList(HousesReviewBo bo, PageQuery pageQuery);
 
     /**
      * 查询购房复审登记列表

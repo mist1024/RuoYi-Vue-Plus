@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @TableName("buy_houses")
-public class BuyHouses {
+public class BuyHouses  {
 
     private static final long serialVersionUID=1L;
 

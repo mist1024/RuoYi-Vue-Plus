@@ -2,9 +2,12 @@ package com.ruoyi.system.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.ruoyi.system.domain.BuyHousesMember;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -217,6 +220,10 @@ public class BuyHousesVo {
     @ExcelProperty(value = "")
     private String workAddress;
 
-    public String processKey;
+    private String processKey;
+
+    @TableField(exist = false)
+    private List<BuyHousesMember> buyHousesMemberList;
+
 
 }

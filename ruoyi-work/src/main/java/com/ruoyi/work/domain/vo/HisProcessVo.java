@@ -73,6 +73,8 @@ public class HisProcessVo {
 
     private String startUser;
 
+    @TableField(exist = false)
+    private String bean;
 
 
 }

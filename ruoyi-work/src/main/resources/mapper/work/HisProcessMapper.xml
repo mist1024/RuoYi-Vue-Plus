@@ -19,9 +19,6 @@
         <result property="companyName" column="companyName"/>
     </resultMap>
 
-    <resultMap id="ReturnBeanResult" type="com.ruoyi.work.domain.bo.ReturnBean">
-
-    </resultMap>
     <select id="selectVoListPage" resultType="com.ruoyi.work.domain.HisProcess" parameterType="com.ruoyi.work.domain.HisProcess">
         SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,d.end_time AS endTime  ,
         d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step
@@ -30,7 +27,8 @@
         FROM
         `his_process` h
         WHERE h.id IN (SELECT MAX(id) FROM his_process
-                                      where  ((audit = #{hisProcess.userId} AND check_type= 1)
+         where  (
+         (audit = #{hisProcess.userId} AND check_type= 1)
         OR
         (check_type = 2 AND  audit =#{hisProcess.deptId})
         OR
@@ -41,7 +39,7 @@
                                       GROUP BY business_id) ) d
         INNER JOIN process  p  ON p.id = d.process_id
         <where>
-            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user= #{hisProcess.startUser}</if>
+            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user like concat('%', #{hisProcess.startUser}, '%')</if>
         </where>
         ORDER BY d.end_time DESC
     </select>

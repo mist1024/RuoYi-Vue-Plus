@@ -151,10 +151,10 @@ public class DemoUnitTest {
         ProcessVo processVo = new ProcessVo();
         processVo.setProcessKey("apply_house");
         processVo.setStep("1");
-        BuyHouses buyHouses = buyHousesMapper.selectById("2");
+        BuyHouses buyHouses = buyHousesMapper.selectById("1011");
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         processVo.setParams(map);
-        processVo.setBusinessId("2");
+        processVo.setBusinessId("1011");
         processVo.setStartUser(buyHouses.getUserName());
         WorkComplyUtils.comply(processVo);
     }

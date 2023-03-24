@@ -87,6 +87,9 @@ public class HisProcess{
     @TableField(exist = false)
     private String name;
 
+    @TableField(exist = false)
+    private String bean;
+
 
 
 }

@@ -52,13 +52,24 @@ public class HousesReviewController extends BaseController {
     private final BuyHousesMapper buyHousesMapper;
 
 
+    /**
+     * 购房登记录入
+     * @param bo
+     * @param pageQuery
+     * @return
+     */
+    @SaCheckPermission("system:review:reviewList")
+    @GetMapping("/review/list")
+    public TableDataInfo<HousesReview> reviewList(HousesReviewBo bo, PageQuery pageQuery) {
+        return iHousesReviewService.queryPageList(bo, pageQuery);
+    }
 
     /**
      * 查询购房复审登记列表
      */
     @SaCheckPermission("system:review:list")
     @GetMapping("/registrationManagement/list")
-    public TableDataInfo<HousesReviewVo> list(HousesReviewBo bo, PageQuery pageQuery) {
+    public TableDataInfo<HousesReview> list(HousesReviewBo bo, PageQuery pageQuery) {
         return iHousesReviewService.queryPageList(bo, pageQuery);
     }
 

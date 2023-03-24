@@ -2,6 +2,7 @@ package com.ruoyi.system.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.system.domain.BuyHousesReviewMember;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class HousesReviewVo {
     /**
      * id
      */
-//    @ExcelProperty(value = "id")
+    @ExcelProperty(value = "id")
     private Long id;
 
     /**

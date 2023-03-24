@@ -8,9 +8,11 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.BuyHouses;
+import com.ruoyi.system.domain.BuyHousesMember;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
 import com.ruoyi.system.mapper.BuyHousesMapper;
+import com.ruoyi.system.mapper.BuyHousesMemberMapper;
 import com.ruoyi.system.service.IBuyHousesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,19 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     private final BuyHousesMapper baseMapper;
 
+    private final BuyHousesMemberMapper buyHousesMemberMapper;
+
     /**
      * 查询【请填写功能名称】
      */
     @Override
     public BuyHousesVo queryById(Long id){
-        return baseMapper.selectVoById(id);
+        BuyHousesVo buyHousesVo = baseMapper.selectVoById(id);
+        LambdaQueryWrapper<BuyHousesMember> queryWrapper = new LambdaQueryWrapper<BuyHousesMember>()
+            .eq(BuyHousesMember::getBuyHousesId, id);
+        List<BuyHousesMember> buyHousesMembers = buyHousesMemberMapper.selectList(queryWrapper);
+        buyHousesVo.setBuyHousesMemberList(buyHousesMembers);
+        return buyHousesVo;
     }
 
     /**

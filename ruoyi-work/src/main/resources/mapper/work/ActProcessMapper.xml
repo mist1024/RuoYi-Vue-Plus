@@ -50,6 +50,9 @@
                     (SELECT id FROM `process` WHERE FIND_IN_SET(#{actProcess.userId},cc))
               GROUP BY business_id  ) AS a
                 INNER JOIN process p ON p.id = a.process_id
+        <where>
+            <if test="actProcess.startUser != null and actProcess.startUser != ''"> and a.start_user like concat('%', #{actProcess.startUser}, '%')</if>
+        </where>
         ORDER BY a.create_time
     </select>
     <select id="selectByIdResultBean2BusinessId" resultType="com.ruoyi.work.domain.ActProcess"

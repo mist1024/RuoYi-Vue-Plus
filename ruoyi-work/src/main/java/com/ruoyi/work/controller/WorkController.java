@@ -1,6 +1,6 @@
 package com.ruoyi.work.controller;
-
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.Constants;
@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -97,6 +96,8 @@ public class WorkController extends BaseController {
         WorkComplyUtils.getStep(businessDTO);
     }
 
+
+
     /**
      * 流程办理
      */
@@ -104,6 +105,15 @@ public class WorkController extends BaseController {
     @SaCheckPermission("work:task:batchDeleted")
     @PostMapping("/batchDeleted")
     public R<?> batchDeleted(@RequestBody HisProcess hisProcess){
+        if (ObjectUtil.isNull(hisProcess.getStatus())){
+            return R.fail("状态不可为空");
+        }
+        if (ObjectUtil.isNull(hisProcess.getProcessKey())){
+            return R.fail("流程key不可为空");
+        }
+        if (ObjectUtil.isNull(hisProcess.getBusinessId())){
+            return R.fail("业务id不可为空");
+        }
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, hisProcess.getProcessKey());
         List<TProcess> tProcesses = processMapper.selectList(wrapper);
