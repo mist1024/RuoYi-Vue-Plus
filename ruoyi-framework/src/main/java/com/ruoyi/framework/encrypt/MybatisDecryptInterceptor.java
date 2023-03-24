@@ -2,12 +2,6 @@ package com.ruoyi.framework.encrypt;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.ruoyi.common.annotation.EncryptField;
-import com.ruoyi.common.encrypt.EncryptContext;
-import com.ruoyi.common.enums.AlgorithmType;
-import com.ruoyi.common.enums.EncodeType;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.config.properties.EncryptorProperties;
 import com.ruoyi.framework.manager.EncryptorManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +28,7 @@ import java.util.*;
 public class MybatisDecryptInterceptor implements Interceptor {
 
     private final EncryptorManager encryptorManager;
-    private final EncryptorProperties defaultProperties;
+
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -91,14 +85,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
      * @return 加密后结果
      */
     private String decryptField(String value, Field field) {
-        EncryptField encryptField = field.getAnnotation(EncryptField.class);
-        EncryptContext encryptContext = new EncryptContext();
-        encryptContext.setAlgorithm(encryptField.algorithm() == AlgorithmType.DEFAULT ? defaultProperties.getAlgorithm() : encryptField.algorithm());
-        encryptContext.setEncode(encryptField.encode() == EncodeType.DEFAULT ? defaultProperties.getEncode() : encryptField.encode());
-        encryptContext.setPassword(StringUtils.isBlank(encryptField.password()) ? defaultProperties.getPassword() : encryptField.password());
-        encryptContext.setPrivateKey(StringUtils.isBlank(encryptField.privateKey()) ? defaultProperties.getPrivateKey() : encryptField.privateKey());
-        encryptContext.setPublicKey(StringUtils.isBlank(encryptField.publicKey()) ? defaultProperties.getPublicKey() : encryptField.publicKey());
-        return this.encryptorManager.decrypt(value, encryptContext);
+        return this.encryptorManager.decrypt(value,  EncryptContextBuild.build(field));
     }
 
     @Override

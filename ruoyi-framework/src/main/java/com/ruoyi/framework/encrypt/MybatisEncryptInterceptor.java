@@ -37,7 +37,6 @@ import java.util.*;
 public class MybatisEncryptInterceptor implements Interceptor {
 
     private final EncryptorManager encryptorManager;
-    private final EncryptorProperties defaultProperties;
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -101,14 +100,7 @@ public class MybatisEncryptInterceptor implements Interceptor {
      * @return 加密后结果
      */
     private String encryptField(String value, Field field) {
-        EncryptField encryptField = field.getAnnotation(EncryptField.class);
-        EncryptContext encryptContext = new EncryptContext();
-        encryptContext.setAlgorithm(encryptField.algorithm() == AlgorithmType.DEFAULT ? defaultProperties.getAlgorithm() : encryptField.algorithm());
-        encryptContext.setEncode(encryptField.encode() == EncodeType.DEFAULT ? defaultProperties.getEncode() : encryptField.encode());
-        encryptContext.setPassword(StringUtils.isBlank(encryptField.password()) ? defaultProperties.getPassword() : encryptField.password());
-        encryptContext.setPrivateKey(StringUtils.isBlank(encryptField.privateKey()) ? defaultProperties.getPrivateKey() : encryptField.privateKey());
-        encryptContext.setPublicKey(StringUtils.isBlank(encryptField.publicKey()) ? defaultProperties.getPublicKey() : encryptField.publicKey());
-        return this.encryptorManager.encrypt(value, encryptContext);
+        return this.encryptorManager.encrypt(value, EncryptContextBuild.build(field));
     }
 
 
