@@ -19,9 +19,6 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(value = "mybatis-encryptor.enable", havingValue = "true")
 public class EncryptorConfig {
 
-    @Autowired
-    private EncryptorProperties properties;
-
     @Bean
     public EncryptorManager encryptorManager() {
         return new EncryptorManager();
@@ -29,11 +26,11 @@ public class EncryptorConfig {
 
     @Bean
     public MybatisEncryptInterceptor mybatisEncryptInterceptor(EncryptorManager encryptorManager) {
-        return new MybatisEncryptInterceptor(encryptorManager, properties);
+        return new MybatisEncryptInterceptor(encryptorManager);
     }
 
     @Bean
     public MybatisDecryptInterceptor mybatisDecryptInterceptor(EncryptorManager encryptorManager) {
-        return new MybatisDecryptInterceptor(encryptorManager, properties);
+        return new MybatisDecryptInterceptor(encryptorManager);
     }
 }
