@@ -321,10 +321,23 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.9</version>
+            </dependency>
+
             <!-- demo模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-demo</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
+<!--            工作模块-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-work</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
@@ -342,6 +355,7 @@
         <module>ruoyi-extend</module>
         <module>ruoyi-oss</module>
         <module>ruoyi-sms</module>
+        <module>ruoyi-work</module>
     </modules>
     <packaging>pom</packaging>
 

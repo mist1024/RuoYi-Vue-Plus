@@ -23,6 +23,7 @@ import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysRoleMenuMapper;
 import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysRoleService;
+import com.ruoyi.work.service.IWorkSysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Service
-public class SysRoleServiceImpl implements ISysRoleService {
+public class SysRoleServiceImpl implements ISysRoleService, IWorkSysRoleService {
 
     private final SysRoleMapper baseMapper;
     private final SysRoleMenuMapper roleMenuMapper;

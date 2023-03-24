@@ -72,5 +72,25 @@ public interface Constants {
      */
     String TOKEN = "token";
 
+    /**
+     * 审核等待中
+     */
+    String WAIT = "wait";
+
+    /**
+     * 审核成功
+     */
+    String SUCCEED = "succeed";
+
+    /**
+     * 审核失败
+     */
+    String FAILD = "faild";
+
+    /**
+     * 数据不存在
+     */
+    String NONENTITY = "nonentity";
+
 }
 

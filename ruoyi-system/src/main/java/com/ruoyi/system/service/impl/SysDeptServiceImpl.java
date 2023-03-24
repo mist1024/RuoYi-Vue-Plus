@@ -23,6 +23,7 @@ import com.ruoyi.system.mapper.SysDeptMapper;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysDeptService;
+import com.ruoyi.work.service.IWorkSysDeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +40,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Service
-public class SysDeptServiceImpl implements ISysDeptService, DeptService {
+public class SysDeptServiceImpl implements ISysDeptService, DeptService, IWorkSysDeptService {
 
     private final SysDeptMapper baseMapper;
     private final SysRoleMapper roleMapper;
