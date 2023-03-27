@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
@@ -45,4 +46,6 @@ public interface IBuyHousesService {
      * 校验并批量删除【请填写功能名称】信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    R<?> getMaterialInfo(BuyHousesBo bo);
 }

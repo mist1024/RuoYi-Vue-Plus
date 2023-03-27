@@ -71,10 +71,15 @@ public class HisProcessVo {
 
     private Date createTime;
 
+    private Date endTime;
+
     private String startUser;
 
     @TableField(exist = false)
     private String bean;
+
+    @TableField(exist = false)
+    private String description;
 
 
 }

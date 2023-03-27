@@ -12,9 +12,11 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.work.domain.ActProcess;
 import com.ruoyi.work.domain.HisProcess;
+import com.ruoyi.work.domain.RollBackLog;
 import com.ruoyi.work.domain.TProcess;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.BusinessDTO;
+import com.ruoyi.work.dto.HisProcessVoResultDto;
 import com.ruoyi.work.dto.ProcessVoResultDto;
 import com.ruoyi.work.mapper.ProcessMapper;
 import com.ruoyi.work.utils.WorkComplyUtils;
@@ -84,7 +86,7 @@ public class WorkController extends BaseController {
      */
     @Log(title = "获取可退回步骤",businessType = BusinessType.OTHER)
     @PostMapping("/getStep")
-    public void getStep(@RequestBody BusinessDTO businessDTO){
+    public R<?> getStep(@RequestBody BusinessDTO businessDTO){
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, businessDTO.getProcessKey());
         List<TProcess> tProcesses = processMapper.selectList(wrapper);
@@ -93,7 +95,8 @@ public class WorkController extends BaseController {
         }
         Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),businessDTO.getBusinessId());
         businessDTO.setParams(map);
-        WorkComplyUtils.getStep(businessDTO);
+        List<HisProcessVoResultDto> step = WorkComplyUtils.getStep(businessDTO);
+        return R.ok(step);
     }
 
 
@@ -154,6 +157,14 @@ public class WorkController extends BaseController {
     public R<?> getAuditLogListByOtherId(@RequestBody BusinessDTO businessDTO){
         return WorkComplyUtils.getAuditLogListByOtherId(businessDTO);
     }
+
+
+    @Log(title = "回退",businessType = BusinessType.OTHER)
+    @PostMapping("/rollBackLog")
+    public R<?> rollBackLog(@RequestBody RollBackLog rollBackLog){
+       return toAjax(WorkComplyUtils.rollBack(rollBackLog));
+    }
+
 
 }
 

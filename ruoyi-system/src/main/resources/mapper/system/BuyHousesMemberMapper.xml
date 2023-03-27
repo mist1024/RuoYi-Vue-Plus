@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BuyHousesMemberMapper">
+
+    <resultMap type="com.ruoyi.system.domain.BuyHousesMember" id="BuyHousesMemberResult">
+        <result property="id" column="id"/>
+        <result property="insidepageUrl" column="insidepage_url"/>
+        <result property="buyHousesId" column="buy_houses_id"/>
+        <result property="frontUrl" column="front_url"/>
+        <result property="relation" column="relation"/>
+        <result property="reverseUrl" column="reverse_url"/>
+        <result property="homeRecordUrl" column="home_record_url"/>
+        <result property="cardId" column="card_id"/>
+        <result property="name" column="name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
+</mapper>

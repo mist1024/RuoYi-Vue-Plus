@@ -153,9 +153,13 @@ public class BuyHouses  {
      */
     private String workAddress;
 
-    public String processKey;
+    private String processKey;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String processStatus;
+
+
     private Date updateTime;
+
+    private String version;
 
 }

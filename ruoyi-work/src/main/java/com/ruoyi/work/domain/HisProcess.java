@@ -47,7 +47,6 @@ public class HisProcess{
      */
     private String status;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
 
@@ -57,7 +56,6 @@ public class HisProcess{
     @TableField(exist = false)
     private Map params;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
     private String step;
@@ -66,17 +64,22 @@ public class HisProcess{
 
     private String startUser;
 
+    @TableField(exist = false)
     private String userId;
 
+    @TableField(exist = false)
     private String roleId;
 
+    @TableField(exist = false)
     private String deptId;
 
+    @TableField(exist = false)
     private String companyUserId;
 
     /**
      * 相隔时间差
      */
+    @TableField(exist = false)
     private String timeBetween;
 
     private String companyName;
@@ -89,6 +92,12 @@ public class HisProcess{
 
     @TableField(exist = false)
     private String bean;
+
+    @TableField(exist = false)
+    private String description;
+
+    @TableField(exist = false)
+    private String audit1;
 
 
 

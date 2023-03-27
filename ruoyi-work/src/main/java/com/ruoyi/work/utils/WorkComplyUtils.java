@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
@@ -28,6 +29,7 @@ import com.ruoyi.work.domain.vo.ActProcessVo;
 import com.ruoyi.work.domain.vo.HisProcessVo;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.BusinessDTO;
+import com.ruoyi.work.dto.HisProcessVoResultDto;
 import com.ruoyi.work.dto.ProcessVoResultDto;
 import com.ruoyi.work.mapper.*;
 import com.ruoyi.work.service.IWorkSysDeptService;
@@ -323,7 +325,7 @@ public class WorkComplyUtils {
      * 先判断这条流程走到那一步了,可以撤回到那几步
      */
 
-    public static Map<String, List<HisProcessVo>>getStep(BusinessDTO businessDTO){
+    public static List<HisProcessVoResultDto> getStep(BusinessDTO businessDTO){
         //获取当前任务执行到那一步了
         LambdaQueryWrapper<ActProcess> lwq = new LambdaQueryWrapper<>();
         lwq.eq(ActProcess::getBusinessId,businessDTO.getBusinessId());
@@ -337,46 +339,45 @@ public class WorkComplyUtils {
             if (!"1".equals(step)){
                 //获取历史表中在该业务流程步骤之前的人员数据,根据业务表的更新时间为节点
                 Object updateTime = businessDTO.getParams().get("updateTime");
-                LambdaQueryWrapper<HisProcess> wrapper = new LambdaQueryWrapper<>();
-                wrapper.eq(HisProcess::getBusinessId,businessDTO.getBusinessId());
-                wrapper.ge(HisProcess::getStep,"1");
-                wrapper.lt(HisProcess::getStep,step);
-                wrapper.ge(HisProcess::getCreateTime,updateTime);
-                wrapper.orderByAsc(HisProcess::getStep);
-                List<HisProcessVo> hisProcessVos = hisProcessMapper.selectVoList(wrapper);
-                for (HisProcessVo hisProcessVo : hisProcessVos) {
-                    if ("4".equals(hisProcessVo)){//企业
-                        String companyName = businessDTO.getParams().get("companyName").toString();
-                        hisProcessVo.setAudit(companyName);
-                    }else{
-                        if ("1".equals(hisProcessVo.getCheckType())){//人才
-                            String username = LoginHelper.getUsername();
-                            hisProcessVo.setAudit1(username);
-                        }else if ("2".equals(hisProcessVo.getCheckType())){//部门
-                            String deptName = LoginHelper.getLoginUser().getDeptName();
-                            hisProcessVo.setAudit1(deptName);
-                        }else if ("3".equals(hisProcessVo.getCheckType())){//角色
-                            Long roleId = LoginHelper.getLoginUser().getRoleId();
-                            SysRole sysRole = sysRoleMapper.selectRoleById(roleId);
-                            hisProcessVo.setAudit1(sysRole.getRoleName());
-                        }else if ("4".equals(hisProcessVo.getCheckType())){//公司
-                            hisProcessVo.setAudit1(hisProcessVo.getCompanyName());
-                        }
+                if (ObjectUtil.isNull(updateTime)){
+                    throw new ServiceException("updateTime不可为空");
+                }
+                QueryWrapper<HisProcess> wrapper = new QueryWrapper<>();
+                wrapper.eq("business_id",businessDTO.getBusinessId());
+                wrapper.ge("h.step","1");
+                wrapper.le("h.step",step);
+                wrapper.ge("h.create_time",updateTime);
+                wrapper.orderByAsc("h.step");
+                List<HisProcess> hisProcessVos = hisProcessMapper.selectVoHisList(wrapper);
+                for (HisProcess hisProcessVo : hisProcessVos) {
+                    if ("4".equals(hisProcessVo.getCheckType())) {//企业审核
+                        hisProcessVo.setAudit1(hisProcessVo.getCompanyName());
+                    } else if ("1".equals(hisProcessVo.getCheckType())) {
+                        //根据id获取人员信息
+                        SysUser sysUser = sysUserMapper.selectUserById(new Long(hisProcessVo.getAudit()));
+                        hisProcessVo.setAudit1(sysUser.getUserName());
+                    } else if ("2".equals(hisProcessVo.getCheckType())) {
+                        SysDept sysDept = sysDeptMapper.selectDeptById(new Long(hisProcessVo.getAudit()));
+                        hisProcessVo.setAudit1(sysDept.getDeptName());
+                    } else if ("3".equals(hisProcessVo.getCheckType())) {
+                        SysRole sysRole = sysRoleMapper.selectRoleById(new Long(hisProcessVo.getAudit()));
+                        hisProcessVo.setAudit1(sysRole.getRoleName());
                     }
                 }
+
                 //将每个步骤处理为单个对象
-                Map<String, List<HisProcessVo>> collect = hisProcessVos.stream().collect(Collectors.groupingBy(HisProcessVo::getStep));
-                System.out.println("collect = " + collect);
-               /* List<HisProcessVoResultDto> collect1 = collect.entrySet()
+                Map<String, List<HisProcess>> collect = hisProcessVos.stream().collect(Collectors.groupingBy(HisProcess::getStep));
+                List<HisProcessVoResultDto> collect1 = collect.entrySet()
                     .stream()
                     .map(e -> new HisProcessVoResultDto(e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
 
                 collect1.forEach(e ->{
-                    String s = e.getHisProcessVoList().stream().map(ProcessVo::getDescription).collect(Collectors.toList()).get(0);
+                    String s = e.getHisProcessVoList().stream().map(HisProcess::getDescription).collect(Collectors.toList()).get(0);
                     e.setStep(s);
-                });*/
-                return collect;
+                });
+                System.out.println("collect = " + collect1);
+                return collect1;
             }
         }
         return null;

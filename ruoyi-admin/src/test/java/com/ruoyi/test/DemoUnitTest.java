@@ -11,13 +11,12 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.system.domain.BuyHouses;
-import com.ruoyi.system.domain.MaterialTalents;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
+import com.ruoyi.system.domain.vo.MaterialModuleVo;
 import com.ruoyi.system.domain.vo.MaterialTalentsVo;
-import com.ruoyi.system.mapper.BuyHousesMapper;
-import com.ruoyi.system.mapper.HousesReviewMapper;
-import com.ruoyi.system.mapper.MaterialTalentsMapper;
+import com.ruoyi.system.mapper.*;
+import com.ruoyi.system.service.impl.MaterialModuleServiceImpl;
 import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import com.ruoyi.work.domain.ActProcess;
 import com.ruoyi.work.domain.HisProcess;
@@ -76,6 +75,15 @@ public class DemoUnitTest {
 
     @Autowired
     private SysConfigServiceImpl sysConfigService;
+
+    @Autowired
+    private MaterialModuleMapper materialModuleMapper;
+
+    @Autowired
+    private MaterialProofMapper materialProofMapper;
+
+    @Autowired
+    private  MaterialModuleServiceImpl materialModuleService;
 
 
     @DisplayName("测试 @SpringBootTest @Test @DisplayName 注解")
@@ -176,10 +184,11 @@ public class DemoUnitTest {
     @Test
     public void  test004(){
         BusinessDTO businessDTO = new BusinessDTO();
-        BuyHouses buyHouses = buyHousesMapper.selectById("2");
-        Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
+//        BuyHouses buyHouses = buyHousesMapper.selectById("1011");
+        HousesReview housesReview = housesReviewMapper.selectById("1633344911078064130");
+        Map<String, Object> map = BeanUtil.beanToMap(housesReview);
         businessDTO.setParams(map);
-        businessDTO.setBusinessId(buyHouses.getId().toString());
+        businessDTO.setBusinessId(housesReview.getId().toString());
         WorkComplyUtils.getStep(businessDTO);
     }
 
@@ -303,5 +312,41 @@ public class DemoUnitTest {
     @Test
     public void test00000(){
         processMapper.updateCommonByBusinessId("buy_houses", Constants.FAILD,"2");
+    }
+
+    @Test
+    public void tests1245545(){
+        List<MaterialModule> materialModules = materialModuleMapper.selectList();
+        List<BuyHouses> buyHouses = buyHousesMapper.selectList();
+        ArrayList<MaterialProof> list = new ArrayList<>();
+        for (BuyHouses buyHouse : buyHouses) {
+            Map<String, Object> map = BeanUtil.beanToMap(buyHouse);
+            for (MaterialModule materialModule : materialModules) {
+                if (ObjectUtil.isNotNull(map.get(materialModule.getMaterialKey()))){
+                    MaterialProof materialProof = new MaterialProof();
+                    materialProof.setHouseId(buyHouse.getId().toString());
+                    materialProof.setModulePathId(materialModule.getId().toString());
+                    materialProof.setFile( map.get(materialModule.getMaterialKey()).toString());
+                    materialProof.setMaterialKey(materialModule.getMaterialKey());
+                    materialProof.setAuditDept(materialModule.getAuditDept());
+                    materialProof.setMaterialName(materialModule.getMaterialName());
+                    materialProof.setDescription(materialModule.getDescription());
+                    materialProof.setProcessKey("apply_house");
+                    list.add(materialProof);
+                    String o = map.get(materialModule.getMaterialKey()).toString();
+                    System.out.println(buyHouse.getId()+":"+materialModule.getMaterialName() +":" + o);
+                }
+
+            }
+        }
+        materialProofMapper.insertBatch(list);
+    }
+
+    @Test
+    public void tesst00000(){
+        BuyHouses buyHouses = buyHousesMapper.selectById(1011L);
+        Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
+        List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
+        System.out.println("materialInfo = " + materialInfo);
     }
 }

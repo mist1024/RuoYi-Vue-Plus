@@ -59,5 +59,7 @@ public class MaterialProof extends BaseEntity {
 
     private String materialName;
 
+    private String processKey;
+
 
 }

@@ -1,14 +1,17 @@
 package com.ruoyi.system.domain.bo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
+import com.ruoyi.system.domain.BuyHousesMember;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 【请填写功能名称】业务对象 buy_houses
@@ -219,6 +222,13 @@ public class BuyHousesBo extends BaseEntity {
     @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private String workAddress;
 
-    public String processKey;
+    private String processKey;
+
+    @TableField(exist = false)
+    private List<BuyHousesMember> buyHousesMemberList;
+
+
+    private String version;
+
 
 }

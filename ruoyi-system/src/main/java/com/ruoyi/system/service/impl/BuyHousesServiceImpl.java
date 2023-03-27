@@ -5,14 +5,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.BuyHousesMember;
+import com.ruoyi.system.domain.MaterialProof;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
+import com.ruoyi.system.domain.vo.MaterialModuleVo;
 import com.ruoyi.system.mapper.BuyHousesMapper;
 import com.ruoyi.system.mapper.BuyHousesMemberMapper;
+import com.ruoyi.system.mapper.MaterialProofMapper;
 import com.ruoyi.system.service.IBuyHousesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,12 +39,21 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     private final BuyHousesMemberMapper buyHousesMemberMapper;
 
+    private final MaterialProofMapper materialProofMapper;
+
+    private final MaterialModuleServiceImpl materialModuleService;
+
     /**
      * 查询【请填写功能名称】
      */
     @Override
     public BuyHousesVo queryById(Long id){
         BuyHousesVo buyHousesVo = baseMapper.selectVoById(id);
+        LambdaQueryWrapper<MaterialProof> wrapper = new LambdaQueryWrapper<MaterialProof>()
+            .eq(MaterialProof::getHouseId, buyHousesVo.getId())
+            .eq(MaterialProof::getProcessKey, buyHousesVo.getProcessKey());
+        List<MaterialProof> materialProofs = materialProofMapper.selectList(wrapper);
+        buyHousesVo.setMaterialProofList(materialProofs);
         LambdaQueryWrapper<BuyHousesMember> queryWrapper = new LambdaQueryWrapper<BuyHousesMember>()
             .eq(BuyHousesMember::getBuyHousesId, id);
         List<BuyHousesMember> buyHousesMembers = buyHousesMemberMapper.selectList(queryWrapper);
@@ -145,5 +158,12 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
+    }
+
+    @Override
+    public R<?> getMaterialInfo(BuyHousesBo bo) {
+        Map<String, Object> map = BeanUtil.beanToMap(bo);
+        List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
+        return R.ok(materialInfo);
     }
 }

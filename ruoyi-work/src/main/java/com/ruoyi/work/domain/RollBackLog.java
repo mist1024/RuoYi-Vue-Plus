@@ -1,5 +1,6 @@
 package com.ruoyi.work.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -38,14 +39,19 @@ public class RollBackLog extends BaseEntity {
      */
     private String param;
 
+    @TableField(exist = false)
     private String businessId;
 
+    @TableField(exist = false)
     private String step;
 
+    @TableField(exist = false)
     private String checked;
 
+    @TableField(exist = false)
     private String checkType;
 
+    @TableField(exist = false)
     private String audit;
 
 }

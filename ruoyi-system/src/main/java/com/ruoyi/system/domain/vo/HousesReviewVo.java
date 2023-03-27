@@ -6,6 +6,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.system.domain.BuyHousesReviewMember;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -170,6 +171,8 @@ public class HousesReviewVo {
     private String companyAddressArea;
 
     private List<BuyHousesReviewMember> buyHousesMemberList;
+
+    private Date updateTime;
 
 
 }

@@ -104,6 +104,9 @@ public class ProcessVo {
     @TableField(exist = false)
     private String checked;
 
+    @TableField(exist = false)
+    private String audit1;
+
     private String bean;
 
     private String description;

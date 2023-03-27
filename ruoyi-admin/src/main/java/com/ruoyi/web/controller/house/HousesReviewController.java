@@ -1,5 +1,4 @@
 package com.ruoyi.web.controller.house;
-
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -26,7 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -48,7 +46,6 @@ import java.util.stream.Collectors;
 public class HousesReviewController extends BaseController {
 
     private final IHousesReviewService iHousesReviewService;
-
     private final BuyHousesMapper buyHousesMapper;
 
 

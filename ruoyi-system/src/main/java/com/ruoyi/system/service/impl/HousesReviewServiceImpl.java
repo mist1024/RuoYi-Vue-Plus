@@ -155,10 +155,6 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             List<Long> list = new ArrayList<>();
             if (ObjectUtil.isNotNull(buyHousesMemberList) && buyHousesMemberList.size()>0) {
                 buyHousesReviewMembers.forEach(e -> {
-                    /*boolean b1 = buyHousesMemberList.stream().noneMatch(b -> b.getFrontUrl().equals(e.getFrontUrl()));
-                    boolean b1 = buyHousesMemberList.stream().noneMatch(b -> b.getInsidepageUrl().equals(e.getInsidepageUrl()));
-                    boolean b1 = buyHousesMemberList.stream().noneMatch(b -> b.getHomeRecordUrl().equals(e.getHomeRecordUrl()));
-                    boolean b1 = buyHousesMemberList.stream().noneMatch(b -> b.getReverseUrl().equals(e.getReverseUrl()));*/
                     if (ObjectUtil.isNotNull(e.getFrontUrl())){
                         if (!buyHousesMemberList.stream().anyMatch(b -> e.getFrontUrl().equals(b.getFrontUrl()))){
                             list.add(new Long(e.getFrontUrl()));
@@ -297,7 +293,8 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      */
     @Override
     public R<?> getMaterialInfo(HousesReviewBo bo) {
-        List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(bo);
+        Map<String, Object> map = BeanUtil.beanToMap(bo);
+        List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
         return R.ok(materialInfo);
     }
 

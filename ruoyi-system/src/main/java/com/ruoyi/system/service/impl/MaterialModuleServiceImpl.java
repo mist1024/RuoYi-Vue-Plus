@@ -126,8 +126,7 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
        return R.ok(baseMapper.selectVoList(lqw));
     }
 
-    public List<MaterialModuleVo> getMaterialInfo(HousesReviewBo bo){
-        Map<String, Object> map = BeanUtil.beanToMap(bo);
+    public List<MaterialModuleVo> getMaterialInfo(Map<String, Object>  map){
         Set<String> keys = map.keySet();
         LambdaQueryWrapper<MaterialTalents> eq = new LambdaQueryWrapper<MaterialTalents>()
             .eq(MaterialTalents::getTalentsValue, map.get("processKey"));
@@ -137,6 +136,9 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
             .apply(DataBaseHelper.findInSet(materialTalentsVo.getId(), "selected"));
         List<MaterialTalents> materialTalents = materialTalentsMapper.selectList(wrapper);
         ArrayList<String> list = new ArrayList<>();
+        if (ObjectUtil.isNotNull(materialTalentsVo.getMaterials())){
+            list.add(materialTalentsVo.getMaterials());
+        }
         for (MaterialTalents materialTalent : materialTalents) {
             if (keys.contains(materialTalent.getTalentsValue())){
                 //获取当前目录下的数据
@@ -149,13 +151,17 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
             }
         }
 
-        List<Long> collect = list.stream().distinct().map(Long ::parseLong).collect(Collectors.toList());
+        String join = String.join(",", list);
+        List<String> strings = Arrays.asList(join.split(","));
+
+        List<Long> collect = strings.stream().distinct().map(Long ::parseLong).collect(Collectors.toList());
+
         List<MaterialModuleVo> materialTalentsVos = baseMapper.selectVoBatchIds(collect);
 
         LambdaQueryWrapper<MaterialProof> queryWrapper = new LambdaQueryWrapper<MaterialProof>()
-            .eq(MaterialProof::getHouseId, bo.getId());
+            .eq(MaterialProof::getHouseId, map.get("id"))
+            .eq(MaterialProof::getProcessKey,map.get("processKey"));
         List<MaterialProof> materialProofs = materialProofMapper.selectList(queryWrapper);
-
         materialTalentsVos.forEach(e -> {
             materialProofs.forEach(m ->{
                 if (e.getId().toString().equals(m.getModulePathId())){

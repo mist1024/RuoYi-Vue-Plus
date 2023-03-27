@@ -4,6 +4,7 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.system.domain.BuyHousesMember;
+import com.ruoyi.system.domain.MaterialProof;
 import lombok.Data;
 
 import java.util.Date;
@@ -224,6 +225,11 @@ public class BuyHousesVo {
 
     @TableField(exist = false)
     private List<BuyHousesMember> buyHousesMemberList;
+
+    private String version;
+
+    @TableField(exist = false)
+    private List<MaterialProof> materialProofList;
 
 
 }

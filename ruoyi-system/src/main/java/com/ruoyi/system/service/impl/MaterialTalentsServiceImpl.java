@@ -62,18 +62,21 @@ public class MaterialTalentsServiceImpl implements IMaterialTalentsService {
             LambdaQueryWrapper<MaterialTalents> wrapper = new LambdaQueryWrapper<MaterialTalents>()
                 .eq(MaterialTalents::getId, bo.getParentId());
             MaterialTalents materialTalents = baseMapper.selectOne(wrapper);
-            String selected = materialTalents.getSelected();
-            if (ObjectUtil.isNull(selected)){
-                bo.setSelected(materialTalents.getId().toString());
-            }else {
-                ArrayList<String> list = new ArrayList<>();
-                List<String> strings = Arrays.asList(materialTalents.getSelected().split(","));
-                list.addAll(strings);
-                list.add(materialTalents.getId().toString());
-                String join = StringUtils.join(list, ",");
-                bo.setSelected(join);
+            if (!bo.getParentId().equals(0L)){
+                String selected = materialTalents.getSelected();
+                if (ObjectUtil.isNull(selected)){
+                    bo.setSelected(materialTalents.getId().toString());
+                }else {
+                    ArrayList<String> list = new ArrayList<>();
+                    List<String> strings = Arrays.asList(materialTalents.getSelected().split(","));
+                    list.addAll(strings);
+                    list.add(materialTalents.getId().toString());
+                    String join = StringUtils.join(list, ",");
+                    bo.setSelected(join);
+                }
             }
         }
+
         MaterialTalents add = BeanUtil.toBean(bo, MaterialTalents.class);
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;

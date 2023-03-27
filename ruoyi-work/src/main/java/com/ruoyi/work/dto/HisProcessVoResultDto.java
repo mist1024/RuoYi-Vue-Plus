@@ -1,5 +1,6 @@
 package com.ruoyi.work.dto;
 
+import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.vo.HisProcessVo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class HisProcessVoResultDto {
     private  String step;
-    private List<HisProcessVo> hisProcessVoList;
+    private List<HisProcess> hisProcessVoList;
 
 }

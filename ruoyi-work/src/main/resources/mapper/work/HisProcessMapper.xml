@@ -43,6 +43,12 @@
         </where>
         ORDER BY d.end_time DESC
     </select>
+    <select id="selectVoHisList" resultType="com.ruoyi.work.domain.HisProcess">
+        SELECT h.id,p.description,h.audit,h.check_type AS checkType,h.step,h.type,h.start_user AS startUser,h.company_name AS companyName,p.bean
+                   ,h.business_id AS businessId
+        FROM `his_process` h INNER JOIN process p ON p.id = h.process_id
+            ${ew.getCustomSqlSegment}
+    </select>
 
 
 </mapper>
