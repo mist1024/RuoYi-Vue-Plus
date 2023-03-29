@@ -44,7 +44,8 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
         log.info("PlusWebSocketHandler, 连接：" + session.getId() + "，已收到消息:" + message.getPayload());
         List<Long> userIds = List.of(loginUser.getUserId());
-        WebSocketMessageDto webSocketMessageDto = WebSocketMessageDto.build(userIds, message.getPayload());
+        WebSocketMessageDto webSocketMessageDto = WebSocketMessageDto.builder()
+            .sessionKeys(userIds).message(message.getPayload()).build();
         WebSocketUtils.publishMessage(webSocketMessageDto);
     }
 

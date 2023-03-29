@@ -2,7 +2,6 @@ package com.ruoyi.common.websocket.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,8 +11,8 @@ import java.util.List;
  *
  * @author zendwang
  */
+@Builder
 @Data
-@Accessors(chain = true)
 public class WebSocketMessageDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,8 +26,4 @@ public class WebSocketMessageDto implements Serializable {
      * 需要发送的消息
      */
     private String message;
-
-    public static WebSocketMessageDto build(List<Long> sessionKeys, String message) {
-        return new WebSocketMessageDto().setMessage(message).setSessionKeys(sessionKeys);
-    }
 }
