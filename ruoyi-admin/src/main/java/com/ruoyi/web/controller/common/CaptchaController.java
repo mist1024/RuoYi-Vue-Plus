@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.common;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.common.constant.CacheConstants;
@@ -14,7 +15,6 @@ import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
-import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.service.ISysConfigService;
@@ -45,7 +45,6 @@ import java.util.Map;
 public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
-    private final SmsProperties smsProperties;
     private final ISysConfigService configService;
 
     /**
@@ -53,17 +52,18 @@ public class CaptchaController {
      *
      * @param phonenumber 用户手机号
      */
+    @SaIgnore
     @GetMapping("/captchaSms")
     public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}")
                               String phonenumber) {
-        if (!smsProperties.getEnabled()) {
+        if (!Convert.toBool(configService.selectConfigByKey("sys.account.smsEnabled"))) {
             return R.fail("当前系统没有开启短信功能！");
         }
         String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
-        // 验证码模板id 自行处理 (查数据库或写死均可)
-        String templateId = "";
+        // 验证码模板id
+        String templateId = configService.selectConfigByKey("sys.account.templateId");
         Map<String, String> map = new HashMap<>(1);
         map.put("code", code);
         SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
