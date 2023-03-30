@@ -27,7 +27,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 认证
@@ -57,9 +59,9 @@ public class AuthController {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.login(
-                body.getTenantId(),
-                body.getUsername(), body.getPassword(),
-                body.getCode(), body.getUuid());
+            body.getTenantId(),
+            body.getUsername(), body.getPassword(),
+            body.getCode(), body.getUuid());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -148,6 +150,20 @@ public class AuthController {
         vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
         vo.setTenantEnabled(TenantHelper.isEnable());
         return R.ok(vo);
+    }
+
+    /**
+     * 注册开关
+     *
+     * @return ture：打开 false：关闭
+     */
+    @SaIgnore
+    @GetMapping("/registerEnabled")
+    public R<Map<String, Object>> registerEnabled() {
+        Map<String, Object> ajax = new HashMap<>();
+        String register = configService.selectConfigByKey("sys.account.registerUser");
+        ajax.put("register", register);
+        return R.ok(ajax);
     }
 
 }
