@@ -2,6 +2,7 @@ package com.ruoyi.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.EmailLoginBody;
 import com.ruoyi.common.core.domain.model.LoginBody;
@@ -27,9 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 认证
@@ -159,11 +158,8 @@ public class AuthController {
      */
     @SaIgnore
     @GetMapping("/registerEnabled")
-    public R<Map<String, Object>> registerEnabled() {
-        Map<String, Object> ajax = new HashMap<>();
-        String register = configService.selectConfigByKey("sys.account.registerUser");
-        ajax.put("register", register);
-        return R.ok(ajax);
+    public R<Boolean> registerEnabled() {
+        return R.ok(Convert.toBool(configService.selectConfigByKey("sys.account.registerUser")));
     }
 
 }
