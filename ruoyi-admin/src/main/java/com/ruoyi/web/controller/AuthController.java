@@ -3,16 +3,19 @@ package com.ruoyi.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.model.EmailLoginBody;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.RegisterBody;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.core.utils.StreamUtils;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.tenant.helper.TenantHelper;
 import com.ruoyi.system.domain.bo.SysTenantBo;
 import com.ruoyi.system.domain.vo.SysTenantVo;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysTenantService;
+import com.ruoyi.web.domain.vo.LoginTenantVo;
 import com.ruoyi.web.domain.vo.LoginVo;
 import com.ruoyi.web.domain.vo.TenantListVo;
 import com.ruoyi.web.service.SysLoginService;
@@ -62,7 +65,7 @@ public class AuthController {
     }
 
     /**
-     * 短信登录(示例)
+     * 短信登录
      *
      * @param body 登录信息
      * @return 结果
@@ -72,6 +75,21 @@ public class AuthController {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
         String token = loginService.smsLogin(body.getTenantId(), body.getPhonenumber(), body.getSmsCode());
+        loginVo.setToken(token);
+        return R.ok(loginVo);
+    }
+
+    /**
+     * 邮件登录
+     *
+     * @param body 登录信息
+     * @return 结果
+     */
+    @PostMapping("/emailLogin")
+    public R<LoginVo> emailLogin(@Validated @RequestBody EmailLoginBody body) {
+        LoginVo loginVo = new LoginVo();
+        // 生成令牌
+        String token = loginService.emailLogin(body.getTenantId(), body.getEmail(), body.getEmailCode());
         loginVo.setToken(token);
         return R.ok(loginVo);
     }
@@ -118,14 +136,18 @@ public class AuthController {
      * @return 租户列表
      */
     @GetMapping("/tenant/list")
-    public R<List<TenantListVo>> tenantList(HttpServletRequest request) throws Exception {
+    public R<LoginTenantVo> tenantList(HttpServletRequest request) throws Exception {
         List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantBo());
         List<TenantListVo> voList = MapstructUtils.convert(tenantList, TenantListVo.class);
         // 获取域名
         String host = new URL(request.getRequestURL().toString()).getHost();
         // 根据域名进行筛选
         List<TenantListVo> list = StreamUtils.filter(voList, vo -> StringUtils.equals(vo.getDomain(), host));
-        return R.ok(CollUtil.isNotEmpty(list) ? list : voList);
+        // 返回对象
+        LoginTenantVo vo = new LoginTenantVo();
+        vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
+        vo.setTenantEnabled(TenantHelper.isEnable());
+        return R.ok(vo);
     }
 
 }
