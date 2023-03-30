@@ -1,5 +1,8 @@
 <template>
   <div class="navbar">
+
+    <WebSocket></WebSocket>
+
     <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/>
@@ -56,6 +59,7 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import WebSocket from './WebSocket'
 
 export default {
   components: {
@@ -66,7 +70,8 @@ export default {
     SizeSelect,
     Search,
     RuoYiGit,
-    RuoYiDoc
+    RuoYiDoc,
+    WebSocket
   },
   computed: {
     ...mapGetters([
