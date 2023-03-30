@@ -8,9 +8,13 @@ import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.SysRegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 注册验证
@@ -24,6 +28,15 @@ public class SysRegisterController extends BaseController {
 
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
+
+    @SaIgnore
+    @GetMapping("/registerEnabled")
+    public R<Map<String, Object>> registerEnabled() {
+        Map<String, Object> ajax = new HashMap<>();
+        String register = configService.selectConfigByKey("sys.account.registerUser");
+        ajax.put("register", register);
+        return R.ok(ajax);
+    }
 
     /**
      * 用户注册
