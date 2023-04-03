@@ -5,6 +5,10 @@ import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.extra.mail.MailAccount;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
@@ -20,9 +24,6 @@ import org.dromara.common.sms.entity.SmsResult;
 import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.dromara.common.web.enums.CaptchaType;
 import org.dromara.web.domain.vo.CaptchaVo;
-import jakarta.validation.constraints.NotBlank;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -49,7 +50,7 @@ public class CaptchaController {
     private final CaptchaProperties captchaProperties;
     private final SmsProperties smsProperties;
     private final MailProperties mailProperties;
-
+    private final MailAccount mailAccount;
     /**
      * 短信验证码
      *
@@ -90,7 +91,7 @@ public class CaptchaController {
         String code = RandomUtil.randomNumbers(4);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         try {
-            MailUtils.sendText(email, "登录验证码", "您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。");
+            MailUtils.sendText(mailAccount, email, "登录验证码", "您本次验证码为：" + code + "，有效性为" + Constants.CAPTCHA_EXPIRATION + "分钟，请尽快填写。");
         } catch (Exception e) {
             log.error("验证码短信发送异常 => {}", e.getMessage());
             return R.fail(e.getMessage());
