@@ -1,8 +1,9 @@
 package org.dromara.demo.controller;
 
+import cn.hutool.extra.mail.MailAccount;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.mail.utils.MailUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ import java.io.File;
 @RestController
 @RequestMapping("/demo/mail")
 public class MailController {
-
+    private final MailAccount mailAccount;
     /**
      * 发送邮件
      *
@@ -31,7 +32,7 @@ public class MailController {
      */
     @GetMapping("/sendSimpleMessage")
     public R<Void> sendSimpleMessage(String to, String subject, String text) {
-        MailUtils.sendText(to, subject, text);
+        MailUtils.sendText(mailAccount, to, subject, text);
         return R.ok();
     }
 
@@ -45,7 +46,7 @@ public class MailController {
      */
     @GetMapping("/sendMessageWithAttachment")
     public R<Void> sendMessageWithAttachment(String to, String subject, String text, String filePath) {
-        MailUtils.sendText(to, subject, text, new File(filePath));
+        MailUtils.sendText(mailAccount, to, subject, text, new File(filePath));
         return R.ok();
     }
 
