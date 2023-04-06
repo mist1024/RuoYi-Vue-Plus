@@ -54,4 +54,7 @@ public class RollBackLog extends BaseEntity {
     @TableField(exist = false)
     private String audit;
 
+    @TableField(exist = false)
+    private String processKey;
+
 }

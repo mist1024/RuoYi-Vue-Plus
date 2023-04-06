@@ -40,7 +40,7 @@ public class MaterialModuleBo extends BaseEntity {
     /**
      * 审核部门
      */
-    @NotBlank(message = "审核部门不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "审核部门不能为空", groups = { AddGroup.class, EditGroup.class })
     private String auditDept;
 
     /**

@@ -127,4 +127,9 @@ public class HousesReview extends BaseEntity {
      */
     private String companyAddressArea;
 
+    /**
+     * d类字段扩展
+     */
+    private String typeExtend;
+
 }

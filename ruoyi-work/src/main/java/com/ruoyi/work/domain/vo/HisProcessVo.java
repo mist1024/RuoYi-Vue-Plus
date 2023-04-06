@@ -78,6 +78,9 @@ public class HisProcessVo {
     @TableField(exist = false)
     private String bean;
 
+
+    private String userId;
+
     @TableField(exist = false)
     private String description;
 

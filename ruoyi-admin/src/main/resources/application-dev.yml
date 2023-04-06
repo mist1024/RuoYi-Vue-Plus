@@ -160,12 +160,26 @@ mail:
 
 --- # sms 短信
 sms:
-  enabled: false
+  enabled: true
   # 阿里云 dysmsapi.aliyuncs.com
   # 腾讯云 sms.tencentcloudapi.com
   endpoint: "dysmsapi.aliyuncs.com"
-  accessKeyId: xxxxxxx
-  accessKeySecret: xxxxxx
-  signName: 测试
+  accessKeyId: LTAI564a5PHBmDPI
+  accessKeySecret: 0ba8OURvLI9e174t8nIGnsKMQtraov
+  signName: 成都高新人才之家
   # 腾讯专用
   sdkAppId:
+
+#    本地文件存储
+file:
+  domain: http://192.168.0.54:8080
+  path: D:\\gaoxin\\images
+  prefix: /images
+  size: 10
+  template: D:\\gaoxin\\file\\
+  doc: D:\\gaoxin\\doc\\
+  mapping: /doc
+#    domain: 192.168.0.54:8080
+#    path: D:\\gaoxin\\images
+#    prefix: /images
+#    size: 10

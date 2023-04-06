@@ -71,5 +71,7 @@ public class ActProcessVo {
 
     private String startUser;
 
+    private String userId;
+
 
 }

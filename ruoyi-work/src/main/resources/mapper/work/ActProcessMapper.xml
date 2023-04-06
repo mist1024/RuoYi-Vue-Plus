@@ -20,6 +20,7 @@
         <result property="description" column="description"/>
         <result property="bean" column="bean"/>
         <result property="timeout" column="timeout"/>
+        <result property="userId" column="user_id"/>
     </resultMap>
     <select id="selectVoListPage" resultType="com.ruoyi.work.domain.ActProcess" parameterType="com.ruoyi.work.domain.ActProcess">
         SELECT a.create_time AS  createTime,a.business_id AS businessId,a.audit, a.step ,a.start_user AS startUser,a.id,p.process_key AS processKey,

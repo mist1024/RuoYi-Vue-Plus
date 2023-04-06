@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectVoPageList" resultMap="MaterialModuleResult">
         SELECT m.id,material_name,`material_key`,s.dept_name AS audit_dept,description,m.sort,m.is_must
         FROM `material_module` m
-            INNER JOIN sys_dept s ON s.dept_id = m.audit_dept
+                 LEFT JOIN sys_dept s ON s.dept_id = m.audit_dept
             ${ew.getCustomSqlSegment}
     </select>
 

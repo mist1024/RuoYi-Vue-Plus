@@ -3,13 +3,19 @@ package com.ruoyi.test;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.helper.DataBaseHelper;
+import com.ruoyi.common.utils.AesUtil;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
@@ -157,12 +163,14 @@ public class DemoUnitTest {
     @Test
     public void test002(){
         ProcessVo processVo = new ProcessVo();
-        processVo.setProcessKey("apply_house");
+        processVo.setProcessKey("apply_jn");
         processVo.setStep("1");
-        BuyHouses buyHouses = buyHousesMapper.selectById("1011");
+        BuyHouses buyHouses = buyHousesMapper.selectById("10");
+        buyHouses.setUpdateTime(DateUtils.getNowDate());
+        buyHouses.setCompanyId("100");
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         processVo.setParams(map);
-        processVo.setBusinessId("1011");
+        processVo.setBusinessId("10");
         processVo.setStartUser(buyHouses.getUserName());
         WorkComplyUtils.comply(processVo);
     }
@@ -171,7 +179,7 @@ public class DemoUnitTest {
     public void test003(){
         HisProcess hisProcess = new HisProcess();
         hisProcess.setStatus("2");
-        BuyHouses buyHouses = buyHousesMapper.selectById("2");
+        BuyHouses buyHouses = buyHousesMapper.selectById("10");
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         hisProcess.setBusinessId(buyHouses.getId().toString());
         hisProcess.setParams(map);
@@ -267,7 +275,7 @@ public class DemoUnitTest {
 
     @Test
     public void test0008(){
-        String host= "https://xyxtest.easyfees.cn/fcc";
+        String host= "https://xyxtest.easyfees.cn/fcopen/fcsso/xyx?sfzdzc=1&qybh=XYX&yhm=8401&sign=b9831864d15add760321d2a3791e2ea7&timestamp=1680154767652";
         String XYXMK ="54a321";
         String qybh="XYX";
         String account="XYX";
@@ -343,10 +351,30 @@ public class DemoUnitTest {
     }
 
     @Test
-    public void tesst00000(){
-        BuyHouses buyHouses = buyHousesMapper.selectById(1011L);
+    public void tesst00000() throws Exception {
+
+      /* String http = HttpRequest.get("https://gx.chengdutalent.cn:8010/candidates/getByCard")
+            .header("Cookie","security.session.id=e1eee749-70da-48a5-8390-b99c7e1749e0")
+            .execute()
+            .body();*/
+        String s = AesUtil.encryptBASE64("18716148446");
+        System.out.println("s = " + s);
+        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
+        JSONObject json1 = JSONUtil.createObj()
+                .set("loginName", AesUtil.encryptBASE64("15881326343"))
+                    .set("password",AesUtil.encryptBASE64("Feng19891217"));
+//        hashMap.put("loginName", AesUtil.encryptBASE64("18716148446"));
+//        hashMap.put("password",AesUtil.encryptBASE64("1234Qwer"));
+
+        String http = HttpRequest.post("https://gx.chengdutalent.cn:8010/user/login")
+            .header("Content-Type","application/json;charset=UTF-8")
+            .body(String.valueOf(json1))
+            .execute().body();
+        String backURL = String.valueOf(JSONUtil.parseObj(http).get("backURL"));
+        System.out.println("http = " + http);
+       /* BuyHouses buyHouses = buyHousesMapper.selectById(1011L);
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
-        System.out.println("materialInfo = " + materialInfo);
+        System.out.println("materialInfo = " + materialInfo);*/
     }
 }

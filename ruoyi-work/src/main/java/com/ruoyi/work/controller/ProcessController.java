@@ -25,7 +25,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 
 /**
- * 流程
+ * 流程配置模块
  *
  * @author ruoyi
  * @date 2023-03-24

@@ -148,6 +148,8 @@ public class HousesReviewController extends BaseController {
             //查询出导入数据中的身份证有那些是属于区级人才的
             List<String> collect1 = buyHousesMapper.selectList(queryWrapper).stream().map(BuyHouses::getCardId).collect(Collectors.toList());
             for (HousesReview housesReview : list) {
+                housesReview.setProcessKey("house_review");
+                housesReview.setProcessStatus("submit");
                 if ( collect1.size() > 0 &&  collect1.contains(housesReview.getCard()) ) {
                     housesReview.setSourceBy("1");
                 } else {

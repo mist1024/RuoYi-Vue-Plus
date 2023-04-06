@@ -114,6 +114,16 @@ public class ProcessVo {
     @TableField(exist = false)
     private List<AuditLog> auditLogList;
 
+    @TableField(exist = false)
+    private List<AuditLog> auditLogList1;
+
+    @TableField(exist = false)
+    private Integer size;
+
+    @TableField(exist = false)
+    private List<ActProcessVo> actProcessVoList;
+
+
 
 
 

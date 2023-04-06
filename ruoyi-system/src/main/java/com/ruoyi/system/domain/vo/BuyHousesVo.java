@@ -223,6 +223,8 @@ public class BuyHousesVo {
 
     private String processKey;
 
+    private String processStatus;
+
     @TableField(exist = false)
     private List<BuyHousesMember> buyHousesMemberList;
 
@@ -230,6 +232,10 @@ public class BuyHousesVo {
 
     @TableField(exist = false)
     private List<MaterialProof> materialProofList;
+
+    private Date updateTime;
+
+    private String companyId;
 
 
 }

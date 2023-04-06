@@ -3,6 +3,7 @@ package com.ruoyi.system.domain.bo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
+import com.ruoyi.common.core.validate.DownloadGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.system.domain.BuyHousesMember;
 import lombok.Data;
@@ -39,7 +40,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 身份证/护照
      */
-    @NotBlank(message = "身份证/护照不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "身份证/护照不能为空", groups = { AddGroup.class, EditGroup.class ,DownloadGroup.class})
     private String cardId;
 
     /**
@@ -51,13 +52,13 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 单位地址
      */
-    @NotBlank(message = "单位地址不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "单位地址不能为空", groups = { AddGroup.class, EditGroup.class, DownloadGroup.class })
     private String companyAddress;
 
     /**
      * 工作单位
      */
-    @NotBlank(message = "工作单位不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "工作单位不能为空", groups = { AddGroup.class, EditGroup.class , DownloadGroup.class})
     private String companyName;
 
     /**
@@ -81,7 +82,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 学历
      */
-    @NotBlank(message = "学历不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "学历不能为空", groups = { AddGroup.class, EditGroup.class,DownloadGroup.class })
     private String education;
 
     /**
@@ -141,7 +142,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 手机号
      */
-    @NotBlank(message = "手机号不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "手机号不能为空", groups = { AddGroup.class, EditGroup.class,DownloadGroup.class })
     private String phone;
 
     /**
@@ -159,7 +160,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 性别
      */
-    @NotBlank(message = "性别不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "性别不能为空", groups = { AddGroup.class, EditGroup.class,DownloadGroup.class })
     private String sex;
 
     /**
@@ -171,7 +172,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 统一社会信用代码
      */
-    @NotBlank(message = "统一社会信用代码不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "统一社会信用代码不能为空", groups = { AddGroup.class, EditGroup.class,DownloadGroup.class })
     private String socialCode;
 
     /**
@@ -189,7 +190,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 类型 A B C D
      */
-    @NotBlank(message = "类型 A B C D不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "类型 A B C D不能为空", groups = { AddGroup.class, EditGroup.class,DownloadGroup.class })
     private String type;
 
     /**
@@ -201,7 +202,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 姓名
      */
-    @NotBlank(message = "姓名不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "姓名不能为空", groups = { AddGroup.class, EditGroup.class,DownloadGroup.class })
     private String userName;
 
     /**
@@ -211,24 +212,34 @@ public class BuyHousesBo extends BaseEntity {
     private Date affTime;
 
     /**
-     *
+     *人才影像卡
      */
     @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private String pictureInformationUrl;
 
     /**
-     *
+     *工作地址
      */
     @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private String workAddress;
 
+    /**
+     * 流程key
+     */
     private String processKey;
+
+    /**
+     * 流程状态
+     */
+    private String processStatus;
 
     @TableField(exist = false)
     private List<BuyHousesMember> buyHousesMemberList;
 
 
     private String version;
+
+    private String companyId;
 
 
 }

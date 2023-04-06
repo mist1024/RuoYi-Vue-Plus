@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +19,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
-import com.ruoyi.common.core.validate.QueryGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
@@ -35,7 +35,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/declare")
+@RequestMapping("/system/house")
 public class BuyHousesController extends BaseController {
 
     private final IBuyHousesService iBuyHousesService;
@@ -75,24 +75,24 @@ public class BuyHousesController extends BaseController {
     /**
      * 新增【请填写功能名称】
      */
-    @SaCheckPermission("system:houses:add")
+    /*@SaCheckPermission("system:houses:add")
     @Log(title = "【购房申请添加】", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody BuyHousesBo bo) {
         return toAjax(iBuyHousesService.insertByBo(bo));
-    }
+    }*/
 
     /**
      * 修改【请填写功能名称】
      */
-    @SaCheckPermission("system:houses:edit")
+  /*  @SaCheckPermission("system:houses:edit")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody BuyHousesBo bo) {
         return toAjax(iBuyHousesService.updateByBo(bo));
-    }
+    }*/
 
     /**
      * 删除【请填写功能名称】
@@ -115,4 +115,7 @@ public class BuyHousesController extends BaseController {
     public R<?> getMaterialInfo(@RequestBody BuyHousesBo bo){
         return iBuyHousesService.getMaterialInfo(bo);
     }
+
+
+
 }

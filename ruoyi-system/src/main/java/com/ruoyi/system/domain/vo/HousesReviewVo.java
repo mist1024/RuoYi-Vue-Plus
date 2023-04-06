@@ -2,10 +2,12 @@ package com.ruoyi.system.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.system.domain.BuyHousesReviewMember;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -18,14 +20,14 @@ import java.util.List;
  */
 @Data
 @ExcelIgnoreUnannotated
-public class HousesReviewVo {
+public class HousesReviewVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @ExcelProperty(value = "id")
+//    @ExcelProperty(value = "id")
     private Long id;
 
     /**
@@ -152,6 +154,7 @@ public class HousesReviewVo {
      * 企业所在地
      */
 //    @ExcelProperty(value = "企业所在地")
+
     private String companyAddress;
 
     /**
@@ -170,9 +173,15 @@ public class HousesReviewVo {
 
     private String companyAddressArea;
 
+    @TableField(exist = false)
     private List<BuyHousesReviewMember> buyHousesMemberList;
 
     private Date updateTime;
+
+    /**
+     * d类字段扩展
+     */
+    private String typeExtend;
 
 
 }

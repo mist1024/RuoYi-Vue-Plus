@@ -3,7 +3,9 @@ package com.ruoyi.system.service;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
+import com.ruoyi.system.domain.dto.DeclareListDTO;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
 
 import java.util.Collection;
@@ -48,4 +50,14 @@ public interface IBuyHousesService {
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 
     R<?> getMaterialInfo(BuyHousesBo bo);
+
+    BuyHouses getBuyHousesByCardId(String cardId);
+
+    R downloadWord(BuyHousesBo buyHouses);
+
+    List<DeclareListDTO> getDeclareList();
+
+    R<?> getInfo(BuyHouses buyHouses);
+
+    R getGaoXinCandidateInfoByCardId(String cardId);
 }

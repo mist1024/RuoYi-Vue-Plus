@@ -53,5 +53,7 @@ public class ActProcessBo {
     @NotBlank(message = "步骤不能为空", groups = { AddGroup.class, EditGroup.class })
     private String step;
 
+    private String userId;
+
 
 }

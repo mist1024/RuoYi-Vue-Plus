@@ -178,6 +178,11 @@ public class HousesReviewBo extends BaseEntity {
 
     private List<MaterialProof> materialProofList;
 
+    /**
+     * d类字段扩展
+     */
+    private String typeExtend;
+
 
 
 }

@@ -39,7 +39,6 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-work</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

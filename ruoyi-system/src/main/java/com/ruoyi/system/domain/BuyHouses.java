@@ -1,11 +1,14 @@
 package com.ruoyi.system.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 【请填写功能名称】对象 buy_houses
@@ -15,7 +18,7 @@ import java.util.Date;
  */
 @Data
 @TableName("buy_houses")
-public class BuyHouses  {
+public class BuyHouses extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -161,5 +164,12 @@ public class BuyHouses  {
     private Date updateTime;
 
     private String version;
+
+    private String companyId;
+
+    @TableField(exist = false)
+    private List<BuyHousesMember> buyHousesMemberList;
+
+
 
 }

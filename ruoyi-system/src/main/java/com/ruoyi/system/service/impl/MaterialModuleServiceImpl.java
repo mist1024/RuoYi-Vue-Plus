@@ -136,7 +136,7 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
             .apply(DataBaseHelper.findInSet(materialTalentsVo.getId(), "selected"));
         List<MaterialTalents> materialTalents = materialTalentsMapper.selectList(wrapper);
         ArrayList<String> list = new ArrayList<>();
-        if (ObjectUtil.isNotNull(materialTalentsVo.getMaterials())){
+        if (!"".equals(materialTalentsVo.getMaterials()) && ObjectUtil.isNotNull(materialTalentsVo.getMaterials())){
             list.add(materialTalentsVo.getMaterials());
         }
         for (MaterialTalents materialTalent : materialTalents) {
@@ -150,14 +150,10 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
                 }
             }
         }
-
         String join = String.join(",", list);
         List<String> strings = Arrays.asList(join.split(","));
-
         List<Long> collect = strings.stream().distinct().map(Long ::parseLong).collect(Collectors.toList());
-
         List<MaterialModuleVo> materialTalentsVos = baseMapper.selectVoBatchIds(collect);
-
         LambdaQueryWrapper<MaterialProof> queryWrapper = new LambdaQueryWrapper<MaterialProof>()
             .eq(MaterialProof::getHouseId, map.get("id"))
             .eq(MaterialProof::getProcessKey,map.get("processKey"));

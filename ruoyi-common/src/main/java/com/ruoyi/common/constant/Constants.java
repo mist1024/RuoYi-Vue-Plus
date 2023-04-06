@@ -91,6 +91,15 @@ public interface Constants {
      * 数据不存在
      */
     String NONENTITY = "nonentity";
+    /**
+     * 待提交
+     */
+    String SUBMIT = "submit";
+
+    /**
+     * 公式中
+     */
+    String PUBLICS = "publics";
 
 }
 

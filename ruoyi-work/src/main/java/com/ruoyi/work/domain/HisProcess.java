@@ -64,7 +64,6 @@ public class HisProcess{
 
     private String startUser;
 
-    @TableField(exist = false)
     private String userId;
 
     @TableField(exist = false)
@@ -98,6 +97,10 @@ public class HisProcess{
 
     @TableField(exist = false)
     private String audit1;
+
+    private String updateTime;
+
+    private Boolean isNext;
 
 
 

@@ -82,6 +82,7 @@ public class WorkComplyUtils {
             throw new ServiceException("当前业务正在审核中,请耐心等待");
         }
         ProcessVo tProcessByKey = processMapper.selectVoOne(lqw);
+        actProcessVo.setUserId(String.valueOf(LoginHelper.getUserId()));
         actProcessVo.setCreateTime(DateUtils.getNowDate());
         actProcessVo.setCheckType(tProcessByKey.getCheckType());
         actProcessVo.setStep(tProcessByKey.getStep());
@@ -156,12 +157,14 @@ public class WorkComplyUtils {
             //根据审核人员类型判断流程中那条数据属于当前人的
             String checkType = actProcessVos.get(0).getCheckType();
             String  audit ="";
-            if ("1".equals(checkType) ||  "4".equals(checkType)){
+            if ("1".equals(checkType)){
                 audit=loginUser.getUserId().toString();
             }else if ("2".equals(checkType)){
                 audit = loginUser.getDeptId().toString();
             }else if ("3".equals(checkType)){
                 audit = loginUser.getRoleId().toString();
+            }else if ("4".equals(checkType)){
+                audit =String.valueOf(loginUser.getCompanyId());
             }
             String finalAudit = audit;
             List<ActProcessVo> collect = actProcessVos.stream().filter(e -> checkType.equals(e.getCheckType()) && finalAudit.equals(e.getAudit())).collect(Collectors.toList());
@@ -170,10 +173,12 @@ public class WorkComplyUtils {
                 hisProcess.setCheckType(actProcessVo.getCheckType());
                 //往历史表里面添加当前数据
                 hisProcess.setProcessId(actProcessVo.getProcessId());
+                hisProcess.setUserId(actProcessVo.getUserId());
                 hisProcess.setCreateTime(actProcessVo.getCreateTime());
                 hisProcess.setStep(actProcessVo.getStep());
                 hisProcess.setType(actProcessVo.getType());
                 hisProcess.setStartUser(actProcessVo.getStartUser());
+                hisProcess.setIsNext(actProcessVo.getIsNext());
                 if ("1".equals(actProcessVo.getCheckType())) {//人员id
                     Long userId = loginUser.getUserId();
                     hisProcess.setAudit(ObjectUtil.isNotEmpty(userId) ? userId.toString() : "");
@@ -184,13 +189,12 @@ public class WorkComplyUtils {
                     Long roleId = loginUser.getRoleId();
                     hisProcess.setAudit(ObjectUtil.isNotEmpty(roleId) ? roleId.toString() : "");
                 } else if ("4".equals(actProcessVo.getCheckType())) {//企业
-                    Long userId = loginUser.getUserId();
+                    String userId = String.valueOf(hisProcess.getParams().get("companyId"));
                     hisProcess.setCompanyName(hisProcess.getParams().get("companyName").toString());
-                    hisProcess.setAudit(ObjectUtil.isNotEmpty(userId) ? userId.toString() : "");
+                    hisProcess.setAudit(ObjectUtil.isNotEmpty(userId) ? userId : "");
                 }
                 //先添加一个属于当前用户的记录
                 hisProcessMapper.insert(hisProcess);
-
                 //todo 保存一条审核日志
                 AuditLog auditLog = new AuditLog();
                 auditLog.setOtherId(hisProcess.getBusinessId());//业务id
@@ -249,48 +253,60 @@ public class WorkComplyUtils {
         if (ObjectUtil.isNull(userId)){
             throw new ServiceException("请先登录");
         }
-        //获取到历史表中的需要回退到那一步的最新数据
-        LambdaQueryWrapper<HisProcess> lqw = new LambdaQueryWrapper<HisProcess>()
-            .eq(HisProcess::getStep,rollBackLog.getStep())
-            .eq(HisProcess::getBusinessId,rollBackLog.getBusinessId())
-            .eq(HisProcess::getCheckType,rollBackLog.getCheckType())
-            .eq(HisProcess::getAudit,rollBackLog.getAudit())
-            .orderByDesc(HisProcess::getEndTime);
-        List<HisProcessVo> hisProcessVos = hisProcessMapper.selectVoList(lqw);
-        String param ="";
-        //获取当前流程的数据
-        LambdaQueryWrapper<ActProcess> eq = new LambdaQueryWrapper<ActProcess>()
-            .eq(ObjectUtil.isNotEmpty(rollBackLog.getBusinessId()), ActProcess::getBusinessId, rollBackLog.getBusinessId());
-        ActProcess actProcesses = actProcessMapper.selectList(eq).get(0);
-        //如果选择回退的步骤在历史表之前,将流程表中的流程替换为当前历史表中的数据
-        if (!rollBackLog.getStep().equals(actProcesses.getStep())){
-            LambdaQueryWrapper<ActProcess> eq1 = new LambdaQueryWrapper<ActProcess>()
-                .eq(ObjectUtil.isNotNull(rollBackLog.getBusinessId()), ActProcess::getBusinessId, rollBackLog.getBusinessId());
-            List<ActProcess> actProcesses1 = actProcessMapper.selectList(eq1);
-            List<Long> collect = actProcesses1.stream().map(ActProcess::getId).collect(Collectors.toList());
-            param = JsonUtils.toJsonString(actProcesses1);
-            actProcessMapper.deleteBatchIds(collect);
-        }else {
-            param = JsonUtils.toJsonString(hisProcessVos.get(0));
+        Object updateTime = rollBackLog.getParams().get("updateTime");
+        if (ObjectUtil.isNull(updateTime)){
+            throw new ServiceException("updateTime不可为空");
         }
-        //如果回退的是当前流程中的步骤(会签),当前会签流程已走了一半,将流程历史表中的记录返回到流程表中
-        HisProcessVo hisProcessVo = hisProcessVos.get(0);
+        //获取出当前流程所在的步骤
+        LambdaQueryWrapper<ActProcess> lwq = new LambdaQueryWrapper<>();
+        lwq.eq(ActProcess::getBusinessId,rollBackLog.getBusinessId());
+        List<ActProcessVo> actProcessVos = actProcessMapper.selectVoList(lwq);
+        //获取去可退回步骤
+        QueryWrapper<HisProcess> wrapper = new QueryWrapper<>();
+        wrapper.eq("business_id",rollBackLog.getBusinessId());
+        wrapper.ge("h.step","1");
+        wrapper.le("h.step",actProcessVos.get(0).getStep());
+        wrapper.ge("h.create_time",updateTime);
+        wrapper.groupBy("h.audit");
+        wrapper.orderByAsc("h.step");
+        List<HisProcess> hisProcessVos = hisProcessMapper.selectVoHisList(wrapper);
+        //如果只有一步就提示可直接退回
+        if (hisProcessVos.size()==1){
+            throw new ServiceException("当前流程不允许退回,请直接驳回");
+        }
+        //取出当前流程中最后的步骤
+        String step = hisProcessVos.stream().max(Comparator.comparing(HisProcess::getStep)).get().getStep();
+        //判断当前撤销的步骤是否是跳步
+        if (new Integer(rollBackLog.getStep())< new Integer(step)){
+            //回退当前rollBackLog中的id,将大于step的id给删除
+            List<Long> collect = hisProcessVos.stream().filter(h -> !h.getId().equals(rollBackLog.getId())).map(HisProcess::getId).collect(Collectors.toList());
+            hisProcessMapper.deleteBatchIds(collect);
+        }else {
+            List<Long> collect = hisProcessVos.stream().filter(h -> h.getId().equals(rollBackLog.getId())).map(HisProcess::getId).collect(Collectors.toList());
+            hisProcessMapper.deleteBatchIds(collect);
+        }
+        //把当前流程运行表中的数据删除
+        List<Long> collect = actProcessVos.stream().map(ActProcessVo::getId).collect(Collectors.toList());
+        actProcessMapper.deleteBatchIds(collect);
+        HisProcess hisProcess = hisProcessVos.stream().filter(h -> h.getId().equals(rollBackLog.getId())).collect(Collectors.toList()).get(0);
+        String param = JsonUtils.toJsonString(hisProcess);
         ActProcess actProcess = new ActProcess();
-        actProcess.setIsNext(actProcesses.getIsNext());
-        actProcess.setType(hisProcessVo.getType());
-        actProcess.setCheckType(hisProcessVo.getCheckType());
-        actProcess.setCompanyName(hisProcessVo.getCompanyName());
-        actProcess.setCreateTime(hisProcessVo.getCreateTime());
-        actProcess.setStep(hisProcessVo.getStep());
-        actProcess.setStartUser(hisProcessVo.getStartUser());
-        actProcess.setBusinessId(hisProcessVo.getBusinessId());
-        actProcess.setAudit(hisProcessVo.getAudit());
-        actProcess.setProcessId(hisProcessVo.getProcessId());
-        int insert = actProcessMapper.insert(actProcess);
+        actProcess.setIsNext(hisProcess.getIsNext());
+        actProcess.setType(hisProcess.getType());
+        actProcess.setUserId(hisProcess.getUserId());
+        actProcess.setCheckType(hisProcess.getCheckType());
+        actProcess.setCompanyName(hisProcess.getCompanyName());
+        actProcess.setCreateTime(hisProcess.getCreateTime());
+        actProcess.setStep(hisProcess.getStep());
+        actProcess.setStartUser(hisProcess.getStartUser());
+        actProcess.setBusinessId(hisProcess.getBusinessId());
+        actProcess.setAudit(hisProcess.getAudit());
+        actProcess.setProcessId(hisProcess.getProcessId());
+        int insert =  actProcessMapper.insert(actProcess);
         rollBackLog.setCreateTime(DateUtils.getNowDate());
         rollBackLog.setParam(param);
         rollBackLog.setUpdateBy(userId.toString());
-        rollBackLogMapper.insert(rollBackLog);
+        insert += rollBackLogMapper.insert(rollBackLog);
         return insert;
     }
     /**
@@ -336,52 +352,51 @@ public class WorkComplyUtils {
             ActProcessVo actProcessVo = actProcessVos.get(0);
             String step = actProcessVo.getStep();
             //如果当前业务就是在第一步,则不返回数据
-            if (!"1".equals(step)){
-                //获取历史表中在该业务流程步骤之前的人员数据,根据业务表的更新时间为节点
-                Object updateTime = businessDTO.getParams().get("updateTime");
-                if (ObjectUtil.isNull(updateTime)){
-                    throw new ServiceException("updateTime不可为空");
-                }
-                QueryWrapper<HisProcess> wrapper = new QueryWrapper<>();
-                wrapper.eq("business_id",businessDTO.getBusinessId());
-                wrapper.ge("h.step","1");
-                wrapper.le("h.step",step);
-                wrapper.ge("h.create_time",updateTime);
-                wrapper.orderByAsc("h.step");
-                List<HisProcess> hisProcessVos = hisProcessMapper.selectVoHisList(wrapper);
-                for (HisProcess hisProcessVo : hisProcessVos) {
-                    if ("4".equals(hisProcessVo.getCheckType())) {//企业审核
-                        hisProcessVo.setAudit1(hisProcessVo.getCompanyName());
-                    } else if ("1".equals(hisProcessVo.getCheckType())) {
-                        //根据id获取人员信息
-                        SysUser sysUser = sysUserMapper.selectUserById(new Long(hisProcessVo.getAudit()));
-                        hisProcessVo.setAudit1(sysUser.getUserName());
-                    } else if ("2".equals(hisProcessVo.getCheckType())) {
-                        SysDept sysDept = sysDeptMapper.selectDeptById(new Long(hisProcessVo.getAudit()));
-                        hisProcessVo.setAudit1(sysDept.getDeptName());
-                    } else if ("3".equals(hisProcessVo.getCheckType())) {
-                        SysRole sysRole = sysRoleMapper.selectRoleById(new Long(hisProcessVo.getAudit()));
-                        hisProcessVo.setAudit1(sysRole.getRoleName());
-                    }
-                }
-
-                //将每个步骤处理为单个对象
-                Map<String, List<HisProcess>> collect = hisProcessVos.stream().collect(Collectors.groupingBy(HisProcess::getStep));
-                List<HisProcessVoResultDto> collect1 = collect.entrySet()
-                    .stream()
-                    .map(e -> new HisProcessVoResultDto(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
-
-                collect1.forEach(e ->{
-                    String s = e.getHisProcessVoList().stream().map(HisProcess::getDescription).collect(Collectors.toList()).get(0);
-                    e.setStep(s);
-                });
-                System.out.println("collect = " + collect1);
-                return collect1;
+//            if (!"1".equals(step)){
+            //获取历史表中在该业务流程步骤之前的人员数据,根据业务表的更新时间为节点
+            Object updateTime = businessDTO.getParams().get("updateTime");
+            if (ObjectUtil.isNull(updateTime)){
+                throw new ServiceException("updateTime不可为空");
             }
+            QueryWrapper<HisProcess> wrapper = new QueryWrapper<>();
+            wrapper.eq("business_id",businessDTO.getBusinessId());
+//                wrapper.ge("h.step","1");
+            wrapper.le("h.step",step);
+            wrapper.ge("h.create_time",updateTime);
+            wrapper.groupBy("h.audit");
+            wrapper.orderByAsc("h.step");
+            List<HisProcess> hisProcessVos = hisProcessMapper.selectVoHisList(wrapper);
+            if (hisProcessVos.size()==0){
+                throw new ServiceException("当前流程没有可退回人员");
+            }
+            for (HisProcess hisProcessVo : hisProcessVos) {
+                if ("4".equals(hisProcessVo.getCheckType())) {//企业审核
+                    hisProcessVo.setAudit1(hisProcessVo.getCompanyName());
+                } else if ("1".equals(hisProcessVo.getCheckType())) {
+                    //根据id获取人员信息
+                    SysUser sysUser = sysUserMapper.selectUserById(new Long(hisProcessVo.getAudit()));
+                    hisProcessVo.setAudit1(sysUser.getUserName());
+                } else if ("2".equals(hisProcessVo.getCheckType())) {
+                    SysDept sysDept = sysDeptMapper.selectDeptById(new Long(hisProcessVo.getAudit()));
+                    hisProcessVo.setAudit1(sysDept.getDeptName());
+                } else if ("3".equals(hisProcessVo.getCheckType())) {
+                    SysRole sysRole = sysRoleMapper.selectRoleById(new Long(hisProcessVo.getAudit()));
+                    hisProcessVo.setAudit1(sysRole.getRoleName());
+                }
+            }
+            //将每个步骤处理为单个对象
+            Map<String, List<HisProcess>> collect = hisProcessVos.stream().collect(Collectors.groupingBy(HisProcess::getStep));
+            List<HisProcessVoResultDto> collect1 = collect.entrySet()
+                .stream()
+                .map(e -> new HisProcessVoResultDto(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
+            collect1.forEach(e ->{
+                String s = e.getHisProcessVoList().stream().map(HisProcess::getDescription).collect(Collectors.toList()).get(0);
+                e.setStep(s);
+            });
+            System.out.println("collect = " + collect1);
+            return collect1;
         }
-        return null;
-
     }
 
     /**
@@ -444,21 +459,18 @@ public class WorkComplyUtils {
             Page<ActProcess> actProcessVoCCList = actProcessMapper.selectCCList(pageQuery.build(), actProcess);
             if (actProcessVoCCList.getRecords().size() > 0) {
                 for (ActProcess record : actProcessVoCCList.getRecords()) {
-                    if ("1".equals(record.getCheckType())){//人员
-                        String username = loginUser.getUsername();
-                        record.setAudit(username);
-                    }
-                    if ("2".equals(record.getCheckType())){//部门
-                        String deptName = loginUser.getDeptName();
-                        record.setAudit(deptName);
-                    }
-                    if ("3".equals(record.getCheckType())){//角色
-                        Long roleId = loginUser.getRoleId();
-                        SysRole sysRole = sysRoleMapper.selectRoleById(roleId);
-                        record.setAudit(sysRole.getRoleName());
-                    }
                     if ("4".equals(record.getCheckType())){//公司
                         record.setAudit(record.getCompanyName());
+                    }else if("1".equals(record.getCheckType())) {
+                        //根据id获取人员信息
+                        SysUser sysUser = sysUserMapper.selectUserById(new Long( record.getAudit()));
+                        record.setAudit(sysUser.getUserName());
+                    }else if ("2".equals(record.getCheckType())){
+                        SysDept sysDept = sysDeptMapper.selectDeptById(new Long(record.getAudit()));
+                        record.setAudit(sysDept.getDeptName());
+                    }else if ("3".equals(record.getCheckType())){
+                        SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
+                        record.setAudit(sysRole.getRoleName());
                     }
                     if (ObjectUtil.isNotEmpty(record.getTimeout())&& ObjectUtil.isNotNull(record.getTimeout())){
                         DateTime beforeTime = DateUtil.offsetDay(record.getCreateTime(), new Integer(record.getTimeout()));
@@ -514,24 +526,21 @@ public class WorkComplyUtils {
             }
             return TableDataInfo.build(actProcessVoList);
         }
-
         actProcess.setUserId(ObjectUtil.isNotNull(loginUser.getUserId())?loginUser.getUserId().toString():"");
         actProcess.setRoleId(ObjectUtil.isNotNull(loginUser.getRoleId())?loginUser.getRoleId().toString():"");
         actProcess.setDeptId(ObjectUtil.isNotNull(loginUser.getDeptId())?loginUser.getDeptId().toString():"");
         Page<ActProcess> actProcessVoList = actProcessMapper.selectVoListPage(pageQuery.build(),actProcess);
         List<ActProcess> records = actProcessVoList.getRecords();
         for (ActProcess record : records) {
-            if ("1".equals(record.getCheckType())){//人员
-                String username = loginUser.getUsername();
-                record.setAudit(username);
-            }
-            if ("2".equals(record.getCheckType())){//部门
-                String deptName = loginUser.getDeptName();
-                record.setAudit(deptName);
-            }
-            if ("3".equals(record.getCheckType())){//角色
-                Long roleId = loginUser.getRoleId();
-                SysRole sysRole = sysRoleMapper.selectRoleById(roleId);
+            if("1".equals(record.getCheckType())) {
+                //根据id获取人员信息
+                SysUser sysUser = sysUserMapper.selectUserById(new Long( record.getAudit()));
+                record.setAudit(sysUser.getUserName());
+            }else if ("2".equals(record.getCheckType())){
+                SysDept sysDept = sysDeptMapper.selectDeptById(new Long(record.getAudit()));
+                record.setAudit(sysDept.getDeptName());
+            }else if ("3".equals(record.getCheckType())){
+                SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
                 record.setAudit(sysRole.getRoleName());
             }
             switch (record.getType()){
@@ -567,17 +576,31 @@ public class WorkComplyUtils {
         if (ObjectUtil.isNull(businessId)){
             throw new ServiceException("业务id不可为空");
         }
-
         Map params = processVo.getParams();
         if (ObjectUtil.isEmpty(params)){
             throw new ServiceException("params不可为空");
+        }
+        Object processKey = params.get("processKey");
+        if (ObjectUtil.isNull(processKey)){
+            throw new ServiceException("processKey不可为空");
         }
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, params.get("processKey"))
             .orderByAsc(TProcess::getStep);
         List<ProcessVo> processVos = processMapper.selectVoList(wrapper);
         List<ProcessVo> list1 = new ArrayList<>();
-        processVos.forEach(e ->{
+        LambdaQueryWrapper<ActProcess> queryWrapper = new LambdaQueryWrapper<ActProcess>()
+            .eq(ActProcess::getBusinessId, businessId);
+        List<ActProcessVo> actProcessVoList = actProcessMapper.selectVoList(queryWrapper);
+
+        LambdaQueryWrapper<AuditLog> wrapperLog = new LambdaQueryWrapper<AuditLog>()
+            .eq(AuditLog::getProcessKey, processKey)
+            .eq(AuditLog::getOtherId, businessId)
+            .orderByAsc(AuditLog::getCreateTime);
+        List<AuditLog> auditLogs = auditLogMapper.selectList(wrapperLog);
+        processVos.stream().forEach(e ->{
+            e.setAuditLogList1(auditLogs);
+            e.setActProcessVoList(actProcessVoList);
             e.setBusinessId(businessId);
             e.setParams(params);
             //遍历出他每一步所需要的审核人
@@ -602,8 +625,10 @@ public class WorkComplyUtils {
                 List<ProcessVo> list = new ArrayList<>();
                 if (1L == e.getProcessCheck()) {
                     String[] split = e.getAudit().split(",");
+                    e.setSize(split.length);
                     for (String s : split) {
                         e.setAudit(s);
+                        e.setChecked("");
                         dd(e);
                         ProcessVo processVo1 = new ProcessVo();
                         BeanCopyUtils.copy(e,processVo1);
@@ -618,8 +643,10 @@ public class WorkComplyUtils {
                         String[] split = e.getAudit().split(",");
                         Collections.addAll(personByRule, split);
                     }
+                    e.setSize(personByRule.size());
                     for (String s : personByRule) {
                         e.setAudit(s);
+                        e.setChecked("");
                         dd(e);
                         ProcessVo processVo1 = new ProcessVo();
                         BeanCopyUtils.copy(e,processVo1);
@@ -629,17 +656,14 @@ public class WorkComplyUtils {
                 }
             }
         });
-
         list1.forEach(e ->{
             e.setParams(null);
         });
-
         Map<String, List<ProcessVo>> collect = list1.stream().collect(Collectors.groupingBy(ProcessVo::getStep));
         List<ProcessVoResultDto> collect1 = collect.entrySet()
             .stream()
             .map(e -> new ProcessVoResultDto(e.getKey(), e.getValue()))
             .collect(Collectors.toList());
-
         collect1.forEach(e ->{
             String s = e.getProcessVoList().stream().map(ProcessVo::getDescription).collect(Collectors.toList()).get(0);
             e.setStep(s);
@@ -653,41 +677,52 @@ public class WorkComplyUtils {
      * @param e
      */
     public static void dd(ProcessVo e){
-        LambdaQueryWrapper<ActProcess> queryWrapper = new LambdaQueryWrapper<ActProcess>()
-            .eq(ActProcess::getBusinessId, e.getBusinessId());
-        List<ActProcessVo> actProcessVoList = actProcessMapper.selectVoList(queryWrapper);
-
+        List<ActProcessVo> actProcessVoList =e.getActProcessVoList();
+        List<AuditLog> auditLogs = e.getAuditLogList1();
+        List<ActProcessVo> collect1 = actProcessVoList.stream().filter(a -> a.getAudit().equals(e.getAudit()) && a.getCheckType().equals(e.getCheckType()) && a.getStep().equals(e.getStep()) && a.getType().equals(e.getType())).collect(Collectors.toList());
         if (actProcessVoList.size()>0){
-            actProcessVoList.forEach(a ->{
+            actProcessVoList.stream().forEach(a ->{
                 if ( new Integer(e.getStep())< new Integer(a.getStep())){
-                    e.setChecked("1");
+                    e.setChecked("1");//绿色
                 }else if ( new Integer(e.getStep()).equals(new Integer(a.getStep()))){
-                    e.setChecked("2");
+                    if (collect1.size()>0){
+                        e.setChecked("2");//红色
+                    }else {
+                        e.setChecked("1");
+                    }
                 }else {
-                    e.setChecked("3");
+                    e.setChecked("3");//无色
                 }
             });
-
         }else {
             Map map = e.getParams();
             Object process_status = map.get("processStatus");
             if (ObjectUtil.isNotNull(process_status)){
                 if (Constants.SUCCEED.equals(process_status.toString())){
                     e.setChecked("1");
+                }else if (Constants.FAILD.equals(process_status.toString())){
+                    if (auditLogs.size()>0){
+                        AuditLog auditLog = auditLogs.get(auditLogs.size()-1);
+                        if (auditLog.getAudit().equals(e.getAudit()) && auditLog.getStep().equals(e.getStep()) && auditLog.getAuditType().equals(e.getCheckType())){
+                            e.setChecked("2");
+                        }
+                    }
                 }
             }else {
                 e.setChecked("3");
             }
         }
-        e.setAuditLogList(null);
-        LambdaQueryWrapper<AuditLog> wrapper = new LambdaQueryWrapper<AuditLog>()
-            .eq(ObjectUtil.isNotNull(e.getProcessKey()) && StringUtils.isNotEmpty(e.getProcessKey()),AuditLog::getProcessKey, e.getProcessKey())
-            .eq(AuditLog::getOtherId, e.getBusinessId())
-            .orderByAsc(AuditLog::getCreateTime);
-        List<AuditLog> auditLogs = auditLogMapper.selectList(wrapper);
+
         if (auditLogs.size()>0) {
+            if ("4".equals(e.getCheckType())){
+                Object companyId = e.getParams().get("companyId");
+                if (ObjectUtil.isNull(companyId)){
+                    throw new ServiceException("companyId不可为空");
+                }
+                e.setAudit(String.valueOf(e.getParams().get("companyId")));
+            }
             List<AuditLog> collect = auditLogs.stream().filter(a -> e.getStep().equals(a.getStep()) && e.getAudit().equals(a.getAudit())).collect(Collectors.toList());
-            collect.forEach(a -> {
+            collect.stream().forEach(a -> {
                 if (ObjectUtil.isNotNull(a.getStatus())) {
                     switch (a.getStatus()) {
                         case "1":
@@ -716,12 +751,21 @@ public class WorkComplyUtils {
         }else if("1".equals(e.getCheckType())) {
             //根据id获取人员信息
             SysUser sysUser = sysUserMapper.selectUserById(new Long( e.getAudit()));
+            if(ObjectUtil.isNull(sysUser)){
+                throw new ServiceException("根据id获取人员信息失败");
+            }
             e.setAudit(sysUser.getUserName());
         }else if ("2".equals(e.getCheckType())){
             SysDept sysDept = sysDeptMapper.selectDeptById(new Long(e.getAudit()));
+            if(ObjectUtil.isNull(sysDept)){
+                throw new ServiceException("根据id获取部门信息失败");
+            }
             e.setAudit(sysDept.getDeptName());
         }else if ("3".equals(e.getCheckType())){
             SysRole sysRole = sysRoleMapper.selectRoleById(new Long(e.getAudit()));
+            if(ObjectUtil.isNull(sysRole)){
+                throw new ServiceException("根据id获取角色信息失败");
+            }
             e.setAudit(sysRole.getRoleName());
         }
     }

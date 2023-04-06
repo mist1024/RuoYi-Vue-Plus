@@ -47,6 +47,7 @@ public class ActProcess {
 
     private Date createTime;
 
+
     /**
      * 是由存在下一步骤
      */
@@ -56,7 +57,6 @@ public class ActProcess {
 
     private String startUser;
 
-    @TableField(exist = false)
     private String userId;
 
     @TableField(exist = false)

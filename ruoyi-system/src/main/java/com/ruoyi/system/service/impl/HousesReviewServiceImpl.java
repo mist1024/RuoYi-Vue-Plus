@@ -145,6 +145,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      */
     @Override
     public Boolean updateByBo(HousesReviewBo bo) {
+        bo.setProcessStatus("wait");
         //先删除存在的关系表
         LambdaQueryWrapper<BuyHousesReviewMember> wrapper = new LambdaQueryWrapper<BuyHousesReviewMember>()
             .eq(BuyHousesReviewMember::getBuyHousesId, bo.getId());
@@ -162,17 +163,17 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
                     }
                     if (ObjectUtil.isNotNull(e.getInsidepageUrl())) {
                         if (!buyHousesMemberList.stream().anyMatch(b ->  e.getInsidepageUrl().equals(b.getInsidepageUrl()))) {
-                            list.add(new Long(e.getFrontUrl()));
+                            list.add(new Long(e.getInsidepageUrl()));
                         }
                     }
                     if (ObjectUtil.isNotNull(e.getHomeRecordUrl())) {
                         if (!buyHousesMemberList.stream().anyMatch(b -> ObjectUtil.isNotNull(e.getHomeRecordUrl()) && e.getHomeRecordUrl().equals(b.getHomeRecordUrl()))) {
-                            list.add(new Long(e.getFrontUrl()));
+                            list.add(new Long(e.getHomeRecordUrl()));
                         }
                     }
                     if (ObjectUtil.isNotNull(e.getReverseUrl())) {
                         if (!buyHousesMemberList.stream().anyMatch(b -> ObjectUtil.isNotNull(e.getReverseUrl()) && e.getReverseUrl().equals(b.getReverseUrl()))) {
-                            list.add(new Long(e.getFrontUrl()));
+                            list.add(new Long(e.getReverseUrl()));
                         }
                     }
                 });
@@ -241,6 +242,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
                 materialProof.setStatus(0L);
                 materialProof.setModulePathId(e.getId().toString());
                 materialProof.setId(null);
+                materialProof.setProcessKey("house_review");
                 list.add(materialProof);
             });
             materialProofMapper.insertBatch(list);

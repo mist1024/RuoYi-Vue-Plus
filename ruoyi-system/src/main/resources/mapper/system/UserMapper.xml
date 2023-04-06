@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.UserMapper">
+
+    <resultMap type="com.ruoyi.system.domain.User" id="UserResult">
+        <result property="id" column="id"/>
+        <result property="status" column="status"/>
+        <result property="loginName" column="login_name"/>
+        <result property="password" column="password"/>
+        <result property="cardNumber" column="card_number"/>
+        <result property="type" column="type"/>
+        <result property="validityDate" column="validity_date"/>
+        <result property="wxToken" column="wx_token"/>
+        <result property="enterNumber" column="enter_number"/>
+        <result property="createTime" column="create_time"/>
+        <result property="userName" column="user_name"/>
+        <result property="lastTime" column="last_time"/>
+        <result property="direction" column="direction"/>
+        <result property="jurisdiction" column="jurisdiction"/>
+        <result property="jobWanted" column="job_wanted"/>
+        <result property="registerTime" column="register_time"/>
+        <result property="wxToken1" column="wx_token1"/>
+        <result property="cardId" column="card_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="userType" column="user_type"/>
+        <result property="companyId" column="company_id"/>
+    </resultMap>
+
+
+</mapper>

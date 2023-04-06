@@ -58,5 +58,7 @@ public class HisProcessBo extends BaseEntity {
 
     private String companyName;
 
+    private String userId;
+
 
 }

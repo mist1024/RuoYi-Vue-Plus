@@ -17,6 +17,8 @@
         <result property="type" column="type"/>
         <result property="startUser" column="start_user"/>
         <result property="companyName" column="companyName"/>
+        <result property="isNext" column="is_next"/>
+        <result property="userId" column="user_id"/>
     </resultMap>
 
     <select id="selectVoListPage" resultType="com.ruoyi.work.domain.HisProcess" parameterType="com.ruoyi.work.domain.HisProcess">
@@ -44,9 +46,10 @@
         ORDER BY d.end_time DESC
     </select>
     <select id="selectVoHisList" resultType="com.ruoyi.work.domain.HisProcess">
-        SELECT h.id,p.description,h.audit,h.check_type AS checkType,h.step,h.type,h.start_user AS startUser,h.company_name AS companyName,p.bean
-                   ,h.business_id AS businessId
-        FROM `his_process` h INNER JOIN process p ON p.id = h.process_id
+        SELECT h.id,p.description,h.audit,h.check_type AS checkType,h.step,h.type,h.start_user AS startUser,h.company_name AS companyName,p.bean ,
+               h.business_id AS businessId,p.process_key AS processKey,p.id AS processId,h.is_next AS isNext,h.create_time AS createTime,h.user_id AS userId
+        FROM `his_process` h
+            INNER JOIN process p ON p.id = h.process_id
             ${ew.getCustomSqlSegment}
     </select>
 

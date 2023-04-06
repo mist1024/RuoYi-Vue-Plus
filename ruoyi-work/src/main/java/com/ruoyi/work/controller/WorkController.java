@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程相关
+ * 公共流程相关
  */
 @Validated
 @RequiredArgsConstructor
@@ -105,7 +105,7 @@ public class WorkController extends BaseController {
      * 流程办理
      */
     @Log(title = "流程办理",businessType = BusinessType.OTHER)
-    @SaCheckPermission("work:task:batchDeleted")
+//    @SaCheckPermission("work:task:batchDeleted")
     @PostMapping("/batchDeleted")
     public R<?> batchDeleted(@RequestBody HisProcess hisProcess){
         if (ObjectUtil.isNull(hisProcess.getStatus())){
@@ -117,16 +117,14 @@ public class WorkController extends BaseController {
         if (ObjectUtil.isNull(hisProcess.getBusinessId())){
             return R.fail("业务id不可为空");
         }
-        LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
-            .eq(TProcess::getProcessKey, hisProcess.getProcessKey());
-        List<TProcess> tProcesses = processMapper.selectList(wrapper);
+        List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
+            .eq(TProcess::getProcessKey, hisProcess.getProcessKey()));
         if (tProcesses.size()==0){
             throw new ServiceException("当前流程不存在");
         }
         Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),hisProcess.getBusinessId());
         hisProcess.setParams(map);
         String s = WorkComplyUtils.batchDeleted(hisProcess);
-
         if (s.equals(Constants.NONENTITY)){
             return R.fail("暂无审核");
         }else{
@@ -162,7 +160,15 @@ public class WorkController extends BaseController {
     @Log(title = "回退",businessType = BusinessType.OTHER)
     @PostMapping("/rollBackLog")
     public R<?> rollBackLog(@RequestBody RollBackLog rollBackLog){
-       return toAjax(WorkComplyUtils.rollBack(rollBackLog));
+        LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
+            .eq(TProcess::getProcessKey, rollBackLog.getProcessKey());
+        List<TProcess> tProcesses = processMapper.selectList(wrapper);
+        if (tProcesses.size()==0){
+            throw new ServiceException("当前流程不存在");
+        }
+        Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),rollBackLog.getBusinessId());
+        rollBackLog.setParams(map);
+       return toAjax(WorkComplyUtils.rollBack(rollBackLog)>1?1:0);
     }
 
 
