@@ -146,7 +146,7 @@ public class BuyHouses extends BaseEntity {
     /**
      *
      */
-    private Date affTime;
+    private Date passTime;
     /**
      *
      */
@@ -169,7 +169,6 @@ public class BuyHouses extends BaseEntity {
 
     @TableField(exist = false)
     private List<BuyHousesMember> buyHousesMemberList;
-
 
 
 }

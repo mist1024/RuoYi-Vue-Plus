@@ -1,4 +1,4 @@
-package com.ruoyi.work.domain;
+package com.ruoyi.work.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;

@@ -60,5 +60,7 @@ public class HisProcessBo extends BaseEntity {
 
     private String userId;
 
+    private String description;
+
 
 }

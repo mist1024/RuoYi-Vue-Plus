@@ -8,6 +8,8 @@ import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.domain.dto.DeclareListDTO;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,4 +62,18 @@ public interface IBuyHousesService {
     R<?> getInfo(BuyHouses buyHouses);
 
     R getGaoXinCandidateInfoByCardId(String cardId);
+
+    /**
+     * 导出列表
+     * @param bo
+     * @return
+     */
+    R subscribeExport(BuyHousesBo bo) throws IOException;
+
+    /**
+     * 导出excel
+     * @param bo
+     * @param response
+     */
+    void exportExcel(BuyHousesBo bo, HttpServletResponse response);
 }

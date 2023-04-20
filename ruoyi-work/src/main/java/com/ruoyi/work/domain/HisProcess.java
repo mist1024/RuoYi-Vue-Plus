@@ -78,7 +78,6 @@ public class HisProcess{
     /**
      * 相隔时间差
      */
-    @TableField(exist = false)
     private String timeBetween;
 
     private String companyName;
@@ -92,7 +91,6 @@ public class HisProcess{
     @TableField(exist = false)
     private String bean;
 
-    @TableField(exist = false)
     private String description;
 
     @TableField(exist = false)
@@ -101,6 +99,13 @@ public class HisProcess{
     private String updateTime;
 
     private Boolean isNext;
+
+    /**
+     * 该字段只对企业审核做扩展
+     */
+    @TableField(exist = false)
+    private String companyId;
+
 
 
 

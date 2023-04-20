@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain.bo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -183,6 +185,9 @@ public class HousesReviewBo extends BaseEntity {
      */
     private String typeExtend;
 
+    @TableField(exist = false)
+    private Long[] ids;
 
+    private Date passTime;
 
 }

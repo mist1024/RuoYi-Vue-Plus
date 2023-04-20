@@ -7,6 +7,8 @@ import com.ruoyi.system.domain.HousesReview;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,4 +57,18 @@ public interface IHousesReviewService {
     HousesReviewVo queryByIdOne(Long id);
 
     R<?> getMaterialByBusinessId(Long id);
+
+    /**
+     * 预约导出
+     * @param bo
+     * @return
+     */
+    R subscribeExport(HousesReviewBo bo) throws IOException;
+
+    /**
+     *
+     * @param bo
+     */
+    void exportExcel(HousesReviewBo bo, HttpServletResponse response);
+
 }

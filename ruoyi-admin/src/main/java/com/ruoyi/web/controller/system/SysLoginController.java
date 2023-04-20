@@ -68,7 +68,6 @@ public class SysLoginController {
     }
 
 
-
     /**
      * 短信登录(示例)
      *
@@ -115,7 +114,6 @@ public class SysLoginController {
 
     /**
      * 获取用户信息
-     *
      * @return 用户信息
      */
     @GetMapping("getInfo")
@@ -144,7 +142,6 @@ public class SysLoginController {
 //----------------------------------------------------客户端-------------------------------------------------------------
     /**
      * 登录方法
-     *
      * @param loginBody 登录信息
      * @return 结果
      */
@@ -199,7 +196,6 @@ public class SysLoginController {
 
     /**
      * 忘记密码发送短信Aliyun
-     *
      * @param phones     电话号
      */
 //    @RateLimiter(count = 1)

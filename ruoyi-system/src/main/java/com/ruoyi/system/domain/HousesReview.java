@@ -6,6 +6,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
  * 购房复审登记对象 houses_review
  *
@@ -131,5 +133,7 @@ public class HousesReview extends BaseEntity {
      * d类字段扩展
      */
     private String typeExtend;
+
+    private Date passTime;
 
 }

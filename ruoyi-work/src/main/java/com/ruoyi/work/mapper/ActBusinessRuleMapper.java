@@ -2,7 +2,7 @@ package com.ruoyi.work.mapper;
 
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 import com.ruoyi.work.domain.ActBusinessRule;
-import com.ruoyi.work.domain.ActBusinessRuleVo;
+import com.ruoyi.work.domain.vo.ActBusinessRuleVo;
 
 /**
  * 业务规则Mapper接口

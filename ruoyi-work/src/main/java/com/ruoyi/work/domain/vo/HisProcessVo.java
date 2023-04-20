@@ -81,7 +81,6 @@ public class HisProcessVo {
 
     private String userId;
 
-    @TableField(exist = false)
     private String description;
 
 

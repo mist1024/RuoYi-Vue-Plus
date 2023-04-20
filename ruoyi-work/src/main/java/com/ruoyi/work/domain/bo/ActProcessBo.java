@@ -55,5 +55,7 @@ public class ActProcessBo {
 
     private String userId;
 
+    private String description;
+
 
 }

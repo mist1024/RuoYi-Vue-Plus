@@ -8,28 +8,36 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.system.domain.BuyHousesReviewMember;
-import com.ruoyi.system.domain.HousesReview;
-import com.ruoyi.system.domain.MaterialModule;
-import com.ruoyi.system.domain.MaterialProof;
+import com.ruoyi.common.utils.file.MyFileUtils;
+import com.ruoyi.common.utils.poi.DeleteFileUtil;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.utils.poi.ZipUtils;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialModuleVo;
 import com.ruoyi.system.mapper.BuyHousesReviewMemberMapper;
 import com.ruoyi.system.mapper.HousesReviewMapper;
 import com.ruoyi.system.mapper.MaterialProofMapper;
+import com.ruoyi.system.mapper.SubscribeExportMapper;
 import com.ruoyi.system.service.IHousesReviewService;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.utils.WorkComplyUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +59,21 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     private final BuyHousesReviewMemberMapper buyHousesReviewMemberMapper;
 
     private final SysOssServiceImpl sysOssService;
+
+
+    private final SubscribeExportMapper subscribeExportMapper;
+
+    @Value("${file.template}")
+    private String template;
+
+    @Value("${file.path}")
+    private String filePath;
+
+    @Value("${file.domain}")
+    private String download;
+
+    @Value("${file.prefix}")
+    private String prefix;
 
 
     /**
@@ -91,6 +114,9 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     private LambdaQueryWrapper<HousesReview> buildQueryWrapper(HousesReviewBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<HousesReview> lqw = Wrappers.lambdaQuery();
+        if (ObjectUtil.isNotNull(bo.getIds())){
+            lqw.in(HousesReview::getId,bo.getIds());
+        }
         lqw.eq(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
         lqw.eq(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
         lqw.like(StringUtils.isNotBlank(bo.getName()), HousesReview::getName, bo.getName());
@@ -326,5 +352,86 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         return R.ok(materialProofMapper.selectList(wrapper));
 
 
+    }
+
+    /**
+     * 获取导出列表
+     * @param bo
+     * @return
+     */
+    @Override
+    public R subscribeExport(HousesReviewBo bo) throws IOException {
+        export(bo);
+        return R.ok("预约成功");
+    }
+
+
+    /**
+     * 下载excel
+     * @param bo
+     */
+    @Override
+    public void exportExcel(HousesReviewBo bo, HttpServletResponse response) {
+        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
+        List<HousesReviewVo> housesReviews = baseMapper.selectVoList(lqw);
+        ExcelUtil.exportExcel(housesReviews,"人才列表", HousesReviewVo.class,response);
+    }
+
+    @Async
+    public void export(HousesReviewBo bo) throws IOException {
+        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
+        List<HousesReview> housesReviews = baseMapper.selectList(lqw);
+        if (housesReviews.size() > 0) {
+            List<Long> collect = housesReviews.stream().map(HousesReview::getId).collect(Collectors.toList());
+            List<MaterialProof> materialProofList = materialProofMapper.selectList(new LambdaQueryWrapper<>(MaterialProof.class).in(MaterialProof::getHouseId, collect));
+            //根据业务id进行分组
+            Map<String, List<MaterialProof>> collectMap = materialProofList.stream().collect(Collectors.groupingBy(MaterialProof::getHouseId));
+            String title = "人才认定申请表";
+            String separator = File.separator;
+            String format = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String path = filePath + separator + format;
+            housesReviews.stream().forEach(r -> {
+                List<MaterialProof> materialProofs = collectMap.get(r.getId().toString());
+                if (materialProofs.size()>0) {
+                    materialProofs.stream().forEach(p -> {
+                        String userNameFile = path + separator + r.getName();
+                        File userFile = new File(userNameFile);
+                        if (!userFile.exists() && !userFile.isDirectory()) {
+                            userFile.mkdirs();
+                        }
+                        String s = userNameFile + separator + r.getName() + "--";
+                        String file = p.getFile();
+                        MyFileUtils.downLoadPic(file, s + p.getDescription() + file.substring(file.lastIndexOf(".")));
+//                            MyFileUtils.writeBytes(file, s + p.getDescription() + file.substring(file.lastIndexOf(".")));
+                        System.out.println("file = " + file);
+                    });
+                }
+            });
+            String p = path + separator + title + ".xlsx";
+            String fo = filePath + separator + format + ".zip";
+            File file = new File(p);
+            //获取父目录
+            File fileParent = file.getParentFile();
+            //判断是否存在
+            if (!fileParent.exists()) {
+                //创建父目录文件
+                fileParent.mkdirs();
+            }
+            file.createNewFile();
+            OutputStream outXlsx = new FileOutputStream(p);
+            ExcelUtil.exportExcel(housesReviews,"111",HousesReview.class,outXlsx);
+            outXlsx.close();
+            ZipUtils.toZip(path, fo, true);
+            System.out.println("path = " + path);
+            System.out.println("fo = " + fo);
+            //生成后删除文件
+            DeleteFileUtil.delete(path);
+            String zip = format+".zip";
+            String url =download+prefix+zip;
+            SubscribeExport subscribeExport = new SubscribeExport();
+            subscribeExport.setPath(url);
+            subscribeExport.setUserId(LoginHelper.getUserId().toString());
+            subscribeExportMapper.insert(subscribeExport);
+        }
     }
 }

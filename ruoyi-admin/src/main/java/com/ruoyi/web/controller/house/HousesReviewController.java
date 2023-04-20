@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +51,7 @@ public class HousesReviewController extends BaseController {
 
 
     /**
-     * 购房登记录入
+     * 购房登记录入列表
      * @param bo
      * @param pageQuery
      * @return
@@ -59,6 +60,26 @@ public class HousesReviewController extends BaseController {
     @GetMapping("/review/list")
     public TableDataInfo<HousesReview> reviewList(HousesReviewBo bo, PageQuery pageQuery) {
         return iHousesReviewService.queryPageList(bo, pageQuery);
+    }
+
+
+    /**
+     * 预约导出
+     * @param bo
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/subscribeExport")
+    public R subscribeExport(HousesReviewBo bo) throws IOException {
+        return iHousesReviewService.subscribeExport(bo);
+    }
+
+    /**
+     * 导出excel
+     */
+    @GetMapping("/exportExcel")
+    public void exportExcel(HousesReviewBo bo,HttpServletResponse response){
+        iHousesReviewService.exportExcel(bo,response);
     }
 
     /**

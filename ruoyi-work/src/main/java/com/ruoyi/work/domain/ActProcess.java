@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -68,7 +69,6 @@ public class ActProcess {
     @TableField(exist = false)
     private String name;
 
-    @TableField(exist = false)
     private String description;
 
     @TableField(exist = false)
@@ -84,6 +84,7 @@ public class ActProcess {
 
     @TableField(exist = false)
     private String processKey;
+
 
 
 

@@ -206,13 +206,13 @@ public class BuyHousesVo {
     /**
      *
      */
-    @ExcelProperty(value = "")
-    private Date affTime;
+    @ExcelProperty(value = "审核通过时间")
+    private Date passTime;
 
     /**
      *
      */
-    @ExcelProperty(value = "")
+    @ExcelProperty(value = "人才影像卡")
     private String pictureInformationUrl;
 
     /**
@@ -236,6 +236,5 @@ public class BuyHousesVo {
     private Date updateTime;
 
     private String companyId;
-
 
 }

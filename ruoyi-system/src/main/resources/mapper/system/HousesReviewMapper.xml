@@ -36,6 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="processStatus" column="process_status"/>
         <result property="companyAddressArea" column="company_address_area"/>
         <result property="typeExtend" column="type_extend"/>
+        <result property="passTime" column="pass_time"/>
     </resultMap>
 
 

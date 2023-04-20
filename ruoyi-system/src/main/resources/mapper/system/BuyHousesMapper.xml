@@ -35,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="type" column="type"/>
         <result property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
-        <result property="affTime" column="aff_time"/>
+        <result property="passTime" column="pass_time"/>
         <result property="pictureInformationUrl" column="picture_information_url"/>
         <result property="workAddress" column="work_address"/>
         <result property="updateTime" column="update_time"/>

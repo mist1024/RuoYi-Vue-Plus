@@ -209,7 +209,7 @@ public class BuyHousesBo extends BaseEntity {
      *
      */
     @NotNull(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
-    private Date affTime;
+    private Date passTime;
 
     /**
      *人才影像卡
@@ -241,5 +241,7 @@ public class BuyHousesBo extends BaseEntity {
 
     private String companyId;
 
+    @TableField(exist = false)
+    private Long[] ids;
 
 }

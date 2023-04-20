@@ -132,7 +132,4 @@ public class UserVo {
 
     private String companyId;
 
-
-
-
 }

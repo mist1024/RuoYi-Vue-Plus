@@ -19,13 +19,15 @@
         <result property="companyName" column="companyName"/>
         <result property="isNext" column="is_next"/>
         <result property="userId" column="user_id"/>
+        <result property="description" column="description"/>
+        <result property="timeBetween" column="time_between"/>
     </resultMap>
 
     <select id="selectVoListPage" resultType="com.ruoyi.work.domain.HisProcess" parameterType="com.ruoyi.work.domain.HisProcess">
         SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,d.end_time AS endTime  ,
-        d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step
+        d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step,d.time_between
         FROM
-        (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user
+        (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user,h.time_between
         FROM
         `his_process` h
         WHERE h.id IN (SELECT MAX(id) FROM his_process
@@ -51,6 +53,19 @@
         FROM `his_process` h
             INNER JOIN process p ON p.id = h.process_id
             ${ew.getCustomSqlSegment}
+    </select>
+    <select id="selectListPageByCC" resultType="com.ruoyi.work.domain.HisProcess">
+        SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,d.end_time AS endTime,d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step,d.time_between
+        FROM
+            (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user,h.time_between
+             FROM
+                 `his_process` h
+             WHERE h.id IN (SELECT MAX(id) FROM his_process GROUP BY business_id) ) d
+                INNER JOIN process  p  ON p.id = d.process_id
+        <where>
+            FIND_IN_SET(#{hisProcess.userId},p.cc)
+            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user like concat('%', #{hisProcess.startUser}, '%')</if>
+        </where>
     </select>
 
 

@@ -135,13 +135,13 @@ public class HousesReviewVo implements Serializable {
     /**
      * 公司名称
      */
-//    @ExcelProperty(value = "公司名称")
+    @ExcelProperty(value = "公司名称")
     private String companyName;
 
     /**
      * 人才类型
      */
-//    @ExcelProperty(value = "人才类型")
+    @ExcelProperty(value = "人才类型")
     private String talentsType;
 
     /**
@@ -153,8 +153,7 @@ public class HousesReviewVo implements Serializable {
     /**
      * 企业所在地
      */
-//    @ExcelProperty(value = "企业所在地")
-
+    @ExcelProperty(value = "企业所在地")
     private String companyAddress;
 
     /**
@@ -183,6 +182,11 @@ public class HousesReviewVo implements Serializable {
      */
     private String typeExtend;
 
+    /**
+     * 审核通过时间
+     */
+    @ExcelProperty(value = "审核通过时间")
+    private Date passTime;
 
 }
 

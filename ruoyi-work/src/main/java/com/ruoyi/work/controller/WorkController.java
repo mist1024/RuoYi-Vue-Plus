@@ -39,7 +39,6 @@ import java.util.Map;
 public class WorkController extends BaseController {
     private final ProcessMapper processMapper;
 
-
     /**
      * 获取待办
      */
@@ -67,9 +66,14 @@ public class WorkController extends BaseController {
     @SaCheckPermission("work:task:processPlan")
     @PostMapping("/processPlan")
     public R<?> processPlan(@RequestBody ActProcess actProcess){
-        LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
-            .eq(TProcess::getProcessKey, actProcess.getProcessKey());
-        List<TProcess> tProcesses = processMapper.selectList(wrapper);
+        if (ObjectUtil.isNull(actProcess.getBusinessId())){
+            return R.fail("businessId不可为空");
+        }
+        if (ObjectUtil.isNull(actProcess.getProcessKey())){
+            return R.fail("key不可为空");
+        }
+        List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
+            .eq(TProcess::getProcessKey, actProcess.getProcessKey()));
         if (tProcesses.size()==0){
             throw new ServiceException("当前流程不存在");
         }
@@ -98,9 +102,6 @@ public class WorkController extends BaseController {
         List<HisProcessVoResultDto> step = WorkComplyUtils.getStep(businessDTO);
         return R.ok(step);
     }
-
-
-
     /**
      * 流程办理
      */
@@ -143,6 +144,12 @@ public class WorkController extends BaseController {
     @SaCheckPermission("work:task:taskInfo")
     @PostMapping("/taskInfo")
     public R<?> getInfoById(@RequestBody ActProcess actProcess){
+        if (ObjectUtil.isNull(actProcess.getProcessKey())){
+            return R.fail("key不可为空");
+        }
+        if (ObjectUtil.isNull(actProcess.getBusinessId())){
+            return R.fail("businessId不可为空");
+        }
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, actProcess.getProcessKey());
         List<TProcess> tProcesses = processMapper.selectList(wrapper);
@@ -150,13 +157,18 @@ public class WorkController extends BaseController {
         return R.ok(map);
     }
 
+
     @Log(title = "获取审核日志",businessType = BusinessType.OTHER)
     @PostMapping("/auditLogList")
     public R<?> getAuditLogListByOtherId(@RequestBody BusinessDTO businessDTO){
         return WorkComplyUtils.getAuditLogListByOtherId(businessDTO);
     }
 
-
+    /**
+     * 退回操作
+     * @param rollBackLog
+     * @return
+     */
     @Log(title = "回退",businessType = BusinessType.OTHER)
     @PostMapping("/rollBackLog")
     public R<?> rollBackLog(@RequestBody RollBackLog rollBackLog){
@@ -170,7 +182,5 @@ public class WorkController extends BaseController {
         rollBackLog.setParams(map);
        return toAjax(WorkComplyUtils.rollBack(rollBackLog)>1?1:0);
     }
-
-
 }
 

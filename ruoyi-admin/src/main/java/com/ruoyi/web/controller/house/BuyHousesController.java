@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.house;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,7 @@ import com.ruoyi.system.service.IBuyHousesService;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 【请填写功能名称】
+ * 一期后台接口
  *
  * @author ruoyi
  * @date 2023-03-27
@@ -41,7 +42,7 @@ public class BuyHousesController extends BaseController {
     private final IBuyHousesService iBuyHousesService;
 
     /**
-     * 查询【请填写功能名称】列表
+     * 一期后台接口查询列表
      */
     @SaCheckPermission("system:houses:list")
     @GetMapping("/list")
@@ -50,18 +51,36 @@ public class BuyHousesController extends BaseController {
     }
 
     /**
-     * 导出【请填写功能名称】列表
+     * 预约导出
+     * @param bo
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/subscribeExport")
+    public R subscribeExport(BuyHousesBo bo) throws IOException {
+        return iBuyHousesService.subscribeExport(bo);
+    }
+    /**
+     * 导出excel
+     */
+    @GetMapping("/exportExcel")
+    public void exportExcel(BuyHousesBo bo,HttpServletResponse response){
+        iBuyHousesService.exportExcel(bo,response);
+    }
+
+    /**
+     * 一期导出列表
      */
     @SaCheckPermission("system:houses:export")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
+    @PostMapping("一期导出列表")
     public void export(BuyHousesBo bo, HttpServletResponse response) {
         List<BuyHousesVo> list = iBuyHousesService.queryList(bo);
         ExcelUtil.exportExcel(list, "【请填写功能名称】", BuyHousesVo.class, response);
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取详细信息
      *
      * @param id 主键
      */

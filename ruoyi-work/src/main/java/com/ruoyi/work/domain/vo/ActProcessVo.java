@@ -73,5 +73,9 @@ public class ActProcessVo {
 
     private String userId;
 
+    private String companyId;
+
+    private String description;
+
 
 }

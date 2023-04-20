@@ -1,4 +1,5 @@
 package com.ruoyi.work.utils;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateTime;
@@ -26,7 +27,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.work.domain.*;
 import com.ruoyi.work.domain.vo.ActProcessVo;
-import com.ruoyi.work.domain.vo.HisProcessVo;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.BusinessDTO;
 import com.ruoyi.work.dto.HisProcessVoResultDto;
@@ -38,6 +38,7 @@ import com.ruoyi.work.service.IWorkSysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @RequiredArgsConstructor
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class WorkComplyUtils {
 
     private static final ProcessMapper processMapper = SpringUtils.getBean(ProcessMapper.class);
@@ -68,12 +69,11 @@ public class WorkComplyUtils {
      * 任务创建
      * @param processVo
      */
-    public  static   void comply(ProcessVo processVo){
+    public  static  void comply(ProcessVo processVo){
         ActProcess actProcessVo = new ActProcess();
         LambdaQueryWrapper<TProcess> lqw = Wrappers.lambdaQuery();
         lqw.eq( TProcess::getProcessKey, processVo.getProcessKey());
         lqw.eq(TProcess::getStep, processVo.getStep());
-
         //判断这条业务是否在进行中
         LambdaQueryWrapper<ActProcess> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ActProcess::getBusinessId,processVo.getBusinessId());
@@ -89,18 +89,31 @@ public class WorkComplyUtils {
         actProcessVo.setStartUser(processVo.getStartUser());
         actProcessVo.setProcessId(tProcessByKey.getId().toString());
         actProcessVo.setBusinessId(processVo.getBusinessId());
+        actProcessVo.setDescription(tProcessByKey.getDescription());
         actProcessVo.setIsNext(tProcessByKey.getIsNext());
         if ("1".equals(tProcessByKey.getType())){//普通流程,只需要将人员设置到运行流程中即可
             actProcessVo.setType(tProcessByKey.getType());
             if (1L==tProcessByKey.getProcessCheck()) {
                 if("4".equals(tProcessByKey.getCheckType())){//企业审核
-                    String audit = processVo.getParams().get(tProcessByKey.getParam()).toString();
-                    actProcessVo.setAudit(audit);
+                    Object param = processVo.getParams().get(tProcessByKey.getParam());
+                    if (ObjectUtil.isNull(param)){
+                        throw new ServiceException("param不可为空");
+                    }
+                    actProcessVo.setAudit(param.toString());
+
+                    Object paramName = processVo.getParams().get(tProcessByKey.getParamName());
+                    if (ObjectUtil.isNull(paramName)){
+                        throw new ServiceException("paramName不可为空");
+                    }
+                    actProcessVo.setCompanyName(paramName.toString());
                 }else {
                     actProcessVo.setAudit(tProcessByKey.getAudit());
                 }
             }else if (2==tProcessByKey.getProcessCheck()){
                 // 根据接口获取
+                if (ObjectUtil.isNull(tProcessByKey.getRuleId())){
+                    throw new ServiceException("业务id不可为空");
+                }
                 List<String> personByRule = WorkUtils.getPersonByRule(tProcessByKey.getRuleId(),processVo.getParams());
                 actProcessVo.setAudit(personByRule.get(0));
             }
@@ -119,7 +132,7 @@ public class WorkComplyUtils {
                 }
             }else if (2L==tProcessByKey.getProcessCheck()){
                 //根据接口获取
-                ArrayList<String> personByRule = WorkUtils.getPersonByRule(tProcessByKey.getRuleId(),processVo.getParams());
+                List<String> personByRule = WorkUtils.getPersonByRule(tProcessByKey.getRuleId(),processVo.getParams());
                 //将某些固定的审核人员添加进去
                 if (ObjectUtil.isNotEmpty(tProcessByKey.getAudit())){
                     String[] split = tProcessByKey.getAudit().split(",");
@@ -128,7 +141,7 @@ public class WorkComplyUtils {
                 for (String s : personByRule) {
                     ActProcess actProcess = new ActProcess();
                     BeanUtil.copyProperties(actProcessVo,actProcess);
-                    actProcessVo.setAudit(s);
+                    actProcess.setAudit(s);
                     list.add(actProcess);
                 }
             }
@@ -163,8 +176,12 @@ public class WorkComplyUtils {
                 audit = loginUser.getDeptId().toString();
             }else if ("3".equals(checkType)){
                 audit = loginUser.getRoleId().toString();
-            }else if ("4".equals(checkType)){
-                audit =String.valueOf(loginUser.getCompanyId());
+            }else if ("4".equals(checkType)) {
+                if (ObjectUtil.isNotNull(hisProcess.getCompanyId())) {
+                    audit = hisProcess.getCompanyId();
+                } else {
+                    audit = String.valueOf(loginUser.getCompanyId());
+                }
             }
             String finalAudit = audit;
             List<ActProcessVo> collect = actProcessVos.stream().filter(e -> checkType.equals(e.getCheckType()) && finalAudit.equals(e.getAudit())).collect(Collectors.toList());
@@ -177,8 +194,15 @@ public class WorkComplyUtils {
                 hisProcess.setCreateTime(actProcessVo.getCreateTime());
                 hisProcess.setStep(actProcessVo.getStep());
                 hisProcess.setType(actProcessVo.getType());
+                hisProcess.setDescription(actProcessVo.getDescription());
                 hisProcess.setStartUser(actProcessVo.getStartUser());
                 hisProcess.setIsNext(actProcessVo.getIsNext());
+                //获取当前业务处理耗时
+                Date date1 = hisProcess.getCreateTime();
+                Date date2 = hisProcess.getEndTime();
+                //精确到秒
+                String formatBetween  = DateUtil.formatBetween(date1, date2, BetweenFormatter.Level.SECOND);
+                hisProcess.setTimeBetween(formatBetween);
                 if ("1".equals(actProcessVo.getCheckType())) {//人员id
                     Long userId = loginUser.getUserId();
                     hisProcess.setAudit(ObjectUtil.isNotEmpty(userId) ? userId.toString() : "");
@@ -189,9 +213,9 @@ public class WorkComplyUtils {
                     Long roleId = loginUser.getRoleId();
                     hisProcess.setAudit(ObjectUtil.isNotEmpty(roleId) ? roleId.toString() : "");
                 } else if ("4".equals(actProcessVo.getCheckType())) {//企业
-                    String userId = String.valueOf(hisProcess.getParams().get("companyId"));
+//                    String userId = String.valueOf(hisProcess.getParams().get("companyId"));
                     hisProcess.setCompanyName(hisProcess.getParams().get("companyName").toString());
-                    hisProcess.setAudit(ObjectUtil.isNotEmpty(userId) ? userId : "");
+                    hisProcess.setAudit(actProcessVo.getAudit());
                 }
                 //先添加一个属于当前用户的记录
                 hisProcessMapper.insert(hisProcess);
@@ -209,6 +233,9 @@ public class WorkComplyUtils {
                 auditLogMapper.insert(auditLog);
                 //如果成功就删除当前条0
                 if ("1".equals(hisProcess.getStatus())) {//失败删除全部当前业务相关数据
+                    //新增系统消息
+                    //获取流程的名称
+                    TProcess tProcess = processMapper.selectById(actProcessVo.getProcessId());
                     //删除当前业务的数据
                     List<Long> collect1 = actProcessVos.stream().map(ActProcessVo::getId).collect(Collectors.toList());
                     actProcessMapper.deleteBatchIds(collect1);
@@ -298,6 +325,7 @@ public class WorkComplyUtils {
         actProcess.setCompanyName(hisProcess.getCompanyName());
         actProcess.setCreateTime(hisProcess.getCreateTime());
         actProcess.setStep(hisProcess.getStep());
+        actProcess.setDescription(hisProcess.getDescription());
         actProcess.setStartUser(hisProcess.getStartUser());
         actProcess.setBusinessId(hisProcess.getBusinessId());
         actProcess.setAudit(hisProcess.getAudit());
@@ -410,7 +438,11 @@ public class WorkComplyUtils {
         if ("4".equals(hisProcess.getCheckType())){
             hisProcess.setCompanyUserId(ObjectUtil.isNotNull(loginUser.getUserId())?loginUser.getUserId().toString():"");
         }
-        Page<HisProcess> hisProcessPage = hisProcessMapper.selectVoListPage(pageQuery.build(), hisProcess);
+        Page<HisProcess> hisProcessPage = new Page<>();
+        hisProcessPage = hisProcessMapper.selectVoListPage(pageQuery.build(), hisProcess);
+        if (hisProcessPage.getRecords().size()==0){
+            hisProcessPage = hisProcessMapper.selectListPageByCC(pageQuery.build(),hisProcess);
+        }
         List<HisProcess> records = hisProcessPage.getRecords();
         for (HisProcess record : records) {
             if("4".equals(record.getCheckType())){//企业审核
@@ -426,20 +458,6 @@ public class WorkComplyUtils {
                 SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
                 record.setAudit(sysRole.getRoleName());
             }
-            switch (record.getType()){
-                case "1" :record.setType("基本类型");
-                    break;
-                case "2" : record.setType("会签");
-                    break;
-                default:record.setType("未知类型");
-                    break;
-            }
-            //获取当前业务处理耗时
-            Date date1 = record.getCreateTime();
-            Date date2 = record.getEndTime();
-            //精确到秒
-            String formatBetween  = DateUtil.formatBetween(date1, date2, BetweenFormatter.Level.SECOND);
-            record.setTimeBetween(formatBetween);
         }
         return TableDataInfo.build(hisProcessPage);
     }
@@ -464,12 +482,21 @@ public class WorkComplyUtils {
                     }else if("1".equals(record.getCheckType())) {
                         //根据id获取人员信息
                         SysUser sysUser = sysUserMapper.selectUserById(new Long( record.getAudit()));
+                        if (ObjectUtil.isNull(sysUser)){
+                            throw new ServiceException("用户获取失败");
+                        }
                         record.setAudit(sysUser.getUserName());
                     }else if ("2".equals(record.getCheckType())){
                         SysDept sysDept = sysDeptMapper.selectDeptById(new Long(record.getAudit()));
+                        if (ObjectUtil.isNull(sysDept)){
+                            throw new ServiceException("部门获取失败");
+                        }
                         record.setAudit(sysDept.getDeptName());
                     }else if ("3".equals(record.getCheckType())){
                         SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
+                        if (ObjectUtil.isNull(sysRole)){
+                            throw new ServiceException("角色获取失败");
+                        }
                         record.setAudit(sysRole.getRoleName());
                     }
                     if (ObjectUtil.isNotEmpty(record.getTimeout())&& ObjectUtil.isNotNull(record.getTimeout())){
@@ -584,20 +611,18 @@ public class WorkComplyUtils {
         if (ObjectUtil.isNull(processKey)){
             throw new ServiceException("processKey不可为空");
         }
-        LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
-            .eq(TProcess::getProcessKey, params.get("processKey"))
-            .orderByAsc(TProcess::getStep);
-        List<ProcessVo> processVos = processMapper.selectVoList(wrapper);
-        List<ProcessVo> list1 = new ArrayList<>();
-        LambdaQueryWrapper<ActProcess> queryWrapper = new LambdaQueryWrapper<ActProcess>()
-            .eq(ActProcess::getBusinessId, businessId);
-        List<ActProcessVo> actProcessVoList = actProcessMapper.selectVoList(queryWrapper);
 
-        LambdaQueryWrapper<AuditLog> wrapperLog = new LambdaQueryWrapper<AuditLog>()
+        List<ProcessVo> processVos = processMapper.selectVoList(new LambdaQueryWrapper<TProcess>()
+            .eq(TProcess::getProcessKey, params.get("processKey"))
+            .orderByAsc(TProcess::getStep));
+
+        List<ActProcessVo> actProcessVoList = actProcessMapper.selectVoList(new LambdaQueryWrapper<ActProcess>()
+            .eq(ActProcess::getBusinessId, businessId));
+        List<AuditLog> auditLogs = auditLogMapper.selectList(new LambdaQueryWrapper<AuditLog>()
             .eq(AuditLog::getProcessKey, processKey)
             .eq(AuditLog::getOtherId, businessId)
-            .orderByAsc(AuditLog::getCreateTime);
-        List<AuditLog> auditLogs = auditLogMapper.selectList(wrapperLog);
+            .orderByAsc(AuditLog::getCreateTime));
+        List<ProcessVo> list1 = new ArrayList<>();
         processVos.stream().forEach(e ->{
             e.setAuditLogList1(auditLogs);
             e.setActProcessVoList(actProcessVoList);
@@ -677,9 +702,41 @@ public class WorkComplyUtils {
      * @param e
      */
     public static void dd(ProcessVo e){
+        if("4".equals(e.getCheckType())){//企业审核
+            Map params = e.getParams();
+            if (ObjectUtil.isNull(e.getParamName())){
+                throw  new ServiceException("param_name不可为空");
+            }
+            String o = params.get(e.getParamName()).toString();
+            e.setAudit1(params.get(e.getParam()).toString());
+            e.setAudit(o);
+        }else if("1".equals(e.getCheckType())) {
+            //根据id获取人员信息
+            SysUser sysUser = sysUserMapper.selectUserById(new Long( e.getAudit()));
+            if(ObjectUtil.isNull(sysUser)){
+                throw new ServiceException("根据id获取人员信息失败");
+            }
+            e.setAudit1(e.getAudit());
+            e.setAudit(sysUser.getUserName());
+        }else if ("2".equals(e.getCheckType())){
+            SysDept sysDept = sysDeptMapper.selectDeptById(new Long(e.getAudit()));
+            if(ObjectUtil.isNull(sysDept)){
+                throw new ServiceException("根据id获取部门信息失败");
+            }
+            e.setAudit1(e.getAudit());
+            e.setAudit(sysDept.getDeptName());
+        }else if ("3".equals(e.getCheckType())){
+            SysRole sysRole = sysRoleMapper.selectRoleById(new Long(e.getAudit()));
+            if(ObjectUtil.isNull(sysRole)){
+                throw new ServiceException("根据id获取角色信息失败");
+            }
+            e.setAudit1(e.getAudit());
+            e.setAudit(sysRole.getRoleName());
+        }
+
         List<ActProcessVo> actProcessVoList =e.getActProcessVoList();
         List<AuditLog> auditLogs = e.getAuditLogList1();
-        List<ActProcessVo> collect1 = actProcessVoList.stream().filter(a -> a.getAudit().equals(e.getAudit()) && a.getCheckType().equals(e.getCheckType()) && a.getStep().equals(e.getStep()) && a.getType().equals(e.getType())).collect(Collectors.toList());
+        List<ActProcessVo> collect1 = actProcessVoList.stream().filter(a -> a.getAudit().equals(e.getAudit1()) && a.getCheckType().equals(e.getCheckType()) && a.getStep().equals(e.getStep()) && a.getType().equals(e.getType())).collect(Collectors.toList());
         if (actProcessVoList.size()>0){
             actProcessVoList.stream().forEach(a ->{
                 if ( new Integer(e.getStep())< new Integer(a.getStep())){
@@ -703,7 +760,7 @@ public class WorkComplyUtils {
                 }else if (Constants.FAILD.equals(process_status.toString())){
                     if (auditLogs.size()>0){
                         AuditLog auditLog = auditLogs.get(auditLogs.size()-1);
-                        if (auditLog.getAudit().equals(e.getAudit()) && auditLog.getStep().equals(e.getStep()) && auditLog.getAuditType().equals(e.getCheckType())){
+                        if (auditLog.getAudit().equals(e.getAudit1()) && auditLog.getStep().equals(e.getStep()) && auditLog.getAuditType().equals(e.getCheckType())){
                             e.setChecked("2");
                         }
                     }
@@ -719,9 +776,9 @@ public class WorkComplyUtils {
                 if (ObjectUtil.isNull(companyId)){
                     throw new ServiceException("companyId不可为空");
                 }
-                e.setAudit(String.valueOf(e.getParams().get("companyId")));
+//                e.setAudit1(String.valueOf(e.getParams().get("companyId")));
             }
-            List<AuditLog> collect = auditLogs.stream().filter(a -> e.getStep().equals(a.getStep()) && e.getAudit().equals(a.getAudit())).collect(Collectors.toList());
+            List<AuditLog> collect = auditLogs.stream().filter(a -> e.getStep().equals(a.getStep()) && e.getAudit1().equals(a.getAudit())).collect(Collectors.toList());
             collect.stream().forEach(a -> {
                 if (ObjectUtil.isNotNull(a.getStatus())) {
                     switch (a.getStatus()) {
@@ -740,33 +797,6 @@ public class WorkComplyUtils {
             e.setAuditLogList(collect);
         }else {
             e.setAuditLogList(new ArrayList<>());
-        }
-        if("4".equals(e.getCheckType())){//企业审核
-            Map params = e.getParams();
-            if (ObjectUtil.isNull(e.getParamName())){
-                throw  new ServiceException("param_name不可为空");
-            }
-            String o = params.get(e.getParamName()).toString();
-            e.setAudit(o);
-        }else if("1".equals(e.getCheckType())) {
-            //根据id获取人员信息
-            SysUser sysUser = sysUserMapper.selectUserById(new Long( e.getAudit()));
-            if(ObjectUtil.isNull(sysUser)){
-                throw new ServiceException("根据id获取人员信息失败");
-            }
-            e.setAudit(sysUser.getUserName());
-        }else if ("2".equals(e.getCheckType())){
-            SysDept sysDept = sysDeptMapper.selectDeptById(new Long(e.getAudit()));
-            if(ObjectUtil.isNull(sysDept)){
-                throw new ServiceException("根据id获取部门信息失败");
-            }
-            e.setAudit(sysDept.getDeptName());
-        }else if ("3".equals(e.getCheckType())){
-            SysRole sysRole = sysRoleMapper.selectRoleById(new Long(e.getAudit()));
-            if(ObjectUtil.isNull(sysRole)){
-                throw new ServiceException("根据id获取角色信息失败");
-            }
-            e.setAudit(sysRole.getRoleName());
         }
     }
 
