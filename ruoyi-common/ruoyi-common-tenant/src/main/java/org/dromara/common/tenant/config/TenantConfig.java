@@ -9,7 +9,6 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mybatis.config.MybatisPlusConfig;
 import org.dromara.common.redis.config.RedisConfig;
 import org.dromara.common.redis.config.properties.RedissonProperties;
-import org.dromara.common.tenant.aspect.TenantAspect;
 import org.dromara.common.tenant.core.TenantSaTokenDao;
 import org.dromara.common.tenant.handle.PlusTenantLineHandler;
 import org.dromara.common.tenant.handle.TenantKeyPrefixHandler;
@@ -98,11 +97,4 @@ public class TenantConfig {
         return new TenantSaTokenDao();
     }
 
-    /**
-     * 多租户切面
-     */
-    @Bean
-    public TenantAspect tenantAspect() {
-        return new TenantAspect();
-    }
 }
