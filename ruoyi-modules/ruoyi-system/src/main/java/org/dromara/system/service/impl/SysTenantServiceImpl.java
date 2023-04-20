@@ -17,7 +17,6 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.*;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
@@ -113,79 +112,76 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantBo bo) {
-        TenantHelper.ignore(unused -> {
+        SysTenant add = MapstructUtils.convert(bo, SysTenant.class);
 
-            SysTenant add = MapstructUtils.convert(bo, SysTenant.class);
+        // 获取所有租户编号
+        List<String> tenantIds = baseMapper.selectObjs(
+            new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId), Convert::toStr);
+        String tenantId = generateTenantId(tenantIds);
+        add.setTenantId(tenantId);
+        boolean flag = baseMapper.insert(add) > 0;
+        if (!flag) {
+            throw new ServiceException("创建租户失败");
+        }
+        bo.setId(add.getId());
 
-            // 获取所有租户编号
-            List<String> tenantIds = baseMapper.selectObjs(
-                new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId), Convert::toStr);
-            String tenantId = generateTenantId(tenantIds);
-            add.setTenantId(tenantId);
-            boolean flag = baseMapper.insert(add) > 0;
-            if (!flag) {
-                throw new ServiceException("创建租户失败");
-            }
-            bo.setId(add.getId());
+        // 根据套餐创建角色
+        Long roleId = createTenantRole(tenantId, bo.getPackageId());
 
-            // 根据套餐创建角色
-            Long roleId = createTenantRole(tenantId, bo.getPackageId());
+        // 创建部门: 公司名是部门名称
+        SysDept dept = new SysDept();
+        dept.setTenantId(tenantId);
+        dept.setDeptName(bo.getCompanyName());
+        dept.setLeader(bo.getUsername());
+        dept.setParentId(Constants.TOP_PARENT_ID);
+        dept.setAncestors(Constants.TOP_PARENT_ID.toString());
+        deptMapper.insert(dept);
+        Long deptId = dept.getDeptId();
 
-            // 创建部门: 公司名是部门名称
-            SysDept dept = new SysDept();
-            dept.setTenantId(tenantId);
-            dept.setDeptName(bo.getCompanyName());
-            dept.setLeader(bo.getUsername());
-            dept.setParentId(Constants.TOP_PARENT_ID);
-            dept.setAncestors(Constants.TOP_PARENT_ID.toString());
-            deptMapper.insert(dept);
-            Long deptId = dept.getDeptId();
+        // 角色和部门关联表
+        SysRoleDept roleDept = new SysRoleDept();
+        roleDept.setRoleId(roleId);
+        roleDept.setDeptId(deptId);
+        roleDeptMapper.insert(roleDept);
 
-            // 角色和部门关联表
-            SysRoleDept roleDept = new SysRoleDept();
-            roleDept.setRoleId(roleId);
-            roleDept.setDeptId(deptId);
-            roleDeptMapper.insert(roleDept);
+        // 创建系统用户
+        SysUser user = new SysUser();
+        user.setTenantId(tenantId);
+        user.setUserName(bo.getUsername());
+        user.setNickName(bo.getUsername());
+        user.setPassword(BCrypt.hashpw(bo.getPassword()));
+        user.setDeptId(deptId);
+        userMapper.insert(user);
 
-            // 创建系统用户
-            SysUser user = new SysUser();
-            user.setTenantId(tenantId);
-            user.setUserName(bo.getUsername());
-            user.setNickName(bo.getUsername());
-            user.setPassword(BCrypt.hashpw(bo.getPassword()));
-            user.setDeptId(deptId);
-            userMapper.insert(user);
+        // 用户和角色关联表
+        SysUserRole userRole = new SysUserRole();
+        userRole.setUserId(user.getUserId());
+        userRole.setRoleId(roleId);
+        userRoleMapper.insert(userRole);
 
-            // 用户和角色关联表
-            SysUserRole userRole = new SysUserRole();
-            userRole.setUserId(user.getUserId());
-            userRole.setRoleId(roleId);
-            userRoleMapper.insert(userRole);
+        String defaultTenantId = TenantConstants.DEFAULT_TENANT_ID;
+        List<SysDictType> dictTypeList = dictTypeMapper.selectList(
+            new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getTenantId, defaultTenantId));
+        List<SysDictData> dictDataList = dictDataMapper.selectList(
+            new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getTenantId, defaultTenantId));
+        for (SysDictType dictType : dictTypeList) {
+            dictType.setDictId(null);
+            dictType.setTenantId(tenantId);
+        }
+        for (SysDictData dictData : dictDataList) {
+            dictData.setDictCode(null);
+            dictData.setTenantId(tenantId);
+        }
+        dictTypeMapper.insertBatch(dictTypeList);
+        dictDataMapper.insertBatch(dictDataList);
 
-            String defaultTenantId = TenantConstants.DEFAULT_TENANT_ID;
-            List<SysDictType> dictTypeList = dictTypeMapper.selectList(
-                new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getTenantId, defaultTenantId));
-            List<SysDictData> dictDataList = dictDataMapper.selectList(
-                new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getTenantId, defaultTenantId));
-            for (SysDictType dictType : dictTypeList) {
-                dictType.setDictId(null);
-                dictType.setTenantId(tenantId);
-            }
-            for (SysDictData dictData : dictDataList) {
-                dictData.setDictCode(null);
-                dictData.setTenantId(tenantId);
-            }
-            dictTypeMapper.insertBatch(dictTypeList);
-            dictDataMapper.insertBatch(dictDataList);
-
-            List<SysConfig> sysConfigList = configMapper.selectList(
-                new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getTenantId, defaultTenantId));
-            for (SysConfig config : sysConfigList) {
-                config.setConfigId(null);
-                config.setTenantId(tenantId);
-            }
-            configMapper.insertBatch(sysConfigList);
-        });
+        List<SysConfig> sysConfigList = configMapper.selectList(
+            new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getTenantId, defaultTenantId));
+        for (SysConfig config : sysConfigList) {
+            config.setConfigId(null);
+            config.setTenantId(tenantId);
+        }
+        configMapper.insertBatch(sysConfigList);
         return true;
     }
 
@@ -342,32 +338,30 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean syncTenantPackage(String tenantId, String packageId) {
-        TenantHelper.ignore(unused -> {
-            SysTenantPackage tenantPackage = tenantPackageMapper.selectById(packageId);
-            List<SysRole> roles = roleMapper.selectList(
-                new LambdaQueryWrapper<SysRole>().eq(SysRole::getTenantId, tenantId));
-            List<Long> roleIds = new ArrayList<>(roles.size() - 1);
-            List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
-            roles.forEach(item -> {
-                if (TenantConstants.TENANT_ADMIN_ROLE_KEY.equals(item.getRoleKey())) {
-                    List<SysRoleMenu> roleMenus = new ArrayList<>(menuIds.size());
-                    menuIds.forEach(menuId -> {
-                        SysRoleMenu roleMenu = new SysRoleMenu();
-                        roleMenu.setRoleId(item.getRoleId());
-                        roleMenu.setMenuId(menuId);
-                        roleMenus.add(roleMenu);
-                    });
-                    roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, item.getRoleId()));
-                    roleMenuMapper.insertBatch(roleMenus);
-                } else {
-                    roleIds.add(item.getRoleId());
-                }
-            });
-            if (!roleIds.isEmpty()) {
-                roleMenuMapper.delete(
-                    new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, roleIds).notIn(!menuIds.isEmpty(), SysRoleMenu::getMenuId, menuIds));
+        SysTenantPackage tenantPackage = tenantPackageMapper.selectById(packageId);
+        List<SysRole> roles = roleMapper.selectList(
+            new LambdaQueryWrapper<SysRole>().eq(SysRole::getTenantId, tenantId));
+        List<Long> roleIds = new ArrayList<>(roles.size() - 1);
+        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
+        roles.forEach(item -> {
+            if (TenantConstants.TENANT_ADMIN_ROLE_KEY.equals(item.getRoleKey())) {
+                List<SysRoleMenu> roleMenus = new ArrayList<>(menuIds.size());
+                menuIds.forEach(menuId -> {
+                    SysRoleMenu roleMenu = new SysRoleMenu();
+                    roleMenu.setRoleId(item.getRoleId());
+                    roleMenu.setMenuId(menuId);
+                    roleMenus.add(roleMenu);
+                });
+                roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, item.getRoleId()));
+                roleMenuMapper.insertBatch(roleMenus);
+            } else {
+                roleIds.add(item.getRoleId());
             }
         });
+        if (!roleIds.isEmpty()) {
+            roleMenuMapper.delete(
+                new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, roleIds).notIn(!menuIds.isEmpty(), SysRoleMenu::getMenuId, menuIds));
+        }
         return true;
     }
 }

@@ -15,7 +15,6 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -57,10 +56,10 @@ public class TenantHelper {
      *
      * @param handle 处理执行方法
      */
-    public static void ignore(Consumer<Void> handle) {
+    public static void ignore(Runnable handle) {
         enableIgnore();
         try {
-            handle.accept(null);
+            handle.run();
         } finally {
             disableIgnore();
         }
