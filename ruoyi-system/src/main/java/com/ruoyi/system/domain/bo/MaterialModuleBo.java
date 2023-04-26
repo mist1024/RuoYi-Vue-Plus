@@ -60,5 +60,15 @@ public class MaterialModuleBo extends BaseEntity {
     @NotNull(message = "是否必填不能为空", groups = { AddGroup.class, EditGroup.class })
     private String isMust;
 
+    /**
+     * 接口或者全路径地址
+     */
+    private String interfacePath;
+
+    /**
+     * 1是接口,2是路径
+     */
+    private String interfaceType;
+
 
 }

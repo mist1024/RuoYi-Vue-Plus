@@ -16,12 +16,12 @@ public class WorkBusinessRule {
 
     public String getDistrict(String district){
         //先获取业务数据
-
         QueryWrapper<BuyHouseCheck> qw = new QueryWrapper<>();
         qw.eq("crux_key","buy_house_audit");
         qw.eq("other_key",district);
         BuyHouseCheckVo buyHouseCheckVo = buyHouseCheckMapper.selectVoOne(qw);
         return buyHouseCheckVo.getPerson();
     }
+
 }
 

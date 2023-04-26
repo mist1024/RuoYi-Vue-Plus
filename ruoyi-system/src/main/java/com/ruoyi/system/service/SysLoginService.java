@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -341,7 +342,7 @@ public class SysLoginService {
      * @param password
      * @return
      */
-    public String userLogin(String username, String password) {
+    public Map<String,Object> userLogin(String username, String password) {
         User user = loadUserByUsername(username);
         Date updateTime = user.getUpdateTime();
         if (ObjectUtil.isNull(updateTime)){
@@ -358,7 +359,11 @@ public class SysLoginService {
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
         recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
-        return StpUtil.getTokenValue();
+        HashMap<String, Object> map = new HashMap<>();
+        String tokenValue = StpUtil.getTokenValue();
+        map.put("token",tokenValue);
+        map.put("loginName",user.getLoginName());
+        return map;
     }
 
     /**

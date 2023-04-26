@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -13,10 +14,12 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.excel.ExcelResult;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.HousesReview;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
+import com.ruoyi.system.domain.dto.HousesReviewEvent;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.mapper.BuyHousesMapper;
 import com.ruoyi.system.service.IHousesReviewService;
@@ -64,20 +67,33 @@ public class HousesReviewController extends BaseController {
 
 
     /**
+     * 购房登记录入管理列表
+     * @param bo
+     * @param pageQuery
+     * @return
+     */
+    @SaCheckPermission("system:manager:reviewList")
+    @GetMapping("/manager/list")
+    public TableDataInfo<HousesReview> managerReviewList(HousesReviewBo bo, PageQuery pageQuery) {
+        bo.setProcessStatus(Constants.SUCCEED);
+        return iHousesReviewService.queryPageList(bo, pageQuery);
+    }
+
+    /**
      * 预约导出
      * @param bo
      * @return
      * @throws IOException
      */
     @PostMapping("/subscribeExport")
-    public R subscribeExport(HousesReviewBo bo) throws IOException {
+    public R subscribeExport(HousesReviewEvent bo) throws IOException {
         return iHousesReviewService.subscribeExport(bo);
     }
 
     /**
      * 导出excel
      */
-    @GetMapping("/exportExcel")
+    @PostMapping("/exportExcel")
     public void exportExcel(HousesReviewBo bo,HttpServletResponse response){
         iHousesReviewService.exportExcel(bo,response);
     }
@@ -88,6 +104,10 @@ public class HousesReviewController extends BaseController {
     @SaCheckPermission("system:review:list")
     @GetMapping("/registrationManagement/list")
     public TableDataInfo<HousesReview> list(HousesReviewBo bo, PageQuery pageQuery) {
+        boolean admin = LoginHelper.isAdmin();
+        if (!admin){
+            bo.setProjectName(LoginHelper.getUsername());
+        }
         return iHousesReviewService.queryPageList(bo, pageQuery);
     }
 
@@ -107,7 +127,7 @@ public class HousesReviewController extends BaseController {
      *
      * @param id 主键
      */
-    @SaCheckPermission("system:review:query")
+    @SaCheckPermission("system:review:edit")
     @GetMapping("/registrationManagement/{id}")
     public R<HousesReviewVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
@@ -140,7 +160,7 @@ public class HousesReviewController extends BaseController {
      * 删除购房复审登记
      * @param ids 主键串
      */
-    @SaCheckPermission("system:review:remove")
+    @SaCheckPermission("system:review:edit")
     @Log(title = "购房复审登记", businessType = BusinessType.DELETE)
     @DeleteMapping("/registrationManagement/{ids}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
@@ -170,7 +190,7 @@ public class HousesReviewController extends BaseController {
             List<String> collect1 = buyHousesMapper.selectList(queryWrapper).stream().map(BuyHouses::getCardId).collect(Collectors.toList());
             for (HousesReview housesReview : list) {
                 housesReview.setProcessKey("house_review");
-                housesReview.setProcessStatus("submit");
+                housesReview.setProcessStatus(Constants.SUBMIT);
                 if ( collect1.size() > 0 &&  collect1.contains(housesReview.getCard()) ) {
                     housesReview.setSourceBy("1");
                 } else {
@@ -208,7 +228,4 @@ public class HousesReviewController extends BaseController {
     public R<?> getMaterialByBusinessId(@PathVariable(value = "id") Long id){
         return iHousesReviewService.getMaterialByBusinessId(id);
     }
-
-
-
 }

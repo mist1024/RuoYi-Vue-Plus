@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils.file;
 
+import cn.hutool.core.io.resource.ClassPathResource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -97,15 +98,28 @@ public class MyFileUtils extends FileUtils
             URL url = new URL(str);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");//POST
-            InputStream inputStream = conn.getInputStream();
-            FileOutputStream fos = new FileOutputStream(fileName);
-            byte[] temp = new byte[1024];
-            int len = 0;
-            while ((len = inputStream.read(temp)) != -1) {
-                fos.write(temp, 0, len);
+            //防止屏蔽程序抓取而返回403错误
+            conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+            int responseCode = conn.getResponseCode();
+            System.out.println("responseCode = " + responseCode);
+            InputStream inputStream = conn.getInputStream();;
+            byte[] temp = new byte[inputStream.available()];;
+            if (200==responseCode) {
+                if (temp.length==0) {
+                    ClassPathResource classPathResource = new ClassPathResource("/404.jpg");
+                    inputStream = classPathResource.getStream();
+                    temp = new byte[inputStream.available()];
+                }
+                FileOutputStream fos = new FileOutputStream(fileName);
+                int len = 0;
+                while ((len = inputStream.read(temp)) != -1) {
+                    fos.write(temp, 0, len);
+                }
+                inputStream.close();
+                fos.close();
             }
-            inputStream.close();
-            fos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -269,11 +283,11 @@ public class MyFileUtils extends FileUtils
 
         StringBuilder contentDispositionValue = new StringBuilder();
         contentDispositionValue.append("attachment; filename=")
-                .append(percentEncodedFileName)
-                .append(";")
-                .append("filename*=")
-                .append("utf-8''")
-                .append(percentEncodedFileName);
+            .append(percentEncodedFileName)
+            .append(";")
+            .append("filename*=")
+            .append("utf-8''")
+            .append(percentEncodedFileName);
 
         response.setHeader("Content-disposition", contentDispositionValue.toString());
     }

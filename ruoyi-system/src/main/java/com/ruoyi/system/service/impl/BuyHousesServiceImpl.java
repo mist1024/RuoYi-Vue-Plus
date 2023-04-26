@@ -20,21 +20,25 @@ import com.ruoyi.common.utils.poi.DeleteFileUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.utils.poi.ExportWordUtil;
 import com.ruoyi.common.utils.poi.ZipUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
+import com.ruoyi.system.domain.dto.BuyHousesEvent;
 import com.ruoyi.system.domain.dto.DeclareListDTO;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
-import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialModuleVo;
 import com.ruoyi.system.mapper.BuyHousesMapper;
 import com.ruoyi.system.mapper.BuyHousesMemberMapper;
 import com.ruoyi.system.mapper.MaterialProofMapper;
 import com.ruoyi.system.mapper.SubscribeExportMapper;
 import com.ruoyi.system.service.IBuyHousesService;
+import com.ruoyi.work.domain.AuditLog;
 import com.ruoyi.work.domain.vo.ProcessVo;
+import com.ruoyi.work.mapper.AuditLogMapper;
 import com.ruoyi.work.utils.WorkComplyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +48,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +65,6 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class BuyHousesServiceImpl implements IBuyHousesService {
 
     @Value("${file.template}")
@@ -82,6 +90,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     private final MaterialModuleServiceImpl materialModuleService;
 
     private final SubscribeExportMapper subscribeExportMapper;
+
+    private final AuditLogMapper auditLogMapper;
+
 
     /**
      * 查询【请填写功能名称】
@@ -158,6 +169,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         lqw.eq(bo.getPassTime() != null, BuyHouses::getPassTime, bo.getPassTime());
         lqw.eq(StringUtils.isNotBlank(bo.getPictureInformationUrl()), BuyHouses::getPictureInformationUrl, bo.getPictureInformationUrl());
         lqw.eq(StringUtils.isNotBlank(bo.getWorkAddress()), BuyHouses::getWorkAddress, bo.getWorkAddress());
+        lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()), BuyHouses::getProcessStatus, bo.getProcessStatus());
         return lqw;
     }
 
@@ -165,6 +177,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      * 新增【请填写功能名称】
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(BuyHousesBo bo) {
         //验证这个身份证是否提交过
         List<BuyHouses> buyHouses = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class)
@@ -201,6 +214,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      * 修改【请填写功能名称】
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(BuyHousesBo bo) {
         BuyHouses update = BeanUtil.toBean(bo, BuyHouses.class);
         validEntityBeforeSave(update);
@@ -227,12 +241,13 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         //TODO 做一些数据校验,如唯一约束
         //验证当前状态是否可以修改
         //判断数据库中是否存在该人才通过身份证去验证
-        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class)
-            .eq(BuyHouses::getCardId, entity.getCardId()));
+        Long userId = LoginHelper.getUserId();
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
         if (!Constants.SUBMIT.equals(buyHouses.getProcessStatus()) && !Constants.FAILD.equals(buyHouses.getProcessStatus())){
             throw new ServiceException("当前用户不可修改");
         }
         //删除家庭情况信息
+        buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId,buyHouses.getId()));
         //先删除家庭信息表
         if (entity.getBuyHousesMemberList().size()>0) {
             buyHousesMemberMapper.delete( new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, entity.getId()));
@@ -279,10 +294,12 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     /**
      * 先保存再执行下载
-     * @param buyHousesBo
+     * @param bo
      */
     @Override
-    public R downloadWord(BuyHousesBo buyHousesBo) {
+    public R downloadWord(BuyHousesBo bo) {
+        BuyHouses buyHousesBo = BeanUtil.toBean(bo, BuyHouses.class);
+        validEntityBeforeSave(buyHousesBo);
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         //判断数据库中是否存在该人才通过身份证去验证
         BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class)
@@ -356,8 +373,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     @Override
     public R<?> getInfo(BuyHouses buyHouses) {
+        Long userId = LoginHelper.getUserId();
         //先判断本地数据库是否有值
-        BuyHousesVo buyHousesVo = baseMapper.selectVoOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId,buyHouses.getCardId()));
+        BuyHousesVo buyHousesVo = baseMapper.selectVoOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId,userId));
         if (ObjectUtil.isNotNull(buyHousesVo)){
             LambdaQueryWrapper<MaterialProof> wrapper = new LambdaQueryWrapper<MaterialProof>()
                 .eq(MaterialProof::getHouseId, buyHousesVo.getId())
@@ -371,10 +389,10 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             return R.ok(buyHousesVo);
         }
         HashMap<String, Object> paramMap = new HashMap<>();
-        paramMap.put("cardId", buyHouses);
+        paramMap.put("cardId", buyHouses.getCardId());
         String json = HttpUtil.get(URL, paramMap);
         JSONObject entrie = JSONUtil.parseObj(json);
-        String data = String.valueOf(entrie.get("date"));
+        String data = String.valueOf(entrie.get("data"));
         if (ObjectUtil.isNull(data)){
             return R.fail("获取失败");
         }
@@ -385,8 +403,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         buyHousesDto.setUserName(String.valueOf(entries.get("name")));
         buyHousesDto.setPhone(String.valueOf(entries.get("phone")));
         buyHousesDto.setCompanyName(String.valueOf(entries.get("companyName")));
-        buyHousesDto.setDistrict(String.valueOf(entries.get("district")));
         buyHousesDto.setSex(String.valueOf(entries.get("sex")));
+        buyHousesDto.setDistrict("1");
         buyHousesDto.setProcessStatus(Constants.SUBMIT);
         buyHousesDto.setType(String.valueOf(entries.get("type")));
         buyHousesDto.setProcessKey("apply_house");
@@ -433,10 +451,13 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      * @return
      */
     @Override
-    public R subscribeExport(BuyHousesBo bo) throws IOException {
-        export(bo);
+    public R subscribeExport(BuyHousesEvent bo) {
+        Long userId = LoginHelper.getUserId();
+        bo.setExcelUserId(userId.toString());
+        SpringUtils.context().publishEvent(bo);
         return R.ok("预约成功");
     }
+
 
     /**
      *导出excel
@@ -452,12 +473,111 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     }
 
     /**
+     * 判断是否申请过
+     * @return
+     */
+    @Override
+    public R checkStatus() {
+        Long userId = LoginHelper.getUserId();
+        List<BuyHouses> buyHousesList = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
+        if (buyHousesList.size()>0){
+            return R.ok();
+        }
+        return R.ok(201,"未申请过",null);
+    }
+
+    /**
+     * 获取当前登录用户日志
+     * @return
+     */
+    @Override
+    public R getBuyHousesLogsByUserId() {
+        Long userId = LoginHelper.getUserId();
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
+        List<AuditLog> auditLogList = auditLogMapper.selectList(new LambdaQueryWrapper<>(AuditLog.class).eq(AuditLog::getOtherId, buyHouses.getId()).orderByAsc(AuditLog::getCreateTime));
+        if (auditLogList.size()>0){
+            auditLogList.stream().forEach(a ->{
+                if (ObjectUtil.isNull(a.getProcessKey())){
+//                    1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6.初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过  11.审定退件,12.资格取消
+                    switch (a.getStatus()){
+                        case "1":a.setStatus("待提交");
+                            break;
+                        case "2":a.setStatus("受理中");
+                            break;
+                        case "3":a.setStatus("受理退件");
+                            break;
+                        case "4":a.setStatus("受理驳回");
+                            break;
+                        case "5":a.setStatus("初审中");
+                            break;
+                        case "6":a.setStatus("初审不通过");
+                            break;
+                        case "7":a.setStatus("初审退件");
+                            break;
+                        case "8":a.setStatus("审定中");
+                            break;
+                        case "9":a.setStatus("审定不通过");
+                            break;
+                        case "10":a.setStatus("审定通过");
+                            break;
+                        case "11":a.setStatus("审定退件");
+                            break;
+                        case "12":a.setStatus("资格取消");
+                            break;
+                    }
+                }else {
+                    switch (a.getStatus()){
+                        case "1":a.setStatus("审核失败");
+                        break;
+                        case "2":a.setStatus("审核成功");
+                        break;
+                    }
+                }
+            });
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("auditLog",auditLogList);
+        map.put("status",buyHouses.getProcessStatus());
+        map.put("id",buyHouses.getId());
+        return R.ok("查询成功",map);
+    }
+
+    @Override
+    public R downloadInform() {
+        Long userId = LoginHelper.getUserId();
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        //判断数据库中是否存在该人才通过身份证去验证
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class)
+            .eq(BuyHouses::getUserId,userId)
+            .eq(BuyHouses::getProcessStatus,Constants.SUCCEED));
+        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
+        hashMap.put("companyName",buyHouses.getCompanyName());
+        hashMap.put("companyAddress",buyHouses.getCompanyAddress());
+        hashMap.put("name",buyHouses.getUserName());
+        hashMap.put("cardId",buyHouses.getCardId());
+        hashMap.put("type",buyHouses.getType());
+        hashMap.put("nationality", "中国籍".equals(buyHouses.getNationality()) ? "身份证" : "护照");
+        String fileName = UUID.randomUUID().toString();
+        String templatePath = fileUpload + "inform.docx";
+        String word = ExportWordUtil.createWord(templatePath, filePath, fileName, hashMap);
+        System.out.println("word = " + word);
+        String file= download + prefix + "/" + fileName + ".docx";
+        System.out.println("file = " + file);
+        map.put("file",file);
+        return R.ok(map);
+
+    }
+
+    /**
      * 起步执行导出zip
-     * @param bo
+     * @param event
      * @throws IOException
      */
     @Async
-    public void export(BuyHousesBo bo) throws IOException {
+    @EventListener
+    public void export(BuyHousesEvent event) throws IOException {
+        BuyHousesBo bo = BeanUtil.toBean(event, BuyHousesBo.class);
+        bo.setProcessStatus(Constants.SUCCEED);
         LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
         List<BuyHousesVo> buyHousesVoList = baseMapper.selectVoList(lqw);
         String title = "人才认定申请表";
@@ -472,14 +592,15 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             Map<String, List<BuyHousesMember>> buyHousesMemberMap = buyHousesMemberList.stream().collect(Collectors.groupingBy(BuyHousesMember::getBuyHousesId));
             buyHousesVoList.stream().forEach(r -> {
                 String userNameFile = path + separator + r.getUserName();
-                File userFile = new File(userNameFile);
-                if (!userFile.exists() && !userFile.isDirectory()) {
-                    userFile.mkdirs();
+                System.out.println("userNameFile = " + userNameFile);
+                try {
+                    Files.createDirectories(Paths.get(userNameFile));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
                 String s = userNameFile + separator + r.getUserName() + "--";
-
                 //护照或者身份证
-                if (ObjectUtil.isNotNull(r.getInsidepageUrl())){
+                if (ObjectUtil.isNotEmpty(r.getInsidepageUrl())){
                     String insidepageUrl = r.getInsidepageUrl();
                     String fileName=null;
                     if ("中国籍".equals(r.getNationality())){
@@ -490,116 +611,118 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                     MyFileUtils.downLoadPic(insidepageUrl, fileName);
                 }
                 //申请表
-                if (ObjectUtil.isNotNull(r.getCommitmentUrl())){
+                /*if (ObjectUtil.isNotEmpty(r.getCommitmentUrl())){
                     String commitmentUrl = r.getCommitmentUrl();
                     String fileName= s  + "申请表" + commitmentUrl.substring(commitmentUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(commitmentUrl, fileName);
                 }
 
                 //申明书
-                if (ObjectUtil.isNotNull(r.getDeclarationUrl())){
+                if (ObjectUtil.isNotEmpty(r.getDeclarationUrl())){
                     String declarationUrl = r.getDeclarationUrl();
                     String fileName= s  + "申明书" + declarationUrl.substring(declarationUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(declarationUrl, fileName);
                 }
 
                 //身份证正面
-                if (ObjectUtil.isNotNull(r.getFrontUrl())){
+                if (ObjectUtil.isNotEmpty(r.getFrontUrl())){
                     String frontUrl = r.getFrontUrl();
                     String fileName= s  + "身份证正面" + frontUrl.substring(frontUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(frontUrl, fileName);
                 }
 
                 //房屋记录
-                if (ObjectUtil.isNotNull(r.getHomeRecordUrl())){
+                if (ObjectUtil.isNotEmpty(r.getHomeRecordUrl())){
                     String homeRecordUrl = r.getHomeRecordUrl();
                     String fileName= s  + "房屋记录" + homeRecordUrl.substring(homeRecordUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(homeRecordUrl, fileName);
                 }
 
+
                 //户口簿主页
-                if (ObjectUtil.isNotNull(r.getHomepageUrl())){
+                if (ObjectUtil.isNotEmpty(r.getHomepageUrl())){
                     String homepageUrl = r.getHomepageUrl();
                     String fileName= s  + "户口簿主页" + homepageUrl.substring(homepageUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(homepageUrl, fileName);
                 }
 
                 //劳动合同
-                if (ObjectUtil.isNotNull(r.getLaborContractUrl())){
+                if (ObjectUtil.isNotEmpty(r.getLaborContractUrl())){
                     String laborContractUrl = r.getLaborContractUrl();
                     String fileName= s  + "劳动合同" + laborContractUrl.substring(laborContractUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(laborContractUrl, fileName);
                 }
 
                 //企业营业执照
-                if (ObjectUtil.isNotNull(r.getLicenseUrl())){
+                if (ObjectUtil.isNotEmpty(r.getLicenseUrl())){
                     String licenseUrl = r.getLicenseUrl();
                     String fileName= s  + "企业营业执照" + licenseUrl.substring(licenseUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(licenseUrl, fileName);
                 }
 
                 //户口簿主页
-                if (ObjectUtil.isNotNull(r.getHomepageUrl())){
+                if (ObjectUtil.isNotEmpty(r.getHomepageUrl())){
                     String homepageUrl = r.getHomepageUrl();
                     String fileName= s  + "户口簿主页" + homepageUrl.substring(homepageUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(homepageUrl, fileName);
                 }
 
                 //婚姻证明材料
-                if (ObjectUtil.isNotNull(r.getMaritalUrl())){
+                if (ObjectUtil.isNotEmpty(r.getMaritalUrl())){
                     String maritalUrl = r.getMaritalUrl();
                     String fileName= s  + "婚姻证明材料" + maritalUrl.substring(maritalUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(maritalUrl, fileName);
                 }
 
                 //身份证背面
-                if (ObjectUtil.isNotNull(r.getReverseUrl())){
+                if (ObjectUtil.isNotEmpty(r.getReverseUrl())){
                     String reverseUrl = r.getReverseUrl();
                     String fileName= s  + "身份证背面" + reverseUrl.substring(reverseUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(reverseUrl, fileName);
                 }
 
                 //社保证明
-                if (ObjectUtil.isNotNull(r.getSocialSecurityUrl())){
+                if (ObjectUtil.isNotEmpty(r.getSocialSecurityUrl())){
                     String socialSecurityUrl = r.getSocialSecurityUrl();
                     String fileName= s  + "社保证明" + socialSecurityUrl.substring(socialSecurityUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(socialSecurityUrl, fileName);
                 }
 
                 //人才影像卡
-                if (ObjectUtil.isNotNull(r.getPictureInformationUrl())){
+                if (ObjectUtil.isNotEmpty(r.getPictureInformationUrl())){
                     String pictureInformationUrl = r.getPictureInformationUrl();
                     String fileName= s  + "人才影像卡" + pictureInformationUrl.substring(pictureInformationUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(pictureInformationUrl, fileName);
-                }
-
-                List<BuyHousesMember> buyHousesMembers = buyHousesMemberMap.get(r.getId().toString());
-                if (buyHousesMembers.size()>0) {
+                }*/
+                //家庭信息
+               /* List<BuyHousesMember> buyHousesMembers = buyHousesMemberMap.get(r.getId().toString());
+                if (ObjectUtil.isNotNull(buyHousesMembers)) {
                     buyHousesMembers.stream().forEach(m -> {
-                        String userNameFile1 = path + separator + m.getName();
-                        if (ObjectUtil.isNotNull(m.getFrontUrl())) {
+                        System.out.println("m = " + m);
+//                        String userNameFile1 = path + separator + m.getName();
+                        if (ObjectUtil.isNotEmpty(m.getFrontUrl())) {
                             String frontUrl = m.getFrontUrl();
-                            String fileName = userNameFile1 + separator + m.getRelation() + "身份证正面" + frontUrl.substring(frontUrl.lastIndexOf("."), frontUrl.length());
+                            String fileName = s + m.getRelation() + "身份证正面" + frontUrl.substring(frontUrl.lastIndexOf("."), frontUrl.length());
                             MyFileUtils.downLoadPic(frontUrl, fileName);
                         }
-                        if (ObjectUtil.isNotNull(m.getInsidepageUrl())) {
+                        if (ObjectUtil.isNotEmpty(m.getInsidepageUrl())) {
                             String insidepageUrl = m.getInsidepageUrl();
-                            String fileName = userNameFile1 + separator + m.getRelation() + "户口簿内页" + insidepageUrl.substring(insidepageUrl.lastIndexOf("."), insidepageUrl.length());
+                            String fileName = s + m.getRelation() + "户口簿内页" + insidepageUrl.substring(insidepageUrl.lastIndexOf("."));
                             MyFileUtils.downLoadPic(insidepageUrl, fileName);
                         }
-                        if (ObjectUtil.isNotNull(m.getReverseUrl())) {
+                        if (ObjectUtil.isNotEmpty(m.getReverseUrl())) {
                             String reverseUrl = m.getReverseUrl();
-                            String fileName = userNameFile1 + separator + m.getRelation() + "身份证正面" + reverseUrl.substring(reverseUrl.lastIndexOf("."), reverseUrl.length());
+                            String fileName = s + m.getRelation() + "身份证正面" + reverseUrl.substring(reverseUrl.lastIndexOf("."), reverseUrl.length());
                             MyFileUtils.downLoadPic(reverseUrl, fileName);
                         }
-                        if (ObjectUtil.isNotNull(m.getHomeRecordUrl())) {
+                        if (ObjectUtil.isNotEmpty(m.getHomeRecordUrl())) {
                             String homeRecordUrl = m.getHomeRecordUrl();
-                            String fileName = userNameFile1 + separator + m.getRelation() + "身份证正面" + homeRecordUrl.substring(homeRecordUrl.lastIndexOf("."), homeRecordUrl.length());
+                            String fileName = s + m.getRelation() + "身份证正面" + homeRecordUrl.substring(homeRecordUrl.lastIndexOf("."), homeRecordUrl.length());
                             MyFileUtils.downLoadPic(homeRecordUrl, fileName);
                         }
 
                     });
-                }
+                }*/
             });
             String p = path + separator + title + ".xlsx";
             String fo = filePath + separator + format + ".zip";
@@ -621,10 +744,13 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             //生成后删除文件
             DeleteFileUtil.delete(path);
             String zip = format+".zip";
-            String url =download+prefix+zip;
+            String url =download+prefix+"/"+zip;
+            System.out.println("url = " + url);
             SubscribeExport subscribeExport = new SubscribeExport();
             subscribeExport.setPath(url);
-            subscribeExport.setUserId(LoginHelper.getUserId().toString());
+            subscribeExport.setProcessKey(event.getProcessKey());
+            subscribeExport.setDescription(event.getDescription());
+            subscribeExport.setUserId(event.getExcelUserId());
             subscribeExportMapper.insert(subscribeExport);
         }
     }

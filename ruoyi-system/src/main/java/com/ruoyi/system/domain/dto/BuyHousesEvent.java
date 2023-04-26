@@ -1,13 +1,12 @@
-package com.ruoyi.system.domain;
+package com.ruoyi.system.domain.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.BaseEntity;
+import com.ruoyi.system.domain.BuyHousesMember;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,8 +17,7 @@ import java.util.List;
  * @date 2023-02-24
  */
 @Data
-@TableName("buy_houses")
-public class BuyHouses extends BaseEntity {
+public class BuyHousesEvent extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
@@ -169,7 +167,16 @@ public class BuyHouses extends BaseEntity {
     private String companyId;
 
     @TableField(exist = false)
-    private List<BuyHousesMember> buyHousesMemberList=new ArrayList<>();
+    private String excelUserId;
+
+    @TableField(exist = false)
+    private List<BuyHousesMember> buyHousesMemberList;
+
+    @TableField(exist = false)
+    private String description;
+
+    @TableField(exist = false)
+    private Long[] ids;
 
 
 }

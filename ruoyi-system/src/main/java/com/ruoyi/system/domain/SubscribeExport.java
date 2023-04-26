@@ -23,7 +23,7 @@ public class SubscribeExport extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     /**
-     * 
+     *
      */
     @TableId(value = "id")
     private Long id;
@@ -35,5 +35,9 @@ public class SubscribeExport extends BaseEntity {
      * 申请人id
      */
     private String userId;
+
+    private String description;
+
+    private String processKey;
 
 }

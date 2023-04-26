@@ -94,6 +94,11 @@
             <artifactId>ruoyi-file</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-rsaencrypt</artifactId>
+        </dependency>
+
         <!-- skywalking 整合 logback -->
 <!--        <dependency>-->
 <!--            <groupId>org.apache.skywalking</groupId>-->

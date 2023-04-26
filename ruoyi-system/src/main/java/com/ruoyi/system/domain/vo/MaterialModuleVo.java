@@ -64,5 +64,15 @@ public class MaterialModuleVo {
 
     private String file;
 
+    /**
+     * 接口或者全路径地址
+     */
+    private String interfacePath;
+
+    /**
+     * 1是接口,2是路径
+     */
+    private String interfaceType;
+
 
 }

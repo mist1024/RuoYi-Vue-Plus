@@ -22,7 +22,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 public class SubscribeExportBo extends BaseEntity {
 
     /**
-     * 
+     *
      */
     @NotNull(message = "不能为空", groups = { EditGroup.class })
     private Long id;
@@ -38,6 +38,10 @@ public class SubscribeExportBo extends BaseEntity {
      */
     @NotBlank(message = "申请人id不能为空", groups = { AddGroup.class, EditGroup.class })
     private String userId;
+
+    private String description;
+
+    private String processKey;
 
 
 }

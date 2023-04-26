@@ -3,23 +3,19 @@ package com.ruoyi.web.controller.house;
 import java.io.IOException;
 import java.util.List;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
-import com.ruoyi.system.domain.BuyHouses;
-import com.ruoyi.system.domain.bo.HousesReviewBo;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.system.domain.dto.BuyHousesEvent;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.validate.AddGroup;
-import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
@@ -47,6 +43,7 @@ public class BuyHousesController extends BaseController {
     @SaCheckPermission("system:houses:list")
     @GetMapping("/list")
     public TableDataInfo<BuyHousesVo> list(BuyHousesBo bo, PageQuery pageQuery) {
+        bo.setProcessStatus(Constants.SUCCEED);
         return iBuyHousesService.queryPageList(bo, pageQuery);
     }
 
@@ -57,13 +54,13 @@ public class BuyHousesController extends BaseController {
      * @throws IOException
      */
     @PostMapping("/subscribeExport")
-    public R subscribeExport(BuyHousesBo bo) throws IOException {
+    public R subscribeExport(@RequestBody BuyHousesEvent bo) throws IOException {
         return iBuyHousesService.subscribeExport(bo);
     }
     /**
      * 导出excel
      */
-    @GetMapping("/exportExcel")
+    @PostMapping("/exportExcel")
     public void exportExcel(BuyHousesBo bo,HttpServletResponse response){
         iBuyHousesService.exportExcel(bo,response);
     }
@@ -91,27 +88,6 @@ public class BuyHousesController extends BaseController {
         return R.ok(iBuyHousesService.queryById(id));
     }
 
-    /**
-     * 新增【请填写功能名称】
-     */
-    /*@SaCheckPermission("system:houses:add")
-    @Log(title = "【购房申请添加】", businessType = BusinessType.INSERT)
-    @RepeatSubmit()
-    @PostMapping()
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody BuyHousesBo bo) {
-        return toAjax(iBuyHousesService.insertByBo(bo));
-    }*/
-
-    /**
-     * 修改【请填写功能名称】
-     */
-  /*  @SaCheckPermission("system:houses:edit")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
-    @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody BuyHousesBo bo) {
-        return toAjax(iBuyHousesService.updateByBo(bo));
-    }*/
 
     /**
      * 删除【请填写功能名称】

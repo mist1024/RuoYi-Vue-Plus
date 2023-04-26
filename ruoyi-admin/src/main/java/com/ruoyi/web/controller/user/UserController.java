@@ -10,6 +10,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.work.domain.ActProcess;
 import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.TProcess;
@@ -128,6 +129,7 @@ public class UserController extends BaseController {
      */
     @Log(title = "获取当前业务运行到那一步",businessType = BusinessType.OTHER)
     @PostMapping("/processPlan")
+    @RsaSecurityParameter(inDecode = true)
     public R<?> processPlan(@RequestBody ActProcess actProcess){
         List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, actProcess.getProcessKey()));
@@ -140,10 +142,8 @@ public class UserController extends BaseController {
         processVo.setBusinessId(actProcess.getBusinessId());
         processVo.setParams(map);
         hashMap.put("status",map.get("processStatus"));
-//        hashMap.put("cardId",map.get("cardId"));
         List<ProcessVoResultDto>  processPlan= WorkComplyUtils.getProcessPlan(processVo);
         hashMap.put("list",processPlan);
         return R.ok(hashMap);
     }
-
 }

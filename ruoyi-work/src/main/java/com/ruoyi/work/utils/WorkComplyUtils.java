@@ -1,6 +1,8 @@
 package com.ruoyi.work.utils;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
@@ -650,7 +652,7 @@ public class WorkComplyUtils {
                 List<ProcessVo> list = new ArrayList<>();
                 if (1L == e.getProcessCheck()) {
                     String[] split = e.getAudit().split(",");
-                    e.setSize(split.length);
+//                    e.setSize(split.length);
                     for (String s : split) {
                         e.setAudit(s);
                         e.setChecked("");
@@ -666,9 +668,8 @@ public class WorkComplyUtils {
                     //将某些固定的审核人员添加进去
                     if (ObjectUtil.isNotEmpty(e.getAudit())) {
                         String[] split = e.getAudit().split(",");
-                        Collections.addAll(personByRule, split);
+                        CollectionUtil.addAll(personByRule,split);
                     }
-                    e.setSize(personByRule.size());
                     for (String s : personByRule) {
                         e.setAudit(s);
                         e.setChecked("");

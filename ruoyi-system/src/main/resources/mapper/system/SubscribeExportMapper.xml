@@ -12,6 +12,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy" column="update_by"/>
         <result property="path" column="path"/>
         <result property="userId" column="user_id"/>
+        <result property="description" column="description"/>
+        <result property="processKey" column="process_key"/>
     </resultMap>
 
 

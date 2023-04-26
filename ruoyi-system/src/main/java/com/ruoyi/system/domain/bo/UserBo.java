@@ -8,8 +8,6 @@ import javax.validation.constraints.*;
 
 import java.util.Date;
 
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**

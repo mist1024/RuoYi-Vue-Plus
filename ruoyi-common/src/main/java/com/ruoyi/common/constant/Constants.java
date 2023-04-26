@@ -73,33 +73,45 @@ public interface Constants {
     String TOKEN = "token";
 
     /**
-     * 审核等待中
+     * 待提交
      */
-    String WAIT = "wait";
+    String SUBMIT = "0";
 
     /**
-     * 审核成功
+     * 审核等待中
      */
-    String SUCCEED = "succeed";
+    String WAIT = "1";
 
     /**
      * 审核失败
      */
-    String FAILD = "faild";
+    String FAILD = "2";
+
+
+    /**
+     * 公式中
+     */
+    String PUBLICS = "3";
+
+    /**
+     * 公式失败
+     */
+    String PUBLICSFail = "4";
+
+    /**
+     * 审核成功
+     */
+    String SUCCEED = "5";
+
+    /**
+     * 取消资格
+     */
+    String CANCEL = "6";
 
     /**
      * 数据不存在
      */
     String NONENTITY = "nonentity";
-    /**
-     * 待提交
-     */
-    String SUBMIT = "submit";
-
-    /**
-     * 公式中
-     */
-    String PUBLICS = "publics";
 
 }
 

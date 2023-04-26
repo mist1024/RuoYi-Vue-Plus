@@ -1,6 +1,7 @@
 package com.ruoyi.work.utils;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.exception.ServiceException;
@@ -91,7 +92,7 @@ public class WorkUtils {
             if (obj == null) {
                 throw new ServiceException("任务环节未配置审批人,请确认传值是否正确,检查：【" + businessRule.getBeanName() + "】Bean容器中【" + methodName + "】方法");
             }
-            return Arrays.asList(obj.toString().split(","));
+            return   CollUtil.newArrayList(obj.toString().split(","));
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }

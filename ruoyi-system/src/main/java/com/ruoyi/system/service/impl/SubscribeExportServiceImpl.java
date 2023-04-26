@@ -1,13 +1,16 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.utils.poi.DeleteFileUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.domain.bo.SubscribeExportBo;
 import com.ruoyi.system.domain.vo.SubscribeExportVo;
@@ -31,6 +34,16 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
 
     private final SubscribeExportMapper baseMapper;
 
+
+    @Value("${file.path}")
+    private String filePath;
+
+    @Value("${file.domain}")
+    private String download;
+
+    @Value("${file.prefix}")
+    private String prefix;
+
     /**
      * 查询预约导出
      */
@@ -44,6 +57,7 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
      */
     @Override
     public TableDataInfo<SubscribeExportVo> queryPageList(SubscribeExportBo bo, PageQuery pageQuery) {
+        bo.setUserId(LoginHelper.getUserId().toString());
         LambdaQueryWrapper<SubscribeExport> lqw = buildQueryWrapper(bo);
         Page<SubscribeExportVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
@@ -63,6 +77,7 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
         LambdaQueryWrapper<SubscribeExport> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getPath()), SubscribeExport::getPath, bo.getPath());
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), SubscribeExport::getUserId, bo.getUserId());
+        lqw.eq(StringUtils.isNotBlank(bo.getProcessKey()), SubscribeExport::getProcessKey, bo.getProcessKey());
         return lqw;
     }
 
@@ -104,6 +119,13 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
+            //删除服务器本地得资源
+            List<SubscribeExport> subscribeExports = baseMapper.selectBatchIds(ids);
+            String path = subscribeExports.get(0).getPath();
+            //将地址转为路径
+            String replace = path.replace(download+prefix, filePath);
+            System.out.println("replace = " + replace);
+            DeleteFileUtil.delete(replace);
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }

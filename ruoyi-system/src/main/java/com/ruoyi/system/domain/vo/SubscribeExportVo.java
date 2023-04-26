@@ -22,7 +22,7 @@ public class SubscribeExportVo {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private Long id;
@@ -38,6 +38,10 @@ public class SubscribeExportVo {
      */
     @ExcelProperty(value = "申请人id")
     private String userId;
+
+    private String description;
+
+    private String processKey;
 
 
 }

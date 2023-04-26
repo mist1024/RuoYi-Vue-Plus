@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.ruoyi.rsaencrypt.advice.DecodeRequestBodyAdvice,\
+com.ruoyi.rsaencrypt.advice.EncodeResponseBodyAdvice

@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -14,8 +15,10 @@ import com.ruoyi.common.utils.file.MyFileUtils;
 import com.ruoyi.common.utils.poi.DeleteFileUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.utils.poi.ZipUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
+import com.ruoyi.system.domain.dto.HousesReviewEvent;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialModuleVo;
 import com.ruoyi.system.mapper.BuyHousesReviewMemberMapper;
@@ -27,6 +30,7 @@ import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.utils.WorkComplyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +52,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
-@Transactional
+
 public class HousesReviewServiceImpl implements IHousesReviewService {
 
     private final HousesReviewMapper baseMapper;
@@ -139,7 +143,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         lqw.eq(StringUtils.isNotBlank(bo.getCreditCode()), HousesReview::getCreditCode, bo.getCreditCode());
         lqw.eq(StringUtils.isNotBlank(bo.getCompanyAddress()), HousesReview::getCompanyAddress, bo.getCompanyAddress());
         lqw.eq(StringUtils.isNotBlank(bo.getSourceBy()), HousesReview::getSourceBy, bo.getSourceBy());
-        lqw.eq(StringUtils.isNotBlank(bo.getProcessKey()), HousesReview::getProcessKey, bo.getProcessKey());
+        lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()), HousesReview::getProcessStatus, bo.getProcessStatus());
         return lqw;
     }
 
@@ -147,6 +151,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * 新增购房复审登记
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(HousesReviewBo bo) {
         //先判断是否存在数据
         HousesReview add = BeanUtil.toBean(bo, HousesReview.class);
@@ -170,90 +175,18 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * 修改购房复审登记
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(HousesReviewBo bo) {
-        bo.setProcessStatus("wait");
-        //先删除存在的关系表
-        LambdaQueryWrapper<BuyHousesReviewMember> wrapper = new LambdaQueryWrapper<BuyHousesReviewMember>()
-            .eq(BuyHousesReviewMember::getBuyHousesId, bo.getId());
-        List<BuyHousesReviewMember> buyHousesReviewMembers = buyHousesReviewMemberMapper.selectList(wrapper);
-        if (ObjectUtil.isNotNull(buyHousesReviewMembers) && buyHousesReviewMembers.size()>0) {
-            List<BuyHousesReviewMember> buyHousesMemberList = bo.getBuyHousesMemberList();
-            //先删除minio的图片
-            List<Long> list = new ArrayList<>();
-            if (ObjectUtil.isNotNull(buyHousesMemberList) && buyHousesMemberList.size()>0) {
-                buyHousesReviewMembers.forEach(e -> {
-                    if (ObjectUtil.isNotNull(e.getFrontUrl())){
-                        if (!buyHousesMemberList.stream().anyMatch(b -> e.getFrontUrl().equals(b.getFrontUrl()))){
-                            list.add(new Long(e.getFrontUrl()));
-                        }
-                    }
-                    if (ObjectUtil.isNotNull(e.getInsidepageUrl())) {
-                        if (!buyHousesMemberList.stream().anyMatch(b ->  e.getInsidepageUrl().equals(b.getInsidepageUrl()))) {
-                            list.add(new Long(e.getInsidepageUrl()));
-                        }
-                    }
-                    if (ObjectUtil.isNotNull(e.getHomeRecordUrl())) {
-                        if (!buyHousesMemberList.stream().anyMatch(b -> ObjectUtil.isNotNull(e.getHomeRecordUrl()) && e.getHomeRecordUrl().equals(b.getHomeRecordUrl()))) {
-                            list.add(new Long(e.getHomeRecordUrl()));
-                        }
-                    }
-                    if (ObjectUtil.isNotNull(e.getReverseUrl())) {
-                        if (!buyHousesMemberList.stream().anyMatch(b -> ObjectUtil.isNotNull(e.getReverseUrl()) && e.getReverseUrl().equals(b.getReverseUrl()))) {
-                            list.add(new Long(e.getReverseUrl()));
-                        }
-                    }
-                });
-            }else {
-                List<Long> insidepageUrl = buyHousesReviewMembers.stream().filter(s ->ObjectUtil.isNotNull(s.getInsidepageUrl())).map(s -> Long.parseLong(s.getInsidepageUrl())).collect(Collectors.toList());
-                if (ObjectUtil.isNotNull(insidepageUrl)&& insidepageUrl.size()>0){
-                    list.addAll(insidepageUrl);
-                }
-                List<Long> homeRecordUrl = buyHousesReviewMembers.stream().filter(s ->ObjectUtil.isNotNull(s.getHomeRecordUrl())).map(s -> Long.parseLong(s.getHomeRecordUrl())).collect(Collectors.toList());
-                if (ObjectUtil.isNotNull(homeRecordUrl)&& homeRecordUrl.size()>0){
-                    list.addAll(homeRecordUrl);
-                }
-                List<Long> reverseUrl = buyHousesReviewMembers.stream().filter(s ->ObjectUtil.isNotNull(s.getReverseUrl())).map(s -> Long.parseLong(s.getReverseUrl())).collect(Collectors.toList());
-                if (ObjectUtil.isNotNull(reverseUrl)&& reverseUrl.size()>0){
-                    list.addAll(reverseUrl);
-                }
-                List<Long> frontUrl = buyHousesReviewMembers.stream().filter(s ->ObjectUtil.isNotNull(s.getFrontUrl())).map(s -> Long.parseLong(s.getFrontUrl())).collect(Collectors.toList());
-                if (ObjectUtil.isNotNull(frontUrl)&& frontUrl.size()>0){
-                    list.addAll(frontUrl);
-                }
-            }
-            if (list.size()>0){
-                sysOssService.deleteWithValidByIds(list,true);
-            }
-            List<Long> collect = buyHousesReviewMembers.stream().map(BuyHousesReviewMember::getId).collect(Collectors.toList());
-            if (collect.size()>0) {
-                buyHousesReviewMemberMapper.deleteBatchIds(collect);
-            }
-        }
-        LambdaQueryWrapper<MaterialProof> queryWrapper = new LambdaQueryWrapper<MaterialProof>()
-            .eq(MaterialProof::getHouseId, bo.getId());
-        List<MaterialProof> materialProofs = materialProofMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNotNull(materialProofs) && materialProofs.size()>0) {
-            List<Long> list = new ArrayList<>();
-            List<MaterialModule> materialsList = bo.getMaterialsList();
-            if (ObjectUtil.isNotNull(materialsList) && materialsList.size() > 0){
-                materialProofs.forEach(mp ->{
-                    boolean b = materialsList.stream().anyMatch(e -> ObjectUtil.isNotNull(mp.getFile()) && mp.getFile().equals(e.getFile()));
-                    if (!b){
-                        Long aLong = new Long(mp.getFile());
-                        list.add(aLong);
-                    }
-                });
-            }else {
-                list.addAll(materialProofs.stream().filter(s ->ObjectUtil.isNotNull(s.getFile())).map(s -> Long.parseLong(s.getFile())).collect(Collectors.toList()));
-            }
-            if (list.size()>0) {
-                sysOssService.deleteWithValidByIds(list, true);
-            }
-            List<Long> collect = materialProofs.stream().map(MaterialProof::getId).collect(Collectors.toList());
-            if (collect.size()>0) {
-                materialProofMapper.deleteBatchIds(collect);
-            }
-        }
+        bo.setProcessStatus(Constants.WAIT);
+        //先删除存在的家庭情况关系表
+        buyHousesReviewMemberMapper.delete( new LambdaQueryWrapper<BuyHousesReviewMember>()
+            .eq(BuyHousesReviewMember::getBuyHousesId, bo.getId()));
+
+        //删除补充材料
+        materialProofMapper.delete(new LambdaQueryWrapper<MaterialProof>()
+            .eq(MaterialProof::getHouseId, bo.getId())
+            .eq(MaterialProof::getProcessKey,"house_review"));
+
         if (ObjectUtil.isNotNull(bo.getBuyHousesMemberList()) && bo.getBuyHousesMemberList().size()>0){
             bo.getBuyHousesMemberList().stream().forEach( e ->{
                 e.setBuyHousesId(bo.getId().toString());
@@ -360,8 +293,10 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * @return
      */
     @Override
-    public R subscribeExport(HousesReviewBo bo) throws IOException {
-        export(bo);
+    public R subscribeExport(HousesReviewEvent bo) throws IOException {
+        Long userId = LoginHelper.getUserId();
+        bo.setExcelUserId(userId.toString());
+        SpringUtils.context().publishEvent(bo);
         return R.ok("预约成功");
     }
 
@@ -378,7 +313,9 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     }
 
     @Async
-    public void export(HousesReviewBo bo) throws IOException {
+    @EventListener
+    public void export(HousesReviewEvent event) throws IOException {
+        HousesReviewBo bo = BeanUtil.toBean(event, HousesReviewBo.class);
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
         List<HousesReview> housesReviews = baseMapper.selectList(lqw);
         if (housesReviews.size() > 0) {
@@ -402,7 +339,6 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
                         String s = userNameFile + separator + r.getName() + "--";
                         String file = p.getFile();
                         MyFileUtils.downLoadPic(file, s + p.getDescription() + file.substring(file.lastIndexOf(".")));
-//                            MyFileUtils.writeBytes(file, s + p.getDescription() + file.substring(file.lastIndexOf(".")));
                         System.out.println("file = " + file);
                     });
                 }
@@ -427,9 +363,11 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             //生成后删除文件
             DeleteFileUtil.delete(path);
             String zip = format+".zip";
-            String url =download+prefix+zip;
+            String url =download+prefix+"/"+zip;
             SubscribeExport subscribeExport = new SubscribeExport();
             subscribeExport.setPath(url);
+            subscribeExport.setDescription(event.getDescription());
+            subscribeExport.setProcessKey("house_review");
             subscribeExport.setUserId(LoginHelper.getUserId().toString());
             subscribeExportMapper.insert(subscribeExport);
         }

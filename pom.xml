@@ -355,6 +355,12 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-rsaencrypt</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+
             <!-- Sa-Token 插件：整合SSO -->
             <!--<dependency>
                 <groupId>cn.dev33</groupId>
@@ -402,6 +408,8 @@
         <module>ruoyi-sms</module>
         <module>ruoyi-work</module>
         <module>ruoyi-file</module>
+        <module>ruoyi-rsaencrypt</module>
+
 
     </modules>
     <packaging>pom</packaging>

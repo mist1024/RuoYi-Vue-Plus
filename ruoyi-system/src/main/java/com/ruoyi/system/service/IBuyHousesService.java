@@ -5,6 +5,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
+import com.ruoyi.system.domain.dto.BuyHousesEvent;
 import com.ruoyi.system.domain.dto.DeclareListDTO;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
 
@@ -68,7 +69,7 @@ public interface IBuyHousesService {
      * @param bo
      * @return
      */
-    R subscribeExport(BuyHousesBo bo) throws IOException;
+    R subscribeExport(BuyHousesEvent bo) throws IOException;
 
     /**
      * 导出excel
@@ -76,4 +77,24 @@ public interface IBuyHousesService {
      * @param response
      */
     void exportExcel(BuyHousesBo bo, HttpServletResponse response);
+
+    /**
+     * 判读当前用户是否提交过
+     * @return
+     */
+    R checkStatus();
+
+    /**
+     * 获取当前用户日志
+     * @return
+     */
+    R getBuyHousesLogsByUserId();
+
+
+    /**
+     * 下载认定通知单
+     * @return
+     */
+    R downloadInform();
+
 }

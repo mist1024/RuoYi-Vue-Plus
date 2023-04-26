@@ -5,6 +5,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.domain.HousesReview;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
+import com.ruoyi.system.domain.dto.HousesReviewEvent;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +64,7 @@ public interface IHousesReviewService {
      * @param bo
      * @return
      */
-    R subscribeExport(HousesReviewBo bo) throws IOException;
+    R subscribeExport(HousesReviewEvent bo) throws IOException;
 
     /**
      *
