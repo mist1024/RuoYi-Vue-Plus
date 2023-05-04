@@ -116,7 +116,7 @@ public class ExcelUtil {
      * @param options 下拉框数据
      */
     public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz,
-                                       HttpServletResponse response, List<ExcelDownHandler.DropDownOptions> options) {
+                                       HttpServletResponse response, List<DropDownOptions> options) {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
@@ -177,7 +177,7 @@ public class ExcelUtil {
      * @param options 下拉框数据
      */
     public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz,
-                                       OutputStream os, List<ExcelDownHandler.DropDownOptions> options) {
+                                       OutputStream os, List<DropDownOptions> options) {
         ExcelWriterSheetBuilder builder = EasyExcel.write(os, clazz)
             .autoCloseStream(false)
             // 自动适配

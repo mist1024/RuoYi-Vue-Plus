@@ -2,15 +2,11 @@ package com.ruoyi.common.excel;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.ruoyi.common.annotation.DropDown;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -21,7 +17,10 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * Excel表格下拉选
+ * <h1>Excel表格下拉选操作</h1>
+ * 考虑到下拉选过多可能导致Excel打开缓慢的问题，只校验前1000行
+ * <p>
+ * 即只有前1000行的数据可以用下拉框，超出的自行通过限制数据量的形式，第二次输出
  *
  * @author Emil.Zhang
  */
@@ -29,7 +28,8 @@ import java.util.*;
 public class ExcelDownHandler implements SheetWriteHandler {
 
     /**
-     * Excel表格中的列名
+     * Excel表格中的列名英文
+     * 仅为了解析列英文，禁止修改
      */
     private static final String EXCEL_COLUMN_NAME = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     /**
@@ -37,13 +37,9 @@ public class ExcelDownHandler implements SheetWriteHandler {
      */
     private static final String OPTIONS_SHEET_NAME = "options";
     /**
-     * 联动选择数据Sheet名
+     * 联动选择数据Sheet名的头
      */
     private static final String LINKED_OPTIONS_SHEET_NAME = "linkedOptions";
-    /**
-     * 是否隐藏数据Sheet
-     */
-    private static final Boolean HIDDEN_FLAG = !"dev".equals(SpringUtils.getActiveProfile());
     /**
      * 下拉可选项
      */
@@ -64,7 +60,13 @@ public class ExcelDownHandler implements SheetWriteHandler {
     }
 
     /**
-     * 开始创建下拉数据
+     * <h2>开始创建下拉数据</h2>
+     * 1.通过解析传入的@ExcelProperty同级是否标注有@DropDown选项
+     * 如果有且设置了value值，则将其直接置为下拉可选项
+     * <p>
+     * 2.或者在调用ExcelUtil时指定了可选项，将依据传入的可选项做下拉
+     * <p>
+     * 3.二者并存，注意调用方式
      */
     @Override
     public void afterSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
@@ -76,11 +78,18 @@ public class ExcelDownHandler implements SheetWriteHandler {
         int length = fields.length;
         for (int i = 0; i < length; i++) {
             if (fields[i].isAnnotationPresent(DropDown.class)) {
+                // 获取设定的下拉选
                 List<String> options = Arrays.asList(fields[i].getDeclaredAnnotation(DropDown.class).value());
+                // 获取列下标，默认为当前循环次数
+                int index = i;
+                if (fields[i].isAnnotationPresent(ExcelProperty.class)) {
+                    // 如果制定了列下标，以指定的为主
+                    index = fields[i].getDeclaredAnnotation(ExcelProperty.class).index();
+                }
                 if (options.size() > 20) {
-                    dropDownWithSheet(helper, workbook, sheet, i, options);
+                    dropDownWithSheet(helper, workbook, sheet, index, options);
                 } else {
-                    dropDownWithSimple(helper, sheet, i, options);
+                    dropDownWithSimple(helper, sheet, index, options);
                 }
             }
         }
@@ -101,24 +110,30 @@ public class ExcelDownHandler implements SheetWriteHandler {
     }
 
     /**
-     * 简单下拉框
+     * <h2>简单下拉框</h2>
+     * 直接将可选项拼接为指定列的数据校验值
+     *
+     * @param celIndex 列index
+     * @param value    下拉选可选值
      */
     private void dropDownWithSimple(DataValidationHelper helper, Sheet sheet, Integer celIndex, List<String> value) {
-        if (value.isEmpty()) {
+        if (ObjectUtil.isEmpty(value)) {
             return;
         }
         this.markOptionsToSheet(helper, sheet, celIndex, helper.createExplicitListConstraint(value.toArray(new String[0])));
     }
 
     /**
-     * 额外表格形式的级联下拉框
+     * <h2>额外表格形式的级联下拉框</h2>
+     *
+     * @param options 额外表格形式存储的下拉可选项
      */
     private void dropDownLinkedOptions(DataValidationHelper helper, Workbook workbook, Sheet sheet, DropDownOptions options) {
         String linkedOptionsSheetName = String.format("%s_%d", LINKED_OPTIONS_SHEET_NAME, currentLinkedOptionsSheetIndex);
         // 创建联动下拉数据表
         Sheet linkedOptionsDataSheet = workbook.createSheet(WorkbookUtil.createSafeSheetName(linkedOptionsSheetName));
         // 将下拉表隐藏
-        workbook.setSheetHidden(workbook.getSheetIndex(linkedOptionsDataSheet), HIDDEN_FLAG);
+        workbook.setSheetHidden(workbook.getSheetIndex(linkedOptionsDataSheet), true);
         // 完善横向的一级选项数据表
         List<String> firstOptions = options.getOptions();
         Map<String, List<String>> secoundOptionsMap = options.getNextOptions();
@@ -209,14 +224,18 @@ public class ExcelDownHandler implements SheetWriteHandler {
     }
 
     /**
-     * 额外表格形式的下拉框
+     * <h2>额外表格形式的普通下拉框</h2>
+     * 由于下拉框可选值数量过多，为提升Excel打开效率，使用额外表格形式做下拉
+     *
+     * @param celIndex 下拉选
+     * @param value    下拉选可选值
      */
     private void dropDownWithSheet(DataValidationHelper helper, Workbook workbook, Sheet sheet, Integer celIndex, List<String> value) {
         // 创建下拉数据表
         Sheet simpleDataSheet = Optional.ofNullable(workbook.getSheet(WorkbookUtil.createSafeSheetName(OPTIONS_SHEET_NAME)))
             .orElseGet(() -> workbook.createSheet(WorkbookUtil.createSafeSheetName(OPTIONS_SHEET_NAME)));
         // 将下拉表隐藏
-        workbook.setSheetHidden(workbook.getSheetIndex(simpleDataSheet), HIDDEN_FLAG);
+        workbook.setSheetHidden(workbook.getSheetIndex(simpleDataSheet), true);
         // 完善纵向的一级选项数据表
         for (int i = 0; i < value.size(); i++) {
             int finalI = i;
@@ -301,7 +320,14 @@ public class ExcelDownHandler implements SheetWriteHandler {
     }
 
     /**
-     * 获取栏位名
+     * <h2>依据列index获取列名英文</h2>
+     * 依据列index转换为Excel中的列名英文
+     * <p>例如第1列，index为0，解析出来为A列</p>
+     * 第27列，index为26，解析为AA列
+     * <p>第28列，index为27，解析为AB列</p>
+     *
+     * @param columnIndex 列index
+     * @return 列index所在得英文名
      */
     private String getExcelColumnName(int columnIndex) {
         // 26一循环的次数
@@ -311,71 +337,10 @@ public class ExcelDownHandler implements SheetWriteHandler {
         // 26一循环的次数大于0，则视为栏名至少两位
         String columnPrefix = columnCircleCount == 0
             ? ""
-            : StrUtil.subWithLength(EXCEL_COLUMN_NAME, columnCircleCount, 1);
+            : StrUtil.subWithLength(EXCEL_COLUMN_NAME, columnCircleCount - 1, 1);
         // 从26一循环内取对应的栏位名
         String columnNext = StrUtil.subWithLength(EXCEL_COLUMN_NAME, thisCircleColumnIndex, 1);
         // 将二者拼接即为最终的栏位名
         return columnPrefix + columnNext;
-    }
-
-    /**
-     * 下拉可选项
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class DropDownOptions {
-        /**
-         * 一级下拉所在列index，从0开始算
-         */
-        private int index = 0;
-        /**
-         * 二级下拉所在的index，从0开始算，不能与一级相同
-         */
-        private int nextIndex = 0;
-        /**
-         * 一级下拉所包含的数据
-         */
-        private List<String> options = new ArrayList<>();
-        /**
-         * 二级下拉所包含的数据Map
-         * <p>以每一个一级选项值为Key，每个一级选项对应的二级数据为Value</p>
-         */
-        private Map<String, List<String>> nextOptions = new HashMap<>();
-
-        /**
-         * 创建只有一级的下拉选
-         */
-        public DropDownOptions(int index, List<String> options) {
-            this.index = index;
-            this.options = options;
-        }
-
-        /**
-         * 创建选项可选值
-         * <p>注意：不能以数字，特殊符号开头，选项中不可以包含任何运算符号</p>
-         *
-         * @param vars 可选值内包含的参数
-         * @return 合规的可选值
-         */
-        public static String createOptionValue(Object... vars) {
-            StringBuilder stringBuffer = new StringBuilder();
-            String regex = "^[\\S\\d\\u4e00-\\u9fa5]+$";
-            for (int i = 0; i < vars.length; i++) {
-                Object var = vars[i];
-                if (!var.toString().matches(regex)) {
-                    throw new ServiceException("选项数据不符合规则，仅允许使用中英文字符以及数字");
-                }
-                stringBuffer.append(StrUtil.trimToEmpty(var.toString()));
-                if (i < vars.length - 1) {
-                    // 直至最后一个前，都以_作为切割线
-                    stringBuffer.append("_");
-                }
-            }
-            if (stringBuffer.toString().matches("^\\d_*$")) {
-                throw new ServiceException("禁止以数字开头");
-            }
-            return stringBuffer.toString();
-        }
     }
 }

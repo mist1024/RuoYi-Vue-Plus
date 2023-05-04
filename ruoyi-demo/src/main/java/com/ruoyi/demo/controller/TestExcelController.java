@@ -1,10 +1,14 @@
 package com.ruoyi.demo.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.demo.service.IExportExcelService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,8 +24,11 @@ import java.util.Map;
  * @author Lion Li
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/demo/excel")
 public class TestExcelController {
+
+    private final IExportExcelService exportExcelService;
 
     /**
      * 单列表多数据
@@ -74,6 +81,17 @@ public class TestExcelController {
         multiListMap.put("data3", list3);
         multiListMap.put("data4", list4);
         ExcelUtil.exportTemplateMultiList(multiListMap, "多列表.xlsx", "excel/多列表.xlsx", response);
+    }
+
+    /**
+     * 导出下拉框
+     *
+     * @param response /
+     */
+    @SaIgnore
+    @GetMapping("/exportWithOptions")
+    public void exportWithOptions(HttpServletResponse response) {
+        exportExcelService.exportWithOptions(response);
     }
 
     @Data
