@@ -69,9 +69,8 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
      * @return
      */
     private Object encodeRsa(MethodParameter methodParameter, Object body) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String result = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
+            String result = JsonUtils.toJsonString(body);
             logger.info("对返回数据 :【" + result + "】进行加密");
             String s = RSAUtil.publicKeyEncryptBase64(result);
             logger.info("加密之后密文:"+s);

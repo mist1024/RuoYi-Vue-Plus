@@ -9,6 +9,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.MyFileUtils;
@@ -62,9 +63,6 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     private final MaterialProofMapper materialProofMapper;
     private final BuyHousesReviewMemberMapper buyHousesReviewMemberMapper;
 
-    private final SysOssServiceImpl sysOssService;
-
-
     private final SubscribeExportMapper subscribeExportMapper;
 
     @Value("${file.template}")
@@ -101,7 +99,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      */
     @Override
     public TableDataInfo<HousesReview> queryPageList(HousesReviewBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
+        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper2(bo);
         Page<HousesReview> result = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
@@ -113,6 +111,38 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     public List<HousesReviewVo> queryList(HousesReviewBo bo) {
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
         return baseMapper.selectVoList(lqw);
+    }
+
+    private LambdaQueryWrapper<HousesReview> buildQueryWrapper2(HousesReviewBo bo) {
+        Map<String, Object> params = bo.getParams();
+        LambdaQueryWrapper<HousesReview> lqw = Wrappers.lambdaQuery();
+        if (ObjectUtil.isNotNull(bo.getIds())){
+            lqw.in(HousesReview::getId,bo.getIds());
+        }
+        lqw.eq(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
+        lqw.eq(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
+        lqw.like(StringUtils.isNotBlank(bo.getName()), HousesReview::getName, bo.getName());
+        lqw.eq(StringUtils.isNotBlank(bo.getQualification()), HousesReview::getQualification, bo.getQualification());
+        lqw.eq(StringUtils.isNotBlank(bo.getAuditTime()), HousesReview::getAuditTime, bo.getAuditTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getPresellCard()), HousesReview::getPresellCard, bo.getPresellCard());
+        lqw.eq(StringUtils.isNotBlank(bo.getDealType()), HousesReview::getDealType, bo.getDealType());
+        lqw.eq(StringUtils.isNotBlank(bo.getProjectName()), HousesReview::getProjectName, bo.getProjectName());
+        lqw.eq(StringUtils.isNotBlank(bo.getProjectArea()), HousesReview::getProjectArea, bo.getProjectArea());
+        lqw.eq(StringUtils.isNotBlank(bo.getQualificationConfirmTime()), HousesReview::getQualificationConfirmTime, bo.getQualificationConfirmTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getQualificationPreApplyTime()), HousesReview::getQualificationPreApplyTime, bo.getQualificationPreApplyTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getFamilyType()), HousesReview::getFamilyType, bo.getFamilyType());
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), HousesReview::getStatus, bo.getStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getRegisterFailureTime()), HousesReview::getRegisterFailureTime, bo.getRegisterFailureTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getNationality()), HousesReview::getNationality, bo.getNationality());
+        lqw.eq(StringUtils.isNotBlank(bo.getMaritalStatus()), HousesReview::getMaritalStatus, bo.getMaritalStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getCompanyType()), HousesReview::getCompanyType, bo.getCompanyType());
+        lqw.like(StringUtils.isNotBlank(bo.getCompanyName()), HousesReview::getCompanyName, bo.getCompanyName());
+        lqw.eq(StringUtils.isNotBlank(bo.getTalentsType()), HousesReview::getTalentsType, bo.getTalentsType());
+        lqw.eq(StringUtils.isNotBlank(bo.getCreditCode()), HousesReview::getCreditCode, bo.getCreditCode());
+        lqw.eq(StringUtils.isNotBlank(bo.getCompanyAddress()), HousesReview::getCompanyAddress, bo.getCompanyAddress());
+        lqw.eq(StringUtils.isNotBlank(bo.getSourceBy()), HousesReview::getSourceBy, bo.getSourceBy());
+        lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()), HousesReview::getProcessStatus, bo.getProcessStatus());
+        return lqw;
     }
 
     private LambdaQueryWrapper<HousesReview> buildQueryWrapper(HousesReviewBo bo) {
@@ -177,11 +207,18 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(HousesReviewBo bo) {
+        //判断该人才是否可提交
+        HousesReview housesReview = baseMapper.selectById(bo.getId());
+        if (ObjectUtil.isNotNull(housesReview.getProcessStatus())
+            && (Constants.WAIT.equals(housesReview.getProcessStatus())
+        || Constants.SUCCEED.equals(housesReview.getProcessStatus())
+        || Constants.PUBLICS.equals(housesReview.getProcessStatus()))){
+            throw new ServiceException("当前人才状态不允许提交");
+        }
         bo.setProcessStatus(Constants.WAIT);
         //先删除存在的家庭情况关系表
         buyHousesReviewMemberMapper.delete( new LambdaQueryWrapper<BuyHousesReviewMember>()
             .eq(BuyHousesReviewMember::getBuyHousesId, bo.getId()));
-
         //删除补充材料
         materialProofMapper.delete(new LambdaQueryWrapper<MaterialProof>()
             .eq(MaterialProof::getHouseId, bo.getId())
@@ -227,6 +264,9 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(HousesReview entity){
+        if (!"D".equals(entity.getTalentsType())){
+            entity.setTypeExtend(null);
+        }
         //TODO 做一些数据校验,如唯一约束
     }
 
@@ -236,14 +276,19 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
+            List<HousesReview> housesReviews = baseMapper.selectBatchIds(ids);
+            boolean b = housesReviews.stream().anyMatch(h -> h.getProcessStatus().equals(Constants.PUBLICS)
+                || h.getProcessStatus().equals(Constants.WAIT)
+                || h.getProcessStatus().equals(Constants.SUCCEED));
+            if (b){
+                throw new ServiceException("当前所选数据中存在审核的数据,请审核之后再删除");
+            }
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 
     @Override
     public Boolean saveBatch(List<HousesReview> list) {
-
         return baseMapper.insertBatch(list);
     }
 
@@ -254,6 +299,15 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      */
     @Override
     public R<?> getMaterialInfo(HousesReviewBo bo) {
+        //执行修改
+        HousesReview housesReview = baseMapper.selectById(bo.getId());
+        if (Constants.PUBLICS.equals(housesReview.getProcessStatus())
+        || Constants.WAIT.equals(housesReview.getProcessStatus())
+        || Constants.SUCCEED.equals(housesReview.getProcessStatus())){
+        }else {
+            HousesReview update = BeanUtil.toBean(bo, HousesReview.class);
+            baseMapper.updateById(update);
+        }
         Map<String, Object> map = BeanUtil.beanToMap(bo);
         List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
         return R.ok(materialInfo);
@@ -270,7 +324,6 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             housesReviewVo.setBuyHousesMemberList(new ArrayList<>());
         }
         return housesReviewVo;
-
     }
 
     /**

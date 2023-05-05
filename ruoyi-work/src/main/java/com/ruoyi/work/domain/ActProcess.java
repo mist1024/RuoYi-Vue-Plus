@@ -1,11 +1,11 @@
 package com.ruoyi.work.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -23,7 +23,7 @@ public class ActProcess {
     /**
      *
      */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
     /**
      * 流程表id
@@ -47,7 +47,6 @@ public class ActProcess {
     private String step;
 
     private Date createTime;
-
 
     /**
      * 是由存在下一步骤
@@ -84,8 +83,5 @@ public class ActProcess {
 
     @TableField(exist = false)
     private String processKey;
-
-
-
 
 }

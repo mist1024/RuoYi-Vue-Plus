@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.model.RegisterBody;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.SysRegisterService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class SysRegisterController extends BaseController {
      */
     @SaIgnore
     @PostMapping("/register")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
             return R.fail("当前系统没有开启注册功能！");

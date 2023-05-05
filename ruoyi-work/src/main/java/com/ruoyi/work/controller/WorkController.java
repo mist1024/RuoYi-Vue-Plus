@@ -10,6 +10,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.work.domain.ActProcess;
 import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.RollBackLog;
@@ -45,6 +46,7 @@ public class WorkController extends BaseController {
     @Log(title = "获取待办数据",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:taskList")
     @GetMapping("/getWaitTaskList")
+    @RsaSecurityParameter
     public TableDataInfo<ActProcess> getWaitTaskList(ActProcess actProcess, PageQuery pageQuery){
         return WorkComplyUtils.getWaitTaskList(actProcess,pageQuery);
     }
@@ -55,6 +57,7 @@ public class WorkController extends BaseController {
     @Log(title = "获取已办数据",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:historyList")
     @GetMapping("/getHistoryList")
+    @RsaSecurityParameter
     public TableDataInfo<HisProcess> getHistoryList(HisProcess hisProcess, PageQuery pageQuery){
         return WorkComplyUtils.getHistoryList(hisProcess,pageQuery);
     }
@@ -65,6 +68,7 @@ public class WorkController extends BaseController {
     @Log(title = "获取当前业务运行到那一步",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:processPlan")
     @PostMapping("/processPlan")
+    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public R<?> processPlan(@RequestBody ActProcess actProcess){
         if (ObjectUtil.isNull(actProcess.getBusinessId())){
             return R.fail("businessId不可为空");
@@ -90,6 +94,7 @@ public class WorkController extends BaseController {
      */
     @Log(title = "获取可退回步骤",businessType = BusinessType.OTHER)
     @PostMapping("/getStep")
+    @RsaSecurityParameter(inDecode = true)
     public R<?> getStep(@RequestBody BusinessDTO businessDTO){
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, businessDTO.getProcessKey());
@@ -108,6 +113,7 @@ public class WorkController extends BaseController {
     @Log(title = "流程办理",businessType = BusinessType.OTHER)
 //    @SaCheckPermission("work:task:batchDeleted")
     @PostMapping("/batchDeleted")
+    @RsaSecurityParameter(inDecode = true)
     public R<?> batchDeleted(@RequestBody HisProcess hisProcess){
         if (ObjectUtil.isNull(hisProcess.getStatus())){
             return R.fail("状态不可为空");
@@ -143,6 +149,7 @@ public class WorkController extends BaseController {
     @Log(title = "获取业务id详情数据",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:taskInfo")
     @PostMapping("/taskInfo")
+    @RsaSecurityParameter(inDecode = true)
     public R<?> getInfoById(@RequestBody ActProcess actProcess){
         if (ObjectUtil.isNull(actProcess.getProcessKey())){
             return R.fail("key不可为空");
@@ -160,6 +167,7 @@ public class WorkController extends BaseController {
 
     @Log(title = "获取审核日志",businessType = BusinessType.OTHER)
     @PostMapping("/auditLogList")
+    @RsaSecurityParameter(inDecode = true)
     public R<?> getAuditLogListByOtherId(@RequestBody BusinessDTO businessDTO){
         return WorkComplyUtils.getAuditLogListByOtherId(businessDTO);
     }
@@ -171,6 +179,7 @@ public class WorkController extends BaseController {
      */
     @Log(title = "回退",businessType = BusinessType.OTHER)
     @PostMapping("/rollBackLog")
+    @RsaSecurityParameter(inDecode = true)
     public R<?> rollBackLog(@RequestBody RollBackLog rollBackLog){
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, rollBackLog.getProcessKey());

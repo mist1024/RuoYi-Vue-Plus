@@ -2,19 +2,18 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.SysConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -36,6 +35,7 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:list")
     @GetMapping("/list")
+    @RsaSecurityParameter
     public TableDataInfo<SysConfig> list(SysConfig config, PageQuery pageQuery) {
         return configService.selectPageConfigList(config, pageQuery);
     }
@@ -58,6 +58,7 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:query")
     @GetMapping(value = "/{configId}")
+    @RsaSecurityParameter
     public R<SysConfig> getInfo(@PathVariable Long configId) {
         return R.ok(configService.selectConfigById(configId));
     }
@@ -68,6 +69,7 @@ public class SysConfigController extends BaseController {
      * @param configKey 参数Key
      */
     @GetMapping(value = "/configKey/{configKey}")
+    @RsaSecurityParameter
     public R<Void> getConfigKey(@PathVariable String configKey) {
         return R.ok(configService.selectConfigByKey(configKey));
     }
@@ -78,6 +80,7 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
     @PostMapping
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysConfig config) {
         if (!configService.checkConfigKeyUnique(config)) {
             return R.fail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
@@ -92,6 +95,7 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysConfig config) {
         if (!configService.checkConfigKeyUnique(config)) {
             return R.fail("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
@@ -106,6 +110,7 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     @PutMapping("/updateByKey")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> updateByKey(@RequestBody SysConfig config) {
         configService.updateConfig(config);
         return R.ok();
@@ -119,6 +124,7 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
+    @RsaSecurityParameter
     public R<Void> remove(@PathVariable Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return R.ok();
@@ -130,6 +136,7 @@ public class SysConfigController extends BaseController {
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
+    @RsaSecurityParameter
     public R<Void> refreshCache() {
         configService.resetConfigCache();
         return R.ok();

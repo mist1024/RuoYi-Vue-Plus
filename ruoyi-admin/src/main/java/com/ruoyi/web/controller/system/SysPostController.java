@@ -2,19 +2,18 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -36,6 +35,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
+    @RsaSecurityParameter
     public TableDataInfo<SysPost> list(SysPost post, PageQuery pageQuery) {
         return postService.selectPagePostList(post, pageQuery);
     }
@@ -58,6 +58,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:query")
     @GetMapping(value = "/{postId}")
+    @RsaSecurityParameter
     public R<SysPost> getInfo(@PathVariable Long postId) {
         return R.ok(postService.selectPostById(postId));
     }
@@ -68,6 +69,7 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:add")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysPost post) {
         if (!postService.checkPostNameUnique(post)) {
             return R.fail("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
@@ -83,6 +85,7 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:edit")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysPost post) {
         if (!postService.checkPostNameUnique(post)) {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
@@ -100,6 +103,7 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
+    @RsaSecurityParameter
     public R<Void> remove(@PathVariable Long[] postIds) {
         return toAjax(postService.deletePostByIds(postIds));
     }
@@ -108,6 +112,7 @@ public class SysPostController extends BaseController {
      * 获取岗位选择框列表
      */
     @GetMapping("/optionselect")
+    @RsaSecurityParameter
     public R<List<SysPost>> optionselect() {
         List<SysPost> posts = postService.selectPostAll();
         return R.ok(posts);

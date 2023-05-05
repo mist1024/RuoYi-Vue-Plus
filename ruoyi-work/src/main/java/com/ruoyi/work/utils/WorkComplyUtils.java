@@ -22,10 +22,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.BeanCopyUtils;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.work.domain.*;
 import com.ruoyi.work.domain.vo.ActProcessVo;
@@ -504,21 +501,13 @@ public class WorkComplyUtils {
                     if (ObjectUtil.isNotEmpty(record.getTimeout())&& ObjectUtil.isNotNull(record.getTimeout())){
                         DateTime beforeTime = DateUtil.offsetDay(record.getCreateTime(), new Integer(record.getTimeout()));
                         Date nowDate = DateUtils.getNowDate();
-                        long between = DateUtil.between(nowDate, beforeTime, DateUnit.DAY);
+                        long between = DateHolidayUtils.getBetweenDays(beforeTime, nowDate);
                         if (between<0){
                             long abs = Math.abs(between);
                             record.setTimeout("超时"+abs+"天");
                         }else {
                             record.setTimeout("剩余"+between+"天");
                         }
-                    }
-                    switch (record.getType()){
-                        case "1" :record.setType("基本类型");
-                            break;
-                        case "2" : record.setType("会签");
-                            break;
-                        default:record.setType("未知类型");
-                            break;
                     }
                 }
                 return TableDataInfo.build(actProcessVoCCList);
@@ -536,21 +525,13 @@ public class WorkComplyUtils {
                 if (ObjectUtil.isNotEmpty(record.getTimeout())&& ObjectUtil.isNotNull(record.getTimeout())){
                     DateTime beforeTime = DateUtil.offsetDay(record.getCreateTime(), new Integer(record.getTimeout()));
                     Date nowDate = DateUtils.getNowDate();
-                    long between = DateUtil.between(nowDate, beforeTime, DateUnit.DAY);
+                    long between = DateHolidayUtils.getBetweenDays(beforeTime, nowDate);
                     if (between<0){
                         long abs = Math.abs(between);
                         record.setTimeout("超时"+abs+"天");
                     }else {
                         record.setTimeout("剩余"+between+"天");
                     }
-                }
-                switch (record.getType()){
-                    case "1" :record.setType("基本类型");
-                        break;
-                    case "2" : record.setType("会签");
-                        break;
-                    default:record.setType("未知类型");
-                        break;
                 }
             }
             return TableDataInfo.build(actProcessVoList);
@@ -572,18 +553,10 @@ public class WorkComplyUtils {
                 SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
                 record.setAudit(sysRole.getRoleName());
             }
-            switch (record.getType()){
-                case "1" :record.setType("基本类型");
-                    break;
-                case "2" : record.setType("会签");
-                    break;
-                default:record.setType("未知类型");
-                    break;
-            }
             if (ObjectUtil.isNotEmpty(record.getTimeout())&& ObjectUtil.isNotNull(record.getTimeout())){
                 DateTime beforeTime = DateUtil.offsetDay(record.getCreateTime(), new Integer(record.getTimeout()));
                 Date nowDate = DateUtils.getNowDate();
-                long between = DateUtil.between(nowDate, beforeTime, DateUnit.DAY);
+                long between = DateHolidayUtils.getBetweenDays(beforeTime, nowDate);
                 if (between<0){
                     long abs = Math.abs(between);
                     record.setTimeout("超时"+abs+"天");
@@ -652,7 +625,6 @@ public class WorkComplyUtils {
                 List<ProcessVo> list = new ArrayList<>();
                 if (1L == e.getProcessCheck()) {
                     String[] split = e.getAudit().split(",");
-//                    e.setSize(split.length);
                     for (String s : split) {
                         e.setAudit(s);
                         e.setChecked("");
@@ -713,21 +685,21 @@ public class WorkComplyUtils {
             e.setAudit(o);
         }else if("1".equals(e.getCheckType())) {
             //根据id获取人员信息
-            SysUser sysUser = sysUserMapper.selectUserById(new Long( e.getAudit()));
+            SysUser sysUser = sysUserMapper.selectUserById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysUser)){
                 throw new ServiceException("根据id获取人员信息失败");
             }
             e.setAudit1(e.getAudit());
             e.setAudit(sysUser.getUserName());
         }else if ("2".equals(e.getCheckType())){
-            SysDept sysDept = sysDeptMapper.selectDeptById(new Long(e.getAudit()));
+            SysDept sysDept = sysDeptMapper.selectDeptById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysDept)){
                 throw new ServiceException("根据id获取部门信息失败");
             }
             e.setAudit1(e.getAudit());
             e.setAudit(sysDept.getDeptName());
         }else if ("3".equals(e.getCheckType())){
-            SysRole sysRole = sysRoleMapper.selectRoleById(new Long(e.getAudit()));
+            SysRole sysRole = sysRoleMapper.selectRoleById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysRole)){
                 throw new ServiceException("根据id获取角色信息失败");
             }

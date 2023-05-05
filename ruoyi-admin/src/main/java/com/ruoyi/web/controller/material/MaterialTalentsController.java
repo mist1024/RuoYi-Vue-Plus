@@ -9,6 +9,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.bo.MaterialTalentsBo;
 import com.ruoyi.system.domain.vo.MaterialTalentsVo;
 import com.ruoyi.system.service.IMaterialTalentsService;
@@ -41,6 +42,7 @@ public class MaterialTalentsController extends BaseController {
      */
     @SaCheckPermission("material:talents:list")
     @GetMapping("/list")
+    @RsaSecurityParameter
     public R<List<MaterialTalentsVo>> list(MaterialTalentsBo bo) {
         List<MaterialTalentsVo> list = iMaterialTalentsService.queryList(bo);
         return R.ok(list);
@@ -64,6 +66,7 @@ public class MaterialTalentsController extends BaseController {
      */
     @SaCheckPermission("material:talents:query")
     @GetMapping("/{id}")
+    @RsaSecurityParameter
     public R<MaterialTalentsVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
         return R.ok(iMaterialTalentsService.queryById(id));
@@ -76,6 +79,7 @@ public class MaterialTalentsController extends BaseController {
     @Log(title = "材料关系", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated(AddGroup.class) @RequestBody MaterialTalentsBo bo) {
         return toAjax(iMaterialTalentsService.insertByBo(bo));
     }
@@ -87,6 +91,7 @@ public class MaterialTalentsController extends BaseController {
     @Log(title = "材料关系", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody MaterialTalentsBo bo) {
         return toAjax(iMaterialTalentsService.updateByBo(bo));
     }
@@ -99,6 +104,7 @@ public class MaterialTalentsController extends BaseController {
     @SaCheckPermission("material:talents:remove")
     @Log(title = "材料关系", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
+    @RsaSecurityParameter
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
         return toAjax(iMaterialTalentsService.deleteWithValidByIds(Arrays.asList(ids), true));

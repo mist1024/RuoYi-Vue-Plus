@@ -148,10 +148,14 @@ public class UserServiceImpl implements IUserService {
         LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
         hashMap.put("loginName",AesUtil.decryptBASE64("18716148446"));
         hashMap.put("password",AesUtil.decryptBASE64("1234Qwer"));
-        HttpRequest.post("https://gx.chengdutalent.cn:8010/user/login")
-            .form(hashMap)
-            .timeout(20000)
-            .execute().body();
+        try {
+            HttpRequest.post("https://gx.chengdutalent.cn:8010/user/login")
+                .form(hashMap)
+                .timeout(20000)
+                .execute().body();
+        } catch (Exception e) {
+            throw new RuntimeException("调用接口超时");
+        }
         //调用高新的接口
         return null;
 

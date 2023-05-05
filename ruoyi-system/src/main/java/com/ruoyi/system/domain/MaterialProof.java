@@ -23,7 +23,7 @@ public class MaterialProof extends BaseEntity {
     /**
      *
      */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
     /**
      * 关联申请id

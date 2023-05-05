@@ -2,9 +2,12 @@ package com.ruoyi.system.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
+
+import java.util.ArrayList;
 
 
 /**
@@ -62,6 +65,9 @@ public class MaterialModuleVo {
     @ExcelDictFormat(dictType = "sys_yes_no")
     private String isMust;
 
+    /**
+     * 上传材料
+     */
     private String file;
 
     /**
@@ -74,5 +80,13 @@ public class MaterialModuleVo {
      */
     private String interfaceType;
 
+
+    @TableField(exist = false)
+    private Long[] auditDeptArr = new Long[]{};
+
+    /**
+     * 按钮显示名称
+     */
+    private String interfaceName;
 
 }

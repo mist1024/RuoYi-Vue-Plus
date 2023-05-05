@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
@@ -44,6 +45,7 @@ public class SubscribeExportController extends BaseController {
      */
     @SaCheckPermission("system:export:list")
     @GetMapping("/list")
+    @RsaSecurityParameter
     public TableDataInfo<SubscribeExportVo> list(SubscribeExportBo bo, PageQuery pageQuery) {
         return iSubscribeExportService.queryPageList(bo, pageQuery);
     }
@@ -78,6 +80,7 @@ public class SubscribeExportController extends BaseController {
     @Log(title = "预约导出", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SubscribeExportBo bo) {
         return toAjax(iSubscribeExportService.insertByBo(bo));
     }
@@ -89,6 +92,7 @@ public class SubscribeExportController extends BaseController {
     @Log(title = "预约导出", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SubscribeExportBo bo) {
         return toAjax(iSubscribeExportService.updateByBo(bo));
     }

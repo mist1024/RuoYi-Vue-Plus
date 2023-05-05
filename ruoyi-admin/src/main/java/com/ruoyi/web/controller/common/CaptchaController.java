@@ -14,6 +14,7 @@ import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
@@ -79,6 +80,7 @@ public class CaptchaController {
      * 生成验证码
      */
     @GetMapping("/captchaImage")
+//    @RsaSecurityParameter
     public R<Map<String, Object>> getCode() {
         Map<String, Object> ajax = new HashMap<>();
         boolean captchaEnabled = configService.selectCaptchaEnabled();

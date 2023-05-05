@@ -22,7 +22,7 @@ public class User extends BaseEntity {
     /**
      *
      */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
     /**
      * 用户账号状态  1，未认定 2，认定中 ，3 未发卡，4 已发卡

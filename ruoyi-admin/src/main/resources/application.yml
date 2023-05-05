@@ -27,7 +27,7 @@ captcha:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: 8084
   servlet:
     # 应用的访问路径
     context-path: /
@@ -89,6 +89,7 @@ spring:
   jackson:
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
     serialization:
       # 格式化输出
       indent_output: false

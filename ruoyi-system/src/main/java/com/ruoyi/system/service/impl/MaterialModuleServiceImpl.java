@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -48,7 +50,13 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
      */
     @Override
     public MaterialModuleVo queryById(Long id){
-        return baseMapper.selectVoById(id);
+        MaterialModuleVo materialModuleVo = baseMapper.selectVoById(id);
+        if (ObjectUtil.isNotNull(materialModuleVo.getAuditDept())){
+            String[] split = materialModuleVo.getAuditDept().split(",");
+            Long[] longs = Convert.toLongArray(split);
+            materialModuleVo.setAuditDeptArr(longs);
+        }
+        return materialModuleVo;
     }
 
     /**
@@ -106,7 +114,11 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MaterialModule entity){
-        //TODO 做一些数据校验,如唯一约束
+        //将数组转为字符串
+        if (ObjectUtil.isNotNull(entity.getAuditDeptArr()) && entity.getAuditDeptArr().length>0){
+            String join = StringUtils.join(entity.getAuditDeptArr(), ",");
+            entity.setAuditDept(join);
+        }
     }
 
     /**
@@ -129,7 +141,8 @@ public class MaterialModuleServiceImpl implements IMaterialModuleService {
     public List<MaterialModuleVo> getMaterialInfo(Map<String, Object>  map){
         Set<String> keys = map.keySet();
         LambdaQueryWrapper<MaterialTalents> eq = new LambdaQueryWrapper<MaterialTalents>()
-            .eq(MaterialTalents::getTalentsValue, map.get("processKey"));
+            .eq(MaterialTalents::getTalentsValue, map.get("processKey"))
+            .eq(MaterialTalents::getDelFlag,"0");
         MaterialTalentsVo materialTalentsVo = materialTalentsMapper.selectVoOne(eq);
         //根据id获取关于他下面的所有子集
         LambdaQueryWrapper<MaterialTalents> wrapper = new LambdaQueryWrapper<MaterialTalents>()

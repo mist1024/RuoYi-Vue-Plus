@@ -102,12 +102,12 @@ spring:
 spring:
   redis:
     # 地址
-#    host: 119.96.86.131
-    host: 127.0.0.1
+    host: 119.96.86.131
+#    host: 127.0.0.1
     # 端口，默认为6379
     port: 6379
     # 数据库索引
-    database: 0
+    database: 1
     # 密码(如没有密码请注释掉)
     password: 123456
     # 连接超时时间

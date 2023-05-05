@@ -1,5 +1,6 @@
 package com.ruoyi.work.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.domain.BaseEntity;
@@ -22,7 +23,7 @@ public class ActBusinessRule extends BaseEntity {
     /**
      * id
      */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
     /**
      * bean名称

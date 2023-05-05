@@ -1,16 +1,18 @@
 package com.ruoyi.system.domain.vo;
-
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.ruoyi.common.core.domain.BaseEntity;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.utils.MySerializerUtils;
 import com.ruoyi.system.domain.BuyHousesReviewMember;
 import lombok.Data;
-
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
 
 /**
  * 购房复审登记视图对象 houses_review
@@ -28,12 +30,16 @@ public class HousesReviewVo implements Serializable {
      * id
      */
 //    @ExcelProperty(value = "id")
+//    @JsonSerialize(using = ToStringSerializer.class)
+//    @JsonSerialize(using = MySerializerUtils.class)
     private Long id;
 
     /**
      * 证件类型
      */
     @ExcelProperty(value = "证件类型")
+    @NotNull(message = "证件类型不可为空")
+    @ExcelDictFormat(dictType = "card_type")
     private String cardType;
 
     /**
@@ -58,6 +64,7 @@ public class HousesReviewVo implements Serializable {
      * 审核时间
      */
     @ExcelProperty(value = "审核时间")
+    @DateTimeFormat("yyyy-MM-dd")
     private String auditTime;
 
     /**

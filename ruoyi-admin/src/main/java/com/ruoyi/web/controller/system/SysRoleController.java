@@ -6,7 +6,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.CacheConstants;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -18,15 +17,14 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.system.service.SysPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -46,13 +44,13 @@ public class SysRoleController extends BaseController {
     private final ISysRoleService roleService;
     private final ISysUserService userService;
     private final ISysDeptService deptService;
-    private final SysPermissionService permissionService;
 
     /**
      * 获取角色信息列表
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/list")
+    @RsaSecurityParameter
     public TableDataInfo<SysRole> list(SysRole role, PageQuery pageQuery) {
         return roleService.selectPageRoleList(role, pageQuery);
     }
@@ -75,6 +73,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:query")
     @GetMapping(value = "/{roleId}")
+    @RsaSecurityParameter
     public R<SysRole> getInfo(@PathVariable Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return R.ok(roleService.selectRoleById(roleId));
@@ -86,6 +85,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:add")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
     @PostMapping
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysRole role) {
         if (!roleService.checkRoleNameUnique(role)) {
             return R.fail("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
@@ -102,6 +102,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysRole role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
@@ -142,6 +143,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/dataScope")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> dataScope(@RequestBody SysRole role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
@@ -154,6 +156,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> changeStatus(@RequestBody SysRole role) {
         roleService.checkRoleAllowed(role);
         roleService.checkRoleDataScope(role.getRoleId());
@@ -168,6 +171,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
+    @RsaSecurityParameter
     public R<Void> remove(@PathVariable Long[] roleIds) {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
@@ -177,6 +181,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:query")
     @GetMapping("/optionselect")
+    @RsaSecurityParameter
     public R<List<SysRole>> optionselect() {
         return R.ok(roleService.selectRoleAll());
     }
@@ -186,6 +191,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/allocatedList")
+    @RsaSecurityParameter
     public TableDataInfo<SysUser> allocatedList(SysUser user, PageQuery pageQuery) {
         return userService.selectAllocatedList(user, pageQuery);
     }
@@ -195,6 +201,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:list")
     @GetMapping("/authUser/unallocatedList")
+    @RsaSecurityParameter
     public TableDataInfo<SysUser> unallocatedList(SysUser user, PageQuery pageQuery) {
         return userService.selectUnallocatedList(user, pageQuery);
     }
@@ -205,6 +212,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancel")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> cancelAuthUser(@RequestBody SysUserRole userRole) {
         return toAjax(roleService.deleteAuthUser(userRole));
     }
@@ -218,6 +226,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> cancelAuthUserAll(Long roleId, Long[] userIds) {
         return toAjax(roleService.deleteAuthUsers(roleId, userIds));
     }
@@ -231,6 +240,7 @@ public class SysRoleController extends BaseController {
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> selectAuthUserAll(Long roleId, Long[] userIds) {
         roleService.checkRoleDataScope(roleId);
         return toAjax(roleService.insertAuthUsers(roleId, userIds));
@@ -243,6 +253,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:list")
     @GetMapping(value = "/deptTree/{roleId}")
+    @RsaSecurityParameter
     public R<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));

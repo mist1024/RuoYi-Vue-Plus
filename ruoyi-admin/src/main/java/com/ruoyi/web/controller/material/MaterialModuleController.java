@@ -11,6 +11,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.bo.MaterialModuleBo;
 import com.ruoyi.system.domain.vo.MaterialModuleVo;
 import com.ruoyi.system.service.IMaterialModuleService;
@@ -43,12 +44,14 @@ public class MaterialModuleController extends BaseController {
      */
     @SaCheckPermission("material:module:list")
     @GetMapping("/list")
+    @RsaSecurityParameter
     public TableDataInfo<MaterialModuleVo> list(MaterialModuleBo bo, PageQuery pageQuery) {
         return iMaterialModuleService.queryPageList(bo, pageQuery);
     }
 
     @SaCheckPermission("material:materialList:list")
     @GetMapping("/materialList")
+    @RsaSecurityParameter
     public R<?> materialList(MaterialModuleBo bo) {
         return iMaterialModuleService.selectMaterialList(bo);
     }
@@ -71,6 +74,7 @@ public class MaterialModuleController extends BaseController {
      */
     @SaCheckPermission("material:module:query")
     @GetMapping("/{id}")
+    @RsaSecurityParameter
     public R<MaterialModuleVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
         return R.ok(iMaterialModuleService.queryById(id));
@@ -83,6 +87,7 @@ public class MaterialModuleController extends BaseController {
     @Log(title = "材料模块", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
+    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated(AddGroup.class) @RequestBody MaterialModuleBo bo) {
         return toAjax(iMaterialModuleService.insertByBo(bo));
     }
@@ -93,6 +98,7 @@ public class MaterialModuleController extends BaseController {
     @SaCheckPermission("material:module:edit")
     @Log(title = "材料模块", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
+    @RsaSecurityParameter(inDecode = true)
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody MaterialModuleBo bo) {
         return toAjax(iMaterialModuleService.updateByBo(bo));
@@ -106,6 +112,7 @@ public class MaterialModuleController extends BaseController {
     @SaCheckPermission("material:module:remove")
     @Log(title = "材料模块", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
+    @RsaSecurityParameter
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ids) {
         return toAjax(iMaterialModuleService.deleteWithValidByIds(Arrays.asList(ids), true));

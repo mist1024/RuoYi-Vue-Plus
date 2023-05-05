@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain.bo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -43,6 +44,9 @@ public class MaterialModuleBo extends BaseEntity {
 //    @NotBlank(message = "审核部门不能为空", groups = { AddGroup.class, EditGroup.class })
     private String auditDept;
 
+    @TableField(exist = false)
+    private Long[] auditDeptArr =new Long[]{};
+
     /**
      * 描述
      */
@@ -69,6 +73,11 @@ public class MaterialModuleBo extends BaseEntity {
      * 1是接口,2是路径
      */
     private String interfaceType;
+
+    /**
+     * 按钮显示名称
+     */
+    private String interfaceName;
 
 
 }

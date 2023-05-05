@@ -65,4 +65,12 @@ public class MaterialModule extends BaseEntity {
      */
     private String interfaceType;
 
+    @TableField(exist = false)
+    private Long[] auditDeptArr=new Long[]{};
+
+    /**
+     * 按钮显示名称
+     */
+    private String interfaceName;
+
 }

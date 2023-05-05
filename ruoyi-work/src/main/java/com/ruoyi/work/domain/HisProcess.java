@@ -1,5 +1,6 @@
 package com.ruoyi.work.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -24,7 +25,7 @@ public class HisProcess{
     /**
      *
      */
-    @TableId(value = "id")
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
     /**
      * 流程表id
@@ -47,6 +48,7 @@ public class HisProcess{
      */
     private String status;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
 
@@ -56,6 +58,7 @@ public class HisProcess{
     @TableField(exist = false)
     private Map params;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date endTime;
 
     private String step;

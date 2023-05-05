@@ -79,7 +79,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Value("${file.prefix}")
     private String prefix;
 
-    private final String URL = "http://192.168.0.54:8010//candidates/getCardId";
+    private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
 
     private final BuyHousesMapper baseMapper;
 
@@ -399,7 +399,12 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         JSONObject entries = JSONUtil.parseObj(data);
         BuyHouses buyHousesDto = new BuyHouses();
         buyHousesDto.setCardId(String.valueOf(entries.get("cardId")));
-        buyHousesDto.setNationality(String.valueOf(entries.get("nationality")));
+        String nationality = String.valueOf(entries.get("nationality"));
+        if ("中国".contains(nationality)){
+            buyHousesDto.setNationality("中国籍");
+        }else {
+            buyHousesDto.setNationality("外籍");
+        }
         buyHousesDto.setUserName(String.valueOf(entries.get("name")));
         buyHousesDto.setPhone(String.valueOf(entries.get("phone")));
         buyHousesDto.setCompanyName(String.valueOf(entries.get("companyName")));

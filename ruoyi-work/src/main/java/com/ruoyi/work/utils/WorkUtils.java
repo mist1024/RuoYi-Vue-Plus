@@ -3,6 +3,8 @@ package com.ruoyi.work.utils;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
@@ -42,7 +44,7 @@ public class WorkUtils {
                 List<Object> params = new ArrayList<>();
                 for (int i = 0; i < businessRuleParams.size(); i++) {
                     if (variables.containsKey(businessRuleParams.get(i).getParam())) {
-                        String variable = (String) variables.get(businessRuleParams.get(i).getParam());
+                        String variable = String.valueOf(variables.get(businessRuleParams.get(i).getParam()));
                         switch (businessRuleParams.get(i).getParamType()) {
                             case "String":
                                 paramClass[i] = String.valueOf(variable).getClass();
@@ -92,7 +94,13 @@ public class WorkUtils {
             if (obj == null) {
                 throw new ServiceException("任务环节未配置审批人,请确认传值是否正确,检查：【" + businessRule.getBeanName() + "】Bean容器中【" + methodName + "】方法");
             }
-            return   CollUtil.newArrayList(obj.toString().split(","));
+            String date = Convert.toStr(obj);
+            if (ObjectUtil.isEmpty(date)){
+                throw new ServiceException("设置审批人流程出错");
+            }
+            String strip = StringUtils.strip(obj.toString(), "[]");
+            List<String> list = StringUtils.str2List(strip, ",", true, true);
+            return list.stream().distinct().collect(Collectors.toList());
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
@@ -112,7 +120,7 @@ public class WorkUtils {
         Method method = ReflectionUtils.findMethod(beanName.getClass(), me, Long.class);
         Object obj = ReflectionUtils.invokeMethod(method, beanName,new Long(businessId));
         Map<String, Object> map = BeanUtil.beanToMap(obj);
-        System.out.println("obj = " + obj);
+        System.out.println("map = " + map);
         return map;
 
     }

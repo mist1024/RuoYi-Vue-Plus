@@ -10,9 +10,7 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.domain.model.SmsLoginBody;
-import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StrUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -26,13 +24,11 @@ import com.ruoyi.system.service.SysLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 登录验证
@@ -56,6 +52,7 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/login")
+    @RsaSecurityParameter(inDecode = true)
     public R<Map<String, Object>> login(
 //        @Validated({LoginBody.passwordLogin.class})
         @RequestBody LoginBody loginBody) {
@@ -76,6 +73,7 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/smsLogin")
+    @RsaSecurityParameter(inDecode = true)
     public R<Map<String, Object>> smsLogin(
         @Validated({LoginBody.smgLogin.class})
         @RequestBody SmsLoginBody smsLoginBody) {
@@ -118,6 +116,7 @@ public class SysLoginController {
      * @return 用户信息
      */
     @GetMapping("getInfo")
+    @RsaSecurityParameter
     public R<Map<String, Object>> getInfo() {
         LoginUser loginUser = LoginHelper.getLoginUser();
         SysUser user = userService.selectUserById(loginUser.getUserId());
