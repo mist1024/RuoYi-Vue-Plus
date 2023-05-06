@@ -1,5 +1,9 @@
 package com.ruoyi.common.core.service;
 
+import com.ruoyi.common.core.domain.entity.SysDictData;
+
+import java.util.List;
+
 /**
  * 通用 字典服务
  *
@@ -54,4 +58,11 @@ public interface DictService {
      */
     String getDictValue(String dictType, String dictLabel, String separator);
 
+    /**
+     * 根据字典类型查询字典数据
+     *
+     * @param dictType 字典类型
+     * @return 字典数据集合信息
+     */
+    List<SysDictData> selectDictDataByType(String dictType);
 }

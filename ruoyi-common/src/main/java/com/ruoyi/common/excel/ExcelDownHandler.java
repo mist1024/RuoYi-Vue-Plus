@@ -1,12 +1,18 @@
 package com.ruoyi.common.excel;
 
+import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
-import com.ruoyi.common.annotation.DropDown;
+import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.annotation.ExcelEnumFormat;
+import com.ruoyi.common.core.domain.entity.SysDictData;
+import com.ruoyi.common.core.service.DictService;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -15,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <h1>Excel表格下拉选操作</h1>
@@ -52,11 +59,13 @@ public class ExcelDownHandler implements SheetWriteHandler {
      * 当前联动选择进度
      */
     private int currentLinkedOptionsSheetIndex;
+    private final DictService dictService;
 
     public ExcelDownHandler(List<DropDownOptions> options) {
         this.dropDownOptions = options;
         this.currentOptionsColumnIndex = 0;
         this.currentLinkedOptionsSheetIndex = 0;
+        this.dictService = SpringUtils.getBean(DictService.class);
     }
 
     /**
@@ -77,18 +86,56 @@ public class ExcelDownHandler implements SheetWriteHandler {
         Workbook workbook = writeWorkbookHolder.getWorkbook();
         int length = fields.length;
         for (int i = 0; i < length; i++) {
-            if (fields[i].isAnnotationPresent(DropDown.class)) {
-                // 获取设定的下拉选
-                List<String> options = Arrays.asList(fields[i].getDeclaredAnnotation(DropDown.class).value());
+            // 循环实体中的每个属性
+            // 可选的下拉值
+            List<String> options = new ArrayList<>();
+            if (fields[i].isAnnotationPresent(ExcelDictFormat.class)) {
+                // 如果指定了@ExcelDictFormat，则使用字典的逻辑
+                ExcelDictFormat thisFiledExcelDictFormat = fields[i].getDeclaredAnnotation(ExcelDictFormat.class);
+                String dictType = thisFiledExcelDictFormat.dictType();
+                String converterExp = thisFiledExcelDictFormat.readConverterExp();
+                if (StrUtil.isNotBlank(dictType)) {
+                    // 如果传递了字典名，则依据字典建立下拉
+                    options =
+                        Optional.ofNullable(dictService.selectDictDataByType(dictType))
+                            .orElseThrow(() -> new ServiceException(String.format("字典 %s 不存在", dictType)))
+                            .stream()
+                            .map(SysDictData::getDictLabel)
+                            .collect(Collectors.toList());
+                } else if (StrUtil.isNotBlank(converterExp)) {
+                    // 如果指定了确切的值，则直接解析确切的值
+                    options = StrUtil.split(
+                        converterExp,
+                        thisFiledExcelDictFormat.separator(),
+                        true,
+                        true);
+                }
+            } else if (fields[i].isAnnotationPresent(ExcelEnumFormat.class)) {
+                // 否则如果指定了@ExcelEnumFormat，则使用枚举的逻辑
+                ExcelEnumFormat thisFiledExcelEnumFormat = fields[i].getDeclaredAnnotation(ExcelEnumFormat.class);
+                options =
+                    EnumUtil
+                        .getFieldValues(
+                            thisFiledExcelEnumFormat.enumClass(),
+                            thisFiledExcelEnumFormat.textField()
+                        )
+                        .stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.toList());
+            }
+            if (ObjectUtil.isNotEmpty(options)) {
+                // 仅当下拉可选项不为空时执行
                 // 获取列下标，默认为当前循环次数
                 int index = i;
                 if (fields[i].isAnnotationPresent(ExcelProperty.class)) {
-                    // 如果制定了列下标，以指定的为主
+                    // 如果指定了列下标，以指定的为主
                     index = fields[i].getDeclaredAnnotation(ExcelProperty.class).index();
                 }
-                if (options.size() > 20) {
+                if (options.size() > 2) {
+                    // 这里限制如果可选项大于20，则使用额外表形式
                     dropDownWithSheet(helper, workbook, sheet, index, options);
                 } else {
+                    // 否则使用固定值形式
                     dropDownWithSimple(helper, sheet, index, options);
                 }
             }
@@ -105,7 +152,6 @@ public class ExcelDownHandler implements SheetWriteHandler {
                 // 当一级选项个数不为空，使用默认形式
                 dropDownWithSimple(helper, sheet, everyOptions.getIndex(), everyOptions.getOptions());
             }
-            // 否则不做处理
         });
     }
 

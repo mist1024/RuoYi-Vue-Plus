@@ -1,5 +1,6 @@
 package com.ruoyi.demo.service.impl;
 
+import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.excel.DropDownOptions;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.demo.domain.vo.ExportDemoVo;
@@ -32,7 +33,8 @@ public class ExportExcelServiceImpl implements IExportExcelService {
             // 模拟数据库中的一条数据
             ExportDemoVo everyRowData = new ExportDemoVo();
             everyRowData.setNickName("用户-" + i);
-            everyRowData.setGender(1);
+            everyRowData.setUserStatus(UserStatus.OK.getCode());
+            everyRowData.setGender("1");
             everyRowData.setPhoneNumber(String.format("175%08d", i));
             everyRowData.setEmail(String.format("175%08d", i) + "@163.com");
             everyRowData.setProvinceId(i);
@@ -105,17 +107,17 @@ public class ExportExcelServiceImpl implements IExportExcelService {
         // 创建省-市级联
         DropDownOptions provinceToCity = new DropDownOptions();
         // 以省为一级
-        provinceToCity.setIndex(25);
+        provinceToCity.setIndex(5);
         // 以市为二级
-        provinceToCity.setNextIndex(26);
+        provinceToCity.setNextIndex(6);
         // 补充省的内容以及市的内容
         provinceToCity.setOptions(provinceOptions);
         provinceToCity.setNextOptions(provinceToCityOptions);
 
         // 创建市-县级联
         DropDownOptions cityToArea = new DropDownOptions();
-        cityToArea.setIndex(26);
-        cityToArea.setNextIndex(27);
+        cityToArea.setIndex(6);
+        cityToArea.setNextIndex(7);
         cityToArea.setOptions(cityOptions);
         cityToArea.setNextOptions(cityToAreaOptions);
 
@@ -128,12 +130,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
         // 接下来需要将Excel中的展示数据转换为对应的下拉选
         List<ExportDemoVo> outList = excelDataList.stream().map(everyRowData -> {
-            // 首先转换性别，性别是通过注解的，则自行提取为对应的值
-            // 业务逻辑中一般会使用枚举的形式，这里直接通过判断值的形式拼接
-            Integer gender = everyRowData.getGender();
-            everyRowData.setGenderStr(gender == 1 ? "1=男" : "2=女");
-
-            // 下面处理下拉框的问题，对于数据本身只需要将对应的下拉值转换为下拉选以选中的选项
+            // 只需要处理没有使用@ExcelDictFormat注解的下拉框
             // 一般来说，可以直接在数据库查询即查询出省市县信息，这里通过模拟操作赋值
             everyRowData.setProvince(buildOptions(provinceList, everyRowData.getProvinceId()));
             everyRowData.setCity(buildOptions(cityList, everyRowData.getCityId()));

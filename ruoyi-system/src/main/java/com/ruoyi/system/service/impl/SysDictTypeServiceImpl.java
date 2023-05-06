@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
-public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService {
+public class SysDictTypeServiceImpl implements ISysDictTypeService {
 
     private final SysDictTypeMapper baseMapper;
     private final SysDictDataMapper dictDataMapper;

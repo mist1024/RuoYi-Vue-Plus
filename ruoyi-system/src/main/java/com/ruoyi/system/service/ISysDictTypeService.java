@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.domain.entity.SysDictType;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.DictService;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysDictTypeService {
+public interface ISysDictTypeService extends DictService {
 
 
     TableDataInfo<SysDictType> selectPageDictTypeList(SysDictType dictType, PageQuery pageQuery);
@@ -31,14 +32,6 @@ public interface ISysDictTypeService {
      * @return 字典类型集合信息
      */
     List<SysDictType> selectDictTypeAll();
-
-    /**
-     * 根据字典类型查询字典数据
-     *
-     * @param dictType 字典类型
-     * @return 字典数据集合信息
-     */
-    List<SysDictData> selectDictDataByType(String dictType);
 
     /**
      * 根据字典类型ID查询信息

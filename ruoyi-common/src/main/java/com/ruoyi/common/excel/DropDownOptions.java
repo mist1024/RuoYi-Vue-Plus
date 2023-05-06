@@ -39,6 +39,10 @@ public class DropDownOptions {
      * <p>以每一个一级选项值为Key，每个一级选项对应的二级数据为Value</p>
      */
     private Map<String, List<String>> nextOptions = new HashMap<>();
+    /**
+     * 分隔符
+     */
+    private static final String DELIMITER = "_";
 
     /**
      * 创建只有一级的下拉选
@@ -66,12 +70,22 @@ public class DropDownOptions {
             stringBuffer.append(StrUtil.trimToEmpty(var.toString()));
             if (i < vars.length - 1) {
                 // 直至最后一个前，都以_作为切割线
-                stringBuffer.append("_");
+                stringBuffer.append(DELIMITER);
             }
         }
         if (stringBuffer.toString().matches("^\\d_*$")) {
             throw new ServiceException("禁止以数字开头");
         }
         return stringBuffer.toString();
+    }
+
+    /**
+     * 将处理后合理的可选值解析为原始的参数
+     *
+     * @param option 经过处理后的合理的可选项
+     * @return 原始的参数
+     */
+    public static List<String> analyzeOptionValue(String option) {
+        return StrUtil.split(option, DELIMITER, true, true);
     }
 }
