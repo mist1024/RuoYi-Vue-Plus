@@ -131,7 +131,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
                     // 如果指定了列下标，以指定的为主
                     index = fields[i].getDeclaredAnnotation(ExcelProperty.class).index();
                 }
-                if (options.size() > 2) {
+                if (options.size() > 20) {
                     // 这里限制如果可选项大于20，则使用额外表形式
                     dropDownWithSheet(helper, workbook, sheet, index, options);
                 } else {
