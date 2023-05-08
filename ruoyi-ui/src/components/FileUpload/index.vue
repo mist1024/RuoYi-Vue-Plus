@@ -61,7 +61,16 @@ export default {
     // 文件类型, 例如['png', 'jpg', 'jpeg']
     fileType: {
       type: Array,
-      default: () => ["doc", "xls", "ppt", "txt", "pdf"],
+      default: () => [
+        "txt",
+        "doc", "docx",
+        "pdf",
+        "xls", "xlsx",
+        "md",
+        "mp3", "wav", "wma", "flac",
+        "mp4", "avi", "wmv", "mov", "flv",
+        "zip", "rar","tar.gz"
+      ],
     },
     // 是否显示提示
     isShowTip: {
@@ -199,7 +208,7 @@ export default {
       for (let i in list) {
         strs += list[i].ossId + separator;
       }
-      return strs != "" ? strs.substr(0, strs.length - 1) : "";
+      return strs !== "" ? strs.substr(0, strs.length - 1) : "";
     },
   },
 };
