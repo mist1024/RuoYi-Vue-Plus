@@ -62,7 +62,7 @@ export default {
     // 文件类型, 例如['png', 'jpg', 'jpeg']
     fileType: {
       type: Array,
-      default: () => ["png", "jpg", "jpeg"],
+      default: () => ["png", "jpg", "jpeg","gif","svg"],
     },
     // 是否显示提示
     isShowTip: {
@@ -207,7 +207,7 @@ export default {
           strs += list[i].ossId + separator;
         }
       }
-      return strs != "" ? strs.substr(0, strs.length - 1) : "";
+      return strs !== "" ? strs.substr(0, strs.length - 1) : "";
     }
   }
 };
