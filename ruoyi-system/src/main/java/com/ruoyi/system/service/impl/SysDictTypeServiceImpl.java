@@ -279,4 +279,16 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         }
     }
 
+    @Override
+    public Map<String, String> getAllDictByDictType(String dictType) {
+        List<SysDictData> thisDictTypeDataList = selectDictDataByType(dictType);
+        Map<String, String> dictMap = null;
+        for (SysDictData everyDictData : thisDictTypeDataList) {
+            if (ObjectUtil.isNull(dictMap)) {
+                dictMap = new HashMap<>();
+            }
+            dictMap.put(everyDictData.getDictValue(), everyDictData.getDictLabel());
+        }
+        return dictMap;
+    }
 }

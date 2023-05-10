@@ -1,8 +1,6 @@
 package com.ruoyi.common.core.service;
 
-import com.ruoyi.common.core.domain.entity.SysDictData;
-
-import java.util.List;
+import java.util.Map;
 
 /**
  * 通用 字典服务
@@ -59,10 +57,10 @@ public interface DictService {
     String getDictValue(String dictType, String dictLabel, String separator);
 
     /**
-     * 根据字典类型查询字典数据
+     * 获取字典下所有的字典值与标签
      *
      * @param dictType 字典类型
-     * @return 字典数据集合信息
+     * @return dictValue为key，dictLabel为值组成的Map
      */
-    List<SysDictData> selectDictDataByType(String dictType);
+    Map<String, String> getAllDictByDictType(String dictType);
 }

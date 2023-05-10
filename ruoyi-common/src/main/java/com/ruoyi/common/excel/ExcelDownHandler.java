@@ -9,7 +9,6 @@ import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.annotation.ExcelEnumFormat;
-import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -97,11 +96,11 @@ public class ExcelDownHandler implements SheetWriteHandler {
                 if (StrUtil.isNotBlank(dictType)) {
                     // 如果传递了字典名，则依据字典建立下拉
                     options =
-                        Optional.ofNullable(dictService.selectDictDataByType(dictType))
-                            .orElseThrow(() -> new ServiceException(String.format("字典 %s 不存在", dictType)))
-                            .stream()
-                            .map(SysDictData::getDictLabel)
-                            .collect(Collectors.toList());
+                        new ArrayList<>(
+                            Optional.ofNullable(dictService.getAllDictByDictType(dictType))
+                                .orElseThrow(() -> new ServiceException(String.format("字典 %s 不存在", dictType)))
+                                .values()
+                        );
                 } else if (StrUtil.isNotBlank(converterExp)) {
                     // 如果指定了确切的值，则直接解析确切的值
                     options = StrUtil.split(
