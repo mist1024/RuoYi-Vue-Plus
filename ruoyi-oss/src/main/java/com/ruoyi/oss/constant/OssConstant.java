@@ -23,16 +23,26 @@ public interface OssConstant {
     /**
      * 系统数据ids
      */
-    List<Long> SYSTEM_DATA_IDS = Arrays.asList(1L, 2L, 3L, 4L);
+    List<Long> SYSTEM_DATA_IDS = Arrays.asList(1L, 2L, 3L, 4L, 5L);
 
     /**
      * 云服务商
      */
-    String[] CLOUD_SERVICE = new String[] {"aliyun", "qcloud", "qiniu", "obs"};
+    String[] CLOUD_SERVICE = new String[]{"aliyun", "qcloud", "qiniu", "obs"};
 
     /**
      * https 状态
      */
     String IS_HTTPS = "Y";
+
+    /**
+     * 本地存储
+     */
+    Long LOCAL_ENV = 1L;
+
+    /**
+     * 本地存储资源路径
+     */
+    String LOCAL_RESOURCE_PATH = "/oss/local";
 
 }
