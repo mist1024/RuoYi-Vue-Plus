@@ -1,6 +1,7 @@
 package com.ruoyi.oss.core;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.file.PathUtil;
 import cn.hutool.core.util.IdUtil;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.HttpMethod;
@@ -22,10 +23,17 @@ import com.ruoyi.oss.enumd.AccessPolicyType;
 import com.ruoyi.oss.enumd.PolicyType;
 import com.ruoyi.oss.exception.OssException;
 import com.ruoyi.oss.properties.OssProperties;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
 /**
@@ -40,34 +48,36 @@ public class OssClient {
 
     private final OssProperties properties;
 
-    private final AmazonS3 client;
+    private AmazonS3 client;
 
     public OssClient(String configKey, OssProperties ossProperties) {
         this.configKey = configKey;
         this.properties = ossProperties;
         try {
-            AwsClientBuilder.EndpointConfiguration endpointConfig =
-                new AwsClientBuilder.EndpointConfiguration(properties.getEndpoint(), properties.getRegion());
+            //AmazonS3环境
+            if (!isLocalEnv()) {
+                AwsClientBuilder.EndpointConfiguration endpointConfig =
+                    new AwsClientBuilder.EndpointConfiguration(properties.getEndpoint(), properties.getRegion());
 
-            AWSCredentials credentials = new BasicAWSCredentials(properties.getAccessKey(), properties.getSecretKey());
-            AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
-            ClientConfiguration clientConfig = new ClientConfiguration();
-            if (OssConstant.IS_HTTPS.equals(properties.getIsHttps())) {
-                clientConfig.setProtocol(Protocol.HTTPS);
-            } else {
-                clientConfig.setProtocol(Protocol.HTTP);
+                AWSCredentials credentials = new BasicAWSCredentials(properties.getAccessKey(), properties.getSecretKey());
+                AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
+                ClientConfiguration clientConfig = new ClientConfiguration();
+                if (OssConstant.IS_HTTPS.equals(properties.getIsHttps())) {
+                    clientConfig.setProtocol(Protocol.HTTPS);
+                } else {
+                    clientConfig.setProtocol(Protocol.HTTP);
+                }
+                AmazonS3ClientBuilder build = AmazonS3Client.builder()
+                    .withEndpointConfiguration(endpointConfig)
+                    .withClientConfiguration(clientConfig)
+                    .withCredentials(credentialsProvider)
+                    .disableChunkedEncoding();
+                if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
+                    // minio 使用https限制使用域名访问 需要此配置 站点填域名
+                    build.enablePathStyleAccess();
+                }
+                this.client = build.build();
             }
-            AmazonS3ClientBuilder build = AmazonS3Client.builder()
-                .withEndpointConfiguration(endpointConfig)
-                .withClientConfiguration(clientConfig)
-                .withCredentials(credentialsProvider)
-                .disableChunkedEncoding();
-            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
-                // minio 使用https限制使用域名访问 需要此配置 站点填域名
-                build.enablePathStyleAccess();
-            }
-            this.client = build.build();
-
             createBucket();
         } catch (Exception e) {
             if (e instanceof OssException) {
@@ -79,6 +89,12 @@ public class OssClient {
 
     public void createBucket() {
         try {
+            //本地环境
+            if (isLocalEnv()) {
+                //创建目录
+                PathUtil.mkdir(Paths.get(getLocalEnvDir()));
+                return;
+            }
             String bucketName = properties.getBucketName();
             if (client.doesBucketExistV2(bucketName)) {
                 return;
@@ -102,13 +118,18 @@ public class OssClient {
             inputStream = new ByteArrayInputStream(IoUtil.readBytes(inputStream));
         }
         try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(inputStream.available());
-            PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
-            // 设置上传对象的 Acl 为公共读
-            putObjectRequest.setCannedAcl(getAccessPolicy().getAcl());
-            client.putObject(putObjectRequest);
+            //本地环境
+            if (isLocalEnv()) {
+                FileUtils.copyInputStreamToFile(inputStream, getLocalEnvFile(path));
+            } else {
+                ObjectMetadata metadata = new ObjectMetadata();
+                metadata.setContentType(contentType);
+                metadata.setContentLength(inputStream.available());
+                PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), path, inputStream, metadata);
+                // 设置上传对象的 Acl 为公共读
+                putObjectRequest.setCannedAcl(getAccessPolicy().getAcl());
+                client.putObject(putObjectRequest);
+            }
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -116,8 +137,13 @@ public class OssClient {
     }
 
     public void delete(String path) {
-        path = path.replace(getUrl() + "/", "");
         try {
+            path = path.replace(getUrl() + "/", "");
+            //本地环境
+            if (isLocalEnv()) {
+                FileUtils.delete(getLocalEnvFile(path));
+                return;
+            }
             client.deleteObject(properties.getBucketName(), path);
         } catch (Exception e) {
             throw new OssException("删除文件失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -138,15 +164,39 @@ public class OssClient {
      * @param path 完整文件路径
      */
     public ObjectMetadata getObjectMetadata(String path) {
-        path = path.replace(getUrl() + "/", "");
-        S3Object object = client.getObject(properties.getBucketName(), path);
-        return object.getObjectMetadata();
+        try {
+            //本地环境
+            if (isLocalEnv()) {
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                BasicFileAttributes fileAttributes = Files.readAttributes(getLocalEnvFile(path).toPath(), BasicFileAttributes.class);
+                //文件大小
+                objectMetadata.setContentLength(fileAttributes.size());
+                //文件创建时间
+                //fileAttributes.creationTime()
+                //文件最后修改时间
+                objectMetadata.setLastModified(new Date(fileAttributes.lastModifiedTime().toMillis()));
+                return objectMetadata;
+            }
+            path = path.replace(getUrl() + "/", "");
+            S3Object object = client.getObject(properties.getBucketName(), path);
+            return object.getObjectMetadata();
+        } catch (IOException ex) {
+            throw new OssException("获取文件元数据失败，请检查配置信息:[" + ex.getMessage() + "]");
+        }
     }
 
     public InputStream getObjectContent(String path) {
-        path = path.replace(getUrl() + "/", "");
-        S3Object object = client.getObject(properties.getBucketName(), path);
-        return object.getObjectContent();
+        try {
+            path = path.replace(getUrl() + "/", "");
+            //本地环境
+            if (isLocalEnv()) {
+                return Files.newInputStream(getLocalEnvFile(path).toPath());
+            }
+            S3Object object = client.getObject(properties.getBucketName(), path);
+            return object.getObjectContent();
+        } catch (IOException ex) {
+            throw new OssException("获取ObjectContent失败，请检查配置信息:[" + ex.getMessage() + "]");
+        }
     }
 
     public String getUrl() {
@@ -160,18 +210,25 @@ public class OssClient {
             }
             return header + properties.getBucketName() + "." + endpoint;
         }
+
+        //请求路径
+        String path = "/" + properties.getBucketName();
+        //本地，单独处理
+        if (isLocalEnv()) {
+            path = OssConstant.LOCAL_RESOURCE_PATH + "/" + properties.getBucketName();
+        }
         // minio 单独处理
         if (StringUtils.isNotBlank(domain)) {
-            return header + domain + "/" + properties.getBucketName();
+            return header + domain + path;
         }
-        return header + endpoint + "/" + properties.getBucketName();
+        return header + endpoint + path;
     }
 
     public String getPath(String prefix, String suffix) {
         // 生成uuid
         String uuid = IdUtil.fastSimpleUUID();
         // 文件路径
-        String path = DateUtils.datePath() + "/" + uuid;
+        String path = DateUtils.dateTime() + "/" + uuid;
         if (StringUtils.isNotBlank(prefix)) {
             path = prefix + "/" + path;
         }
@@ -190,6 +247,10 @@ public class OssClient {
      * @param second    授权时间
      */
     public String getPrivateUrl(String objectKey, Integer second) {
+        //本地环境
+        if (isLocalEnv()) {
+            return objectKey;
+        }
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
             new GeneratePresignedUrlRequest(properties.getBucketName(), objectKey)
                 .withMethod(HttpMethod.GET)
@@ -248,6 +309,29 @@ public class OssClient {
         builder.append(bucketName);
         builder.append("/*\"\n}\n],\n\"Version\": \"2012-10-17\"\n}\n");
         return builder.toString();
+    }
+
+    /**
+     * 本地环境
+     */
+    private boolean isLocalEnv() {
+        return OssConstant.LOCAL_ENV.equals(properties.getOssConfigId());
+    }
+
+    /**
+     * 获取本地环境文件目录
+     */
+    private String getLocalEnvDir() {
+        return OssProperties.getLocalResourceDir() + properties.getBucketName();
+    }
+
+    /**
+     * 获取本地环境文件对象
+     *
+     * @param path 文件相对路径
+     */
+    private File getLocalEnvFile(String path) {
+        return new File(FilenameUtils.normalize(getLocalEnvDir() + File.separator + path));
     }
 
 }

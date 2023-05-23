@@ -1,6 +1,9 @@
 package com.ruoyi.oss.properties;
 
+import cn.hutool.core.util.SystemPropsUtil;
 import lombok.Data;
+
+import java.io.File;
 
 /**
  * OSS对象存储 配置属性
@@ -9,6 +12,11 @@ import lombok.Data;
  */
 @Data
 public class OssProperties {
+
+    /**
+     * 主建
+     */
+    private Long ossConfigId;
 
     /**
      * 访问站点
@@ -54,5 +62,12 @@ public class OssProperties {
      * 桶权限类型(0private 1public 2custom)
      */
     private String accessPolicy;
+
+    /**
+     * 本地资源目录
+     */
+    public static String getLocalResourceDir() {
+        return SystemPropsUtil.get("user.dir") + File.separator;
+    }
 
 }
