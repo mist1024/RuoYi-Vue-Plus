@@ -59,7 +59,7 @@ public class SysDeptController extends BaseController {
      * @param deptId 部门ID
      */
     @SaCheckPermission("system:dept:query")
-    @GetMapping(value = "/{deptId}")
+    @GetMapping("/{deptId}")
     public R<SysDept> getInfo(@PathVariable Long deptId) {
         deptService.checkDeptDataScope(deptId);
         return R.ok(deptService.selectDeptById(deptId));

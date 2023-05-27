@@ -62,7 +62,7 @@ public class IndexController {
         return new ModelAndView("login");
     }
 
-    @RequestMapping(value = "login", method = RequestMethod.POST)
+    @PostMapping("/login")
     @ResponseBody
     @PermissionLimit(limit = false)
     public ReturnT<String> loginDo(HttpServletRequest request, HttpServletResponse response, String userName, String password, String ifRemember) {
@@ -70,7 +70,7 @@ public class IndexController {
         return loginService.login(request, response, userName, password, ifRem);
     }
 
-    @RequestMapping(value = "logout", method = RequestMethod.POST)
+    @PostMapping("/logout")
     @ResponseBody
     @PermissionLimit(limit = false)
     public ReturnT<String> logout(HttpServletRequest request, HttpServletResponse response) {

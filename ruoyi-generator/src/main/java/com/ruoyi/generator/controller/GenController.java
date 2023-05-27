@@ -50,7 +50,7 @@ public class GenController extends BaseController {
      * @param tableId 表ID
      */
     @SaCheckPermission("tool:gen:query")
-    @GetMapping(value = "/{tableId}")
+    @GetMapping("/{tableId}")
     public R<Map<String, Object>> getInfo(@PathVariable Long tableId) {
         GenTable table = genTableService.selectGenTableById(tableId);
         List<GenTable> tables = genTableService.selectGenTableAll();
@@ -77,7 +77,7 @@ public class GenController extends BaseController {
      * @param tableId 表ID
      */
     @SaCheckPermission("tool:gen:list")
-    @GetMapping(value = "/column/{tableId}")
+    @GetMapping("/column/{tableId}")
     public TableDataInfo<GenTableColumn> columnList(Long tableId) {
         TableDataInfo<GenTableColumn> dataInfo = new TableDataInfo<>();
         List<GenTableColumn> list = genTableService.selectGenTableColumnListByTableId(tableId);
