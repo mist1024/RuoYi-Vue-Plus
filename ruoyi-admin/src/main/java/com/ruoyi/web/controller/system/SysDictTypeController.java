@@ -57,7 +57,7 @@ public class SysDictTypeController extends BaseController {
      * @param dictId 字典ID
      */
     @SaCheckPermission("system:dict:query")
-    @GetMapping(value = "/{dictId}")
+    @GetMapping("/{dictId}")
     public R<SysDictType> getInfo(@PathVariable Long dictId) {
         return R.ok(dictTypeService.selectDictTypeById(dictId));
     }

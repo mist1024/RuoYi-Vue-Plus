@@ -67,7 +67,7 @@ public class SysRoleController extends BaseController {
      * @param roleId 角色ID
      */
     @SaCheckPermission("system:role:query")
-    @GetMapping(value = "/{roleId}")
+    @GetMapping("/{roleId}")
     public R<SysRole> getInfo(@PathVariable Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return R.ok(roleService.selectRoleById(roleId));
@@ -217,7 +217,7 @@ public class SysRoleController extends BaseController {
      * @param roleId 角色ID
      */
     @SaCheckPermission("system:role:list")
-    @GetMapping(value = "/deptTree/{roleId}")
+    @GetMapping("/deptTree/{roleId}")
     public R<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
