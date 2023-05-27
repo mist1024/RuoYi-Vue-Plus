@@ -60,7 +60,7 @@ public class SysDictDataController extends BaseController {
      * @param dictCode 字典code
      */
     @SaCheckPermission("system:dict:query")
-    @GetMapping(value = "/{dictCode}")
+    @GetMapping("/{dictCode}")
     public R<SysDictData> getInfo(@PathVariable Long dictCode) {
         return R.ok(dictDataService.selectDictDataById(dictCode));
     }
@@ -70,7 +70,7 @@ public class SysDictDataController extends BaseController {
      *
      * @param dictType 字典类型
      */
-    @GetMapping(value = "/type/{dictType}")
+    @GetMapping("/type/{dictType}")
     public R<List<SysDictData>> dictType(@PathVariable String dictType) {
         List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
         if (ObjectUtil.isNull(data)) {
