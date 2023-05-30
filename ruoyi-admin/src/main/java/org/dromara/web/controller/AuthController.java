@@ -53,13 +53,17 @@ public class AuthController {
     @PostMapping("/login/{clientId}/{authType}")
     public <T> R<LoginVo> login(@PathVariable String clientId,
                                 @PathVariable String authType,
+                                @RequestParam(required = false) String tenantId,
                                 @Validated @RequestBody T loginBody) {
+        // FIXME 后续不用泛型传参，考虑改为 req 获取
         // 校验类型和id
         loginService.checkAuthType(clientId, authType);
+        // FIXME 抽取出来，校验租户，前端没改暂时注释
+//        loginService.checkTenant(tenantId);
         // 登录
         LoginVo loginVo = new LoginVo();
         IAuthStrategy authStrategy = AuthFactory.instance(authType);
-        String token = authStrategy.login(authStrategy.getLoginBody(loginBody));
+        String token = authStrategy.login(clientId, authStrategy.getLoginBody(loginBody));
         loginVo.setToken(token);
         return R.ok(loginVo);
     }

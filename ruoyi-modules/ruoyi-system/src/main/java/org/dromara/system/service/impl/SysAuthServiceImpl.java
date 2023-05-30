@@ -1,5 +1,11 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import org.dromara.common.core.domain.model.AuthBody;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.exception.user.AuthTypeErrorException;
+import org.dromara.common.core.service.AuthService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -27,7 +33,7 @@ import java.util.Collection;
  */
 @RequiredArgsConstructor
 @Service
-public class SysAuthServiceImpl implements ISysAuthService {
+public class SysAuthServiceImpl implements ISysAuthService, AuthService {
 
     private final SysAuthMapper baseMapper;
 
@@ -111,4 +117,13 @@ public class SysAuthServiceImpl implements ISysAuthService {
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 
+    @Override
+    public AuthBody getAuthBody(String clientId) {
+        SysAuth sysAuth = baseMapper.selectOne(
+            new LambdaQueryWrapper<SysAuth>().eq(SysAuth::getClientId, clientId));
+        if (ObjectUtil.isEmpty(sysAuth)) {
+            throw new ServiceException("clientId 错误");
+        }
+        return BeanUtil.toBean(sysAuth, AuthBody.class);
+    }
 }

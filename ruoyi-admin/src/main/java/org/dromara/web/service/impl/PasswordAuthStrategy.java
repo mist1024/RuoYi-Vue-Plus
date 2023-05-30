@@ -1,5 +1,8 @@
 package org.dromara.web.service.impl;
 
+import cn.dev33.satoken.oauth2.logic.SaOAuth2Util;
+import cn.dev33.satoken.oauth2.model.AccessTokenModel;
+import cn.dev33.satoken.oauth2.model.RequestAuthModel;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
@@ -51,7 +54,7 @@ public class PasswordAuthStrategy implements IAuthStrategy<LoginBody> {
     }
 
     @Override
-    public String login(LoginBody loginBody) {
+    public String login(String clientId, LoginBody loginBody) {
         String tenantId = loginBody.getTenantId();
         String username = loginBody.getUsername();
         String password = loginBody.getPassword();
@@ -75,7 +78,13 @@ public class PasswordAuthStrategy implements IAuthStrategy<LoginBody> {
 
         loginService.recordLogininfor(loginUser.getTenantId(), username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());
-        return StpUtil.getTokenValue();
+
+        // FIXME 参考 demo 生成 AccessToken，但是 loginUser 获取不到值，未解决
+        RequestAuthModel ra = new RequestAuthModel();
+        ra.clientId = clientId;
+        ra.loginId = StpUtil.getLoginId();
+        AccessTokenModel at = SaOAuth2Util.generateAccessToken(ra, true);
+        return at.accessToken;
     }
 
     /**

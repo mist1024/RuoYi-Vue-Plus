@@ -16,6 +16,6 @@ public interface IAuthStrategy<T> {
     /**
      * 登录
      */
-    String login(T loginBody);
+    String login(String clientId, T loginBody);
 
 }

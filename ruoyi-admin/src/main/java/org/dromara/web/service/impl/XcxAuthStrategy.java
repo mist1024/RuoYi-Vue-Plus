@@ -35,7 +35,7 @@ public class XcxAuthStrategy implements IAuthStrategy<XcxLoginBody> {
     }
 
     @Override
-    public String login(XcxLoginBody loginBody) {
+    public String login(String clientId, XcxLoginBody loginBody) {
         // xcxCode 为 小程序调用 wx.login 授权后获取
         String xcxCode = loginBody.getXcxCode();
         // todo 以下自行实现

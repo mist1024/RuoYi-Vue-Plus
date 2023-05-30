@@ -46,7 +46,7 @@ public class SmsAuthStrategy implements IAuthStrategy<SmsLoginBody> {
     }
 
     @Override
-    public String login(SmsLoginBody loginBody) {
+    public String login(String clientId, SmsLoginBody loginBody) {
         String tenantId = loginBody.getTenantId();
         String phonenumber = loginBody.getPhonenumber();
         String smsCode = loginBody.getSmsCode();

@@ -46,7 +46,7 @@ public class EmailAuthStrategy implements IAuthStrategy<EmailLoginBody> {
     }
 
     @Override
-    public String login(EmailLoginBody loginBody) {
+    public String login(String clientId, EmailLoginBody loginBody) {
         String tenantId = loginBody.getTenantId();
         String email = loginBody.getEmail();
         String emailCode = loginBody.getEmailCode();
