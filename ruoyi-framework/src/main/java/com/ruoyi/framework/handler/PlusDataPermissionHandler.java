@@ -14,7 +14,6 @@ import com.ruoyi.common.enums.DataScopeType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.DataPermissionHelper;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.StreamUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -110,7 +108,7 @@ public class PlusDataPermissionHandler {
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(beanResolver);
         DataPermissionHelper.getContext().forEach(context::setVariable);
-        Set<String> conditions = new HashSet<>();
+        List<String> conditions = new LinkedList<>();
         for (RoleDTO role : user.getRoles()) {
             user.setRoleId(role.getRoleId());
             // 获取角色权限泛型
@@ -150,7 +148,8 @@ public class PlusDataPermissionHandler {
         }
 
         if (CollUtil.isNotEmpty(conditions)) {
-            String sql = StreamUtils.join(conditions, Function.identity(), "");
+            conditions.sort((o1, o2) -> o1.length() > o2.length() ? -1 : 1);
+            String sql = conditions.get(0);
             return sql.substring(joinStr.length());
         }
         return "";
