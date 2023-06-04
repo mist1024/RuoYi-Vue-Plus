@@ -27,11 +27,13 @@ import org.dromara.system.mapper.SysOssMapper;
 import org.dromara.system.service.ISysOssService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -130,6 +132,22 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             throw new ServiceException(e.getMessage());
         }
         // 保存文件信息
+        return getUploadSysOssVo(originalfileName, suffix, storage, uploadResult);
+    }
+
+    @Override
+    public SysOssVo upload(File file) {
+        String originalfileName = file.getName();
+        String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+        OssClient storage = OssFactory.instance();
+        UploadResult uploadResult;
+        uploadResult = storage.uploadSuffix(file, suffix);
+        // 保存文件信息
+        return getUploadSysOssVo(originalfileName, suffix, storage, uploadResult);
+    }
+
+    @NotNull
+    private SysOssVo getUploadSysOssVo(String originalfileName, String suffix, OssClient storage, UploadResult uploadResult) {
         SysOss oss = new SysOss();
         oss.setUrl(uploadResult.getUrl());
         oss.setFileSuffix(suffix);
