@@ -163,12 +163,22 @@ mail:
 
 --- # sms 短信
 sms:
+  # 是否启用短信
   enabled: false
-  # 阿里云 dysmsapi.aliyuncs.com
-  # 腾讯云 sms.tencentcloudapi.com
-  endpoint: "dysmsapi.aliyuncs.com"
-  accessKeyId: xxxxxxx
-  accessKeySecret: xxxxxx
-  signName: 测试
-  # 腾讯专用
-  sdkAppId:
+  # SupplierType中枚举
+  # ALIBABA 阿里云短信/ HUAWEI 华为云短信/ YUNPIAN 云片短信/ TENCENT 腾讯云短信/ UNI_SMS 合一短信/ JD_CLOUD 京东云短信/ CLOOPEN 容联云短信/ EMAY 亿美软通/ CTYUN 天翼云短信
+  supplierType: ALIBABA
+  # supplierType 对应的配置
+  alibaba:
+    #阿里云的accessKey
+    accessKeyId: 您的accessKey
+    #阿里云的accessKeySecret
+    accessKeySecret: 您的accessKeySecret
+    #短信签名
+    signature: 测试签名
+    #模板ID 用于发送固定模板短信使用
+    templateId: SMS_215125134
+    #模板变量 上述模板的变量
+    templateName: code
+    #请求地址 默认为dysmsapi.aliyuncs.com 如无特殊改变可以不用设置
+    requestUrl: dysmsapi.aliyuncs.com
