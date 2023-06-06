@@ -1,15 +1,16 @@
 package org.dromara.common.sms.config;
 
 import org.dromara.common.sms.config.properties.SmsProperties;
-import org.dromara.common.sms.core.AliyunSmsTemplate;
+import org.dromara.common.sms.core.Sms4jSmsTemplate;
 import org.dromara.common.sms.core.SmsTemplate;
-import org.dromara.common.sms.core.TencentSmsTemplate;
+import org.dromara.sms4j.autoimmit.config.SmsAutowiredConfig;
+import org.dromara.sms4j.autoimmit.utils.SpringUtil;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 短信配置类
@@ -19,30 +20,26 @@ import org.springframework.context.annotation.Configuration;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(SmsProperties.class)
+@ConditionalOnProperty(value = "sms.enabled", havingValue = "true")
+@ConditionalOnClass(org.dromara.sms4j.autoimmit.config.SmsAutowiredConfig.class)
 public class SmsConfig {
 
-    @Configuration
-    @ConditionalOnProperty(value = "sms.enabled", havingValue = "true")
-    @ConditionalOnClass(com.aliyun.dysmsapi20170525.Client.class)
-    static class AliyunSmsConfig {
-
-        @Bean
-        public SmsTemplate aliyunSmsTemplate(SmsProperties smsProperties) {
-            return new AliyunSmsTemplate(smsProperties);
-        }
-
+    @Bean
+    public SpringUtil springUtil(DefaultListableBeanFactory defaultListableBeanFactory) {
+        return new SpringUtil(defaultListableBeanFactory);
     }
 
-    @Configuration
-    @ConditionalOnProperty(value = "sms.enabled", havingValue = "true")
-    @ConditionalOnClass(com.tencentcloudapi.sms.v20190711.SmsClient.class)
-    static class TencentSmsConfig {
+    /**
+     * 主要配置注入 确保springUtil注入后再注入
+     */
+    @Bean(initMethod = "init")
+    public SmsAutowiredConfig smsAutowiredConfig(SpringUtil springUtil) {
+        return new SmsAutowiredConfig(springUtil);
+    }
 
-        @Bean
-        public SmsTemplate tencentSmsTemplate(SmsProperties smsProperties) {
-            return new TencentSmsTemplate(smsProperties);
-        }
-
+    @Bean
+    public SmsTemplate sms4jSmsTemplate(SmsProperties smsProperties) {
+        return new Sms4jSmsTemplate(smsProperties);
     }
 
 }
