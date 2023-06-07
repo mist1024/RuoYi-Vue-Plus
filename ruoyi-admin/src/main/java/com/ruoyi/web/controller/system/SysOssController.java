@@ -46,7 +46,6 @@ public class SysOssController extends BaseController {
      */
     @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysOssVo> list(@Validated(QueryGroup.class) SysOssBo bo, PageQuery pageQuery) {
         return iSysOssService.queryPageList(bo, pageQuery);
     }
@@ -56,9 +55,8 @@ public class SysOssController extends BaseController {
      *
      * @param ossIds OSS对象ID串
      */
-//    @SaCheckPermission("system:oss:list")
+    @SaCheckPermission("system:oss:list")
     @GetMapping("/listByIds/{ossIds}")
-    @RsaSecurityParameter
     public R<List<SysOssVo>> listByIds(@NotEmpty(message = "主键不能为空")
                                        @PathVariable Long[] ossIds) {
         List<SysOssVo> list = iSysOssService.listByIds(Arrays.asList(ossIds));
@@ -73,10 +71,9 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:upload")
     @Log(title = "OSS对象存储", businessType = BusinessType.INSERT)
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @RsaSecurityParameter
     public R<Map<String, String>> upload(@RequestPart("file") MultipartFile file) {
         if (ObjectUtil.isNull(file)) {
-            throw new ServiceException("上传文件不能为空");
+            return R.fail("上传文件不能为空");
         }
         SysOssVo oss = iSysOssService.upload(file);
         Map<String, String> map = new HashMap<>(2);
@@ -93,7 +90,6 @@ public class SysOssController extends BaseController {
      */
     @SaCheckPermission("system:oss:download")
     @GetMapping("/download/{ossId}")
-    @RsaSecurityParameter
     public void download(@PathVariable Long ossId, HttpServletResponse response) throws IOException {
         iSysOssService.download(ossId,response);
     }
@@ -106,7 +102,6 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:remove")
     @Log(title = "OSS对象存储", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ossIds}")
-    @RsaSecurityParameter
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ossIds) {
         return toAjax(iSysOssService.deleteWithValidByIds(Arrays.asList(ossIds), true));
