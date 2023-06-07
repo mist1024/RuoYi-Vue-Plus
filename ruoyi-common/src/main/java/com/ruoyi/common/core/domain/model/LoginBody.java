@@ -19,7 +19,7 @@ public class LoginBody {
     /**
      * 用户名
      */
-    @NotBlank(message = "{user.username.not.blank}",groups = {passwordLogin.class,smgLogin.class,forgetPasswordLogin.class,registerUser.class})
+    @NotBlank(message = "{user.username.not.blank}",groups = {passwordLogin.class,smgLogin.class,forgetPasswordLogin.class,registerUser.class,userOpenLogin.class})
     @Length(min = UserConstants.USERNAME_MIN_LENGTH, max = UserConstants.USERNAME_MAX_LENGTH, message = "{user.username.length.valid}",groups = {passwordLogin.class,smgLogin.class,forgetPasswordLogin.class,registerUser.class})
     private String username;
 
@@ -44,6 +44,13 @@ public class LoginBody {
 
 
     /**
+     * 外部用户标识key
+     */
+    @NotBlank(message = "user.id.cannot.be.empty",groups ={userOpenLogin.class})
+    private String apiKey;
+
+
+    /**
      * 账号登录验证
      */
     public interface passwordLogin {}
@@ -62,6 +69,8 @@ public class LoginBody {
      * 注册验证
      */
     public interface registerUser {}
+
+    public interface userOpenLogin {}
 
 
 

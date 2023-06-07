@@ -49,7 +49,7 @@ spring:
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
-          url: jdbc:mysql://182.150.40.133:3309/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+          url: jdbc:mysql://182.150.40.133:3309/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&useAffectedRows=true
           username: root
           password: 1234Qwer@
         # 从库数据源
@@ -102,18 +102,40 @@ spring:
 spring:
   redis:
     # 地址
-    host: 119.96.86.131
-#    host: 127.0.0.1
+#    host: 182.42.81.18
+    host: 127.0.0.1
     # 端口，默认为6379
     port: 6379
-    # 数据库索引
-    database: 1
+    # 数据库索3
+    database: 5
     # 密码(如没有密码请注释掉)
     password: 123456
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
     ssl: false
+  #mq
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    #确认消息已发送到队列
+    publisher-returns: true
+    #确认消息已发送到交换机
+    publisher-confirm-type: correlated
+    template:
+      #交换机处理消息到路由失败，则会返回给生产者
+      mandatory: true
+    #指定消费端消息确认方式,手动确认
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
+
+
 
 redisson:
   # redis key前缀
@@ -136,7 +158,6 @@ redisson:
     timeout: 3000
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
-
 --- # mail 邮件发送
 mail:
   enabled: false
@@ -173,7 +194,7 @@ sms:
 
 #    本地文件存储
 file:
-  domain: http://192.168.0.54:8080
+  domain: http://192.168.0.54:8084
   path: D:\\gaoxin\\images
   prefix: /images
   size: 10

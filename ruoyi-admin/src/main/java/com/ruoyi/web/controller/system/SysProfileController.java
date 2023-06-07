@@ -41,7 +41,6 @@ public class SysProfileController extends BaseController {
      * 个人信息
      */
     @GetMapping
-    @RsaSecurityParameter
     public R<Map<String, Object>> profile() {
         SysUser user = userService.selectUserById(getUserId());
         Map<String, Object> ajax = new HashMap<>();
@@ -56,7 +55,6 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> updateProfile(@RequestBody SysUser user) {
         if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
@@ -83,7 +81,6 @@ public class SysProfileController extends BaseController {
      */
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> updatePwd(String oldPassword, String newPassword) {
         SysUser user = userService.selectUserById(LoginHelper.getUserId());
         String userName = user.getUserName();
@@ -107,7 +104,6 @@ public class SysProfileController extends BaseController {
      * @param avatarfile 用户头像
      */
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
-    @RsaSecurityParameter
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Map<String, Object>> avatar(@RequestPart("avatarfile") MultipartFile avatarfile) {
         Map<String, Object> ajax = new HashMap<>();

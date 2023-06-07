@@ -7,7 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="com.ruoyi.system.domain.MaterialProof" id="MaterialProofResult">
         <result property="id" column="id"/>
         <result property="houseId" column="house_id"/>
-        <result property="getCreateTime" column="create_time"/>
+        <result property="createTime" column="create_time"/>
         <result property="status" column="status"/>
         <result property="modulePathId" column="module_path_id"/>
         <result property="file" column="file"/>
@@ -19,6 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy" column="update_by"/>
         <result property="createBy" column="create_by"/>
         <result property="materialName" column="material_name"/>
+        <result property="number" column="number"/>
     </resultMap>
 
 

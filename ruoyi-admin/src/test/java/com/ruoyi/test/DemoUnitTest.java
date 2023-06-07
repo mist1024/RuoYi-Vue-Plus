@@ -2,21 +2,21 @@ package com.ruoyi.test;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.CipherMode;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.SmUtil;
-import cn.hutool.crypto.asymmetric.ECIES;
 import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.asymmetric.SM2;
 import cn.hutool.crypto.symmetric.SM4;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.util.ListUtils;
 import com.antherd.smcrypto.sm2.Keypair;
 import com.antherd.smcrypto.sm2.Sm2;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,7 +28,9 @@ import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.AesUtil;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.rsaencrypt.utls.RSAUtil;
+import com.ruoyi.demo.domain.ImageDemoData;
+import com.ruoyi.mq.service.OrderService;
+import com.ruoyi.mq.service.Produceras;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialTalentsVo;
@@ -42,6 +44,7 @@ import com.ruoyi.work.domain.TProcess;
 import com.ruoyi.work.domain.vo.ActProcessVo;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.BusinessDTO;
+import com.ruoyi.work.dto.HousingConstructionBureauPushDto;
 import com.ruoyi.work.mapper.ActProcessMapper;
 import com.ruoyi.work.mapper.HisProcessMapper;
 import com.ruoyi.work.mapper.ProcessMapper;
@@ -50,20 +53,20 @@ import com.ruoyi.work.utils.WorkComplyUtils;
 import org.apache.commons.text.CaseUtils;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.junit.jupiter.api.*;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ReflectionUtils;
 
 import javax.crypto.SecretKey;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -118,6 +121,18 @@ public class DemoUnitTest {
 
     @Autowired
     private BuyHousesMemberMapper buyHousesMemberMapper;
+
+    @Autowired
+    private HousingConstructionBureauPushDto housingConstructionBureauPushDto;
+
+    @Autowired
+    private Produceras providerCustomer;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private RabbitTemplate amqpTemplate;
 
 
     @DisplayName("测试 @SpringBootTest @Test @DisplayName 注解")
@@ -213,7 +228,7 @@ public class DemoUnitTest {
         hisProcess.setParams(map);
         hisProcess.setProcessKey(buyHouses.getProcessKey());
         hisProcess.setStartUser(buyHouses.getUserName());
-        String s = WorkComplyUtils.batchDeleted(hisProcess);
+        String s = WorkComplyUtils.batchDeleted(hisProcess,null);
         System.out.println("s = " + s);
     }
 
@@ -299,6 +314,8 @@ public class DemoUnitTest {
             .eq(TProcess::getProcessKey, actProcess.getProcessKey());
         List<TProcess> tProcesses = processMapper.selectList(wrapper);
         System.out.println("tProcesses = " + tProcesses);
+
+
     }
 
     @Test
@@ -453,7 +470,7 @@ public class DemoUnitTest {
         System.out.println("publicKey = " + publicKey);
         final String VUE_PUBLIC_KEY = "048af4184056315a9ecfcc14280b32504ba194ec8dd0e06b298c4a1aa557e7e9a5d15e1293392f741f7fb31a82e55785b7f1880d61b57def1e38e3f06435fb0502";
         String s2 = Sm2.doEncrypt("12312312", VUE_PUBLIC_KEY);
-        String s3 = Sm2.doDecrypt("5c63a8de6826da7d293935766a0c13048e3aff31f9830160e0ec05b977d5153b3951f5c35207e9b7b7114e70991a4f199075ecb38b6fa33f1dab0aa2d25d2b94a989cb6f0da0e55f005b631973f18e64b65861774367502288448b8b12c9054a0baedd3d957474fcea8dcc7915826ca7d51bcb120c36184eb928e13d67042e408afa6258b68eb5c9cc609f594b2d9c047f634e9ff319f221ffbebf7253a95833224c1978", privateKey);
+        String s3 = Sm2.doDecrypt("c368df0c094044c0648b412078c2067f84984531afebe3fd494fbce4f5e9b7bc42465855964def4f3bbdd1f61b8780f62656f63c25f8cc6c7e5caff9b0757909848577302a0a1a708d226ecc6a2b3e5c3ac6056cc74884cf5dbe80482f7edb7af59778528a12986bf671d9619c5d60ba00f44e4369aa48f5cf91ac60b9af8e144c730dd0e60330a3fc9473a80ce88fa2", privateKey);
         System.out.println("s3 = " + s3);
         System.out.println("s2 = " + s2);
 
@@ -531,5 +548,228 @@ public class DemoUnitTest {
 //        System.out.println("decryptStr = " + decryptStr);
     }
 
-}
+    @Test
+    public void test021231(){
+        String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
+        String privateKey="9cefdfcb925a32e10206d3a693ba204632c59e5f9a171faebb814885191dd35e";
 
+        BuyHouses buyHouses = buyHousesMapper.selectById("41");
+        Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
+        String virtualcode = String.valueOf(map.get("virtualcode"));
+        map.put("virtualcode", virtualcode == "3" ? "010" : "009");
+        String cardType = String.valueOf(map.get("cardType"));
+        map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
+        map.put("qyStatus", "4");
+        map.put("gyStatus", "4");
+        map.put("shStatus", "4");
+        map.put("buyHousesMemberList", "null");
+        map.put("buyHousesLogList", "null");
+        map.put("buyHousesLogList", "null");
+        String prettyStr = JSONUtil.toJsonPrettyStr(map);
+        System.out.println("prettyStr = " + prettyStr);
+        List<BuyHousesMember> buyHousesMembers = buyHousesMemberMapper.selectList(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, buyHouses.getId()));
+        buyHouses.setBuyHousesMemberList(buyHousesMembers);
+        String s = JSONUtil.toJsonPrettyStr(buyHouses);
+
+        String doEncrypt = Sm2.doEncrypt(s, publicKey);
+//        System.out.println("doEncrypt = " + doEncrypt);
+        String doDecrypt = Sm2.doDecrypt(doEncrypt, privateKey);
+//        System.out.println("doDecrypt = " + doDecrypt);
+        String result2 = HttpRequest.post("http://192.168.0.54:8084/user/house/insertOpenBuyHouses")
+            .header("Referer","http://192.168.0.54:8084")
+            .header("path","/user/house/insertOpenBuyHouses")
+            .header("method","POST")
+            .body(doDecrypt,"application/json")
+            .execute().body();
+        System.out.println("result2 = " + result2);
+    }
+
+//String privateKey="9cefdfcb925a32e10206d3a693ba204632c59e5f9a171faebb814885191dd35e";
+    @Test
+    public void test0212311123123(){
+        String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("username","15808234569");
+        map.put("apiKey","gaoxingongyuanchengshiju");
+        String s = JSONUtil.toJsonPrettyStr(map);
+        String doEncrypt = Sm2.doEncrypt(s, publicKey);
+        String result2 = HttpRequest.post("http://192.168.0.54:8084/userOpenLogin")
+            .header("Referer","http://192.168.0.54:8084")
+            .header("path","/userOpenLogin")
+            .header("targe","weixin")
+            .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhcHBfdXNlcjo0Mzc4OSIsInJuU3RyIjoiV05XZFFnaHpHYlRRRU5ObVpwbmhaaFp6MmtKaWtSR0MiLCJ1c2VySWQiOjQzNzg5fQ.QCsN3iIFk38dzTvXITGx2wV5c9kdPdvWZs7gjf6dFzc")
+            .header("method","POST")
+            .body(doEncrypt,"application/json")
+            .execute().body();
+    }
+
+    /**
+     * 登录接口
+     */
+    @Test
+    public void test0002(){
+        String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("businessId","15808234569");//用户标识符
+        map.put("processKey","apply_house");//使用方唯一key
+        map.put("apiKey","gaoxingongyuanchengshiju");//使用方唯一key
+        String s = JSONUtil.toJsonPrettyStr(map);
+        String doEncrypt = Sm2.doEncrypt(s, publicKey);
+        String result2 = HttpRequest.post("http://192.168.0.54:8084/user/house/stepProcessPlan")
+            .header("Referer","http://192.168.0.54:8084")
+            .header("path","/user/house/stepProcessPlan")
+            .header("targe","weixin")
+            .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhcHBfdXNlcjo0Mzc4OSIsInJuU3RyIjoiV05XZFFnaHpHYlRRRU5ObVpwbmhaaFp6MmtKaWtSR0MiLCJ1c2VySWQiOjQzNzg5fQ.QCsN3iIFk38dzTvXITGx2wV5c9kdPdvWZs7gjf6dFzc")
+            .header("method","POST")
+            .body(doEncrypt,"application/json")
+            .execute().body();
+    }
+
+    /**
+     * 新增或者修改接口
+     */
+    @Test
+    public void test0003(){
+        String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("username","15808234569");
+        map.put("apiKey","gaoxingongyuanchengshiju");
+        BuyHouses buyHouses = buyHousesMapper.selectById("3");
+        String s = JSONUtil.toJsonPrettyStr(map);
+        String doEncrypt = Sm2.doEncrypt(s, publicKey);
+        String result2 = HttpRequest.post("http://192.168.0.54:8084/userOpenLogin")
+            .header("Referer","http://192.168.0.54:8084")
+            .header("path","/userOpenLogin")
+            .header("targe","weixin")
+            .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhcHBfdXNlcjo0Mzc4OSIsInJuU3RyIjoiV05XZFFnaHpHYlRRRU5ObVpwbmhaaFp6MmtKaWtSR0MiLCJ1c2VySWQiOjQzNzg5fQ.QCsN3iIFk38dzTvXITGx2wV5c9kdPdvWZs7gjf6dFzc")
+            .header("method","POST")
+            .body(doEncrypt,"application/json")
+            .execute().body();
+    }
+
+    /**
+     * 图片导出
+     * <p>
+     * 1. 创建excel对应的实体对象 参照{@link ImageDemoData}
+     * <p>
+     * 2. 直接写即可
+     */
+    @Test
+    public void imageWrite() throws Exception {
+        String fileName = "E:\\"+ System.currentTimeMillis() + ".xlsx";
+
+        // 这里注意下 所有的图片都会放到内存 暂时没有很好的解法，大量图片的情况下建议 2选1:
+        // 1. 将图片上传到oss 或者其他存储网站: https://www.aliyun.com/product/oss ，然后直接放链接
+        // 2. 使用: https://github.com/coobird/thumbnailator 或者其他工具压缩图片
+        String imagePath = "https://gx.chengdutalent.cn:8010/upload/GXTalents/images/f264ec41dcfb47b9b6ef231441d3123b.png";
+        try  {
+            List<ImageDemoData> list =  ListUtils.newArrayList();
+            ImageDemoData imageDemoData = new ImageDemoData();
+            list.add(imageDemoData);
+            // 放入五种类型的图片 实际使用只要选一种即可
+//            imageDemoData.setByteArray(FileUtils.readFileToByteArray(new File(imagePath)));
+//            imageDemoData.setFile(new File(imagePath));
+//            imageDemoData.setString(imagePath);
+//            imageDemoData.setInputStream(inputStream);
+            imageDemoData.setUrl(new URL(
+                "https://gx.chengdutalent.cn:8010/upload/GXTalents/images/f264ec41dcfb47b9b6ef231441d3123b.png"));
+
+            // 这里演示
+            // 需要额外放入文字
+            // 而且需要放入2个图片
+            // 第一个图片靠左
+            // 第二个靠右 而且要额外的占用他后面的单元格
+            /*WriteCellData<Void> writeCellData = new WriteCellData<>();
+            imageDemoData.setWriteCellDataFile(writeCellData);
+            // 这里可以设置为 EMPTY 则代表不需要其他数据了
+            writeCellData.setType(CellDataTypeEnum.STRING);
+            writeCellData.setStringValue("额外的放一些文字");*/
+
+            /*// 可以放入多个图片
+            List<ImageData> imageDataList = new ArrayList<>();
+            ImageData imageData = new ImageData();
+            imageDataList.add(imageData);
+            writeCellData.setImageDataList(imageDataList);
+            // 放入2进制图片
+            imageData.setImage(FileUtils.readFileToByteArray(new File(imagePath)));
+            // 图片类型
+            imageData.setImageType(ImageData.ImageType.PICTURE_TYPE_PNG);
+            // 上 右 下 左 需要留空
+            // 这个类似于 css 的 margin
+            // 这里实测 不能设置太大 超过单元格原始大小后 打开会提示修复。暂时未找到很好的解法。
+            imageData.setTop(5);
+            imageData.setRight(40);
+            imageData.setBottom(5);
+            imageData.setLeft(5);
+
+            // 放入第二个图片
+            imageData = new ImageData();
+            imageDataList.add(imageData);
+            writeCellData.setImageDataList(imageDataList);
+            imageData.setImage(FileUtils.readFileToByteArray(new File(imagePath)));
+            imageData.setImageType(ImageData.ImageType.PICTURE_TYPE_PNG);
+            imageData.setTop(5);
+            imageData.setRight(5);
+            imageData.setBottom(5);
+            imageData.setLeft(50);
+            // 设置图片的位置 假设 现在目标 是 覆盖 当前单元格 和当前单元格右边的单元格
+            // 起点相对于当前单元格为0 当然可以不写
+            imageData.setRelativeFirstRowIndex(0);
+            imageData.setRelativeFirstColumnIndex(0);
+            imageData.setRelativeLastRowIndex(0);
+            // 前面3个可以不写  下面这个需要写 也就是 结尾 需要相对当前单元格 往右移动一格
+            // 也就是说 这个图片会覆盖当前单元格和 后面的那一格
+            imageData.setRelativeLastColumnIndex(1);*/
+
+            // 写入数据
+            EasyExcel.write(fileName, ImageDemoData.class).sheet().doWrite(list);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test0121123(){
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id","1");
+        hashMap.put("status","00T");
+        hashMap.put("description","测试");
+        housingConstructionBureauPushDto.send3(hashMap,"http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
+    }
+
+    @Test
+    public void test15234523(){
+//        providerCustomer.sendDelayMsg("延迟队列测试",3);
+        String msg ="我来了";
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setHeader("x-delay",5000);//延迟5秒被删除
+        Message message = new Message(msg.getBytes(), messageProperties);
+        amqpTemplate.convertAndSend("PLUGIN_DELAY_EXCHANGE","delay","123132");//交换机和路由键必须和配置文件类中保持一致
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println("消息发送成功【" + sdf.format(new Date()) + "】");
+//        orderService.makeOrder();
+    }
+
+    @Test
+    public void  testt12333(){
+        double div = NumberUtil.div(28, 3000);
+        System.out.println("div = " + div);
+        String s = NumberUtil.decimalFormat("#.##%", div);
+        System.out.println("s = " + s);
+        //获取二期认定通过人才数
+        /*List<HousesReview> housesReviewList = housesReviewMapper.selectList(new LambdaQueryWrapper<>(HousesReview.class)
+            .eq(HousesReview::getProcessStatus, Constants.SUCCEED));
+        //获取本月复审通过数
+        Date date = DateUtil.date();
+        //获得月份，从0开始计数
+        int month = DateUtil.month(date);
+        housesReviewList.forEach(h ->{
+            int month1 = h.getPassTime().getMonth();
+            System.out.println("month1 = " + month1);
+            String s = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD_HH_MM_SS, h.getPassTime());
+            System.out.println("s = " + s);
+        });*/
+//        List<HousesReview> collect = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == month).collect(Collectors.toList());
+//        System.out.println("collect = " + collect);
+    }
+}

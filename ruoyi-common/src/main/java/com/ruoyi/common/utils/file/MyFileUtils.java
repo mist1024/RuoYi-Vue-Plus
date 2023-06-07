@@ -99,14 +99,14 @@ public class MyFileUtils extends FileUtils
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");//POST
             //防止屏蔽程序抓取而返回403错误
-            conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
             int responseCode = conn.getResponseCode();
             System.out.println("responseCode = " + responseCode);
-            InputStream inputStream = conn.getInputStream();;
-            byte[] temp = new byte[inputStream.available()];;
-            if (200==responseCode) {
+            InputStream inputStream = conn.getInputStream();
+            byte[] temp = new byte[inputStream.available()];
+            if (responseCode==200) {
                 if (temp.length==0) {
                     ClassPathResource classPathResource = new ClassPathResource("/404.jpg");
                     inputStream = classPathResource.getStream();
@@ -123,6 +123,90 @@ public class MyFileUtils extends FileUtils
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    /**
+     * 对中文字符进行UTF-8编码
+     * @param source 要转义的字符串
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static String tranformStyle(String source) throws UnsupportedEncodingException
+    {
+        char[] arr = source.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < arr.length; i++)
+        {
+            char temp = arr[i];
+            if(isChinese(temp))
+            {
+                sb.append(URLEncoder.encode("" + temp, "UTF-8"));
+                continue;
+            }
+            sb.append(arr[i]);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 获取字符的编码值
+     * @param s
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static int getValue(char s) throws UnsupportedEncodingException
+    {
+        String temp = (URLEncoder.encode("" + s, "GBK")).replace("%", "");
+        if(temp.equals(s + ""))
+        {
+            return 0;
+        }
+        char[] arr = temp.toCharArray();
+        int total = 0;
+        for(int i = 0; i < arr.length; i++)
+        {
+            try
+            {
+                int t = Integer.parseInt((arr[i] + ""), 16);
+                total = total * 16 + t;
+            }
+            catch(NumberFormatException e)
+            {
+                e.printStackTrace();
+                return 0;
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 判断是不是中文字符
+     * @param c
+     * @return
+     */
+    public static boolean isChinese(char c)
+    {
+
+        Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+
+        if(ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+
+            || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+
+            || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+
+            || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION
+
+            || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+
+            || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS)
+        {
+
+            return true;
+
+        }
+
+        return false;
+
     }
 
     /**

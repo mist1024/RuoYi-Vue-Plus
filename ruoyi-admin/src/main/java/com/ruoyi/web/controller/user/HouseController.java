@@ -6,6 +6,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.annotation.RepeatSubmit;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
@@ -18,11 +19,8 @@ import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.service.IBuyHousesService;
 import lombok.RequiredArgsConstructor;
-import oracle.jdbc.proxy.annotation.GetProxy;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 /**
  * 客户端购房申请相关接口
@@ -51,7 +49,6 @@ public class HouseController extends BaseController {
     @Log(title = "【购房申请修改】", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PostMapping()
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody BuyHousesBo bo) {
         return toAjax(iBuyHousesService.updateByBo(bo));
     }
@@ -62,7 +59,6 @@ public class HouseController extends BaseController {
     @Log(title = "【购房获取详情】", businessType = BusinessType.OTHER)
     @RepeatSubmit()
     @PostMapping("/info")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> getInfo(@RequestBody BuyHouses buyHouses) {
         return iBuyHousesService.getInfo(buyHouses);
     }
@@ -72,7 +68,7 @@ public class HouseController extends BaseController {
      * 下载人才认定申请表
      */
     @PostMapping("/download")
-    @RsaSecurityParameter(inDecode = true)
+    @RateLimiter(count = 1, time = 10)
     public R downloadWord(@Validated(DownloadGroup.class) @RequestBody BuyHousesBo buyHousesBo){
         return iBuyHousesService.downloadWord(buyHousesBo);
     }
@@ -81,7 +77,6 @@ public class HouseController extends BaseController {
      * 下载认定通知单
      */
     @GetMapping("/downloadInform")
-    @RsaSecurityParameter
     public R downloadInform(){
         return iBuyHousesService.downloadInform();
     }
@@ -91,7 +86,6 @@ public class HouseController extends BaseController {
      * @return
      */
     @GetMapping("/declareList")
-    @RsaSecurityParameter
     public R getDeclareList(){
         return R.ok(iBuyHousesService.getDeclareList());
     }
@@ -123,5 +117,27 @@ public class HouseController extends BaseController {
     @RsaSecurityParameter
     public R getBuyHouseLog(){
         return iBuyHousesService.getBuyHousesLogsByUserId();
+    }
+
+    /**
+     * 外部推送接口
+     * @param buyHouse
+     * @return
+     * @throws InterruptedException
+     */
+    @Log(title = "【外部推送接口】", businessType = BusinessType.OTHER)
+    @RepeatSubmit()
+    @PostMapping("/insertOpenBuyHouses")
+    public R<?> insertOpenBuyHouses(@RequestBody BuyHouses buyHouse){
+        /*CCSMessageDigest wxDigest = CCSMessageDigest.getInstance();
+        R r = wxDigest.checkSign(httpRequestBody);
+        if (r.getCode()==200){
+            BuyHouses buyHouses = (BuyHouses)r.getData();
+            buyHouses.setApiKey(httpRequestBody.getApiKey());
+            return  iBuyHousesService.insertOpenBuyHouses(buyHouses);
+        }
+        return R.fail(r.getMsg());*/
+        buyHouse.setApiKey("gxgycsj");
+        return  iBuyHousesService.insertOpenBuyHouses(buyHouse);
     }
 }

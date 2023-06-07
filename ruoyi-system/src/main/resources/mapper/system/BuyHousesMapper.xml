@@ -42,8 +42,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="processKey" column="process_key"/>
         <result property="processStatus" column="process_status"/>
         <result property="version" column="version"/>
+        <result property="apiKey" column="api_key"/>
 
     </resultMap>
+    <select id="getIndexType" resultType="java.util.Map">
+        SELECT type as 'name',COUNT(type) AS 'value' FROM `buy_houses` WHERE process_status = 5 GROUP BY type ORDER BY type
+    </select>
+    <select id="getActProcessList" resultType="java.util.Map">
+        SELECT (
+                   CASE WHEN step='1' THEN '受理中'
+                        WHEN step ='2' THEN '初审中'
+                        WHEN step = '3' THEN '审定中'
+                        ELSE '' END) AS `name`, COUNT(step) AS 'value' FROM act_process WHERE process_id IN(SELECT id FROM `process` WHERE process_key = 'apply_house') GROUP BY step;
+    </select>
+    <select id="getCompanyDistrict" resultType="java.util.Map">
+        SELECT (
+                   CASE WHEN district='1' THEN '数字经济局'
+                        WHEN district = '3' THEN '高新西区'
+                        WHEN district = '4' THEN '生物城'
+                        WHEN district ='2' THEN '交子公园金融商务区'
+                        ELSE '' END) AS `name`,COUNT(DISTINCT company_name,district) AS 'value' FROM buy_houses WHERE process_status = 5 GROUP BY district
+    </select>
+    <select id="getNationality" resultType="java.util.Map">
+        SELECT nationality as 'name',COUNT(nationality) AS 'value' FROM buy_houses WHERE process_status=5 GROUP BY nationality;
+    </select>
+    <select id="getMaritalStatus" resultType="java.util.Map">
+        SELECT (
+                   CASE WHEN marital_status='1' THEN '未婚'
+                        WHEN marital_status ='2' THEN '已婚'
+                        WHEN marital_status = '3' THEN '离异'
+                        ELSE '' END)  as 'name',COUNT(marital_status) AS 'value' FROM buy_houses WHERE process_status=5 GROUP BY marital_status;
+    </select>
 
 
 </mapper>

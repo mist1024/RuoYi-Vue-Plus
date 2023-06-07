@@ -2,10 +2,13 @@ package com.ruoyi.system.domain.vo;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
+import com.alibaba.excel.converters.date.DateDateConverter;
+import com.alibaba.excel.converters.date.DateStringConverter;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.ruoyi.common.annotation.ExcelDictFormat;
+import com.ruoyi.common.convert.ExcelDictConvert;
 import com.ruoyi.common.utils.MySerializerUtils;
 import com.ruoyi.system.domain.BuyHousesReviewMember;
 import lombok.Data;
@@ -39,13 +42,12 @@ public class HousesReviewVo implements Serializable {
      */
     @ExcelProperty(value = "证件类型")
     @NotNull(message = "证件类型不可为空")
-    @ExcelDictFormat(dictType = "card_type")
     private String cardType;
 
     /**
      * 身份证号码
      */
-    @ExcelProperty(value = "身份证号码")
+    @ExcelProperty(value = "证件号码")
     private String card;
 
     /**
@@ -112,7 +114,7 @@ public class HousesReviewVo implements Serializable {
     /**
      * 状态
      */
-    @ExcelProperty(value = "状态")
+//    @ExcelProperty(value = "状态")
     private String status;
 
     /**
@@ -124,19 +126,22 @@ public class HousesReviewVo implements Serializable {
     /**
      * 国籍
      */
-//    @ExcelProperty(value = "国籍")
+    @ExcelProperty(value = "国籍", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "nationality_type")
     private String nationality;
 
     /**
      * 婚姻状况
      */
-//    @ExcelProperty(value = "婚姻状况")
+    @ExcelProperty(value = "婚姻状况",converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "marital_status")
     private String maritalStatus;
 
     /**
      * 单位类型
      */
-//    @ExcelProperty(value = "单位类型")
+    @ExcelProperty(value = "单位类型", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "company_type")
     private String companyType;
 
     /**
@@ -148,7 +153,8 @@ public class HousesReviewVo implements Serializable {
     /**
      * 人才类型
      */
-    @ExcelProperty(value = "人才类型")
+    @ExcelProperty(value = "人才类型", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "talents_type")
     private String talentsType;
 
     /**
@@ -166,7 +172,8 @@ public class HousesReviewVo implements Serializable {
     /**
      * 来源
      */
-//    @ExcelProperty(value = "来源")
+    @ExcelProperty(value = "来源", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "source_by")
     private String sourceBy;
 
     /**
@@ -192,7 +199,8 @@ public class HousesReviewVo implements Serializable {
     /**
      * 审核通过时间
      */
-    @ExcelProperty(value = "审核通过时间")
+    @ExcelProperty(value = "审核通过时间",converter = DateStringConverter.class)
+    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     private Date passTime;
 
 }

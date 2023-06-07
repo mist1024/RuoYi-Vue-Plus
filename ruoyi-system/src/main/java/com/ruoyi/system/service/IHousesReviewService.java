@@ -72,4 +72,5 @@ public interface IHousesReviewService {
      */
     void exportExcel(HousesReviewBo bo, HttpServletResponse response);
 
+    TableDataInfo<HousesReview> managerQueryPageList(HousesReviewBo bo, PageQuery pageQuery);
 }

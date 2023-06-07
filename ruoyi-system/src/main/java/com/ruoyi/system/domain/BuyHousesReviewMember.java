@@ -58,4 +58,6 @@ public class BuyHousesReviewMember extends BaseEntity {
      */
     private String name;
 
+    private Integer number;
+
 }

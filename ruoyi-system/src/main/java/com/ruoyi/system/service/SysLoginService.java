@@ -255,6 +255,7 @@ public class SysLoginService {
         loginUser.setDeptId(user.getDeptId());
         loginUser.setUsername(user.getUserName());
         loginUser.setUserType(user.getUserType());
+        loginUser.setNickName(user.getNickName());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
         loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());
@@ -335,6 +336,7 @@ public class SysLoginService {
         }
         return user;
     }
+
 
     /**
      * 客户端用户登录
@@ -451,5 +453,51 @@ public class SysLoginService {
         recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         return StpUtil.getTokenValue();
 
+    }
+
+    /**
+     * 公开登录接口
+     * @param username
+     * @param apiKey
+     * @return
+     */
+    public String userOpenLogin(String username, String apiKey) {
+        //1.根据用户账号和key获取用户信息
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+            .eq(User::getLoginName, username)
+            .eq(User::getApiKey,apiKey));
+        //2.如果不存在就新增,反之构造用户信息并返回一个token
+        if (ObjectUtil.isNull(user)){
+            User user1 = new User();
+            user1.setUserType("app_user");
+            user1.setLoginName(username);
+            user1.setApiKey(apiKey);
+            user1.setCreateTime(new Date());
+            user1.setUpdateTime(new Date());
+            user1.setUpdateBy(username);
+            user1.setCreateBy(username);
+            user1.setWxToken(username);
+            user1.setJurisdiction(1L);
+            int insert = userMapper.insert(user1);
+            if (insert==0){
+                throw new ServiceException("用户操作失败");
+            }
+            LoginUser loginUser = buildLoginUser(user1);
+            // 生成token
+            LoginHelper.loginByDevice(loginUser, DeviceType.PC);
+            recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+            String tokenValue = StpUtil.getTokenValue();
+            return tokenValue;
+        }
+        if (user.getJurisdiction().equals(2L)) {
+            log.info("登录用户：{} 已被停用.", username);
+            throw new UserException("user.blocked", username);
+        }
+        LoginUser loginUser = buildLoginUser(user);
+        // 生成token
+        LoginHelper.loginByDevice(loginUser, DeviceType.PC);
+        recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        String tokenValue = StpUtil.getTokenValue();
+        return tokenValue;
     }
 }

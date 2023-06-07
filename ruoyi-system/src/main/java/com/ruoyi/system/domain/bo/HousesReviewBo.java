@@ -109,7 +109,7 @@ public class HousesReviewBo extends BaseEntity {
     /**
      * 状态
      */
-    @NotBlank(message = "状态不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "状态不能为空", groups = { AddGroup.class, EditGroup.class })
     private String status;
 
     /**
@@ -133,7 +133,7 @@ public class HousesReviewBo extends BaseEntity {
     /**
      * 单位类型
      */
-    @NotBlank(message = "单位类型不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "单位类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String companyType;
 
     /**

@@ -96,4 +96,6 @@ public class User extends BaseEntity {
 
     private String companyId;
 
+    private String apiKey;
+
 }

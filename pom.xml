@@ -361,6 +361,17 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-rabbitmq</artifactId>
+                <version>${ruoyi-vue-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>2.7.9</version>
+            </dependency>
+
             <!-- Sa-Token 插件：整合SSO -->
             <!--<dependency>
                 <groupId>cn.dev33</groupId>
@@ -409,6 +420,7 @@
         <module>ruoyi-work</module>
         <module>ruoyi-file</module>
         <module>ruoyi-rsaencrypt</module>
+        <module>ruoyi-rabbitmq</module>
 
 
     </modules>

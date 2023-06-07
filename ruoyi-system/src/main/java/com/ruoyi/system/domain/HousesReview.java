@@ -114,7 +114,7 @@ public class HousesReview extends BaseEntity {
      */
     private String companyAddress;
     /**
-     * 来源
+     * 来源区级:1,市级:2
      */
     private String sourceBy;
     /**

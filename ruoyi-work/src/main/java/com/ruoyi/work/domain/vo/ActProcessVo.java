@@ -77,5 +77,12 @@ public class ActProcessVo {
 
     private String description;
 
+    /**
+     * 证件号码
+     */
+    private  String cardId;
+
+    private String companyName;
+
 
 }

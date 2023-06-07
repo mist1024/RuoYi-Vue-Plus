@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.constant.Constants;
@@ -127,9 +128,10 @@ public class UserController extends BaseController {
     /**
      * 获取当前业务进行步骤
      */
+    @SaIgnore
     @Log(title = "获取当前业务运行到那一步",businessType = BusinessType.OTHER)
     @PostMapping("/processPlan")
-    @RsaSecurityParameter(inDecode = true)
+    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public R<?> processPlan(@RequestBody ActProcess actProcess){
         List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, actProcess.getProcessKey()));
@@ -138,6 +140,43 @@ public class UserController extends BaseController {
         }
         LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
         Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(), actProcess.getBusinessId());
+        ProcessVo processVo = new ProcessVo();
+        processVo.setBusinessId(actProcess.getBusinessId());
+        processVo.setParams(map);
+        hashMap.put("status",map.get("processStatus"));
+        List<ProcessVoResultDto>  processPlan= WorkComplyUtils.getProcessPlan(processVo);
+        hashMap.put("list",processPlan);
+        return R.ok(hashMap);
+    }
+
+    @Log(title = "对外提供步骤接口",businessType = BusinessType.OTHER)
+    @PostMapping("/stepProcessPlan")
+    @RsaSecurityParameter(inDecode = true,outEncode = false)
+    public R<?> stepProcessPlan(@RequestBody ActProcess actProcess){
+        if (ObjectUtil.isNull(actProcess.getBusinessId())){
+            return R.fail("必要参数不可为空");
+        }
+        if (ObjectUtil.isNull(actProcess.getProcessKey())){
+            return R.fail("必要参数不可为空");
+        }
+        if (ObjectUtil.isNull(actProcess.getApiKey())){
+            return R.fail("必要参数不可为空");
+        }
+        List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
+            .eq(TProcess::getProcessKey, actProcess.getProcessKey()));
+        if (tProcesses.size()==0){
+            throw new ServiceException("当前流程不存在");
+        }
+        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
+        Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(), actProcess.getBusinessId());
+        if (ObjectUtil.isNotNull(map)){
+            Object apiKey = map.get("apiKey");
+            if (ObjectUtil.isNull(apiKey) || !actProcess.getApiKey().equals(apiKey.toString())){
+                return R.fail("无查看权限");
+            }
+        }else {
+            return R.fail("数据查询失败:无此业务id");
+        }
         ProcessVo processVo = new ProcessVo();
         processVo.setBusinessId(actProcess.getBusinessId());
         processVo.setParams(map);

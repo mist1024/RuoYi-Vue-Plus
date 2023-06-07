@@ -18,16 +18,21 @@ import com.ruoyi.work.domain.TProcess;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.BusinessDTO;
 import com.ruoyi.work.dto.HisProcessVoResultDto;
+import com.ruoyi.work.dto.HousingConstructionBureauPushDto;
 import com.ruoyi.work.dto.ProcessVoResultDto;
 import com.ruoyi.work.mapper.ProcessMapper;
 import com.ruoyi.work.utils.WorkComplyUtils;
 import com.ruoyi.work.utils.WorkUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 公共流程相关
@@ -39,6 +44,7 @@ import java.util.Map;
 @Transactional
 public class WorkController extends BaseController {
     private final ProcessMapper processMapper;
+    private  final HousingConstructionBureauPushDto housingConstructionBureauPushDto;
 
     /**
      * 获取待办
@@ -131,10 +137,34 @@ public class WorkController extends BaseController {
         }
         Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),hisProcess.getBusinessId());
         hisProcess.setParams(map);
-        String s = WorkComplyUtils.batchDeleted(hisProcess);
+        String s = WorkComplyUtils.batchDeleted(hisProcess,tProcesses.stream().map(TProcess::getId).collect(Collectors.toList()));
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id", String.valueOf(map.get("id")));
         if (s.equals(Constants.NONENTITY)){
             return R.fail("暂无审核");
         }else{
+           /* if (Constants.SUCCEED.equals(s)){//审核成功推送数据
+                //公园城市局推送
+                String virtualcode = String.valueOf(map.get("virtualcode"));
+                map.put("virtualcode", virtualcode == "3" ? "010" : "009");
+                String cardType = String.valueOf(map.get("cardType"));
+                map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
+                map.put("qyStatus", "4");
+                map.put("gyStatus", "4");
+                map.put("shStatus", "4");
+                map.put("buyHousesMemberList", "null");
+                map.put("buyHousesLogList", "null");
+                map.put("buyHousesLogList", "null");
+                housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"253");
+                //人才通推送
+                hashMap.put("status", "00T");
+            }else if (Constants.FAILD.equals(s)){
+                hashMap.put("status", "00N");
+                hashMap.put("description",hisProcess.getReply());
+            }else {
+                hashMap.put("status", "00D");
+            }
+            housingConstructionBureauPushDto.openUrl("https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback",hashMap,"");*/
             processMapper.updateCommonByBusinessId(tProcesses.get(0).getBean(),s, hisProcess.getBusinessId());
         }
         System.out.println("s = " + s);

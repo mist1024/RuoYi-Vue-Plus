@@ -29,5 +29,12 @@ public @interface RsaSecurityParameter {
     boolean outEncode() default true;
 
 
+    /**
+     * 出参公钥
+     * @return
+     */
+    String outPublicKey() default "" ;
+
+
 
 }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
+import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.dto.BuyHousesEvent;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +46,6 @@ public class BuyHousesController extends BaseController {
     @GetMapping("/list")
     @RsaSecurityParameter
     public TableDataInfo<BuyHousesVo> list(BuyHousesBo bo, PageQuery pageQuery) {
-        bo.setProcessStatus(Constants.SUCCEED);
         return iBuyHousesService.queryPageList(bo, pageQuery);
     }
 
@@ -89,10 +89,9 @@ public class BuyHousesController extends BaseController {
      * @param id 主键
      */
     @SaCheckPermission("system:houses:query")
-    @GetMapping("/{id}")
+    @GetMapping
     @RsaSecurityParameter
-    public R<BuyHousesVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long id) {
+    public R<BuyHousesVo> getInfo(Long id) {
         return R.ok(iBuyHousesService.queryById(id));
     }
 
@@ -104,10 +103,9 @@ public class BuyHousesController extends BaseController {
      */
     @SaCheckPermission("system:houses:remove")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
+    @DeleteMapping
     @RsaSecurityParameter
-    public R<Void> remove(@NotEmpty(message = "主键不能为空")
-                          @PathVariable Long[] ids) {
+    public R<Void> remove(@NotEmpty(message = "主键不能为空")Long[] ids) {
         return toAjax(iBuyHousesService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
 
@@ -122,5 +120,54 @@ public class BuyHousesController extends BaseController {
     }
 
 
+    /**
+     * 取消资格
+     * @param buyHouses
+     * @return
+     */
+    @SaCheckPermission("system:houses:edit")
+    @PutMapping
+    @RsaSecurityParameter(inDecode = true)
+    public R<?>updateBuyHouses(@RequestBody BuyHouses buyHouses){
+        return iBuyHousesService.updateBuyHouses(buyHouses);
+    }
 
+    /**
+     * 首页购房申请表展示
+     */
+    @GetMapping("/indexType")
+    public R<?>getIndexType(){
+        return iBuyHousesService.getIndexType();
+    }
+
+    /**
+     * 首页企业所在地展示
+     */
+    @GetMapping("/companyDistrict")
+    public R<?>getCompanyDistrict(){
+        return iBuyHousesService.getCompanyDistrict();
+    }
+    /**
+     * 首页国籍和婚姻状态展示
+     */
+    @GetMapping("/nationalityAndMarital")
+    public R<?>getNationalityAndMarital(){
+        return iBuyHousesService.getNationalityAndMarital();
+    }
+
+    /**
+     * 首页第一排基础数据
+     */
+    @GetMapping("/basicData")
+    public R getBasicData(){
+        return iBuyHousesService.getBasicData();
+    }
+
+    /**
+     * 复审柱状图
+     */
+    @GetMapping("/histogram")
+    public R getHistogram(String date){
+        return iBuyHousesService.getHistogram(date);
+    }
 }

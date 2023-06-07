@@ -62,9 +62,9 @@ public class SysDictDataController extends BaseController {
      * @param dictCode 字典code
      */
     @SaCheckPermission("system:dict:query")
-    @GetMapping(value = "/{dictCode}")
+    @GetMapping
     @RsaSecurityParameter
-    public R<SysDictData> getInfo(@PathVariable Long dictCode) {
+    public R<SysDictData> getInfo(Long dictCode) {
         return R.ok(dictDataService.selectDictDataById(dictCode));
     }
 
@@ -73,9 +73,9 @@ public class SysDictDataController extends BaseController {
      *
      * @param dictType 字典类型
      */
-    @GetMapping(value = "/type/{dictType}")
-    @RsaSecurityParameter
-    public R<List<SysDictData>> dictType(@PathVariable String dictType) {
+    @GetMapping(value = "/type")
+//    @RsaSecurityParameter
+    public R<List<SysDictData>> dictType(String dictType) {
         List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
         if (ObjectUtil.isNull(data)) {
             data = new ArrayList<>();
@@ -114,9 +114,9 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{dictCodes}")
+    @DeleteMapping
     @RsaSecurityParameter
-    public R<Void> remove(@PathVariable Long[] dictCodes) {
+    public R<Void> remove(Long[] dictCodes) {
         dictDataService.deleteDictDataByIds(dictCodes);
         return R.ok();
     }

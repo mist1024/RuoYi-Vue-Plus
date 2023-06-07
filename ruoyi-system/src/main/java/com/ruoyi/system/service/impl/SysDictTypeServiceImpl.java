@@ -235,7 +235,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
         // 优先从本地缓存获取
-        List<SysDictData> datas = (List<SysDictData>) SaHolder.getStorage().get(CacheConstants.SYS_DICT_KEY + dictType);
+        List<SysDictData> datas = (List<SysDictData>)  CacheUtils.get(CacheNames.SYS_DICT, dictType);
         if (ObjectUtil.isNull(datas)) {
             datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
             SaHolder.getStorage().set(CacheConstants.SYS_DICT_KEY + dictType, datas);

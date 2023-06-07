@@ -150,7 +150,7 @@ public class SysLoginController {
     @RsaSecurityParameter(inDecode = true)
     @PostMapping("/userLogin")
     public R userLogin(
-        @Validated({LoginBody.passwordLogin.class})
+//        @Validated({LoginBody.passwordLogin.class})
         @RequestBody LoginBody loginBody) {
         // 生成令牌
         return R.ok("登录成功",loginService.userLogin(loginBody.getUsername(), loginBody.getPassword()));
@@ -271,5 +271,13 @@ public class SysLoginController {
         }
     }
 
-
+    @SaIgnore
+    @RateLimiter(count = 2, time = 10)
+    @PostMapping("/userOpenLogin")
+    public R userOpenLogin(
+        @Validated({LoginBody.userOpenLogin.class})
+        @RequestBody LoginBody loginBody) {
+        // 生成令牌
+        return R.ok("登录成功",loginService.userOpenLogin(loginBody.getUsername(), loginBody.getApiKey()));
+    }
 }

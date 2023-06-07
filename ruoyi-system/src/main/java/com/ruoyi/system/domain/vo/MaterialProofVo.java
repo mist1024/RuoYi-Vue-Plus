@@ -81,5 +81,6 @@ public class MaterialProofVo {
 
     private String materialName;
 
+    private Integer number;
 
 }

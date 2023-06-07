@@ -57,5 +57,10 @@ public class ActProcessBo {
 
     private String description;
 
+    /**
+     * 证件号码
+     */
+    private  String cardId;
+
 
 }

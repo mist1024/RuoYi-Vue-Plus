@@ -1,4 +1,4 @@
-package com.ruoyi.job.config.properties;
+package com.ruoyi.mq.config;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

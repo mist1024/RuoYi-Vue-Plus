@@ -78,8 +78,7 @@ public class HousesReviewController extends BaseController {
     @GetMapping("/manager/list")
     @RsaSecurityParameter
     public TableDataInfo<HousesReview> managerReviewList(HousesReviewBo bo, PageQuery pageQuery) {
-        bo.setProcessStatus(Constants.SUCCEED);
-        return iHousesReviewService.queryPageList(bo, pageQuery);
+        return iHousesReviewService.managerQueryPageList(bo, pageQuery);
     }
 
     /**
@@ -90,8 +89,7 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:houses:subscribeExport")
     @PostMapping("/subscribeExport")
-    @RsaSecurityParameter(inDecode = true)
-    public R subscribeExport(HousesReviewEvent bo) throws IOException {
+    public R subscribeExport(@RequestBody HousesReviewEvent bo) throws IOException {
         return iHousesReviewService.subscribeExport(bo);
     }
 
@@ -137,10 +135,9 @@ public class HousesReviewController extends BaseController {
      * @param id 主键
      */
     @SaCheckPermission("system:review:edit")
-    @GetMapping("/registrationManagement/{id}")
+    @GetMapping("/registrationManagement")
     @RsaSecurityParameter
-    public R<HousesReviewVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long id) {
+    public R<HousesReviewVo> getInfo(Long id) {
         return R.ok(iHousesReviewService.queryById(id));
     }
 
@@ -163,7 +160,6 @@ public class HousesReviewController extends BaseController {
     @Log(title = "购房复审登记", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping("/registrationManagement")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody HousesReviewBo bo) {
         return toAjax(iHousesReviewService.updateByBo(bo));
     }
@@ -174,10 +170,9 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:review:remove")
     @Log(title = "购房复审登记", businessType = BusinessType.DELETE)
-    @DeleteMapping("/review/{ids}")
+    @DeleteMapping("/review")
     @RsaSecurityParameter
-    public R<Void> remove(@NotEmpty(message = "主键不能为空")
-                          @PathVariable Long[] ids) {
+    public R<Void> remove(Long[] ids) {
         return toAjax(iHousesReviewService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
 
@@ -239,9 +234,9 @@ public class HousesReviewController extends BaseController {
      * 获取审核材料
      */
     @Log(title = "审核时返回当前人材料",businessType = BusinessType.OTHER)
-    @GetMapping("/getMaterial/{id}")
+    @GetMapping("/getMaterial")
     @RsaSecurityParameter
-    public R<?> getMaterialByBusinessId(@PathVariable(value = "id") Long id){
+    public R<?> getMaterialByBusinessId(Long id){
         return iHousesReviewService.getMaterialByBusinessId(id);
     }
 }

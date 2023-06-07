@@ -8,6 +8,7 @@ import com.ruoyi.common.convert.ExcelDictConvert;
 import com.ruoyi.work.domain.AuditLog;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -123,6 +124,7 @@ public class ProcessVo {
     @TableField(exist = false)
     private List<ActProcessVo> actProcessVoList;
 
+    private Date createTime;
 
 
 

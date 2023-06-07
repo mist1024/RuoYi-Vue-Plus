@@ -84,4 +84,13 @@ public class ActProcess {
     @TableField(exist = false)
     private String processKey;
 
+    /**
+     * 证件号码
+     */
+    private  String cardId;
+
+    @TableField(exist = false)
+    private String apiKey;
+
+
 }

@@ -1,6 +1,7 @@
 package com.ruoyi.system.runner;
 
 import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.system.service.IRsaSecurityService;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysOssConfigService;
@@ -25,6 +26,8 @@ public class SystemApplicationRunner implements ApplicationRunner {
     private final ISysDictTypeService dictTypeService;
     private final ISysOssConfigService ossConfigService;
 
+    private final IRsaSecurityService rsaSecurityService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ossConfigService.init();
@@ -36,6 +39,11 @@ public class SystemApplicationRunner implements ApplicationRunner {
         log.info("加载参数缓存数据成功");
         dictTypeService.loadingDictCache();
         log.info("加载字典缓存数据成功");
+        rsaSecurityService.loadingRsaSecurityCache();
+        log.info("加载加解密缓存数据成功");
+
+
+//        log.info("通道: {} 监听中......", queueName);
     }
 
 }

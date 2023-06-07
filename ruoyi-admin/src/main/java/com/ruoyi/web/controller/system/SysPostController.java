@@ -35,7 +35,6 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysPost> list(SysPost post, PageQuery pageQuery) {
         return postService.selectPagePostList(post, pageQuery);
     }
@@ -57,9 +56,8 @@ public class SysPostController extends BaseController {
      * @param postId 岗位ID
      */
     @SaCheckPermission("system:post:query")
-    @GetMapping(value = "/{postId}")
-    @RsaSecurityParameter
-    public R<SysPost> getInfo(@PathVariable Long postId) {
+    @GetMapping
+    public R<SysPost> getInfo(Long postId) {
         return R.ok(postService.selectPostById(postId));
     }
 
@@ -69,7 +67,6 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:add")
     @Log(title = "岗位管理", businessType = BusinessType.INSERT)
     @PostMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysPost post) {
         if (!postService.checkPostNameUnique(post)) {
             return R.fail("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
@@ -85,7 +82,6 @@ public class SysPostController extends BaseController {
     @SaCheckPermission("system:post:edit")
     @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysPost post) {
         if (!postService.checkPostNameUnique(post)) {
             return R.fail("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
@@ -102,8 +98,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{postIds}")
-    @RsaSecurityParameter
+    @DeleteMapping
     public R<Void> remove(@PathVariable Long[] postIds) {
         return toAjax(postService.deletePostByIds(postIds));
     }
@@ -112,7 +107,6 @@ public class SysPostController extends BaseController {
      * 获取岗位选择框列表
      */
     @GetMapping("/optionselect")
-    @RsaSecurityParameter
     public R<List<SysPost>> optionselect() {
         List<SysPost> posts = postService.selectPostAll();
         return R.ok(posts);

@@ -64,7 +64,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      *
      */
-    @NotNull(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotNull(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private Date createTime;
 
     /**
@@ -88,13 +88,13 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 身份证正面
      */
-    @NotBlank(message = "身份证正面不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "身份证正面不能为空", groups = { AddGroup.class, EditGroup.class })
     private String frontUrl;
 
     /**
      * 公园城市局审核状态 1.待审核 2.退件 3.不通过 4.通过
      */
-    @NotBlank(message = "公园城市局审核状态 1.待审核 2.退件 3.不通过 4.通过不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "公园城市局审核状态 1.待审核 2.退件 3.不通过 4.通过不能为空", groups = { AddGroup.class, EditGroup.class })
     private String gyStatus;
 
     /**
@@ -106,7 +106,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 户口簿主页
      */
-    @NotBlank(message = "户口簿主页不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "户口簿主页不能为空", groups = { AddGroup.class, EditGroup.class })
     private String homepageUrl;
 
     /**
@@ -148,13 +148,13 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 区域部门审核状态 1.待审核 2.退件 3.不通过 4.通过
      */
-    @NotBlank(message = "区域部门审核状态 1.待审核 2.退件 3.不通过 4.通过不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "区域部门审核状态 1.待审核 2.退件 3.不通过 4.通过不能为空", groups = { AddGroup.class, EditGroup.class })
     private String qyStatus;
 
     /**
      * 身份证背面
      */
-    @NotBlank(message = "身份证背面不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "身份证背面不能为空", groups = { AddGroup.class, EditGroup.class })
     private String reverseUrl;
 
     /**
@@ -166,7 +166,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 社会事业局审核状态 1.待审核 2.退件 3.不通过 4.通过
      */
-    @NotBlank(message = "社会事业局审核状态 1.待审核 2.退件 3.不通过 4.通过不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "社会事业局审核状态 1.待审核 2.退件 3.不通过 4.通过不能为空", groups = { AddGroup.class, EditGroup.class })
     private String shStatus;
 
     /**
@@ -184,7 +184,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 状态 1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过
      */
-    @NotBlank(message = "状态 1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "状态 1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过不能为空", groups = { AddGroup.class, EditGroup.class })
     private String status;
 
     /**
@@ -208,13 +208,13 @@ public class BuyHousesBo extends BaseEntity {
     /**
      *
      */
-    @NotNull(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotNull(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private Date passTime;
 
     /**
      *人才影像卡
      */
-    @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private String pictureInformationUrl;
 
     /**
@@ -243,5 +243,7 @@ public class BuyHousesBo extends BaseEntity {
 
     @TableField(exist = false)
     private Long[] ids;
+
+    private String apiKey;
 
 }

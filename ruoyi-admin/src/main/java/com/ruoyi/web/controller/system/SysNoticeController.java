@@ -32,7 +32,6 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysNotice> list(SysNotice notice, PageQuery pageQuery) {
         return noticeService.selectPageNoticeList(notice, pageQuery);
     }
@@ -43,9 +42,8 @@ public class SysNoticeController extends BaseController {
      * @param noticeId 公告ID
      */
     @SaCheckPermission("system:notice:query")
-    @GetMapping(value = "/{noticeId}")
-    @RsaSecurityParameter
-    public R<SysNotice> getInfo(@PathVariable Long noticeId) {
+    @GetMapping
+    public R<SysNotice> getInfo(Long noticeId) {
         return R.ok(noticeService.selectNoticeById(noticeId));
     }
 
@@ -55,7 +53,6 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
     @PostMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysNotice notice) {
         return toAjax(noticeService.insertNotice(notice));
     }
@@ -66,7 +63,6 @@ public class SysNoticeController extends BaseController {
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysNotice notice) {
         return toAjax(noticeService.updateNotice(notice));
     }
@@ -78,9 +74,8 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{noticeIds}")
-    @RsaSecurityParameter
-    public R<Void> remove(@PathVariable Long[] noticeIds) {
+    @DeleteMapping
+    public R<Void> remove(Long[] noticeIds) {
         return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }

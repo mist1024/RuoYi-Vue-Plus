@@ -1,6 +1,5 @@
-package com.ruoyi.job.config;
+package com.ruoyi.mq.config;
 
-import com.ruoyi.job.config.properties.XxlJobProperties;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

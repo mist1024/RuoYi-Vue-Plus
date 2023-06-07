@@ -35,7 +35,6 @@ public class SysDictTypeController extends BaseController {
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysDictType> list(SysDictType dictType, PageQuery pageQuery) {
         return dictTypeService.selectPageDictTypeList(dictType, pageQuery);
     }
@@ -58,9 +57,9 @@ public class SysDictTypeController extends BaseController {
      * @param dictId 字典ID
      */
     @SaCheckPermission("system:dict:query")
-    @GetMapping(value = "/{dictId}")
+    @GetMapping
     @RsaSecurityParameter
-    public R<SysDictType> getInfo(@PathVariable Long dictId) {
+    public R<SysDictType> getInfo(Long dictId) {
         return R.ok(dictTypeService.selectDictTypeById(dictId));
     }
 
@@ -101,9 +100,9 @@ public class SysDictTypeController extends BaseController {
      */
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{dictIds}")
+    @DeleteMapping
     @RsaSecurityParameter
-    public R<Void> remove(@PathVariable Long[] dictIds) {
+    public R<Void> remove(Long[] dictIds) {
         dictTypeService.deleteDictTypeByIds(dictIds);
         return R.ok();
     }

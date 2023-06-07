@@ -62,5 +62,6 @@ public class MaterialProof extends BaseEntity {
 
     private String processKey;
 
+    private Integer number;
 
 }

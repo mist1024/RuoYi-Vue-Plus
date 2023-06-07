@@ -65,10 +65,9 @@ public class MaterialTalentsController extends BaseController {
      * @param id 主键
      */
     @SaCheckPermission("material:talents:query")
-    @GetMapping("/{id}")
+    @GetMapping
     @RsaSecurityParameter
-    public R<MaterialTalentsVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long id) {
+    public R<MaterialTalentsVo> getInfo(Long id) {
         return R.ok(iMaterialTalentsService.queryById(id));
     }
 
@@ -103,10 +102,9 @@ public class MaterialTalentsController extends BaseController {
      */
     @SaCheckPermission("material:talents:remove")
     @Log(title = "材料关系", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
+    @DeleteMapping
     @RsaSecurityParameter
-    public R<Void> remove(@NotEmpty(message = "主键不能为空")
-                          @PathVariable Long[] ids) {
+    public R<Void> remove(Long[] ids) {
         return toAjax(iMaterialTalentsService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
 }

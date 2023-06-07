@@ -62,5 +62,10 @@ public class HisProcessBo extends BaseEntity {
 
     private String description;
 
+    /**
+     * 证件号码
+     */
+    private  String cardId;
+
 
 }

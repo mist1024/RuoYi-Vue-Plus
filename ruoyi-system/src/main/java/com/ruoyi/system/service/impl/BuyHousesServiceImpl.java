@@ -1,19 +1,25 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.Month;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.MyFileUtils;
 import com.ruoyi.common.utils.poi.DeleteFileUtil;
@@ -27,13 +33,11 @@ import com.ruoyi.system.domain.dto.BuyHousesEvent;
 import com.ruoyi.system.domain.dto.DeclareListDTO;
 import com.ruoyi.system.domain.vo.BuyHousesVo;
 import com.ruoyi.system.domain.vo.MaterialModuleVo;
-import com.ruoyi.system.mapper.BuyHousesMapper;
-import com.ruoyi.system.mapper.BuyHousesMemberMapper;
-import com.ruoyi.system.mapper.MaterialProofMapper;
-import com.ruoyi.system.mapper.SubscribeExportMapper;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.IBuyHousesService;
 import com.ruoyi.work.domain.AuditLog;
 import com.ruoyi.work.domain.vo.ProcessVo;
+import com.ruoyi.work.dto.HousingConstructionBureauPushDto;
 import com.ruoyi.work.mapper.AuditLogMapper;
 import com.ruoyi.work.utils.WorkComplyUtils;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +56,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -79,7 +82,12 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Value("${file.prefix}")
     private String prefix;
 
-    private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
+    //正式地址
+//        private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
+    //测试地址
+    private final String URL = "https://mihuatang.xyz/gaoxin-api/candidates/getCardId";
+    //本地地址
+//    private final String URL = "http://127.0.0.1:8010/candidates/getCardId";
 
     private final BuyHousesMapper baseMapper;
 
@@ -92,6 +100,10 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     private final SubscribeExportMapper subscribeExportMapper;
 
     private final AuditLogMapper auditLogMapper;
+
+    private  final HousingConstructionBureauPushDto housingConstructionBureauPushDto;
+
+    private final HousesReviewMapper housesReviewMapper;
 
 
     /**
@@ -117,7 +129,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     @Override
     public TableDataInfo<BuyHousesVo> queryPageList(BuyHousesBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
+        LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper2(bo);
         Page<BuyHousesVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
@@ -173,12 +185,60 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         return lqw;
     }
 
+    private LambdaQueryWrapper<BuyHouses> buildQueryWrapper2(BuyHousesBo bo) {
+        Map<String, Object> params = bo.getParams();
+        LambdaQueryWrapper<BuyHouses> lqw = Wrappers.lambdaQuery();
+        if (ObjectUtil.isNotNull(bo.getIds())){
+            lqw.in(BuyHouses::getId,bo.getIds());
+        }
+        lqw.eq(StringUtils.isNotBlank(bo.getInsidepageUrl()), BuyHouses::getInsidepageUrl, bo.getInsidepageUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getCardId()), BuyHouses::getCardId, bo.getCardId());
+        lqw.eq(StringUtils.isNotBlank(bo.getCommitmentUrl()), BuyHouses::getCommitmentUrl, bo.getCommitmentUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getCompanyAddress()), BuyHouses::getCompanyAddress, bo.getCompanyAddress());
+        lqw.like(StringUtils.isNotBlank(bo.getCompanyName()), BuyHouses::getCompanyName, bo.getCompanyName());
+        lqw.eq(bo.getCreateTime() != null, BuyHouses::getCreateTime, bo.getCreateTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getDeclarationUrl()), BuyHouses::getDeclarationUrl, bo.getDeclarationUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getEducation()), BuyHouses::getEducation, bo.getEducation());
+        lqw.eq(StringUtils.isNotBlank(bo.getFrontUrl()), BuyHouses::getFrontUrl, bo.getFrontUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getGyStatus()), BuyHouses::getGyStatus, bo.getGyStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getHomeRecordUrl()), BuyHouses::getHomeRecordUrl, bo.getHomeRecordUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getHomepageUrl()), BuyHouses::getHomepageUrl, bo.getHomepageUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getLaborContractUrl()), BuyHouses::getLaborContractUrl, bo.getLaborContractUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getLicenseUrl()), BuyHouses::getLicenseUrl, bo.getLicenseUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getMaritalStatus()), BuyHouses::getMaritalStatus, bo.getMaritalStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getMaritalUrl()), BuyHouses::getMaritalUrl, bo.getMaritalUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getNationality()), BuyHouses::getNationality, bo.getNationality());
+        lqw.eq(StringUtils.isNotBlank(bo.getQyStatus()), BuyHouses::getQyStatus, bo.getQyStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getReverseUrl()), BuyHouses::getReverseUrl, bo.getReverseUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getSex()), BuyHouses::getSex, bo.getSex());
+        lqw.eq(StringUtils.isNotBlank(bo.getShStatus()), BuyHouses::getShStatus, bo.getShStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getSocialCode()), BuyHouses::getSocialCode, bo.getSocialCode());
+        lqw.eq(StringUtils.isNotBlank(bo.getSocialSecurityUrl()), BuyHouses::getSocialSecurityUrl, bo.getSocialSecurityUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BuyHouses::getStatus, bo.getStatus());
+        lqw.eq(bo.getUserId() != null, BuyHouses::getUserId, bo.getUserId());
+
+        lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()),BuyHouses::getProcessStatus,bo.getProcessStatus());
+        lqw.ge(StringUtils.isBlank(bo.getProcessStatus()),BuyHouses::getProcessStatus,Constants.SUCCEED);
+        lqw.and(StringUtils.isNotBlank(bo.getUserName()),t ->t.like(BuyHouses::getUserName,bo.getUserName())
+            .or().like(BuyHouses::getPhone,bo.getUserName())
+            .or().like(BuyHouses::getCardId,bo.getUserName()));
+        lqw.eq(StringUtils.isNotBlank(bo.getDistrict()),BuyHouses::getDistrict,bo.getDistrict());
+        lqw.like(StringUtils.isNotBlank(bo.getType()),BuyHouses::getType,bo.getType());
+
+        lqw.eq(bo.getPassTime() != null, BuyHouses::getPassTime, bo.getPassTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getPictureInformationUrl()), BuyHouses::getPictureInformationUrl, bo.getPictureInformationUrl());
+        lqw.eq(StringUtils.isNotBlank(bo.getWorkAddress()), BuyHouses::getWorkAddress, bo.getWorkAddress());
+        return lqw;
+    }
+
     /**
      * 新增【请填写功能名称】
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(BuyHousesBo bo) {
+        Long userId = LoginHelper.getUserId();
+        bo.setUserId(userId);
         //验证这个身份证是否提交过
         List<BuyHouses> buyHouses = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class)
             .eq(BuyHouses::getCardId, bo.getCardId()));
@@ -216,6 +276,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(BuyHousesBo bo) {
+        Long userId = LoginHelper.getUserId();
+        bo.setUserId(userId);
         BuyHouses update = BeanUtil.toBean(bo, BuyHouses.class);
         validEntityBeforeSave(update);
         update.setProcessStatus(Constants.WAIT);
@@ -243,17 +305,22 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         //判断数据库中是否存在该人才通过身份证去验证
         Long userId = LoginHelper.getUserId();
         BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
-        if (!Constants.SUBMIT.equals(buyHouses.getProcessStatus()) && !Constants.FAILD.equals(buyHouses.getProcessStatus())){
-            throw new ServiceException("当前用户不可修改");
-        }
-        //删除家庭情况信息
-        buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId,buyHouses.getId()));
-        //先删除家庭信息表
-        if (entity.getBuyHousesMemberList().size()>0) {
-            buyHousesMemberMapper.delete( new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, entity.getId()));
-            //添加家庭信息
-            entity.getBuyHousesMemberList().stream().forEach(e ->e.setBuyHousesId(String.valueOf(entity.getId())));
-            buyHousesMemberMapper.insertBatch(entity.getBuyHousesMemberList());
+        if (ObjectUtil.isNotNull(buyHouses)) {
+            if (!Constants.SUBMIT.equals(buyHouses.getProcessStatus()) && !Constants.FAILD.equals(buyHouses.getProcessStatus())) {
+                throw new ServiceException("当前用户不可修改");
+            }
+            //删除家庭情况信息
+//            buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, buyHouses.getId()));
+            //先删除家庭信息表
+            if (entity.getBuyHousesMemberList().size() > 0) {
+                buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, entity.getId()));
+                //添加家庭信息
+                entity.getBuyHousesMemberList().stream().forEach(e -> {
+                    e.setBuyHousesId(String.valueOf(entity.getId()));
+                    e.setId(null);
+                });
+                buyHousesMemberMapper.insertBatch(entity.getBuyHousesMemberList());
+            }
         }
     }
 
@@ -298,6 +365,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     @Override
     public R downloadWord(BuyHousesBo bo) {
+        bo.setUserId(LoginHelper.getUserId());
         BuyHouses buyHousesBo = BeanUtil.toBean(bo, BuyHouses.class);
         validEntityBeforeSave(buyHousesBo);
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
@@ -409,9 +477,11 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         buyHousesDto.setPhone(String.valueOf(entries.get("phone")));
         buyHousesDto.setCompanyName(String.valueOf(entries.get("companyName")));
         buyHousesDto.setSex(String.valueOf(entries.get("sex")));
+        buyHousesDto.setEducation(String.valueOf(entries.get("education")));
         buyHousesDto.setDistrict("1");
         buyHousesDto.setProcessStatus(Constants.SUBMIT);
-        buyHousesDto.setType(String.valueOf(entries.get("type")));
+        buyHousesDto.setType(String.valueOf(entries.get("type"))+"类");
+        buyHousesDto.setWorkAddress(String.valueOf(entries.get("district")));
         buyHousesDto.setProcessKey("apply_house");
         return R.ok(buyHousesDto);
     }
@@ -451,7 +521,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     }
 
     /**
-     * 导出列表
+     * 预约导出列表
      * @param bo
      * @return
      */
@@ -472,6 +542,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     @Override
     public void exportExcel(BuyHousesBo bo, HttpServletResponse response) {
+        bo.setProcessStatus(Constants.SUCCEED);
         LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
         List<BuyHousesVo> buyHousesVoList = baseMapper.selectVoList(lqw);
         ExcelUtil.exportExcel(buyHousesVoList,"人才列表", BuyHousesVo.class,response);
@@ -533,9 +604,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                 }else {
                     switch (a.getStatus()){
                         case "1":a.setStatus("审核失败");
-                        break;
+                            break;
                         case "2":a.setStatus("审核成功");
-                        break;
+                            break;
                     }
                 }
             });
@@ -555,6 +626,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class)
             .eq(BuyHouses::getUserId,userId)
             .eq(BuyHouses::getProcessStatus,Constants.SUCCEED));
+        if (ObjectUtil.isNull(buyHouses)){
+            return R.fail("没有查询到该人才,请确保该人才已通过审核");
+        }
         LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
         hashMap.put("companyName",buyHouses.getCompanyName());
         hashMap.put("companyAddress",buyHouses.getCompanyAddress());
@@ -570,6 +644,393 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         System.out.println("file = " + file);
         map.put("file",file);
         return R.ok(map);
+
+    }
+
+    @Override
+    public R<?> updateBuyHouses(BuyHouses buyHouses) {
+        LoginUser loginUser = LoginHelper.getLoginUser();
+        buyHouses.setProcessStatus(Constants.CANCEL);
+        int i = baseMapper.updateById(buyHouses);
+        //添加取消资格日志
+        AuditLog auditLog = new AuditLog();
+        auditLog.setOtherId(String.valueOf(buyHouses.getId()));//业务id
+        auditLog.setProcessKey("apply_house");//流程key
+        auditLog.setAuditId(loginUser.getUserId().toString());//审核人id
+        auditLog.setReply(buyHouses.getReply());
+        auditLog.setAuditType("2");//审核类型
+        auditLog.setStatus("1");//审核状态
+        auditLog.setAudit(loginUser.getUserId().toString());
+        auditLog.setAdminUserName(loginUser.getUsername());
+        auditLog.setCreateTime(new Date());
+        auditLog.setUpdateTime(new Date());
+        auditLog.setStep("3");
+        auditLogMapper.insert(auditLog);
+        if (i>0){
+            //todo 推送
+            Map<String, Object> map = new HashMap<>();
+            map.put("id",buyHouses.getId());
+            map.put("reason",buyHouses.getReply());//原因
+            map.put("userName",buyHouses.getUserName());
+            map.put("cardId",buyHouses.getCardId());
+            map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
+            map.put("note","人才信息有误");//备注
+            map.put("status", "00N");
+            System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
+//            housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"254");
+
+//            housingConstructionBureauPushDto.openUrl("https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback",map,"001");
+            return R.ok();
+        }
+        return R.fail();
+    }
+
+    /**
+     * 对外推送接口
+     * @param buyHouses
+     * @return
+     */
+    @Override
+    public R<?> insertOpenBuyHouses(BuyHouses buyHouses) {
+        BuyHouses buyHouses1 = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, buyHouses.getCardId()));
+        if (ObjectUtil.isNull(buyHouses1)){
+            //新增
+            if (ObjectUtil.isNull(buyHouses.getProcessStatus())){
+                return R.fail("状态不可为空");
+            }
+            buyHouses.setProcessKey("apply_house");
+            buyHouses.setCreateTime(new Date());
+            buyHouses.setUpdateTime(new Date());
+            int insert = baseMapper.insert(buyHouses);
+            if (insert==0){
+                return R.fail("新增失败");
+            }
+            //创建关系材料表
+            List<BuyHousesMember> buyHousesMemberList = buyHouses.getBuyHousesMemberList();
+            if (buyHousesMemberList.size()>0){
+                buyHousesMemberList.stream().forEach(b ->{
+                    b.setBuyHousesId(String.valueOf(buyHouses.getId()));
+                });
+            }
+            buyHousesMemberMapper.insertBatch(buyHousesMemberList);
+
+        }else {
+            //判断该人才是否存在
+            if (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses.getUserId().equals(buyHouses1.getUserId())){
+                return R.fail("当前用户已在系统存在");
+            }
+            //判断当前是否可以提交
+            if (Constants.WAIT.equals(buyHouses1.getProcessStatus())
+                ||Constants.SUCCEED.equals(buyHouses1.getProcessStatus())){
+                return R.fail("当前状态不允许修改");
+            }
+            buyHouses.setUpdateTime(new Date());
+            //删除关系表中得数据
+            buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, buyHouses.getId()));
+            //修改数据
+            int i = baseMapper.updateById(buyHouses);
+            if (Constants.WAIT.equals(buyHouses.getProcessStatus()) && i==0){
+                return R.fail("修改失败");
+            }
+            //修改材料表中得数据
+            List<BuyHousesMember> buyHousesMemberList = buyHouses.getBuyHousesMemberList();
+            if (buyHousesMemberList.size()>0){
+                buyHousesMemberList.stream().forEach(b ->{
+                    b.setBuyHousesId(buyHouses.getId().toString());
+                    b.setId(null);
+                });
+            }
+            buyHousesMemberMapper.insertBatch(buyHousesMemberList);
+        }
+        if (Constants.WAIT.equals(buyHouses1.getProcessStatus())){
+            //创建流程
+            //将数据添加到流程中
+            ProcessVo processVo = new ProcessVo();
+            processVo.setProcessKey("apply_house");
+            processVo.setStep("1");
+            Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
+            processVo.setParams(map);
+            processVo.setBusinessId(buyHouses.getId().toString());
+            processVo.setStartUser(buyHouses.getUserName());
+            WorkComplyUtils.comply(processVo);
+        }
+        return R.ok();
+    }
+
+    @Override
+    public R<?> getIndexType() {
+        HashMap<String, Object> map = new HashMap<>();
+        List<Map> mapList =  baseMapper.getIndexType();
+        map.put("type",mapList);
+        AtomicReference<Integer> sum = new AtomicReference<>(0);
+        mapList.stream().forEach(m ->{
+            Object num = m.get("value");
+            if (ObjectUtil.isNotNull(num)){
+                sum.updateAndGet(v -> v + Integer.valueOf(String.valueOf(num)));
+            }
+        });
+        map.put("sum",sum);
+        List<Map>  actMapList = baseMapper.getActProcessList();
+        map.put("step",actMapList);
+        return R.ok(map);
+    }
+
+    /**
+     * 首页企业所在地展示
+     * @return
+     */
+    @Override
+    public R<?> getCompanyDistrict() {
+        HashMap<String, Object> map = new HashMap<>();
+        List<Map> list = baseMapper.getCompanyDistrict();
+        AtomicReference<Integer> sum = new AtomicReference<>(0);
+        list.stream().forEach(m ->{
+            Object num = m.get("value");
+            if (ObjectUtil.isNotNull(num)){
+                sum.updateAndGet(v -> v + Integer.valueOf(String.valueOf(num)));
+            }
+        });
+        map.put("sum",sum);
+        map.put("district",list);
+        return R.ok(map);
+    }
+
+    @Override
+    public R<?> getNationalityAndMarital() {
+        HashMap<String, Object> map = new HashMap<>();
+        List<Map> mapList=   baseMapper.getNationality();
+        AtomicReference<Integer> nationalitySum = new AtomicReference<>(0);
+        mapList.stream().forEach(m ->{
+            Object num = m.get("value");
+            if (ObjectUtil.isNotNull(num)){
+                nationalitySum.updateAndGet(v -> v + Integer.valueOf(String.valueOf(num)));
+            }
+        });
+        map.put("nationalitySum",nationalitySum);
+        map.put("nationality",mapList);
+        List<Map> maritalList = baseMapper.getMaritalStatus();
+        AtomicReference<Integer> maritalSum = new AtomicReference<>(0);
+        maritalList.stream().forEach(m ->{
+            Object num = m.get("value");
+            if (ObjectUtil.isNotNull(num)){
+                maritalSum.updateAndGet(v -> v + Integer.valueOf(String.valueOf(num)));
+            }
+        });
+        map.put("maritalSum",maritalSum);
+        map.put("marital",maritalList);
+        return R.ok(map);
+    }
+
+    /**
+     * 首页第一排基础数据展示
+     * @return
+     */
+    @Override
+    public R getBasicData() {
+        //获取一期认定通过人才数
+        HashMap<String, Object> map = new HashMap<>();
+        Long aLong = baseMapper.selectCount(new LambdaQueryWrapper<>(BuyHouses.class)
+            .eq(BuyHouses::getProcessStatus, Constants.SUCCEED));
+        map.put("oneSum",aLong);
+        //获取二期认定通过人才数
+        List<HousesReview> housesReviewList = housesReviewMapper.selectList(new LambdaQueryWrapper<>(HousesReview.class)
+            .eq(HousesReview::getProcessStatus, Constants.SUCCEED));
+        map.put("twoSum",housesReviewList.size());
+        //获取二期市级和区级比例
+        //市级
+        int twoMunicipal = housesReviewList.stream().filter(f -> f.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+        double div2 = NumberUtil.div(twoMunicipal,housesReviewList.size());
+        String twoMunicipalDecimalFormat = NumberUtil.decimalFormat("#.##%", div2);
+        map.put("twoMunicipal",twoMunicipalDecimalFormat);
+        //区级
+        int twoDistrict = housesReviewList.stream().filter(f -> f.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+        double div1 = NumberUtil.div(twoDistrict,housesReviewList.size());
+        String twoDistrictDecimalFormat = NumberUtil.decimalFormat("#.##%", div1);
+        map.put("twoDistrict",twoDistrictDecimalFormat);
+        //获取本月复审通过数
+        Date date = DateUtil.date();
+        //获得月份，从0开始计数
+        int month = DateUtil.month(date);
+        List<HousesReview> housesReviewStream = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == month).collect(Collectors.toList());
+        map.put("monthSum",housesReviewStream.size());
+        //筛选区级人才数
+        int size = housesReviewList.stream().filter(h -> h.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+        double div = NumberUtil.div(size,aLong.intValue());
+        String decimalFormat = NumberUtil.decimalFormat("#.##%", div);
+        //获取复审占比
+        map.put("decimalFormat",decimalFormat);
+        return R.ok(map);
+    }
+
+
+    /**
+     * 复审柱状图统计图
+     * @param date
+     * @return
+     */
+    @Override
+    public R getHistogram(String date) {
+        //查询出所有的数据
+        QueryWrapper<HousesReview> queryWrapper = new QueryWrapper<>();
+        if (ObjectUtil.isNull(date)){
+            queryWrapper.eq(ObjectUtil.isNotNull(date),"DATE_FORMAT(create_time,'%Y')", DateUtils.getDate());
+        }else {
+            queryWrapper.eq("DATE_FORMAT(create_time,'%Y')", date);
+        }
+        queryWrapper.eq("process_status",Constants.SUCCEED);
+        List<HousesReview> housesReviewList = housesReviewMapper.selectList(queryWrapper);
+        //区级
+        List<Integer> districtList = new ArrayList<>();
+        //市级
+        List<Integer> municipalList = new ArrayList<>();
+        //获取第一个月的数据
+        List<HousesReview> collect = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 0).collect(Collectors.toList());
+        if (collect.size()>0){
+            //区分区级还是市级
+            int size = collect.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect1 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 1).collect(Collectors.toList());
+        if (collect1.size()>0){
+            //区分区级还是市级
+            int size = collect1.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect1.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect2 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 2).collect(Collectors.toList());
+        if (collect2.size()>0){
+            //区分区级还是市级
+            int size = collect2.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect2.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect3 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 3).collect(Collectors.toList());
+        if (collect3.size()>0){
+            //区分区级还是市级
+            int size = collect3.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect3.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect4 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 4).collect(Collectors.toList());
+        if (collect4.size()>0){
+            //区分区级还是市级
+            int size = collect4.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect4.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect5 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 5).collect(Collectors.toList());
+        if (collect5.size()>0){
+            //区分区级还是市级
+            int size = collect5.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect5.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect6 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 6).collect(Collectors.toList());
+        if (collect6.size()>0){
+            //区分区级还是市级
+            int size = collect6.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect6.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }//获取第一个月的数据
+        List<HousesReview> collect7 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 7).collect(Collectors.toList());
+        if (collect7.size()>0){
+            //区分区级还是市级
+            int size = collect7.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect7.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }//获取第一个月的数据
+        List<HousesReview> collect8 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 8).collect(Collectors.toList());
+        if (collect8.size()>0){
+            //区分区级还是市级
+            int size = collect8.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect8.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect9 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 9).collect(Collectors.toList());
+        if (collect9.size()>0){
+            //区分区级还是市级
+            int size = collect9.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect9.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect10 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 10).collect(Collectors.toList());
+        if (collect10.size()>0){
+            //区分区级还是市级
+            int size = collect10.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect10.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        //获取第一个月的数据
+        List<HousesReview> collect11 = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == 11).collect(Collectors.toList());
+        if (collect11.size()>0){
+            //区分区级还是市级
+            int size = collect11.stream().filter(c -> c.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            int size1 = collect11.stream().filter(c -> c.getSourceBy().equals("2")).collect(Collectors.toList()).size();
+            districtList.add(size);
+            municipalList.add(size1);
+        }else {
+            districtList.add(0);
+            municipalList.add(0);
+        }
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("district",districtList);
+        map.put("municipal",municipalList);
+        map.put("sum",housesReviewList.size());
+        return R.ok(map);
+
 
     }
 
@@ -616,7 +1077,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                     MyFileUtils.downLoadPic(insidepageUrl, fileName);
                 }
                 //申请表
-                /*if (ObjectUtil.isNotEmpty(r.getCommitmentUrl())){
+                if (ObjectUtil.isNotEmpty(r.getCommitmentUrl())){
                     String commitmentUrl = r.getCommitmentUrl();
                     String fileName= s  + "申请表" + commitmentUrl.substring(commitmentUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(commitmentUrl, fileName);
@@ -698,9 +1159,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                     String pictureInformationUrl = r.getPictureInformationUrl();
                     String fileName= s  + "人才影像卡" + pictureInformationUrl.substring(pictureInformationUrl.lastIndexOf("."));
                     MyFileUtils.downLoadPic(pictureInformationUrl, fileName);
-                }*/
+                }
                 //家庭信息
-               /* List<BuyHousesMember> buyHousesMembers = buyHousesMemberMap.get(r.getId().toString());
+                List<BuyHousesMember> buyHousesMembers = buyHousesMemberMap.get(r.getId().toString());
                 if (ObjectUtil.isNotNull(buyHousesMembers)) {
                     buyHousesMembers.stream().forEach(m -> {
                         System.out.println("m = " + m);
@@ -727,7 +1188,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                         }
 
                     });
-                }*/
+                }
             });
             String p = path + separator + title + ".xlsx";
             String fo = filePath + separator + format + ".zip";

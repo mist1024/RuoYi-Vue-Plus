@@ -83,4 +83,9 @@ public class MaterialProofBo extends BaseEntity {
 
     private String materialName;
 
+    /**
+     * 次数
+     */
+    private Integer number;
+
 }

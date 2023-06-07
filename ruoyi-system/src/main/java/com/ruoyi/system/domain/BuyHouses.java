@@ -172,5 +172,10 @@ public class BuyHouses extends BaseEntity {
     @TableField(exist = false)
     private List<BuyHousesMember> buyHousesMemberList=new ArrayList<>();
 
+    private String apiKey;
+
+    @TableField(exist = false)
+    private String reply;
+
 
 }

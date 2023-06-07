@@ -99,6 +99,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return DateFormatUtils.format(now, "yyyyMMdd");
     }
 
+    public static String dateTime(String format) {
+        Date now = new Date();
+        return DateFormatUtils.format(now, format);
+    }
+
     /**
      * 日期型字符串转化为日期 格式
      */

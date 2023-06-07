@@ -57,9 +57,9 @@ public class SysConfigController extends BaseController {
      * @param configId 参数ID
      */
     @SaCheckPermission("system:config:query")
-    @GetMapping(value = "/{configId}")
+    @GetMapping
     @RsaSecurityParameter
-    public R<SysConfig> getInfo(@PathVariable Long configId) {
+    public R<SysConfig> getInfo(Long configId) {
         return R.ok(configService.selectConfigById(configId));
     }
 
@@ -68,9 +68,9 @@ public class SysConfigController extends BaseController {
      *
      * @param configKey 参数Key
      */
-    @GetMapping(value = "/configKey/{configKey}")
+    @GetMapping(value = "/configKey")
     @RsaSecurityParameter
-    public R<Void> getConfigKey(@PathVariable String configKey) {
+    public R<Void> getConfigKey(String configKey) {
         return R.ok(configService.selectConfigByKey(configKey));
     }
 
@@ -123,9 +123,9 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{configIds}")
+    @DeleteMapping
     @RsaSecurityParameter
-    public R<Void> remove(@PathVariable Long[] configIds) {
+    public R<Void> remove(Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return R.ok();
     }

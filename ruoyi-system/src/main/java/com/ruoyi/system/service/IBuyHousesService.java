@@ -97,4 +97,30 @@ public interface IBuyHousesService {
      */
     R downloadInform();
 
+    /***
+     * 修改数据
+     * @param buyHouses
+     * @return
+     */
+    R<?> updateBuyHouses(BuyHouses buyHouses);
+
+
+    /**
+     * 对外接口提交
+     * @param buyHouses
+     * @return
+     */
+    R<?> insertOpenBuyHouses(BuyHouses buyHouses);
+
+    R<?> getIndexType();
+
+
+    R<?> getCompanyDistrict();
+
+    R<?> getNationalityAndMarital();
+
+
+    R getBasicData();
+
+    R getHistogram(String date);
 }

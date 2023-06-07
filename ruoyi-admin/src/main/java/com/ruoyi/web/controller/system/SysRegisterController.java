@@ -31,7 +31,6 @@ public class SysRegisterController extends BaseController {
      */
     @SaIgnore
     @PostMapping("/register")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
         if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
             return R.fail("当前系统没有开启注册功能！");

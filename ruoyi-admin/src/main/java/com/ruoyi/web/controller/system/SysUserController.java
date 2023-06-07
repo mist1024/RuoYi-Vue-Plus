@@ -60,7 +60,6 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysUser> list(SysUser user, PageQuery pageQuery) {
         return userService.selectPageUserList(user, pageQuery);
     }
@@ -70,7 +69,6 @@ public class SysUserController extends BaseController {
      */
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @SaCheckPermission("system:user:export")
-    @RsaSecurityParameter(inDecode = true)
     @PostMapping("/export")
     public void export(SysUser user, HttpServletResponse response) {
         List<SysUser> list = userService.selectUserList(user);
@@ -94,7 +92,6 @@ public class SysUserController extends BaseController {
      */
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
     @SaCheckPermission("system:user:import")
-    @RsaSecurityParameter
     @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file, boolean updateSupport) throws Exception {
         ExcelResult<SysUserImportVo> result = ExcelUtil.importExcel(file.getInputStream(), SysUserImportVo.class, new SysUserImportListener(updateSupport));
@@ -115,9 +112,8 @@ public class SysUserController extends BaseController {
      * @param userId 用户ID
      */
     @SaCheckPermission("system:user:query")
-    @GetMapping(value = {"/", "/{userId}"})
-    @RsaSecurityParameter
-    public R<Map<String, Object>> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    @GetMapping
+    public R<Map<String, Object>> getInfo(Long userId) {
         userService.checkUserDataScope(userId);
         Map<String, Object> ajax = new HashMap<>();
         List<SysRole> roles = roleService.selectRoleAll();
@@ -138,7 +134,6 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:add")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysUser user) {
         if (!userService.checkUserNameUnique(user)) {
             return R.fail("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
@@ -157,7 +152,6 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
@@ -178,8 +172,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{userIds}")
-    @RsaSecurityParameter
+    @DeleteMapping
     public R<Void> remove(@PathVariable Long[] userIds) {
         if (ArrayUtil.contains(userIds, getUserId())) {
             return R.fail("当前用户不能删除");
@@ -193,7 +186,6 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:resetPwd")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
@@ -207,7 +199,6 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> changeStatus(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
@@ -220,9 +211,8 @@ public class SysUserController extends BaseController {
      * @param userId 用户ID
      */
     @SaCheckPermission("system:user:query")
-    @GetMapping("/authRole/{userId}")
-    @RsaSecurityParameter
-    public R<Map<String, Object>> authRole(@PathVariable Long userId) {
+    @GetMapping("/authRole")
+    public R<Map<String, Object>> authRole( Long userId) {
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
         Map<String, Object> ajax = new HashMap<>();
@@ -240,7 +230,6 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
     @PutMapping("/authRole")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> insertAuthRole(Long userId, Long[] roleIds) {
         userService.checkUserDataScope(userId);
         userService.insertUserAuth(userId, roleIds);
@@ -252,7 +241,6 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/deptTree")
-    @RsaSecurityParameter
     public R<List<Tree<Long>>> deptTree(SysDept dept) {
         return R.ok(deptService.selectDeptTreeList(dept));
     }

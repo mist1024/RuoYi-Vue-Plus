@@ -71,5 +71,6 @@ public class BuyHousesReviewMemberVo {
     @ExcelProperty(value = "姓名")
     private String name;
 
+    private Integer number;
 
 }

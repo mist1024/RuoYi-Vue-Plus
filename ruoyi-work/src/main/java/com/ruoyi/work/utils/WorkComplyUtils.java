@@ -38,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.AbstractDocument;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,25 @@ public class WorkComplyUtils {
         if (actProcessVos.size()>0){
             throw new ServiceException("当前业务正在审核中,请耐心等待");
         }
+        Map params = processVo.getParams();
+        if (ObjectUtil.isNull(params)){
+            throw new ServiceException("params不可为空");
+        }
+
         ProcessVo tProcessByKey = processMapper.selectVoOne(lqw);
+        Object companyName = params.get("companyName");
+        if (ObjectUtil.isNotNull(companyName)){
+            actProcessVo.setCompanyName(String.valueOf(companyName));
+        }
+        Object cardId = params.get("card");
+        Object card = params.get("cardId");
+
+        if (ObjectUtil.isNotNull(cardId)){
+            actProcessVo.setCardId(String.valueOf(cardId));
+        }
+        if (ObjectUtil.isNotNull(card)){
+            actProcessVo.setCardId(String.valueOf(card));
+        }
         actProcessVo.setUserId(String.valueOf(LoginHelper.getUserId()));
         actProcessVo.setCreateTime(DateUtils.getNowDate());
         actProcessVo.setCheckType(tProcessByKey.getCheckType());
@@ -157,12 +176,14 @@ public class WorkComplyUtils {
      * 2.根据businessId删除actProcess
      */
 
-    public static  String batchDeleted(HisProcess hisProcess){
+    public static  String batchDeleted(HisProcess hisProcess,List<Long> ids){
         hisProcess.setEndTime(DateUtils.getNowDate());
         //获取当前购房信息
         //1.得到当前这条运行任务
         LambdaQueryWrapper<ActProcess> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ActProcess::getBusinessId,hisProcess.getBusinessId());
+        lqw.eq(ActProcess::getProcessId,ids);
+
         List<ActProcessVo> actProcessVos = actProcessMapper.selectVoList(lqw);
         LoginUser loginUser = LoginHelper.getLoginUser();
         if (actProcessVos.size()>0){
@@ -189,6 +210,8 @@ public class WorkComplyUtils {
                 hisProcess.setCheckType(actProcessVo.getCheckType());
                 //往历史表里面添加当前数据
                 hisProcess.setProcessId(actProcessVo.getProcessId());
+                hisProcess.setCardId(actProcessVo.getCardId());
+                hisProcess.setCompanyName(actProcessVo.getCompanyName());
                 hisProcess.setUserId(actProcessVo.getUserId());
                 hisProcess.setCreateTime(actProcessVo.getCreateTime());
                 hisProcess.setStep(actProcessVo.getStep());
@@ -227,14 +250,14 @@ public class WorkComplyUtils {
                 auditLog.setStatus(hisProcess.getStatus());//审核状态
                 auditLog.setReply(hisProcess.getReply());//原因
                 auditLog.setAudit(hisProcess.getAudit());
-                auditLog.setAdminUserName(loginUser.getUsername());
+                auditLog.setAdminUserName(loginUser.getNickName());
                 auditLog.setStep(actProcessVo.getStep());
                 auditLogMapper.insert(auditLog);
                 //如果成功就删除当前条0
                 if ("1".equals(hisProcess.getStatus())) {//失败删除全部当前业务相关数据
                     //新增系统消息
                     //获取流程的名称
-                    TProcess tProcess = processMapper.selectById(actProcessVo.getProcessId());
+//                    TProcess tProcess = processMapper.selectById(actProcessVo.getProcessId());
                     //删除当前业务的数据
                     List<Long> collect1 = actProcessVos.stream().map(ActProcessVo::getId).collect(Collectors.toList());
                     actProcessMapper.deleteBatchIds(collect1);
@@ -592,7 +615,9 @@ public class WorkComplyUtils {
             .orderByAsc(TProcess::getStep));
 
         List<ActProcessVo> actProcessVoList = actProcessMapper.selectVoList(new LambdaQueryWrapper<ActProcess>()
-            .eq(ActProcess::getBusinessId, businessId));
+            .eq(ActProcess::getBusinessId, businessId)
+            .in(ActProcess::getProcessId,processVos.stream().map(ProcessVo::getId).collect(Collectors.toList())));
+
         List<AuditLog> auditLogs = auditLogMapper.selectList(new LambdaQueryWrapper<AuditLog>()
             .eq(AuditLog::getProcessKey, processKey)
             .eq(AuditLog::getOtherId, businessId)
@@ -655,17 +680,68 @@ public class WorkComplyUtils {
             }
         });
         list1.forEach(e ->{
+            switch (e.getCheckType()){
+                case "1":e.setCheckType("人员");
+                    break;
+                case "2":e.setCheckType("部门");
+                    break;
+                case "3":e.setCheckType("角色");
+                    break;
+                case "4":e.setCheckType("公司");
+                    break;
+                case "5":e.setCheckType("人员");
+                    break;
+                default:e.setCheckType("未知类型");
+                    break;
+            }
+            e.setAuditLogList1(null);
+            e.setId(null);
+            e.setProcessKey(null);
+            e.setType(null);
+            e.setProcessCheck(null);
+            e.setCc(null);
+            e.setIsNext(null);
+            e.setRuleId(null);
+            e.setBusinessId(null);
             e.setParams(null);
+            e.setParam(null);
+            e.setParamName(null);
+            e.setTimeout(null);
+            e.setBean(null);
+            e.setAudit1(null);
+            e.setActProcessVoList(null);
         });
         Map<String, List<ProcessVo>> collect = list1.stream().collect(Collectors.groupingBy(ProcessVo::getStep));
         List<ProcessVoResultDto> collect1 = collect.entrySet()
             .stream()
             .map(e -> new ProcessVoResultDto(e.getKey(), e.getValue()))
             .collect(Collectors.toList());
+
         collect1.forEach(e ->{
             String s = e.getProcessVoList().stream().map(ProcessVo::getDescription).collect(Collectors.toList()).get(0);
             e.setStep(s);
         });
+
+        String processStatus = params.get("processStatus").toString();
+        if (Constants.CANCEL.equals(processStatus)){
+            List<AuditLog> arrayList = new ArrayList<>();
+            AuditLog auditLog1 = auditLogs.get(auditLogs.size() - 1);
+            auditLog1.setStatus("取消认定");
+            arrayList.add(auditLog1);
+            ProcessVo processVo1 = new ProcessVo();
+            processVo1.setAudit(auditLogs.get(auditLogs.size()-1).getAdminUserName());
+            processVo1.setName("安居资格认定");
+            processVo1.setChecked("2");
+            processVo1.setAuditLogList(arrayList);
+            List<ProcessVo> list = new ArrayList<>();
+            list.add(processVo1);
+
+            ProcessVoResultDto processVoResultDto = new ProcessVoResultDto();
+            processVoResultDto.setStep("安居资格取消");
+            processVoResultDto.setProcessVoList(list);
+            collect1.add(processVoResultDto);
+        }
+
         System.out.println("collect = " + collect1);
         return collect1;
     }
@@ -737,6 +813,8 @@ public class WorkComplyUtils {
                             e.setChecked("2");
                         }
                     }
+                }else if (Constants.CANCEL.equals(process_status.toString())){
+                    e.setChecked("3");//无色
                 }
             }else {
                 e.setChecked("3");
@@ -749,24 +827,110 @@ public class WorkComplyUtils {
                 if (ObjectUtil.isNull(companyId)){
                     throw new ServiceException("companyId不可为空");
                 }
-//                e.setAudit1(String.valueOf(e.getParams().get("companyId")));
             }
+            //状态 1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过,11.审定退件 12.资格取消
+            //2,3,4,5--->step1
+            //6,7,8---->step2
+            //9,10---->step3
             List<AuditLog> collect = auditLogs.stream().filter(a -> e.getStep().equals(a.getStep()) && e.getAudit1().equals(a.getAudit())).collect(Collectors.toList());
-            collect.stream().forEach(a -> {
-                if (ObjectUtil.isNotNull(a.getStatus())) {
-                    switch (a.getStatus()) {
-                        case "1":
-                            a.setStatus("审核失败");
-                            break;
-                        case "2":
-                            a.setStatus("审核成功");
-                            break;
-                        default:
-                            a.setStatus("未知状态");
-                            break;
-                    }
+            if (e.getProcessKey().equals("apply_house") && collect.size()==0 ) {
+                if ("1".equals(e.getStep())) {
+                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAuditId()) &&
+                        (a.getStatus().equals("1") || a.getStatus().equals("2") || a.getStatus().equals("3")
+                            || a.getStatus().equals("4") || a.getStatus().equals("5")) ).collect(Collectors.toList());
+                }else if ("2".equals(e.getStep())){
+                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAuditId()) &&
+                        (a.getStatus().equals("6") || a.getStatus().equals("7") || a.getStatus().equals("8"))).collect(Collectors.toList());
+                }else if ("3".equals(e.getStep())){
+                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAuditId()) &&
+                        (a.getStatus().equals("9") || a.getStatus().equals("10") || a.getStatus().equals("11") || a.getStatus().equals("12"))).collect(Collectors.toList());
                 }
-            });
+
+                collect.stream().forEach(a -> {
+                    if (ObjectUtil.isNotNull(a.getStatus())) {
+                        switch (a.getStatus()) {
+                            case "1":
+                                a.setStatus("待提交");
+                                break;
+                            case "2":
+                                a.setStatus("受理中");
+                                break;
+                            case "3":
+                                a.setStatus("受理退件");
+                                break;
+                            case "4":
+                                a.setStatus("受理驳回");
+                                break;
+                            case "5":
+                                a.setStatus("受理成功");
+                                break;
+                            case "6":
+                                a.setStatus("初审不通过");
+                                break;
+                            case "7":
+                                a.setStatus("初审退件");
+                                break;
+                            case "8":
+                                a.setStatus("初审成功");
+                                break;
+                            case "9":
+                                a.setStatus("审定不通过");
+                                break;
+                            case "10":
+                                a.setStatus("审定通过");
+                                break;
+                            case "11":
+                                a.setStatus("审定退件");
+                                break;
+                            case "12":
+                                a.setStatus("资格取消");
+                                break;
+                            default:
+                                a.setStatus("未知状态");
+                                break;
+                        }
+                    }
+                    a.setCreateBy(null);
+                    a.setUpdateBy(null);
+                    a.setId(null);
+                    a.setAuditId(null);
+                    a.setOtherId(null);
+                    a.setRoleName(null);
+                    a.setPushLog(null);
+                    a.setProcessKey(null);
+                    a.setAudit(null);
+                    a.setStep(null);
+                    a.setAuditType(null);
+                });
+            }else {
+                collect.stream().forEach(a -> {
+                    if (ObjectUtil.isNotNull(a.getStatus())) {
+                        switch (a.getStatus()) {
+                            case "1":
+                                a.setStatus(e.getDescription()+"失败");
+                                break;
+                            case "2":
+                                a.setStatus(e.getDescription()+"成功");
+                                break;
+                            default:
+                                a.setStatus(e.getDescription()+"未知状态");
+                                break;
+                        }
+                    }
+                    a.setCreateBy(null);
+                    a.setUpdateBy(null);
+                    a.setId(null);
+                    a.setAuditId(null);
+                    a.setOtherId(null);
+                    a.setRoleName(null);
+                    a.setPushLog(null);
+                    a.setProcessKey(null);
+                    a.setAudit(null);
+                    a.setStep(null);
+                    a.setAuditType(null);
+                });
+            }
+
             e.setAuditLogList(collect);
         }else {
             e.setAuditLogList(new ArrayList<>());

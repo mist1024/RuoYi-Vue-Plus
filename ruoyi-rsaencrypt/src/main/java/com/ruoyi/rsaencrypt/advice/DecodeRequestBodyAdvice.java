@@ -1,14 +1,10 @@
 package com.ruoyi.rsaencrypt.advice;
-import cn.hutool.core.io.FastByteArrayOutputStream;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.stream.StreamUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.ruoyi.common.utils.StreamUtils;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
+import com.ruoyi.common.core.domain.RsaSecurity;
+import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.rsaencrypt.service.IRsaSecurityService2;
 import com.ruoyi.rsaencrypt.utls.RSAUtil;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +26,11 @@ import java.util.List;
  * @date 2018/10/29 20:17
  */
 @ControllerAdvice
-@RsaSecurityParameter()
+//@RsaSecurityParameter()
 public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
 
     private static final Logger logger = LoggerFactory.getLogger(DecodeRequestBodyAdvice.class);
+    private static final IRsaSecurityService2 rsaSecurityService= SpringUtils.getBean(IRsaSecurityService2.class);
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
@@ -48,7 +45,21 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         try {
-            if (methodParameter.getMethod().isAnnotationPresent(RsaSecurityParameter.class)) {
+            String path = inputMessage.getHeaders().getFirst("path");
+            String method = inputMessage.getHeaders().getFirst("method");
+            if (ObjectUtil.isNotNull(path)) {
+                RsaSecurity info = rsaSecurityService.getInfo(path, StringUtils.toRootUpperCase(method));
+                if (ObjectUtil.isNotNull(info)) {
+                    if ("1".equals(info.getRestricted())){
+                        throw new ServerException("接口已限制请求");
+                    }
+                    if ("1".equals(info.getInDecode())) {
+                        return new RsaHttpInputMessage(inputMessage, info.getPrivateKey());
+                    }
+
+                }
+            }
+            /*if (methodParameter.getMethod().isAnnotationPresent(RsaSecurityParameter.class)) {
                 //获取注解配置的包含和去除字段
                 RsaSecurityParameter serializedField = methodParameter.getMethodAnnotation(RsaSecurityParameter.class);
                 //入参是否需要解密
@@ -56,7 +67,7 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
                     logger.info("注解RsaSecurityParameter,对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行解密");
                     return new RsaHttpInputMessage(inputMessage);
                 }
-            }
+            }*/
             return inputMessage;
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +86,7 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
 
         private InputStream body;
 
-        public RsaHttpInputMessage(HttpInputMessage inputMessage) throws Exception {
+        public RsaHttpInputMessage(HttpInputMessage inputMessage,String privateKey ) throws Exception {
             this.headers = inputMessage.getHeaders();
             String targe="pc";
             List<String> list = headers.get("targe");
@@ -85,7 +96,7 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
                     targe = "weixin";
                 }
             }
-            this.body = IoUtil.toUtf8Stream(easpString(IoUtil.readUtf8(inputMessage.getBody()),targe));
+            this.body = IoUtil.toUtf8Stream(easpString(IoUtil.readUtf8(inputMessage.getBody()),targe,privateKey));
         }
 
         @Override
@@ -98,7 +109,7 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
             return headers;
         }
 
-        public String easpString(String requestData,String targe) throws IOException {
+        public String easpString(String requestData,String targe,String privateKey) throws IOException {
             if (requestData != null && !requestData.equals("")) {
                 if (StringUtils.isEmpty(requestData)) {
                     throw new RuntimeException("参数【requestData】缺失异常！");
@@ -107,11 +118,11 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
                     try {
                         logger.info("解密密文:"+requestData);
                         if ("weixin".equals(targe)){
-                            content = RSAUtil.privateKeyDecryptStr(requestData);
+                            content = RSAUtil.privateKeyDecryptStr(requestData,privateKey);
                         }else {
                             String data1 = requestData.substring(1);
                             String substring = requestData.substring(1, data1.length());
-                            content = RSAUtil.privateKeyDecryptStr(substring);
+                            content = RSAUtil.privateKeyDecryptStr(substring,privateKey);
                         }
                         logger.info("解密明文:"+content);
                     } catch (Exception e) {

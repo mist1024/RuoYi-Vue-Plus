@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -72,7 +73,7 @@ public class StrUtils {
 
     public static String getComplexRandomString(int length) {
         String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < length; i++) {
             int number = random.nextInt(62);

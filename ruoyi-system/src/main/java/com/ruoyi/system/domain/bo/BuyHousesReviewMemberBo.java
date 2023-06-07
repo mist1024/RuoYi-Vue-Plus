@@ -74,5 +74,6 @@ public class BuyHousesReviewMemberBo extends BaseEntity {
     @NotBlank(message = "姓名不能为空", groups = { AddGroup.class, EditGroup.class })
     private String name;
 
+    private Integer number;
 
 }

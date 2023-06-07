@@ -35,7 +35,6 @@ public class SysDeptController extends BaseController {
      */
     @SaCheckPermission("system:dept:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public R<List<SysDept>> list(SysDept dept) {
         List<SysDept> depts = deptService.selectDeptList(dept);
         return R.ok(depts);
@@ -47,9 +46,9 @@ public class SysDeptController extends BaseController {
      * @param deptId 部门ID
      */
     @SaCheckPermission("system:dept:list")
-    @GetMapping("/list/exclude/{deptId}")
+    @GetMapping("/list/exclude")
     @RsaSecurityParameter
-    public R<List<SysDept>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
+    public R<List<SysDept>> excludeChild(Long deptId) {
         List<SysDept> depts = deptService.selectDeptList(new SysDept());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
             || StringUtils.splitList(d.getAncestors()).contains(Convert.toStr(deptId)));
@@ -62,9 +61,9 @@ public class SysDeptController extends BaseController {
      * @param deptId 部门ID
      */
     @SaCheckPermission("system:dept:query")
-    @GetMapping(value = "/{deptId}")
+    @GetMapping
     @RsaSecurityParameter
-    public R<SysDept> getInfo(@PathVariable Long deptId) {
+    public R<SysDept> getInfo(Long deptId) {
         deptService.checkDeptDataScope(deptId);
         return R.ok(deptService.selectDeptById(deptId));
     }
@@ -111,8 +110,8 @@ public class SysDeptController extends BaseController {
      */
     @SaCheckPermission("system:dept:remove")
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{deptId}")
-    public R<Void> remove(@PathVariable Long deptId) {
+    @DeleteMapping
+    public R<Void> remove(Long deptId) {
         if (deptService.hasChildByDeptId(deptId)) {
             return R.warn("存在下级部门,不允许删除");
         }

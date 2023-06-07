@@ -67,9 +67,8 @@ public class SubscribeExportController extends BaseController {
      * @param id 主键
      */
     @SaCheckPermission("system:export:query")
-    @GetMapping("/{id}")
-    public R<SubscribeExportVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long id) {
+    @GetMapping
+    public R<SubscribeExportVo> getInfo(Long id) {
         return R.ok(iSubscribeExportService.queryById(id));
     }
 
@@ -104,9 +103,8 @@ public class SubscribeExportController extends BaseController {
      */
     @SaCheckPermission("system:export:remove")
     @Log(title = "预约导出", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
-    public R<Void> remove(@NotEmpty(message = "主键不能为空")
-                          @PathVariable Long[] ids) {
+    @DeleteMapping
+    public R<Void> remove(Long[] ids) {
         return toAjax(iSubscribeExportService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
 }

@@ -36,7 +36,6 @@ public class SysMenuController extends BaseController {
      */
     @SaCheckPermission("system:menu:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public R<List<SysMenu>> list(SysMenu menu) {
         List<SysMenu> menus = menuService.selectMenuList(menu, getUserId());
         return R.ok(menus);
@@ -48,9 +47,8 @@ public class SysMenuController extends BaseController {
      * @param menuId 菜单ID
      */
     @SaCheckPermission("system:menu:query")
-    @GetMapping(value = "/{menuId}")
-    @RsaSecurityParameter
-    public R<SysMenu> getInfo(@PathVariable Long menuId) {
+    @GetMapping
+    public R<SysMenu> getInfo(Long menuId) {
         return R.ok(menuService.selectMenuById(menuId));
     }
 
@@ -58,7 +56,6 @@ public class SysMenuController extends BaseController {
      * 获取菜单下拉树列表
      */
     @GetMapping("/treeselect")
-    @RsaSecurityParameter
     public R<List<Tree<Long>>> treeselect(SysMenu menu) {
         List<SysMenu> menus = menuService.selectMenuList(menu, getUserId());
         return R.ok(menuService.buildMenuTreeSelect(menus));
@@ -69,9 +66,8 @@ public class SysMenuController extends BaseController {
      *
      * @param roleId 角色ID
      */
-    @RsaSecurityParameter
-    @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public R<Map<String, Object>> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
+    @GetMapping(value = "/roleMenuTreeselect")
+    public R<Map<String, Object>> roleMenuTreeselect(Long roleId) {
         List<SysMenu> menus = menuService.selectMenuList(getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
@@ -85,7 +81,6 @@ public class SysMenuController extends BaseController {
     @SaCheckPermission("system:menu:add")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @PostMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysMenu menu) {
         if (!menuService.checkMenuNameUnique(menu)) {
             return R.fail("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
@@ -101,7 +96,6 @@ public class SysMenuController extends BaseController {
     @SaCheckPermission("system:menu:edit")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysMenu menu) {
         if (!menuService.checkMenuNameUnique(menu)) {
             return R.fail("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
@@ -120,9 +114,8 @@ public class SysMenuController extends BaseController {
      */
     @SaCheckPermission("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{menuId}")
-    @RsaSecurityParameter
-    public R<Void> remove(@PathVariable("menuId") Long menuId) {
+    @DeleteMapping
+    public R<Void> remove(Long menuId) {
         if (menuService.hasChildByMenuId(menuId)) {
             return R.warn("存在子菜单,不允许删除");
         }

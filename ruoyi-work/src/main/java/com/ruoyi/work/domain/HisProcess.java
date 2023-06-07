@@ -44,7 +44,7 @@ public class HisProcess{
      */
     private String checkType;
     /**
-     * 1fail(失败)，2success（成功）
+     * 1(失败)，2（成功）
      */
     private String status;
 
@@ -108,6 +108,12 @@ public class HisProcess{
      */
     @TableField(exist = false)
     private String companyId;
+
+    /**
+     * 证件号码
+     */
+    private  String cardId;
+
 
 
 

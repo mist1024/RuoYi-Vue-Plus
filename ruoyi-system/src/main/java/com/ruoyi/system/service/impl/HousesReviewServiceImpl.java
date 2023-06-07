@@ -35,7 +35,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,7 +52,6 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
-
 public class HousesReviewServiceImpl implements IHousesReviewService {
 
     private final HousesReviewMapper baseMapper;
@@ -113,12 +111,48 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         return baseMapper.selectVoList(lqw);
     }
 
+    private LambdaQueryWrapper<HousesReview> buildQueryWrapper3(HousesReviewBo bo) {
+        Map<String, Object> params = bo.getParams();
+        LambdaQueryWrapper<HousesReview> lqw = Wrappers.lambdaQuery();
+        if (ObjectUtil.isNotNull(bo.getIds())){
+            lqw.in(HousesReview::getId,bo.getIds());
+        }
+        lqw.and(StringUtils.isNotBlank(bo.getName()),t ->
+            t.like(HousesReview::getName,bo.getName())
+                .or().like(HousesReview::getCard,bo.getName())
+                .or().like(HousesReview::getProjectName,bo.getName()));
+        lqw.orderByDesc(HousesReview::getUpdateTime);
+        lqw.like(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
+        lqw.eq(StringUtils.isNotBlank(bo.getQualification()), HousesReview::getQualification, bo.getQualification());
+        lqw.eq(StringUtils.isNotBlank(bo.getAuditTime()), HousesReview::getAuditTime, bo.getAuditTime());
+        lqw.like(StringUtils.isNotBlank(bo.getPresellCard()), HousesReview::getPresellCard, bo.getPresellCard());
+        lqw.eq(StringUtils.isNotBlank(bo.getDealType()), HousesReview::getDealType, bo.getDealType());
+        lqw.eq(StringUtils.isNotBlank(bo.getProjectArea()), HousesReview::getProjectArea, bo.getProjectArea());
+        lqw.eq(StringUtils.isNotBlank(bo.getQualificationConfirmTime()), HousesReview::getQualificationConfirmTime, bo.getQualificationConfirmTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getQualificationPreApplyTime()), HousesReview::getQualificationPreApplyTime, bo.getQualificationPreApplyTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getFamilyType()), HousesReview::getFamilyType, bo.getFamilyType());
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), HousesReview::getStatus, bo.getStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getRegisterFailureTime()), HousesReview::getRegisterFailureTime, bo.getRegisterFailureTime());
+        lqw.eq(StringUtils.isNotBlank(bo.getNationality()), HousesReview::getNationality, bo.getNationality());
+        lqw.eq(StringUtils.isNotBlank(bo.getMaritalStatus()), HousesReview::getMaritalStatus, bo.getMaritalStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getCompanyType()), HousesReview::getCompanyType, bo.getCompanyType());
+        lqw.like(StringUtils.isNotBlank(bo.getCompanyName()), HousesReview::getCompanyName, bo.getCompanyName());
+        lqw.like(StringUtils.isNotBlank(bo.getTalentsType()), HousesReview::getTalentsType, bo.getTalentsType());
+        lqw.eq(StringUtils.isNotBlank(bo.getCreditCode()), HousesReview::getCreditCode, bo.getCreditCode());
+        lqw.like(StringUtils.isNotBlank(bo.getCompanyAddress()), HousesReview::getCompanyAddress, bo.getCompanyAddress());
+        lqw.eq(StringUtils.isNotBlank(bo.getSourceBy()), HousesReview::getSourceBy, bo.getSourceBy());
+        lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()), HousesReview::getProcessStatus, bo.getProcessStatus());
+        return lqw;
+    }
+
     private LambdaQueryWrapper<HousesReview> buildQueryWrapper2(HousesReviewBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<HousesReview> lqw = Wrappers.lambdaQuery();
         if (ObjectUtil.isNotNull(bo.getIds())){
             lqw.in(HousesReview::getId,bo.getIds());
         }
+        lqw.orderByAsc(HousesReview::getProcessStatus);
+        lqw.orderByDesc(HousesReview::getUpdateTime);
         lqw.eq(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
         lqw.eq(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
         lqw.like(StringUtils.isNotBlank(bo.getName()), HousesReview::getName, bo.getName());
@@ -211,11 +245,13 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         HousesReview housesReview = baseMapper.selectById(bo.getId());
         if (ObjectUtil.isNotNull(housesReview.getProcessStatus())
             && (Constants.WAIT.equals(housesReview.getProcessStatus())
-        || Constants.SUCCEED.equals(housesReview.getProcessStatus())
-        || Constants.PUBLICS.equals(housesReview.getProcessStatus()))){
+            || Constants.SUCCEED.equals(housesReview.getProcessStatus())
+            || Constants.PUBLICS.equals(housesReview.getProcessStatus()))){
             throw new ServiceException("当前人才状态不允许提交");
         }
         bo.setProcessStatus(Constants.WAIT);
+
+//     todo   注释原因:驳回重新提交资料后，以前的资料能否保存历史记录，可以查看
         //先删除存在的家庭情况关系表
         buyHousesReviewMemberMapper.delete( new LambdaQueryWrapper<BuyHousesReviewMember>()
             .eq(BuyHousesReviewMember::getBuyHousesId, bo.getId()));
@@ -223,13 +259,34 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         materialProofMapper.delete(new LambdaQueryWrapper<MaterialProof>()
             .eq(MaterialProof::getHouseId, bo.getId())
             .eq(MaterialProof::getProcessKey,"house_review"));
+        Integer number=1;
+//        获取当前关系材料的最新一条数据
+       /* Integer number=1;
+        BuyHousesReviewMember buyHousesReviewMember = buyHousesReviewMemberMapper.selectOne(new LambdaQueryWrapper<>(BuyHousesReviewMember.class)
+            .eq(BuyHousesReviewMember::getBuyHousesId, bo.getId())
+            .orderByDesc(BuyHousesReviewMember::getUpdateTime));
+        if (ObjectUtil.isNotNull(buyHousesReviewMember)){
+             number+=buyHousesReviewMember.getNumber();
+        }
 
         if (ObjectUtil.isNotNull(bo.getBuyHousesMemberList()) && bo.getBuyHousesMemberList().size()>0){
-            bo.getBuyHousesMemberList().stream().forEach( e ->{
+            Integer finalNumber = number;
+            bo.getBuyHousesMemberList().stream().forEach(e ->{
                 e.setBuyHousesId(bo.getId().toString());
+                e.setNumber(finalNumber);
+            });
+            buyHousesReviewMemberMapper.insertBatch(bo.getBuyHousesMemberList());
+        }*/
+        if (ObjectUtil.isNotNull(bo.getBuyHousesMemberList()) && bo.getBuyHousesMemberList().size()>0) {
+            Integer finalNumber = number;
+            bo.getBuyHousesMemberList().forEach(e -> {
+                e.setBuyHousesId(bo.getId().toString());
+                e.setId(null);
+                e.setNumber(finalNumber);
             });
             buyHousesReviewMemberMapper.insertBatch(bo.getBuyHousesMemberList());
         }
+        //获取
         if(ObjectUtil.isNotNull(bo.getMaterialsList()) && bo.getMaterialsList().size()>0){
             ArrayList<MaterialProof> list = new ArrayList<>();
             bo.getMaterialsList().forEach(e ->{
@@ -267,7 +324,13 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         if (!"D".equals(entity.getTalentsType())){
             entity.setTypeExtend(null);
         }
-        //TODO 做一些数据校验,如唯一约束
+        //如果是区级没有企业类型且D类不区分学历和技能
+        if (entity.getSourceBy().equals("1")){
+            entity.setCompanyType(null);
+            if (entity.getTalentsType().equals("D")){
+                entity.setTypeExtend(null);
+            }
+        }
     }
 
     /**
@@ -302,11 +365,24 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         //执行修改
         HousesReview housesReview = baseMapper.selectById(bo.getId());
         if (Constants.PUBLICS.equals(housesReview.getProcessStatus())
-        || Constants.WAIT.equals(housesReview.getProcessStatus())
-        || Constants.SUCCEED.equals(housesReview.getProcessStatus())){
+            || Constants.WAIT.equals(housesReview.getProcessStatus())
+            || Constants.SUCCEED.equals(housesReview.getProcessStatus())){
         }else {
             HousesReview update = BeanUtil.toBean(bo, HousesReview.class);
+            validEntityBeforeSave(update);
+            //家庭信息修改,先删除,再增加
+            /*buyHousesReviewMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesReviewMember.class).eq(BuyHousesReviewMember::getBuyHousesId,bo.getId()));
+            if (bo.getBuyHousesMemberList().size()>0){
+                bo.getBuyHousesMemberList().forEach(t ->{
+                    t.setId(null);
+                    t.setBuyHousesId(String.valueOf(bo.getId()));
+                });
+                buyHousesReviewMemberMapper.insertBatch(bo.getBuyHousesMemberList());
+            }*/
             baseMapper.updateById(update);
+            Map<String, Object> map = BeanUtil.beanToMap(update);
+            List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
+            return R.ok(materialInfo);
         }
         Map<String, Object> map = BeanUtil.beanToMap(bo);
         List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
@@ -346,7 +422,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * @return
      */
     @Override
-    public R subscribeExport(HousesReviewEvent bo) throws IOException {
+    public R subscribeExport(HousesReviewEvent bo){
         Long userId = LoginHelper.getUserId();
         bo.setExcelUserId(userId.toString());
         SpringUtils.context().publishEvent(bo);
@@ -360,26 +436,41 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      */
     @Override
     public void exportExcel(HousesReviewBo bo, HttpServletResponse response) {
+        bo.setProcessStatus(Constants.SUCCEED);
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
         List<HousesReviewVo> housesReviews = baseMapper.selectVoList(lqw);
         ExcelUtil.exportExcel(housesReviews,"人才列表", HousesReviewVo.class,response);
+    }
+
+    /**
+     * 数据库统计
+     * @param bo
+     * @param pageQuery
+     * @return
+     */
+    @Override
+    public TableDataInfo<HousesReview> managerQueryPageList(HousesReviewBo bo, PageQuery pageQuery) {
+        bo.setProcessStatus(Constants.SUCCEED);
+        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper3(bo);
+        Page<HousesReview> result = baseMapper.selectPage(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
     }
 
     @Async
     @EventListener
     public void export(HousesReviewEvent event) throws IOException {
         HousesReviewBo bo = BeanUtil.toBean(event, HousesReviewBo.class);
-        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper(bo);
-        List<HousesReview> housesReviews = baseMapper.selectList(lqw);
+        LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper3(bo);
+        List<HousesReviewVo>  housesReviews = baseMapper.selectVoList(lqw);
+        String title = "人才认定申请表";
+        String separator = File.separator;
+        String format = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        String path = filePath + separator + format;
         if (housesReviews.size() > 0) {
-            List<Long> collect = housesReviews.stream().map(HousesReview::getId).collect(Collectors.toList());
+            List<Long> collect = housesReviews.stream().map(HousesReviewVo::getId).collect(Collectors.toList());
             List<MaterialProof> materialProofList = materialProofMapper.selectList(new LambdaQueryWrapper<>(MaterialProof.class).in(MaterialProof::getHouseId, collect));
             //根据业务id进行分组
             Map<String, List<MaterialProof>> collectMap = materialProofList.stream().collect(Collectors.groupingBy(MaterialProof::getHouseId));
-            String title = "人才认定申请表";
-            String separator = File.separator;
-            String format = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-            String path = filePath + separator + format;
             housesReviews.stream().forEach(r -> {
                 List<MaterialProof> materialProofs = collectMap.get(r.getId().toString());
                 if (materialProofs.size()>0) {
@@ -391,7 +482,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
                         }
                         String s = userNameFile + separator + r.getName() + "--";
                         String file = p.getFile();
-                        MyFileUtils.downLoadPic(file, s + p.getDescription() + file.substring(file.lastIndexOf(".")));
+                        MyFileUtils.downLoadPic(file, s + p.getMaterialName() + file.substring(file.lastIndexOf(".")));
                         System.out.println("file = " + file);
                     });
                 }
@@ -408,7 +499,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             }
             file.createNewFile();
             OutputStream outXlsx = new FileOutputStream(p);
-            ExcelUtil.exportExcel(housesReviews,"111",HousesReview.class,outXlsx);
+            ExcelUtil.exportExcel(housesReviews,"111",HousesReviewVo.class,outXlsx);
             outXlsx.close();
             ZipUtils.toZip(path, fo, true);
             System.out.println("path = " + path);
@@ -421,7 +512,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             subscribeExport.setPath(url);
             subscribeExport.setDescription(event.getDescription());
             subscribeExport.setProcessKey("house_review");
-            subscribeExport.setUserId(LoginHelper.getUserId().toString());
+            subscribeExport.setUserId(event.getExcelUserId());
             subscribeExportMapper.insert(subscribeExport);
         }
     }

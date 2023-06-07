@@ -43,7 +43,6 @@ public class SysOssConfigController extends BaseController {
      */
     @SaCheckPermission("system:oss:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysOssConfigVo> list(@Validated(QueryGroup.class) SysOssConfigBo bo, PageQuery pageQuery) {
         return iSysOssConfigService.queryPageList(bo, pageQuery);
     }
@@ -54,10 +53,8 @@ public class SysOssConfigController extends BaseController {
      * @param ossConfigId OSS配置ID
      */
     @SaCheckPermission("system:oss:query")
-    @GetMapping("/{ossConfigId}")
-    @RsaSecurityParameter
-    public R<SysOssConfigVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long ossConfigId) {
+    @GetMapping
+    public R<SysOssConfigVo> getInfo(Long ossConfigId) {
         return R.ok(iSysOssConfigService.queryById(ossConfigId));
     }
 
@@ -68,7 +65,6 @@ public class SysOssConfigController extends BaseController {
     @Log(title = "对象存储配置", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysOssConfigBo bo) {
         return toAjax(iSysOssConfigService.insertByBo(bo));
     }
@@ -80,7 +76,6 @@ public class SysOssConfigController extends BaseController {
     @Log(title = "对象存储配置", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysOssConfigBo bo) {
         return toAjax(iSysOssConfigService.updateByBo(bo));
     }
@@ -92,10 +87,8 @@ public class SysOssConfigController extends BaseController {
      */
     @SaCheckPermission("system:oss:remove")
     @Log(title = "对象存储配置", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ossConfigIds}")
-    @RsaSecurityParameter
-    public R<Void> remove(@NotEmpty(message = "主键不能为空")
-                          @PathVariable Long[] ossConfigIds) {
+    @DeleteMapping
+    public R<Void> remove(Long[] ossConfigIds) {
         return toAjax(iSysOssConfigService.deleteWithValidByIds(Arrays.asList(ossConfigIds), true));
     }
 
@@ -105,7 +98,6 @@ public class SysOssConfigController extends BaseController {
     @SaCheckPermission("system:oss:edit")
     @Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> changeStatus(@RequestBody SysOssConfigBo bo) {
         return toAjax(iSysOssConfigService.updateOssConfigStatus(bo));
     }
