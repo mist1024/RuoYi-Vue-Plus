@@ -115,8 +115,8 @@ public class SysLoginService {
     }
 
     /**
-     * 小程序登录
-     * @param xcxCode
+     * 邮箱登录
+     * @param
      * @return
      */
     public String emailLogin(String email, String emailCode) {
@@ -125,7 +125,7 @@ public class SysLoginService {
 
         checkLogin(LoginType.EMAIL, user.getUserName(), () -> !validateEmailCode(email, emailCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
-        LoginUser loginUser = buildLoginUser(user);
+        LoginUser loginUser = buildLoginSysUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.APP);
 
@@ -257,7 +257,7 @@ public class SysLoginService {
     }
 
     private SysUser loadUserByEmail(String email) {
-        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+        SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getPhonenumber, SysUser::getStatus)
             .eq(SysUser::getEmail, email));
         if (ObjectUtil.isNull(user)) {
@@ -267,7 +267,7 @@ public class SysLoginService {
             log.info("登录用户：{} 已被停用.", email);
             throw new UserException("user.blocked", email);
         }
-        return userMapper.selectUserByEmail(email);
+        return sysUserMapper.selectUserByEmail(email);
     }
 
     private SysUser loadUserByOpenid(String openid) {
