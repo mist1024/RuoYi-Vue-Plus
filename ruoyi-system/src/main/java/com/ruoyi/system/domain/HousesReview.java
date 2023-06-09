@@ -33,6 +33,8 @@ public class HousesReview extends BaseEntity {
      * 证件类型
      */
     private String cardType;
+
+    private String step;
     /**
      * 身份证号码
      */

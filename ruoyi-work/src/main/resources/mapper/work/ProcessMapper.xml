@@ -24,7 +24,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     </resultMap>
     <update id="updateCommonByBusinessId">
-        update ${bean} set process_status = #{processStatus} ,pass_time =now()  where id = #{businessId}
+        update ${bean}
+        <set>
+            <if test="processStatus != null and processStatus != ''">process_status = #{processStatus},</if>
+            pass_time =now(),
+            <if test="step != null and step != ''">step = #{step}</if>
+        </set>
+         where id = #{businessId}
     </update>
 
 

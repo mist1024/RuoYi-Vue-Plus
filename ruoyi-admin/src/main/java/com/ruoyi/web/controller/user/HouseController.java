@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.user;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
@@ -14,7 +15,6 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.DownloadGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.service.IBuyHousesService;
@@ -95,7 +95,6 @@ public class HouseController extends BaseController {
      * 通过调用高新人才判断该身份证是否具备人才资格
      */
     @PostMapping("/CandidatesInfo")
-    @RsaSecurityParameter(inDecode = true)
     public R getGaoXinCandidateInfoByCardId(@RequestBody BuyHouses buyHouses){
         String cardId = buyHouses.getCardId();
         if (ObjectUtil.isNull(cardId) || ObjectUtil.isEmpty(cardId)){
@@ -103,8 +102,9 @@ public class HouseController extends BaseController {
         }
         return iBuyHousesService.getGaoXinCandidateInfoByCardId(cardId);
     }
+
+
     @GetMapping("/checkStatus")
-    @RsaSecurityParameter
     public R checkStatus(){
         return iBuyHousesService.checkStatus();
     }
@@ -114,30 +114,21 @@ public class HouseController extends BaseController {
      * @return
      */
     @GetMapping("/buyHouseLogs")
-    @RsaSecurityParameter
     public R getBuyHouseLog(){
         return iBuyHousesService.getBuyHousesLogsByUserId();
     }
 
     /**
      * 外部推送接口
-     * @param buyHouse
+     * @param bo
      * @return
      * @throws InterruptedException
      */
     @Log(title = "【外部推送接口】", businessType = BusinessType.OTHER)
     @RepeatSubmit()
     @PostMapping("/insertOpenBuyHouses")
-    public R<?> insertOpenBuyHouses(@RequestBody BuyHouses buyHouse){
-        /*CCSMessageDigest wxDigest = CCSMessageDigest.getInstance();
-        R r = wxDigest.checkSign(httpRequestBody);
-        if (r.getCode()==200){
-            BuyHouses buyHouses = (BuyHouses)r.getData();
-            buyHouses.setApiKey(httpRequestBody.getApiKey());
-            return  iBuyHousesService.insertOpenBuyHouses(buyHouses);
-        }
-        return R.fail(r.getMsg());*/
-        buyHouse.setApiKey("gxgycsj");
-        return  iBuyHousesService.insertOpenBuyHouses(buyHouse);
+    public R<?> insertOpenBuyHouses(@Validated(EditGroup.class)@RequestBody BuyHousesBo bo){
+        bo.setApiKey("gaoxingongyuanchengshiju");
+        return  iBuyHousesService.insertOpenBuyHouses(bo);
     }
 }

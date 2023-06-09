@@ -37,6 +37,7 @@ public class HousesReviewVo implements Serializable {
 //    @JsonSerialize(using = MySerializerUtils.class)
     private Long id;
 
+    private String step;
     /**
      * 证件类型
      */

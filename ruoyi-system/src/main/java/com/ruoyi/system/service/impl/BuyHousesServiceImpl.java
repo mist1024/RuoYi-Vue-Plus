@@ -2,7 +2,6 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.Month;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
@@ -68,6 +67,7 @@ import java.util.stream.Stream;
  */
 @RequiredArgsConstructor
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class BuyHousesServiceImpl implements IBuyHousesService {
 
     @Value("${file.template}")
@@ -112,6 +112,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Override
     public BuyHousesVo queryById(Long id){
         BuyHousesVo buyHousesVo = baseMapper.selectVoById(id);
+        if (ObjectUtil.isNull(buyHousesVo)){
+            throw new ServiceException("数据查询为空");
+        }
         LambdaQueryWrapper<MaterialProof> wrapper = new LambdaQueryWrapper<MaterialProof>()
             .eq(MaterialProof::getHouseId, buyHousesVo.getId())
             .eq(MaterialProof::getProcessKey, buyHousesVo.getProcessKey());
@@ -265,6 +268,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             processVo.setParams(map);
             processVo.setBusinessId(bo.getId().toString());
             processVo.setStartUser(bo.getUserName());
+            processVo.setCardId(bo.getCardId());
+            processVo.setCompanyName(bo.getCompanyName());
             WorkComplyUtils.comply(processVo);
         }
         return flag;
@@ -277,10 +282,15 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(BuyHousesBo bo) {
         Long userId = LoginHelper.getUserId();
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
+        if (ObjectUtil.isNull(buyHouses)){
+            throw new ServiceException("请先下载申请表");
+        }
         bo.setUserId(userId);
         BuyHouses update = BeanUtil.toBean(bo, BuyHouses.class);
         validEntityBeforeSave(update);
         update.setProcessStatus(Constants.WAIT);
+        update.setStep("1");
         Boolean flag =  baseMapper.updateById(update) > 0;
         if (flag){
             //将数据添加到流程中
@@ -291,6 +301,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             processVo.setParams(map);
             processVo.setBusinessId(bo.getId().toString());
             processVo.setStartUser(bo.getUserName());
+            processVo.setCardId(bo.getCardId());
+            processVo.setCompanyName(bo.getCompanyName());
             WorkComplyUtils.comply(processVo);
         }
         return flag;
@@ -306,11 +318,12 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         Long userId = LoginHelper.getUserId();
         BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
         if (ObjectUtil.isNotNull(buyHouses)) {
-            if (!Constants.SUBMIT.equals(buyHouses.getProcessStatus()) && !Constants.FAILD.equals(buyHouses.getProcessStatus())) {
+            if (!Constants.SUBMIT.equals(buyHouses.getProcessStatus())
+                && !Constants.FAILD.equals(buyHouses.getProcessStatus())
+//                && !Constants.CANCEL.equals(buyHouses.getProcessStatus())
+            ) {
                 throw new ServiceException("当前用户不可修改");
             }
-            //删除家庭情况信息
-//            buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, buyHouses.getId()));
             //先删除家庭信息表
             if (entity.getBuyHousesMemberList().size() > 0) {
                 buyHousesMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesMember.class).eq(BuyHousesMember::getBuyHousesId, entity.getId()));
@@ -367,6 +380,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     public R downloadWord(BuyHousesBo bo) {
         bo.setUserId(LoginHelper.getUserId());
         BuyHouses buyHousesBo = BeanUtil.toBean(bo, BuyHouses.class);
+        buyHousesBo.setStep("1");
         validEntityBeforeSave(buyHousesBo);
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         //判断数据库中是否存在该人才通过身份证去验证
@@ -385,6 +399,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             if (Constants.SUBMIT.equals(buyHouses.getProcessStatus()) || Constants.FAILD.equals(buyHouses.getProcessStatus())){
                 //执行修改操作
                 buyHousesBo.setUpdateTime(new Date());
+                buyHousesBo.setId(buyHouses.getId());
                 BuyHouses toBean = BeanUtil.toBean(buyHousesBo, BuyHouses.class);
                 baseMapper.updateById(toBean);
                 map.put("buyHouses",toBean);
@@ -569,53 +584,72 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Override
     public R getBuyHousesLogsByUserId() {
         Long userId = LoginHelper.getUserId();
-        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
-        List<AuditLog> auditLogList = auditLogMapper.selectList(new LambdaQueryWrapper<>(AuditLog.class).eq(AuditLog::getOtherId, buyHouses.getId()).orderByAsc(AuditLog::getCreateTime));
-        if (auditLogList.size()>0){
-            auditLogList.stream().forEach(a ->{
-                if (ObjectUtil.isNull(a.getProcessKey())){
-//                    1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6.初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过  11.审定退件,12.资格取消
-                    switch (a.getStatus()){
-                        case "1":a.setStatus("待提交");
-                            break;
-                        case "2":a.setStatus("受理中");
-                            break;
-                        case "3":a.setStatus("受理退件");
-                            break;
-                        case "4":a.setStatus("受理驳回");
-                            break;
-                        case "5":a.setStatus("初审中");
-                            break;
-                        case "6":a.setStatus("初审不通过");
-                            break;
-                        case "7":a.setStatus("初审退件");
-                            break;
-                        case "8":a.setStatus("审定中");
-                            break;
-                        case "9":a.setStatus("审定不通过");
-                            break;
-                        case "10":a.setStatus("审定通过");
-                            break;
-                        case "11":a.setStatus("审定退件");
-                            break;
-                        case "12":a.setStatus("资格取消");
-                            break;
-                    }
-                }else {
-                    switch (a.getStatus()){
-                        case "1":a.setStatus("审核失败");
-                            break;
-                        case "2":a.setStatus("审核成功");
-                            break;
-                    }
-                }
-            });
-        }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("auditLog",auditLogList);
-        map.put("status",buyHouses.getProcessStatus());
-        map.put("id",buyHouses.getId());
-        return R.ok("查询成功",map);
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
+        if (ObjectUtil.isNotNull(buyHouses)) {
+            List<AuditLog> auditLogList = auditLogMapper.selectList(new LambdaQueryWrapper<>(AuditLog.class).eq(AuditLog::getOtherId, buyHouses.getId()).orderByAsc(AuditLog::getCreateTime));
+            if (auditLogList.size() > 0) {
+                auditLogList.stream().forEach(a -> {
+                    if (ObjectUtil.isNull(a.getProcessKey())) {
+//                    1.待提交 2.受理中 3.受理退件 4.受理驳回 5.初审中 6.初审不通过 7.初审退件 8.审定中 9.审定不通过 10.审定通过  11.审定退件,12.资格取消
+                        switch (a.getStatus()) {
+                            case "1":
+                                a.setStatus("待提交");
+                                break;
+                            case "2":
+                                a.setStatus("受理中");
+                                break;
+                            case "3":
+                                a.setStatus("受理退件");
+                                break;
+                            case "4":
+                                a.setStatus("受理驳回");
+                                break;
+                            case "5":
+                                a.setStatus("初审中");
+                                break;
+                            case "6":
+                                a.setStatus("初审不通过");
+                                break;
+                            case "7":
+                                a.setStatus("初审退件");
+                                break;
+                            case "8":
+                                a.setStatus("审定中");
+                                break;
+                            case "9":
+                                a.setStatus("审定不通过");
+                                break;
+                            case "10":
+                                a.setStatus("审定通过");
+                                break;
+                            case "11":
+                                a.setStatus("审定退件");
+                                break;
+                            case "12":
+                                a.setStatus("资格取消");
+                                break;
+                        }
+                    } else {
+                        switch (a.getStatus()) {
+                            case "1":
+                                a.setStatus("审核失败");
+                                break;
+                            case "2":
+                                a.setStatus("审核成功");
+                                break;
+                        }
+                    }
+                });
+            }
+
+            map.put("auditLog", auditLogList);
+            map.put("status", buyHouses.getProcessStatus());
+            map.put("id", buyHouses.getId());
+            return R.ok("查询成功",map);
+        }
+        return R.fail("当前身份证与登录信息不匹配");
+
     }
 
     @Override
@@ -687,17 +721,17 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     /**
      * 对外推送接口
-     * @param buyHouses
+     * @param bo
      * @return
      */
     @Override
-    public R<?> insertOpenBuyHouses(BuyHouses buyHouses) {
+    public R<?> insertOpenBuyHouses(BuyHousesBo bo) {
+        BuyHouses buyHouses = BeanUtil.toBean(bo, BuyHouses.class);
+        buyHouses.setStep("1");
         BuyHouses buyHouses1 = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, buyHouses.getCardId()));
         if (ObjectUtil.isNull(buyHouses1)){
             //新增
-            if (ObjectUtil.isNull(buyHouses.getProcessStatus())){
-                return R.fail("状态不可为空");
-            }
+            buyHouses.setProcessStatus(Constants.WAIT);
             buyHouses.setProcessKey("apply_house");
             buyHouses.setCreateTime(new Date());
             buyHouses.setUpdateTime(new Date());
@@ -715,8 +749,15 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             buyHousesMemberMapper.insertBatch(buyHousesMemberList);
 
         }else {
+            //判断状态是否在可执行范围
+            if (!Constants.WAIT.equals(buyHouses.getProcessStatus())
+                && !Constants.SUBMIT.equals(buyHouses.getProcessStatus())
+                && ! Constants.FAILD.equals(buyHouses.getProcessStatus())){
+                return R.fail("当前状态不在修改范围");
+            }
+            buyHouses.setId(buyHouses1.getId());
             //判断该人才是否存在
-            if (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses.getUserId().equals(buyHouses1.getUserId())){
+            if (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses1.getUserId().equals(buyHouses.getUserId())){
                 return R.fail("当前用户已在系统存在");
             }
             //判断当前是否可以提交
@@ -742,7 +783,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             }
             buyHousesMemberMapper.insertBatch(buyHousesMemberList);
         }
-        if (Constants.WAIT.equals(buyHouses1.getProcessStatus())){
+        if (Constants.WAIT.equals(buyHouses.getProcessStatus())){
             //创建流程
             //将数据添加到流程中
             ProcessVo processVo = new ProcessVo();
@@ -752,9 +793,11 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             processVo.setParams(map);
             processVo.setBusinessId(buyHouses.getId().toString());
             processVo.setStartUser(buyHouses.getUserName());
+            processVo.setCardId(buyHouses.getCardId());
+            processVo.setCompanyName(buyHouses.getCompanyName());
             WorkComplyUtils.comply(processVo);
         }
-        return R.ok();
+        return R.ok(buyHouses.getId());
     }
 
     @Override

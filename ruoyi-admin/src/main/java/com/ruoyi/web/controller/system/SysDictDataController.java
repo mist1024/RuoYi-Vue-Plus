@@ -10,7 +10,6 @@ import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.service.ISysDictDataService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,6 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<SysDictData> list(SysDictData dictData, PageQuery pageQuery) {
         return dictDataService.selectPageDictDataList(dictData, pageQuery);
     }
@@ -63,7 +61,6 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:query")
     @GetMapping
-    @RsaSecurityParameter
     public R<SysDictData> getInfo(Long dictCode) {
         return R.ok(dictDataService.selectDictDataById(dictCode));
     }
@@ -74,7 +71,6 @@ public class SysDictDataController extends BaseController {
      * @param dictType 字典类型
      */
     @GetMapping(value = "/type")
-//    @RsaSecurityParameter
     public R<List<SysDictData>> dictType(String dictType) {
         List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
         if (ObjectUtil.isNull(data)) {
@@ -89,7 +85,6 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated @RequestBody SysDictData dict) {
         dictDataService.insertDictData(dict);
         return R.ok();
@@ -101,7 +96,6 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> edit(@Validated @RequestBody SysDictData dict) {
         dictDataService.updateDictData(dict);
         return R.ok();
@@ -115,7 +109,6 @@ public class SysDictDataController extends BaseController {
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping
-    @RsaSecurityParameter
     public R<Void> remove(Long[] dictCodes) {
         dictDataService.deleteDictDataByIds(dictCodes);
         return R.ok();

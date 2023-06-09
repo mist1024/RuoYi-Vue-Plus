@@ -10,7 +10,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.work.domain.ActProcess;
 import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.RollBackLog;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/work")
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class WorkController extends BaseController {
     private final ProcessMapper processMapper;
     private  final HousingConstructionBureauPushDto housingConstructionBureauPushDto;
@@ -52,7 +52,6 @@ public class WorkController extends BaseController {
     @Log(title = "获取待办数据",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:taskList")
     @GetMapping("/getWaitTaskList")
-    @RsaSecurityParameter
     public TableDataInfo<ActProcess> getWaitTaskList(ActProcess actProcess, PageQuery pageQuery){
         return WorkComplyUtils.getWaitTaskList(actProcess,pageQuery);
     }
@@ -63,7 +62,6 @@ public class WorkController extends BaseController {
     @Log(title = "获取已办数据",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:historyList")
     @GetMapping("/getHistoryList")
-    @RsaSecurityParameter
     public TableDataInfo<HisProcess> getHistoryList(HisProcess hisProcess, PageQuery pageQuery){
         return WorkComplyUtils.getHistoryList(hisProcess,pageQuery);
     }
@@ -74,7 +72,6 @@ public class WorkController extends BaseController {
     @Log(title = "获取当前业务运行到那一步",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:processPlan")
     @PostMapping("/processPlan")
-    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public R<?> processPlan(@RequestBody ActProcess actProcess){
         if (ObjectUtil.isNull(actProcess.getBusinessId())){
             return R.fail("businessId不可为空");
@@ -100,7 +97,6 @@ public class WorkController extends BaseController {
      */
     @Log(title = "获取可退回步骤",businessType = BusinessType.OTHER)
     @PostMapping("/getStep")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> getStep(@RequestBody BusinessDTO businessDTO){
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, businessDTO.getProcessKey());
@@ -119,7 +115,6 @@ public class WorkController extends BaseController {
     @Log(title = "流程办理",businessType = BusinessType.OTHER)
 //    @SaCheckPermission("work:task:batchDeleted")
     @PostMapping("/batchDeleted")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> batchDeleted(@RequestBody HisProcess hisProcess){
         if (ObjectUtil.isNull(hisProcess.getStatus())){
             return R.fail("状态不可为空");
@@ -137,35 +132,47 @@ public class WorkController extends BaseController {
         }
         Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),hisProcess.getBusinessId());
         hisProcess.setParams(map);
-        String s = WorkComplyUtils.batchDeleted(hisProcess,tProcesses.stream().map(TProcess::getId).collect(Collectors.toList()));
+        Map map1 = WorkComplyUtils.batchDeleted(hisProcess,tProcesses.stream().map(TProcess::getId).collect(Collectors.toList()));
+        String s = String.valueOf(map1.get("status"));
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("id", String.valueOf(map.get("id")));
+        String deptName = LoginHelper.getLoginUser().getDeptName();
+        if (ObjectUtil.isNotNull(deptName)){
+            hashMap.put("auditDepartName",deptName);
+        }
         if (s.equals(Constants.NONENTITY)){
             return R.fail("暂无审核");
         }else{
-           /* if (Constants.SUCCEED.equals(s)){//审核成功推送数据
-                //公园城市局推送
-                String virtualcode = String.valueOf(map.get("virtualcode"));
-                map.put("virtualcode", virtualcode == "3" ? "010" : "009");
-                String cardType = String.valueOf(map.get("cardType"));
-                map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
-                map.put("qyStatus", "4");
-                map.put("gyStatus", "4");
-                map.put("shStatus", "4");
-                map.put("buyHousesMemberList", "null");
-                map.put("buyHousesLogList", "null");
-                map.put("buyHousesLogList", "null");
-                housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"253");
-                //人才通推送
-                hashMap.put("status", "00T");
-            }else if (Constants.FAILD.equals(s)){
-                hashMap.put("status", "00N");
-                hashMap.put("description",hisProcess.getReply());
-            }else {
-                hashMap.put("status", "00D");
+            if ("apply_house".equals(hisProcess.getProcessKey())) {
+                if (Constants.SUCCEED.equals(s)) {//审核成功推送数据
+                    //公园城市局推送
+                    /*String virtualcode = String.valueOf(map.get("virtualcode"));
+                    map.put("virtualcode", virtualcode == "3" ? "010" : "009");
+                    String cardType = String.valueOf(map.get("cardType"));
+                    map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
+                    map.put("qyStatus", "4");
+                    map.put("gyStatus", "4");
+                    map.put("shStatus", "4");
+                    map.put("buyHousesMemberList", "null");
+                    map.put("buyHousesLogList", "null");
+                    map.put("buyHousesLogList", "null");
+                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"253");*/
+                    //人才通推送
+                    hashMap.put("status", "00T");
+                } else if (Constants.FAILD.equals(s)) {
+                    hashMap.put("status", "00N");
+                    hashMap.put("description", hisProcess.getReply());
+                } else {
+                    hashMap.put("status", "00D");
+                }
+                Object apiKey = map.get("apiKey");
+                if (ObjectUtil.isNotNull(apiKey) && String.valueOf(apiKey).equals("gaoxingongyuanchengshiju")) {
+                    housingConstructionBureauPushDto.send3(hashMap, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
+                }
             }
-            housingConstructionBureauPushDto.openUrl("https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback",hashMap,"");*/
-            processMapper.updateCommonByBusinessId(tProcesses.get(0).getBean(),s, hisProcess.getBusinessId());
+
+            Object step = map1.get("step");
+            processMapper.updateCommonByBusinessId(tProcesses.get(0).getBean(),s, hisProcess.getBusinessId(),step);
         }
         System.out.println("s = " + s);
         return R.ok();
@@ -179,7 +186,6 @@ public class WorkController extends BaseController {
     @Log(title = "获取业务id详情数据",businessType = BusinessType.OTHER)
     @SaCheckPermission("work:task:taskInfo")
     @PostMapping("/taskInfo")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> getInfoById(@RequestBody ActProcess actProcess){
         if (ObjectUtil.isNull(actProcess.getProcessKey())){
             return R.fail("key不可为空");
@@ -197,7 +203,6 @@ public class WorkController extends BaseController {
 
     @Log(title = "获取审核日志",businessType = BusinessType.OTHER)
     @PostMapping("/auditLogList")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> getAuditLogListByOtherId(@RequestBody BusinessDTO businessDTO){
         return WorkComplyUtils.getAuditLogListByOtherId(businessDTO);
     }
@@ -209,7 +214,6 @@ public class WorkController extends BaseController {
      */
     @Log(title = "回退",businessType = BusinessType.OTHER)
     @PostMapping("/rollBackLog")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> rollBackLog(@RequestBody RollBackLog rollBackLog){
         LambdaQueryWrapper<TProcess> wrapper = new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, rollBackLog.getProcessKey());
@@ -219,7 +223,7 @@ public class WorkController extends BaseController {
         }
         Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),rollBackLog.getBusinessId());
         rollBackLog.setParams(map);
-       return toAjax(WorkComplyUtils.rollBack(rollBackLog)>1?1:0);
+        return toAjax(WorkComplyUtils.rollBack(rollBackLog)>1?1:0);
     }
 }
 

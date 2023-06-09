@@ -101,6 +101,8 @@ public class WorkComplyUtils {
             actProcessVo.setCardId(String.valueOf(card));
         }
         actProcessVo.setUserId(String.valueOf(LoginHelper.getUserId()));
+        actProcessVo.setCardId(processVo.getCardId());
+        actProcessVo.setCompanyName(processVo.getCompanyName());
         actProcessVo.setCreateTime(DateUtils.getNowDate());
         actProcessVo.setCheckType(tProcessByKey.getCheckType());
         actProcessVo.setStep(tProcessByKey.getStep());
@@ -176,14 +178,15 @@ public class WorkComplyUtils {
      * 2.根据businessId删除actProcess
      */
 
-    public static  String batchDeleted(HisProcess hisProcess,List<Long> ids){
+    public static  Map batchDeleted(HisProcess hisProcess,List<Long> ids){
+        HashMap<String, Object> map = new HashMap<>();
         hisProcess.setEndTime(DateUtils.getNowDate());
         //获取当前购房信息
         //1.得到当前这条运行任务
         LambdaQueryWrapper<ActProcess> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ActProcess::getBusinessId,hisProcess.getBusinessId());
-        lqw.eq(ActProcess::getProcessId,ids);
-
+        lqw.eq(ObjectUtil.isNotNull(hisProcess.getStep()) && ObjectUtil.isNotEmpty(hisProcess.getStep()),ActProcess::getStep,hisProcess.getStep());
+        lqw.in(ActProcess::getProcessId,ids);
         List<ActProcessVo> actProcessVos = actProcessMapper.selectVoList(lqw);
         LoginUser loginUser = LoginHelper.getLoginUser();
         if (actProcessVos.size()>0){
@@ -261,7 +264,8 @@ public class WorkComplyUtils {
                     //删除当前业务的数据
                     List<Long> collect1 = actProcessVos.stream().map(ActProcessVo::getId).collect(Collectors.toList());
                     actProcessMapper.deleteBatchIds(collect1);
-                    return Constants.FAILD;
+                    map.put("status",Constants.FAILD);
+                    return map;
                 } else if ("2".equals(hisProcess.getStatus())) {//审核成功
                     //修改业务表的状态,0保持,1提交,审核中,2成功,3失败
                     //判断是否只剩最后一条记录
@@ -277,20 +281,28 @@ public class WorkComplyUtils {
                             processVo.setParams(hisProcess.getParams());
                             processVo.setBusinessId(hisProcess.getBusinessId());
                             processVo.setStartUser(actProcessVo.getStartUser());
+                            processVo.setCompanyName(actProcessVo.getCompanyName());
+                            processVo.setCardId(actProcessVo.getCardId());
                             comply(processVo);
-                            return Constants.WAIT;
+                            map.put("status",Constants.WAIT);
+                            map.put("step",step);
+                            return map;
                         } else {
                             //业务办结
-                            return Constants.SUCCEED;
+                            map.put("status",Constants.SUCCEED);
+                            return map;
+
                         }
                     }
-                    return Constants.WAIT;
+                    map.put("status",Constants.WAIT);
+                    return map;
                 }
             }else {
                 throw new ServiceException("当前不具备审核资格");
             }
         }
-        return Constants.NONENTITY;
+        map.put("status",Constants.NONENTITY);
+        return map;
     }
 
     /**
@@ -627,6 +639,7 @@ public class WorkComplyUtils {
             e.setAuditLogList1(auditLogs);
             e.setActProcessVoList(actProcessVoList);
             e.setBusinessId(businessId);
+            params.put("step",e.getStep());
             e.setParams(params);
             //遍历出他每一步所需要的审核人
             if ("1".equals(e.getType())){//普通流程,只需查出将人员设置到运行流程中即可
@@ -710,6 +723,20 @@ public class WorkComplyUtils {
             e.setBean(null);
             e.setAudit1(null);
             e.setActProcessVoList(null);
+            List<AuditLog> auditLogList = e.getAuditLogList();
+            auditLogList.forEach(a ->{
+                a.setCreateBy(null);
+                a.setUpdateBy(null);
+                a.setId(null);
+                a.setAuditId(null);
+                a.setOtherId(null);
+                a.setRoleName(null);
+                a.setPushLog(null);
+                a.setProcessKey(null);
+                a.setAudit(null);
+                a.setStep(null);
+                a.setAuditType(null);
+            });
         });
         Map<String, List<ProcessVo>> collect = list1.stream().collect(Collectors.groupingBy(ProcessVo::getStep));
         List<ProcessVoResultDto> collect1 = collect.entrySet()
@@ -759,14 +786,14 @@ public class WorkComplyUtils {
             String o = params.get(e.getParamName()).toString();
             e.setAudit1(params.get(e.getParam()).toString());
             e.setAudit(o);
-        }else if("1".equals(e.getCheckType())) {
+        }else if("1".equals(e.getCheckType()) || "5".equals(e.getChecked())) {
             //根据id获取人员信息
             SysUser sysUser = sysUserMapper.selectUserById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysUser)){
                 throw new ServiceException("根据id获取人员信息失败");
             }
             e.setAudit1(e.getAudit());
-            e.setAudit(sysUser.getUserName());
+            e.setAudit(sysUser.getNickName());
         }else if ("2".equals(e.getCheckType())){
             SysDept sysDept = sysDeptMapper.selectDeptById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysDept)){
@@ -782,7 +809,6 @@ public class WorkComplyUtils {
             e.setAudit1(e.getAudit());
             e.setAudit(sysRole.getRoleName());
         }
-
         List<ActProcessVo> actProcessVoList =e.getActProcessVoList();
         List<AuditLog> auditLogs = e.getAuditLogList1();
         List<ActProcessVo> collect1 = actProcessVoList.stream().filter(a -> a.getAudit().equals(e.getAudit1()) && a.getCheckType().equals(e.getCheckType()) && a.getStep().equals(e.getStep()) && a.getType().equals(e.getType())).collect(Collectors.toList());
@@ -810,7 +836,7 @@ public class WorkComplyUtils {
                     if (auditLogs.size()>0){
                         AuditLog auditLog = auditLogs.get(auditLogs.size()-1);
                         if (auditLog.getAudit().equals(e.getAudit1()) && auditLog.getStep().equals(e.getStep()) && auditLog.getAuditType().equals(e.getCheckType())){
-                            e.setChecked("2");
+                            e.setChecked("4");
                         }
                     }
                 }else if (Constants.CANCEL.equals(process_status.toString())){
@@ -835,14 +861,14 @@ public class WorkComplyUtils {
             List<AuditLog> collect = auditLogs.stream().filter(a -> e.getStep().equals(a.getStep()) && e.getAudit1().equals(a.getAudit())).collect(Collectors.toList());
             if (e.getProcessKey().equals("apply_house") && collect.size()==0 ) {
                 if ("1".equals(e.getStep())) {
-                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAuditId()) &&
+                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAudit()) &&
                         (a.getStatus().equals("1") || a.getStatus().equals("2") || a.getStatus().equals("3")
                             || a.getStatus().equals("4") || a.getStatus().equals("5")) ).collect(Collectors.toList());
                 }else if ("2".equals(e.getStep())){
-                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAuditId()) &&
+                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAudit()) &&
                         (a.getStatus().equals("6") || a.getStatus().equals("7") || a.getStatus().equals("8"))).collect(Collectors.toList());
                 }else if ("3".equals(e.getStep())){
-                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAuditId()) &&
+                    collect = auditLogs.stream().filter(a -> e.getAudit1().equals(a.getAudit()) &&
                         (a.getStatus().equals("9") || a.getStatus().equals("10") || a.getStatus().equals("11") || a.getStatus().equals("12"))).collect(Collectors.toList());
                 }
 
@@ -890,17 +916,6 @@ public class WorkComplyUtils {
                                 break;
                         }
                     }
-                    a.setCreateBy(null);
-                    a.setUpdateBy(null);
-                    a.setId(null);
-                    a.setAuditId(null);
-                    a.setOtherId(null);
-                    a.setRoleName(null);
-                    a.setPushLog(null);
-                    a.setProcessKey(null);
-                    a.setAudit(null);
-                    a.setStep(null);
-                    a.setAuditType(null);
                 });
             }else {
                 collect.stream().forEach(a -> {
@@ -917,17 +932,6 @@ public class WorkComplyUtils {
                                 break;
                         }
                     }
-                    a.setCreateBy(null);
-                    a.setUpdateBy(null);
-                    a.setId(null);
-                    a.setAuditId(null);
-                    a.setOtherId(null);
-                    a.setRoleName(null);
-                    a.setPushLog(null);
-                    a.setProcessKey(null);
-                    a.setAudit(null);
-                    a.setStep(null);
-                    a.setAuditType(null);
                 });
             }
 

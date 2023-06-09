@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class HousesReviewServiceImpl implements IHousesReviewService {
 
     private final HousesReviewMapper baseMapper;
@@ -312,6 +313,8 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             processVo.setParams(map);
             processVo.setBusinessId(bo.getId().toString());
             processVo.setStartUser(bo.getName());
+            processVo.setCompanyName(bo.getCompanyName());
+            processVo.setCardId(bo.getCard());
             WorkComplyUtils.comply(processVo);
         }
         return i>0;
@@ -322,13 +325,13 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      */
     private void validEntityBeforeSave(HousesReview entity){
         if (!"D".equals(entity.getTalentsType())){
-            entity.setTypeExtend(null);
+            entity.setTypeExtend("");
         }
         //如果是区级没有企业类型且D类不区分学历和技能
         if (entity.getSourceBy().equals("1")){
-            entity.setCompanyType(null);
+            entity.setCompanyType("");
             if (entity.getTalentsType().equals("D")){
-                entity.setTypeExtend(null);
+                entity.setTypeExtend("");
             }
         }
     }
@@ -370,15 +373,6 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         }else {
             HousesReview update = BeanUtil.toBean(bo, HousesReview.class);
             validEntityBeforeSave(update);
-            //家庭信息修改,先删除,再增加
-            /*buyHousesReviewMemberMapper.delete(new LambdaQueryWrapper<>(BuyHousesReviewMember.class).eq(BuyHousesReviewMember::getBuyHousesId,bo.getId()));
-            if (bo.getBuyHousesMemberList().size()>0){
-                bo.getBuyHousesMemberList().forEach(t ->{
-                    t.setId(null);
-                    t.setBuyHousesId(String.valueOf(bo.getId()));
-                });
-                buyHousesReviewMemberMapper.insertBatch(bo.getBuyHousesMemberList());
-            }*/
             baseMapper.updateById(update);
             Map<String, Object> map = BeanUtil.beanToMap(update);
             List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);

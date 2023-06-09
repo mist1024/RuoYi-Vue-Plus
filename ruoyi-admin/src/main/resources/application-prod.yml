@@ -106,7 +106,8 @@ spring:
 spring:
   redis:
     # 地址
-    host: 182.42.81.18
+#    host: 182.42.81.18
+    host: 172.12.9.2
     #    host: 127.0.0.1
     # 端口，默认为6379
     port: 6379
@@ -188,8 +189,8 @@ sms:
 
 #Linux dev
 file:
-  domain: https://mihuatang.xyz
-  path: /home/taxi/images
+  domain: https://rcaj.cdhtgycs.cn
+  path: /usr/local/images
   prefix: /images
   size: 10
   template: /usr/local/template/

@@ -9,11 +9,8 @@ import java.util.concurrent.TimeUnit;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.work.domain.ActProcess;
-import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.TProcess;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.ProcessVoResultDto;
@@ -131,7 +128,6 @@ public class UserController extends BaseController {
     @SaIgnore
     @Log(title = "获取当前业务运行到那一步",businessType = BusinessType.OTHER)
     @PostMapping("/processPlan")
-    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public R<?> processPlan(@RequestBody ActProcess actProcess){
         List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, actProcess.getProcessKey()));
@@ -151,12 +147,9 @@ public class UserController extends BaseController {
 
     @Log(title = "对外提供步骤接口",businessType = BusinessType.OTHER)
     @PostMapping("/stepProcessPlan")
-    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public R<?> stepProcessPlan(@RequestBody ActProcess actProcess){
+        actProcess.setProcessKey("apply_house");
         if (ObjectUtil.isNull(actProcess.getBusinessId())){
-            return R.fail("必要参数不可为空");
-        }
-        if (ObjectUtil.isNull(actProcess.getProcessKey())){
             return R.fail("必要参数不可为空");
         }
         if (ObjectUtil.isNull(actProcess.getApiKey())){

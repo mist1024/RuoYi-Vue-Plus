@@ -2,8 +2,8 @@ package com.ruoyi.test;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -29,8 +29,6 @@ import com.ruoyi.common.utils.AesUtil;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.demo.domain.ImageDemoData;
-import com.ruoyi.mq.service.OrderService;
-import com.ruoyi.mq.service.Produceras;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialTalentsVo;
@@ -53,9 +51,6 @@ import com.ruoyi.work.utils.WorkComplyUtils;
 import org.apache.commons.text.CaseUtils;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.junit.jupiter.api.*;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ReflectionUtils;
@@ -125,14 +120,14 @@ public class DemoUnitTest {
     @Autowired
     private HousingConstructionBureauPushDto housingConstructionBureauPushDto;
 
-    @Autowired
+    /*@Autowired
     private Produceras providerCustomer;
 
     @Autowired
     private OrderService orderService;
 
     @Autowired
-    private RabbitTemplate amqpTemplate;
+    private RabbitTemplate amqpTemplate;*/
 
 
     @DisplayName("测试 @SpringBootTest @Test @DisplayName 注解")
@@ -206,15 +201,16 @@ public class DemoUnitTest {
     @Test
     public void test002(){
         ProcessVo processVo = new ProcessVo();
-        processVo.setProcessKey("apply_jn");
+        processVo.setProcessKey("apply_house");
         processVo.setStep("1");
-        BuyHouses buyHouses = buyHousesMapper.selectById("10");
+        BuyHouses buyHouses = buyHousesMapper.selectById("12");
         buyHouses.setUpdateTime(DateUtils.getNowDate());
-        buyHouses.setCompanyId("100");
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         processVo.setParams(map);
-        processVo.setBusinessId("10");
+        processVo.setBusinessId(buyHouses.getId().toString());
         processVo.setStartUser(buyHouses.getUserName());
+        processVo.setCardId(buyHouses.getCardId());
+        processVo.setCompanyName(buyHouses.getCompanyName());
         WorkComplyUtils.comply(processVo);
     }
 
@@ -228,19 +224,22 @@ public class DemoUnitTest {
         hisProcess.setParams(map);
         hisProcess.setProcessKey(buyHouses.getProcessKey());
         hisProcess.setStartUser(buyHouses.getUserName());
-        String s = WorkComplyUtils.batchDeleted(hisProcess,null);
-        System.out.println("s = " + s);
+        Map map1 = WorkComplyUtils.batchDeleted(hisProcess, null);
+        System.out.println("s = " + map1);
     }
 
     @Test
     public void  test004(){
-        BusinessDTO businessDTO = new BusinessDTO();
+        /*BusinessDTO businessDTO = new BusinessDTO();
 //        BuyHouses buyHouses = buyHousesMapper.selectById("1011");
         HousesReview housesReview = housesReviewMapper.selectById("1633344911078064130");
         Map<String, Object> map = BeanUtil.beanToMap(housesReview);
         businessDTO.setParams(map);
         businessDTO.setBusinessId(housesReview.getId().toString());
-        WorkComplyUtils.getStep(businessDTO);
+        WorkComplyUtils.getStep(businessDTO);*/
+
+        boolean validCard = IdcardUtil.isValidCard("51050319960221405X");
+        System.out.println("validCard = " + validCard);
     }
 
     @Test
@@ -362,10 +361,10 @@ public class DemoUnitTest {
 //        System.out.println("processPlan = " +processPlan) ;
     }
 
-    @Test
-    public void test00000(){
-        processMapper.updateCommonByBusinessId("buy_houses", Constants.FAILD,"2");
-    }
+//    @Test
+//    public void test00000(){
+//        processMapper.updateCommonByBusinessId("buy_houses", Constants.FAILD,"2");
+//    }
 
     @Test
     public void tests1245545(){
@@ -464,6 +463,8 @@ public class DemoUnitTest {
     @Test
     public void test4454545() throws Exception {
         Keypair keypair = Sm2.generateKeyPairHex();
+        String publicKey1 = keypair.getPublicKey();
+
         String privateKey = "9cefdfcb925a32e10206d3a693ba204632c59e5f9a171faebb814885191dd35e";
         System.out.println("privateKey = " + privateKey);
         String publicKey = "0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
@@ -579,7 +580,7 @@ public class DemoUnitTest {
             .header("Referer","http://192.168.0.54:8084")
             .header("path","/user/house/insertOpenBuyHouses")
             .header("method","POST")
-            .body(doDecrypt,"application/json")
+            .body(doEncrypt,"application/json")
             .execute().body();
         System.out.println("result2 = " + result2);
     }
@@ -604,25 +605,27 @@ public class DemoUnitTest {
     }
 
     /**
-     * 登录接口
+     * 查看日志接口
      */
     @Test
     public void test0002(){
         String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
+//        String publicKey="04eea960591fff39b445b289faf56f755a1c895de57dfa3ca6ab2c84d2b5429cad1444809d941e4a0ed168bd226d0bf28a016389f26ea8506039da5db6a93a79f6";
         HashMap<String, Object> map = new HashMap<>();
-        map.put("businessId","15808234569");//用户标识符
-        map.put("processKey","apply_house");//使用方唯一key
+        map.put("businessId","2819");//用户标识符
         map.put("apiKey","gaoxingongyuanchengshiju");//使用方唯一key
         String s = JSONUtil.toJsonPrettyStr(map);
         String doEncrypt = Sm2.doEncrypt(s, publicKey);
-        String result2 = HttpRequest.post("http://192.168.0.54:8084/user/house/stepProcessPlan")
-            .header("Referer","http://192.168.0.54:8084")
-            .header("path","/user/house/stepProcessPlan")
+//        String result2 = HttpRequest.post("https://dbxqtalents.cn/gx-api/user/stepProcessPlan")
+        String result2 = HttpRequest.post("http://127.0.0.1:8084/user/stepProcessPlan")
+            .header("Referer","https://dbxqtalents.cn/gx-api")
+            .header("path","/user/stepProcessPlan")
             .header("targe","weixin")
-            .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhcHBfdXNlcjo0Mzc4OSIsInJuU3RyIjoiV05XZFFnaHpHYlRRRU5ObVpwbmhaaFp6MmtKaWtSR0MiLCJ1c2VySWQiOjQzNzg5fQ.QCsN3iIFk38dzTvXITGx2wV5c9kdPdvWZs7gjf6dFzc")
+            .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJzeXNfdXNlcjoxIiwicm5TdHIiOiJUNjZNSjBIckwzcjF1YkFsQlFTem4yNTdjdDhTc2l2cyIsInVzZXJJZCI6MX0.qbEbSQ7ZElegj_1-BKs3xzDfBuZHBItQzJkNaMv0Lrs")
             .header("method","POST")
             .body(doEncrypt,"application/json")
             .execute().body();
+        System.out.println("result2 = " + result2);
     }
 
     /**
@@ -634,17 +637,19 @@ public class DemoUnitTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("username","15808234569");
         map.put("apiKey","gaoxingongyuanchengshiju");
-        BuyHouses buyHouses = buyHousesMapper.selectById("3");
         String s = JSONUtil.toJsonPrettyStr(map);
         String doEncrypt = Sm2.doEncrypt(s, publicKey);
-        String result2 = HttpRequest.post("http://192.168.0.54:8084/userOpenLogin")
-            .header("Referer","http://192.168.0.54:8084")
+//        String result2 = HttpRequest.post("https://dbxqtalents.cn/gx-api/userOpenLogin")
+//        String result2 = HttpRequest.post("http://192.168.0.54:8084/userOpenLogin")
+        String result2 = HttpRequest.post("http://ljlcom.gnway.cc/userOpenLogin")
+            .header("Referer","https://dbxqtalents.cn/gx-api")
             .header("path","/userOpenLogin")
             .header("targe","weixin")
             .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhcHBfdXNlcjo0Mzc4OSIsInJuU3RyIjoiV05XZFFnaHpHYlRRRU5ObVpwbmhaaFp6MmtKaWtSR0MiLCJ1c2VySWQiOjQzNzg5fQ.QCsN3iIFk38dzTvXITGx2wV5c9kdPdvWZs7gjf6dFzc")
             .header("method","POST")
             .body(doEncrypt,"application/json")
             .execute().body();
+        System.out.println("result2 = " + result2);
     }
 
     /**
@@ -741,12 +746,12 @@ public class DemoUnitTest {
     public void test15234523(){
 //        providerCustomer.sendDelayMsg("延迟队列测试",3);
         String msg ="我来了";
-        MessageProperties messageProperties = new MessageProperties();
+       /* MessageProperties messageProperties = new MessageProperties();
         messageProperties.setHeader("x-delay",5000);//延迟5秒被删除
         Message message = new Message(msg.getBytes(), messageProperties);
         amqpTemplate.convertAndSend("PLUGIN_DELAY_EXCHANGE","delay","123132");//交换机和路由键必须和配置文件类中保持一致
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println("消息发送成功【" + sdf.format(new Date()) + "】");
+        System.out.println("消息发送成功【" + sdf.format(new Date()) + "】");*/
 //        orderService.makeOrder();
     }
 
@@ -772,4 +777,18 @@ public class DemoUnitTest {
 //        List<HousesReview> collect = housesReviewList.stream().filter(h -> h.getPassTime().getMonth() == month).collect(Collectors.toList());
 //        System.out.println("collect = " + collect);
     }
+
+    /**
+     * 获取公钥和私钥
+     */
+    @Test
+    public void test0004(){
+        Keypair keypair = Sm2.generateKeyPairHex();
+        String publicKey = keypair.getPublicKey();
+        System.out.println("publicKey = " + publicKey);
+
+        String privateKey = keypair.getPrivateKey();
+        System.out.println("privateKey = " + privateKey);
+    }
 }
+

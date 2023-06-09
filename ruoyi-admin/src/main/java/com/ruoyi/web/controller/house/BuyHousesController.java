@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Arrays;
 
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.dto.BuyHousesEvent;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,6 @@ public class BuyHousesController extends BaseController {
      */
     @SaCheckPermission("system:houses:list")
     @GetMapping("/list")
-    @RsaSecurityParameter
     public TableDataInfo<BuyHousesVo> list(BuyHousesBo bo, PageQuery pageQuery) {
         return iBuyHousesService.queryPageList(bo, pageQuery);
     }
@@ -57,7 +55,6 @@ public class BuyHousesController extends BaseController {
      */
     @SaCheckPermission("system:houses:subscribeExport")
     @PostMapping("/subscribeExport")
-    @RsaSecurityParameter(inDecode = true)
     public R subscribeExport(@RequestBody BuyHousesEvent bo) throws IOException {
         return iBuyHousesService.subscribeExport(bo);
     }
@@ -66,7 +63,6 @@ public class BuyHousesController extends BaseController {
      */
     @SaCheckPermission("system:houses:exportExcel")
     @PostMapping("/exportExcel")
-    @RsaSecurityParameter(outEncode = false)
     public void exportExcel(BuyHousesBo bo,HttpServletResponse response){
         iBuyHousesService.exportExcel(bo,response);
     }
@@ -77,7 +73,6 @@ public class BuyHousesController extends BaseController {
     @SaCheckPermission("system:houses:export")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("一期导出列表")
-    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public void export(BuyHousesBo bo, HttpServletResponse response) {
         List<BuyHousesVo> list = iBuyHousesService.queryList(bo);
         ExcelUtil.exportExcel(list, "一期导出列表", BuyHousesVo.class, response);
@@ -90,7 +85,6 @@ public class BuyHousesController extends BaseController {
      */
     @SaCheckPermission("system:houses:query")
     @GetMapping
-    @RsaSecurityParameter
     public R<BuyHousesVo> getInfo(Long id) {
         return R.ok(iBuyHousesService.queryById(id));
     }
@@ -104,7 +98,6 @@ public class BuyHousesController extends BaseController {
     @SaCheckPermission("system:houses:remove")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
     @DeleteMapping
-    @RsaSecurityParameter
     public R<Void> remove(@NotEmpty(message = "主键不能为空")Long[] ids) {
         return toAjax(iBuyHousesService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
@@ -114,7 +107,6 @@ public class BuyHousesController extends BaseController {
      */
     @Log(title = "获取申报材料",businessType = BusinessType.OTHER)
     @PostMapping("/review/material")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> getMaterialInfo(@RequestBody BuyHousesBo bo){
         return iBuyHousesService.getMaterialInfo(bo);
     }
@@ -127,7 +119,6 @@ public class BuyHousesController extends BaseController {
      */
     @SaCheckPermission("system:houses:edit")
     @PutMapping
-    @RsaSecurityParameter(inDecode = true)
     public R<?>updateBuyHouses(@RequestBody BuyHouses buyHouses){
         return iBuyHousesService.updateBuyHouses(buyHouses);
     }

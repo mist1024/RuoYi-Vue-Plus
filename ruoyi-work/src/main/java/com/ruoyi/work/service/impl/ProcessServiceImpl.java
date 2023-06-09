@@ -14,6 +14,7 @@ import com.ruoyi.work.mapper.ProcessMapper;
 import com.ruoyi.work.service.IProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class ProcessServiceImpl implements IProcessService {
 
     private final ProcessMapper baseMapper;

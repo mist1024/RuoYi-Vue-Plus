@@ -15,7 +15,6 @@ import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StrUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -53,7 +52,6 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/login")
-    @RsaSecurityParameter(inDecode = true)
     public R<Map<String, Object>> login(
 //        @Validated({LoginBody.passwordLogin.class})
         @RequestBody LoginBody loginBody) {
@@ -74,7 +72,6 @@ public class SysLoginController {
      */
     @SaIgnore
     @PostMapping("/smsLogin")
-    @RsaSecurityParameter(inDecode = true)
     public R<Map<String, Object>> smsLogin(
         @Validated({LoginBody.smgLogin.class})
         @RequestBody SmsLoginBody smsLoginBody) {
@@ -120,7 +117,6 @@ public class SysLoginController {
      * 退出登录
      */
     @SaIgnore
-    @RsaSecurityParameter
     @PostMapping("/logout")
     public R<Void> logout() {
         loginService.logout();
@@ -132,7 +128,6 @@ public class SysLoginController {
      * @return 用户信息
      */
     @GetMapping("getInfo")
-    @RsaSecurityParameter
     public R<Map<String, Object>> getInfo() {
         LoginUser loginUser = LoginHelper.getLoginUser();
         SysUser user = userService.selectUserById(loginUser.getUserId());
@@ -163,7 +158,6 @@ public class SysLoginController {
      */
     @SaIgnore
     @RateLimiter(count = 2, time = 10)
-    @RsaSecurityParameter(inDecode = true)
     @PostMapping("/userLogin")
     public R userLogin(
 //        @Validated({LoginBody.passwordLogin.class})
@@ -180,7 +174,6 @@ public class SysLoginController {
      */
     @SaIgnore
 //    @RateLimiter(count = 2, time = 10)
-    @RsaSecurityParameter(inDecode = true)
     @PostMapping("/userSmsLogin")
     public R<Map<String, Object>> userSmsLogin(@Validated(LoginBody.smgLogin.class) @RequestBody LoginBody loginBody) {
         Map<String, Object> ajax = new HashMap<>();
@@ -197,7 +190,6 @@ public class SysLoginController {
      */
     @SaIgnore
     @RateLimiter(count = 1, time = 10)
-    @RsaSecurityParameter(inDecode = true)
     @PostMapping("/userUpdatePwd")
     public R<?> userUpdatePwd(@Validated(LoginBody.forgetPasswordLogin.class) @RequestBody LoginBody loginBody) {
         return loginService.userUpdatePwd(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode());
@@ -211,7 +203,6 @@ public class SysLoginController {
     @SaIgnore
     @RateLimiter(count = 1, time = 10)
     @PostMapping("/userRegister")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> userRegister(@Validated(LoginBody.registerUser.class) @RequestBody LoginBody loginBody) {
         return  loginService.userRegister(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode());
     }
@@ -223,7 +214,6 @@ public class SysLoginController {
      */
 //    @RateLimiter(count = 1)
     @SaIgnore
-    @RsaSecurityParameter()
     @GetMapping("/forgotSendAliYun")
     public R<?> forgotSendAliYun(String phones) {
         boolean matches = phones.matches("^1(3\\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\\d|9[0-35-9])\\d{8}$");
@@ -240,7 +230,6 @@ public class SysLoginController {
      */
 //    @RateLimiter(count = 1,time = 20)
     @SaIgnore
-    @RsaSecurityParameter
     @GetMapping("/registerSendAliYun")
     public R<?> registerSendAliYun(String phones) {
         boolean matches = phones.matches("^1(3\\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\\d|9[0-35-9])\\d{8}$");
@@ -258,7 +247,6 @@ public class SysLoginController {
 //    @RateLimiter(count = 1,time = 20)
     @SaIgnore
     @GetMapping("/smsLoginSendAliYun")
-    @RsaSecurityParameter
     public R<?> smsLoginSendAliYun(String phones) {
         boolean matches = phones.matches("^1(3\\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\\d|9[0-35-9])\\d{8}$");
         if (!matches) {

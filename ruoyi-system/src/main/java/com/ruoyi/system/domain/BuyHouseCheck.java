@@ -40,4 +40,6 @@ public class BuyHouseCheck{
      */
     private String cruxKey;
 
+    private String step;
+
 }

@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="person" column="person"/>
         <result property="otherKey" column="other_key"/>
         <result property="cruxKey" column="crux_key"/>
+        <result property="step" column="step"/>
     </resultMap>
 
 

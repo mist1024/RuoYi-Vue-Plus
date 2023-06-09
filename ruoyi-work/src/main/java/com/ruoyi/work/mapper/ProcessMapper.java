@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ProcessMapper extends BaseMapperPlus<ProcessMapper, TProcess, ProcessVo> {
 
-    boolean updateCommonByBusinessId(@Param("bean") String bean, @Param("processStatus") String processStatus, @Param("businessId") String businessId);
+    boolean updateCommonByBusinessId(@Param("bean") String bean, @Param("processStatus") String processStatus, @Param("businessId") String businessId, @Param("step") Object step);
 
 }

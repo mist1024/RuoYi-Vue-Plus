@@ -19,6 +19,7 @@ import com.ruoyi.system.domain.vo.UserVo;
 import com.ruoyi.system.domain.User;
 import com.ruoyi.system.mapper.UserMapper;
 import com.ruoyi.system.service.IUserService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Collection;
  */
 @RequiredArgsConstructor
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class UserServiceImpl implements IUserService {
 
     private final UserMapper baseMapper;

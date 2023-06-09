@@ -3,7 +3,6 @@ package com.ruoyi.web.controller.common;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.file.service.ISysFileService;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ public class SysFileController
  /*文件上传请求*/
 
 
-    @RsaSecurityParameter
     @PostMapping("upload")
     public R<Map> upload(MultipartFile file)
     {

@@ -252,4 +252,6 @@ public class BuyHousesVo {
 
     private String apiKey;
 
+    private String step;
+
 }

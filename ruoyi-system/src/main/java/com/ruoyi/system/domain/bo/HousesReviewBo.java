@@ -40,6 +40,8 @@ public class HousesReviewBo extends BaseEntity {
     @NotBlank(message = "证件类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String cardType;
 
+
+    private String step;
     /**
      * 身份证号码
      */

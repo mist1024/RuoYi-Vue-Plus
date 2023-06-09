@@ -126,6 +126,10 @@ public class ProcessVo {
 
     private Date createTime;
 
+    private String companyName;
+
+    private String cardId;
+
 
 
 

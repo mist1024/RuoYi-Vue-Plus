@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.CacheNames;
+import com.ruoyi.common.core.service.IRsaSecurityService2;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -14,7 +15,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.utils.redis.CacheUtils;
-import com.ruoyi.rsaencrypt.service.IRsaSecurityService2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -71,7 +71,7 @@ public class RsaSecurityServiceImpl implements IRsaSecurityService, IRsaSecurity
     private LambdaQueryWrapper<RsaSecurity> buildQueryWrapper(RsaSecurityBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<RsaSecurity> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getPath()), RsaSecurity::getPath, bo.getPath());
+        lqw.like(StringUtils.isNotBlank(bo.getPath()), RsaSecurity::getPath, bo.getPath());
         lqw.eq(bo.getInDecode() != null, RsaSecurity::getInDecode, bo.getInDecode());
         lqw.eq(bo.getOutEncode() != null, RsaSecurity::getOutEncode, bo.getOutEncode());
         lqw.eq(StringUtils.isNotBlank(bo.getPublicKey()), RsaSecurity::getPublicKey, bo.getPublicKey());

@@ -28,11 +28,12 @@ public class WorkBusinessRule {
     private static final HousesReviewMapper housesReviewMapper = SpringUtils.getBean(HousesReviewMapper.class);
     private static final MaterialModuleServiceImpl materialModuleService = SpringUtils.getBean(MaterialModuleServiceImpl.class);
 
-    public String getDistrict(String district){
+    public String getDistrict(String district,String step){
         //先获取业务数据
         QueryWrapper<BuyHouseCheck> qw = new QueryWrapper<>();
         qw.eq("crux_key","buy_house_audit");
         qw.eq("other_key",district);
+        qw.eq("step",step);
         BuyHouseCheckVo buyHouseCheckVo = buyHouseCheckMapper.selectVoOne(qw);
         return buyHouseCheckVo.getPerson();
     }
@@ -41,7 +42,8 @@ public class WorkBusinessRule {
         HousesReview housesReview = housesReviewMapper.selectById(id);
         Map<String, Object> map = BeanUtil.beanToMap(housesReview);
         List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
-        List<String> collect = materialInfo.stream().map(MaterialModuleVo::getAuditDept).filter(c -> ObjectUtil.isNotNull(c) && ObjectUtil.isNotEmpty(c)).collect(Collectors.toList());
+        List<String> collect = materialInfo.stream().map(MaterialModuleVo::getAuditDept)
+            .filter(c -> ObjectUtil.isNotNull(c) && ObjectUtil.isNotEmpty(c)).collect(Collectors.toList());
         return collect;
     }
 }

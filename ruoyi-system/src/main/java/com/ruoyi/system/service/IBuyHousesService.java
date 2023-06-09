@@ -110,7 +110,7 @@ public interface IBuyHousesService {
      * @param buyHouses
      * @return
      */
-    R<?> insertOpenBuyHouses(BuyHouses buyHouses);
+    R<?> insertOpenBuyHouses(BuyHousesBo buyHouses);
 
     R<?> getIndexType();
 

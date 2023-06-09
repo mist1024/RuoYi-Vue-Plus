@@ -16,7 +16,6 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.excel.ExcelResult;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.HousesReview;
 import com.ruoyi.system.domain.bo.HousesReviewBo;
@@ -62,7 +61,6 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:review:reviewList")
     @GetMapping("/review/list")
-    @RsaSecurityParameter
     public TableDataInfo<HousesReview> reviewList(HousesReviewBo bo, PageQuery pageQuery) {
         return iHousesReviewService.queryPageList(bo, pageQuery);
     }
@@ -76,7 +74,6 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:manager:reviewList")
     @GetMapping("/manager/list")
-    @RsaSecurityParameter
     public TableDataInfo<HousesReview> managerReviewList(HousesReviewBo bo, PageQuery pageQuery) {
         return iHousesReviewService.managerQueryPageList(bo, pageQuery);
     }
@@ -98,7 +95,6 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:houses:exportExcel")
     @PostMapping("/exportExcel")
-    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public void exportExcel(HousesReviewBo bo,HttpServletResponse response){
         iHousesReviewService.exportExcel(bo,response);
     }
@@ -108,7 +104,6 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:review:list")
     @GetMapping("/registrationManagement/list")
-    @RsaSecurityParameter
     public TableDataInfo<HousesReview> list(HousesReviewBo bo, PageQuery pageQuery) {
         boolean admin = LoginHelper.isAdmin();
         if (!admin){
@@ -123,7 +118,6 @@ public class HousesReviewController extends BaseController {
     @SaCheckPermission("system:review:export")
     @Log(title = "购房复审登记", businessType = BusinessType.EXPORT)
     @PostMapping("/registrationManagement/export")
-    @RsaSecurityParameter(inDecode = true,outEncode = false)
     public void export(HousesReviewBo bo, HttpServletResponse response) {
         List<HousesReviewVo> list = iHousesReviewService.queryList(bo);
         ExcelUtil.exportExcel(list, "购房复审登记", HousesReviewVo.class, response);
@@ -136,7 +130,6 @@ public class HousesReviewController extends BaseController {
      */
     @SaCheckPermission("system:review:edit")
     @GetMapping("/registrationManagement")
-    @RsaSecurityParameter
     public R<HousesReviewVo> getInfo(Long id) {
         return R.ok(iHousesReviewService.queryById(id));
     }
@@ -148,7 +141,6 @@ public class HousesReviewController extends BaseController {
     @Log(title = "购房复审登记", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/registrationManagement")
-    @RsaSecurityParameter(inDecode = true)
     public R<Void> add(@Validated(AddGroup.class) @RequestBody HousesReviewBo bo) {
         return toAjax(iHousesReviewService.insertByBo(bo));
     }
@@ -171,7 +163,6 @@ public class HousesReviewController extends BaseController {
     @SaCheckPermission("system:review:remove")
     @Log(title = "购房复审登记", businessType = BusinessType.DELETE)
     @DeleteMapping("/review")
-    @RsaSecurityParameter
     public R<Void> remove(Long[] ids) {
         return toAjax(iHousesReviewService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
@@ -184,7 +175,6 @@ public class HousesReviewController extends BaseController {
      */
     @Log(title = "购房复审导入", businessType = BusinessType.IMPORT)
     @SaCheckPermission("system:review:import")
-    @RsaSecurityParameter
     @PostMapping(value = "/review/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<HousesReviewVo> result = ExcelUtil.importExcel(file.getInputStream(), HousesReviewVo.class, true);
@@ -225,7 +215,6 @@ public class HousesReviewController extends BaseController {
      */
     @Log(title = "获取申报材料",businessType = BusinessType.OTHER)
     @PostMapping("/review/material")
-    @RsaSecurityParameter(inDecode = true)
     public R<?> getMaterialInfo(@RequestBody HousesReviewBo bo){
         return iHousesReviewService.getMaterialInfo(bo);
     }
@@ -235,7 +224,6 @@ public class HousesReviewController extends BaseController {
      */
     @Log(title = "审核时返回当前人材料",businessType = BusinessType.OTHER)
     @GetMapping("/getMaterial")
-    @RsaSecurityParameter
     public R<?> getMaterialByBusinessId(Long id){
         return iHousesReviewService.getMaterialByBusinessId(id);
     }

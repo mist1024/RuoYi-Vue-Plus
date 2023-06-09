@@ -28,7 +28,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      *
      */
-    @NotNull(message = "不能为空", groups = { EditGroup.class })
+//    @NotNull(message = "不能为空", groups = { EditGroup.class })
     private Long id;
 
     /**
@@ -196,7 +196,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 用户id
      */
-    @NotNull(message = "用户id不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotNull(message = "用户id不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long userId;
 
     /**
@@ -231,6 +231,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      * 流程状态
      */
+    @NotBlank(message = "状态不能为空", groups = { AddGroup.class, EditGroup.class })
     private String processStatus;
 
     @TableField(exist = false)
@@ -245,5 +246,7 @@ public class BuyHousesBo extends BaseEntity {
     private Long[] ids;
 
     private String apiKey;
+
+    private String step;
 
 }

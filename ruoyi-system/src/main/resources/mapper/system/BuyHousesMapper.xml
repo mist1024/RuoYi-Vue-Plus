@@ -43,6 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="processStatus" column="process_status"/>
         <result property="version" column="version"/>
         <result property="apiKey" column="api_key"/>
+        <result property="step" column="step"/>
 
     </resultMap>
     <select id="getIndexType" resultType="java.util.Map">

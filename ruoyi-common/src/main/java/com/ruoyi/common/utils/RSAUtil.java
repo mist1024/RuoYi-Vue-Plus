@@ -1,7 +1,7 @@
-package com.ruoyi.rsaencrypt.utls;
+package com.ruoyi.common.utils;
+
 import cn.hutool.core.util.ObjectUtil;
 import com.antherd.smcrypto.sm2.Sm2;
-import com.ruoyi.rsaencrypt.annotation.RsaSecurityParameter;
 
 /**
  * RSA加解密工具类

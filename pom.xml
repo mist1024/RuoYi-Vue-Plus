@@ -364,11 +364,6 @@
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-rsaencrypt</artifactId>
-                <version>${ruoyi-vue-plus.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -428,7 +423,6 @@
         <module>ruoyi-sms</module>
         <module>ruoyi-work</module>
         <module>ruoyi-file</module>
-        <module>ruoyi-rsaencrypt</module>
         <module>ruoyi-rabbitmq</module>
 
 

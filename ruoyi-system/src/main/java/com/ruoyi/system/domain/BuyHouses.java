@@ -177,5 +177,6 @@ public class BuyHouses extends BaseEntity {
     @TableField(exist = false)
     private String reply;
 
+    private String step;
 
 }

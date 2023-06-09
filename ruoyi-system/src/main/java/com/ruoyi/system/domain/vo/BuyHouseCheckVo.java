@@ -48,5 +48,7 @@ public class BuyHouseCheckVo {
     @ExcelProperty(value = "关键key")
     private String cruxKey;
 
+    private String step;
+
 
 }
