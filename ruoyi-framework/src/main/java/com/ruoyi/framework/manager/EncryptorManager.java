@@ -53,7 +53,7 @@ public class EncryptorManager {
      *
      * @param encryptContext 加密执行者需要的相关配置参数
      */
-    public IEncryptor registAndGetEncryptor(EncryptContext encryptContext) {
+    public IEncryptor registerAndGetEncryptor(EncryptContext encryptContext) {
         if (encryptorMap.containsKey(encryptContext)) {
             return encryptorMap.get(encryptContext);
         }
@@ -78,7 +78,7 @@ public class EncryptorManager {
      * @param encryptContext 加密相关的配置信息
      */
     public String encrypt(String value, EncryptContext encryptContext) {
-        IEncryptor encryptor = this.registAndGetEncryptor(encryptContext);
+        IEncryptor encryptor = this.registerAndGetEncryptor(encryptContext);
         return encryptor.encrypt(value, encryptContext.getEncode());
     }
 
@@ -89,7 +89,7 @@ public class EncryptorManager {
      * @param encryptContext 加密相关的配置信息
      */
     public String decrypt(String value, EncryptContext encryptContext) {
-        IEncryptor encryptor = this.registAndGetEncryptor(encryptContext);
+        IEncryptor encryptor = this.registerAndGetEncryptor(encryptContext);
         return encryptor.decrypt(value);
     }
 

@@ -12,7 +12,7 @@ import java.util.Date;
  */
 
 @Data
-public class OperLogEvent implements Serializable {
+public class OperationLogEvent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
