@@ -1,6 +1,7 @@
-package org.dromara.job.config;
+package org.dromara.common.job.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import tech.powerjob.worker.PowerJobWorker;
@@ -12,8 +13,9 @@ import tech.powerjob.worker.PowerJobWorker;
  */
 @Configuration
 @ConditionalOnBean(PowerJobWorker.class)
+@ConditionalOnProperty(prefix = "powerjob.worker", name = "enabled", havingValue = "true")
 @EnableScheduling
-public class PowerJobConfiguration {
+public class PowerJobConfig {
 
 
 }

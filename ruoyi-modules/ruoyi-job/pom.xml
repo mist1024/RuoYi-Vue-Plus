@@ -24,14 +24,8 @@
         </dependency>
 
         <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-worker-spring-boot-starter</artifactId>
-            <version>${powerjob.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-official-processors</artifactId>
-            <version>${powerjob.version}</version>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-job</artifactId>
         </dependency>
 
 
