@@ -32,7 +32,7 @@ public enum AuthTypeEnumd {
     EMAIL("email", EmailAuthStrategy.class),
 
     /**
-     * 邮件认证
+     * 小程序认证
      */
     XCX("xcx", XcxAuthStrategy.class)
     ;

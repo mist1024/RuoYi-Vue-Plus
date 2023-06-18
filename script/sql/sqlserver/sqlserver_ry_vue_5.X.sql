@@ -1441,6 +1441,8 @@ INSERT sys_menu VALUES (121, N'租户管理', 6, 1, N'tenant', N'system/tenant/i
 GO
 INSERT sys_menu VALUES (122, N'租户套餐管理', 6, 2, N'tenantPackage', N'system/tenantPackage/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenantPackage:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户套餐管理菜单')
 GO
+INSERT sys_menu VALUES (100, N'客户端管理', 1, 1, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
+GO
 INSERT sys_menu VALUES (117, N'Admin监控', 2, 5, N'Admin', N'monitor/admin/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:admin:list', N'dashboard', 103, 1, getdate(), NULL, NULL, N'Admin监控菜单');
 GO
 INSERT sys_menu VALUES (118, N'文件管理', 1, 10, N'oss', N'system/oss/index', N'', 1, 0, N'C', '0', N'0', N'system:oss:list', N'upload', 103, 1, getdate(), NULL, NULL, N'文件管理菜单');
@@ -1595,6 +1597,17 @@ GO
 INSERT sys_menu VALUES (1614, N'租户套餐删除', 122, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
 INSERT sys_menu VALUES (1615, N'租户套餐导出', 122, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:tenantPackage:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+-- 客户端管理按钮
+INSERT sys_menu VALUES (1061, N'客户端管理查询', 123, 1, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:query', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (1062, N'客户端管理新增', 123, 2, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:add', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (1063, N'客户端管理修改', 123, 3, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:edit', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (1064, N'客户端管理删除', 123, 4, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
+GO
+INSERT sys_menu VALUES (1065, N'客户端管理导出', 123, 5, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:client:export', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
 
 CREATE TABLE sys_notice
@@ -2319,6 +2332,16 @@ INSERT sys_role_menu VALUES (2, 1059)
 GO
 INSERT sys_role_menu VALUES (2, 1060)
 GO
+INSERT sys_role_menu VALUES (2, 1061)
+GO
+INSERT sys_role_menu VALUES (2, 1062)
+GO
+INSERT sys_role_menu VALUES (2, 1063)
+GO
+INSERT sys_role_menu VALUES (2, 1064)
+GO
+INSERT sys_role_menu VALUES (2, 1065)
+GO
 
 CREATE TABLE sys_user
 (
@@ -2823,19 +2846,21 @@ GO
 
 CREATE TABLE sys_client
 (
-    id              bigint                      NOT NULL,
-    client_id       nvarchar(20)  DEFAULT ''    NULL,
-    client_key      nvarchar(255) DEFAULT ''    NULL,
-    client_secret   nvarchar(255) DEFAULT ''    NULL,
-    grant_type      nvarchar(255) DEFAULT ''    NULL,
-    status          nchar(1)      DEFAULT ('0') NULL,
-    del_flag        nchar(1)      DEFAULT ('0') NULL,
-    create_dept     bigint                      NULL,
-    create_by       bigint                      NULL,
-    create_time     datetime2(7)                NULL,
-    update_by       bigint                      NULL,
-    update_time     datetime2(7)                NULL
-        CONSTRAINT PK__sys_client___BFBDE87009ED2882 PRIMARY KEY CLUSTERED (id)
+    id                  bigint                              NOT NULL,
+    client_id           nvarchar(20)  DEFAULT ''            NULL,
+    client_key          nvarchar(255) DEFAULT ''            NULL,
+    client_secret       nvarchar(255) DEFAULT ''            NULL,
+    grant_type          nvarchar(255) DEFAULT ''            NULL,
+    activity_timeout    int           DEFAULT ((1800))      NULL,
+    timeout             int           DEFAULT ((604800))    NULL,
+    status              nchar(1)      DEFAULT ('0')         NULL,
+    del_flag            nchar(1)      DEFAULT ('0')         NULL,
+    create_dept         bigint                              NULL,
+    create_by           bigint                              NULL,
+    create_time         datetime2(7)                        NULL,
+    update_by           bigint                              NULL,
+    update_time         datetime2(7)                        NULL
+    CONSTRAINT PK__sys_client___BFBDE87009ED2882 PRIMARY KEY CLUSTERED (id)
         WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
         ON [PRIMARY]
 )
@@ -2871,6 +2896,18 @@ EXEC sp_addextendedproperty
 'SCHEMA', N'dbo',
 'TABLE', N'sys_client',
 'COLUMN', N'grant_type'
+GO
+EXEC sp_addextendedproperty
+'MS_Description', N'token活跃超时时间',
+'SCHEMA', N'dbo',
+'TABLE', N'sys_client',
+'COLUMN', N'activity_timeout'
+GO
+EXEC sp_addextendedproperty
+'MS_Description', N'token固定超时',
+'SCHEMA', N'dbo',
+'TABLE', N'sys_client',
+'COLUMN', N'timeout'
 GO
 EXEC sp_addextendedproperty
 'MS_Description', N'状态（0正常 1停用）',
@@ -2920,7 +2957,7 @@ EXEC sp_addextendedproperty
 'TABLE', N'sys_client'
 GO
 
-INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password', N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO
-INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms', N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO

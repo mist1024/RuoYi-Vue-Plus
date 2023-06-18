@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 授权管理对象 sys_auth
+ * 授权管理对象 sys_client
  *
  * @author Michelle.Chung
  * @date 2023-05-15
@@ -46,6 +46,16 @@ public class SysClient extends BaseEntity {
      * 授权类型
      */
     private String grantType;
+
+    /**
+     * token活跃超时时间
+     */
+    private Long activityTimeout;
+
+    /**
+     * token固定超时时间
+     */
+    private Long timeout;
 
     /**
      * 状态（0正常 1停用）

@@ -9,8 +9,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 /**
- * 授权管理业务对象 sys_auth
+ * 授权管理业务对象 sys_client
  *
  * @author Michelle.Chung
  * @date 2023-05-15
@@ -46,8 +48,23 @@ public class SysClientBo extends BaseEntity {
     /**
      * 授权类型
      */
-    @NotBlank(message = "授权类型不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "授权类型不能为空", groups = { AddGroup.class, EditGroup.class })
+    private List<String> grantTypeList;
+
+    /**
+     * 授权类型
+     */
     private String grantType;
+
+    /**
+     * token活跃超时时间
+     */
+    private Long activityTimeout;
+
+    /**
+     * token固定超时时间
+     */
+    private Long timeout;
 
     /**
      * 状态（0正常 1停用）

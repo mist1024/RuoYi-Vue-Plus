@@ -245,8 +245,9 @@ insert into sys_menu values('109',  '在线用户',     '2',   '1', 'online',   
 insert into sys_menu values('113',  '缓存监控',     '2',   '5', 'cache',            'monitor/cache/index',          '', 1, 0, 'C', '0', '0', 'monitor:cache:list',          'redis',         103, 1, sysdate(), null, null, '缓存监控菜单');
 insert into sys_menu values('114',  '表单构建',     '3',   '1', 'build',            'tool/build/index',             '', 1, 0, 'C', '0', '0', 'tool:build:list',             'build',         103, 1, sysdate(), null, null, '表单构建菜单');
 insert into sys_menu values('115',  '代码生成',     '3',   '2', 'gen',              'tool/gen/index',               '', 1, 0, 'C', '0', '0', 'tool:gen:list',               'code',          103, 1, sysdate(), null, null, '代码生成菜单');
-insert into sys_menu values ('121', '租户管理',     '6',   '1', 'tenant',           'system/tenant/index',          '', 1, 0, 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, sysdate(), null, null, '租户管理菜单');
-insert into sys_menu values ('122', '租户套餐管理',  '6',   '2', 'tenantPackage',    'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate(), null, null, '租户套餐管理菜单');
+insert into sys_menu values('121',  '租户管理',     '6',   '1', 'tenant',           'system/tenant/index',          '', 1, 0, 'C', '0', '0', 'system:tenant:list',          'list',          103, 1, sysdate(), null, null, '租户管理菜单');
+insert into sys_menu values('122',  '租户套餐管理', '6',   '2', 'tenantPackage',    'system/tenantPackage/index',   '', 1, 0, 'C', '0', '0', 'system:tenantPackage:list',   'form',          103, 1, sysdate(), null, null, '租户套餐管理菜单');
+insert into sys_menu values('123',  '客户端管理',   '1',   '1', 'client',           'system/client/index',          '', 1, 0, 'C', '0', '0', 'system:client:list',          'international', 103, 1, sysdate(), null, null, '客户端管理菜单');
 
 -- springboot-admin监控
 insert into sys_menu values('117',  'Admin监控',   '2',   '5',  'Admin',            'monitor/admin/index',         '', 1, 0, 'C', '0', '0', 'monitor:admin:list',           'dashboard',     103, 1, sysdate(), null, null, 'Admin监控菜单');
@@ -344,7 +345,12 @@ insert into sys_menu values ('1612', '租户套餐新增', '122', '2', '#', '', 
 insert into sys_menu values ('1613', '租户套餐修改', '122', '3', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:edit',    '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values ('1614', '租户套餐删除', '122', '4', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:remove',  '#', 103, 1, sysdate(), null, null, '');
 insert into sys_menu values ('1615', '租户套餐导出', '122', '5', '#', '', '', 1, 0, 'F', '0', '0', 'system:tenantPackage:export',  '#', 103, 1, sysdate(), null, null, '');
-
+-- 客户端管理按钮
+insert into sys_menu values('1061', '客户端管理查询', '123', '1',  '#', '', 1, 0, 'F', '0', '0', 'system:client:query',        '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1062', '客户端管理新增', '123', '2',  '#', '', 1, 0, 'F', '0', '0', 'system:client:add',          '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1063', '客户端管理修改', '123', '3',  '#', '', 1, 0, 'F', '0', '0', 'system:client:edit',         '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1064', '客户端管理删除', '123', '4',  '#', '', 1, 0, 'F', '0', '0', 'system:client:remove',       '#', 103, 1, sysdate(), null, null, '');
+insert into sys_menu values('1065', '客户端管理导出', '123', '5',  '#', '', 1, 0, 'F', '0', '0', 'system:client:export',       '#', 103, 1, sysdate(), null, null, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
@@ -455,6 +461,11 @@ insert into sys_role_menu values ('2', '1057');
 insert into sys_role_menu values ('2', '1058');
 insert into sys_role_menu values ('2', '1059');
 insert into sys_role_menu values ('2', '1060');
+insert into sys_role_menu values ('2', '1061');
+insert into sys_role_menu values ('2', '1062');
+insert into sys_role_menu values ('2', '1063');
+insert into sys_role_menu values ('2', '1064');
+insert into sys_role_menu values ('2', '1065');
 
 -- ----------------------------
 -- 8、角色和部门关联表  角色1-N部门
@@ -801,20 +812,22 @@ insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'r
 -- ----------------------------
 drop table if exists sys_client;
 create table sys_client (
-    id            bigint(20)    not null            comment 'id',
-    client_id     varchar(64)   default null        comment '客户端id',
-    client_key    varchar(32)   default null        comment '客户端key',
-    client_secret varchar(255)  default null        comment '客户端秘钥',
-    grant_type    varchar(255)  default null        comment '授权类型',
-    status        char(1)       default '0'         comment '状态（0正常 1停用）',
-    del_flag      char(1)       default '0'         comment '删除标志（0代表存在 2代表删除）',
-    create_dept   bigint(20)    default null        comment '创建部门',
-    create_by     bigint(20)    default null        comment '创建者',
-    create_time   datetime      default null        comment '创建时间',
-    update_by     bigint(20)    default null        comment '更新者',
-    update_time   datetime      default null        comment '更新时间',
+    id                  bigint(20)    not null            comment 'id',
+    client_id           varchar(64)   default null        comment '客户端id',
+    client_key          varchar(32)   default null        comment '客户端key',
+    client_secret       varchar(255)  default null        comment '客户端秘钥',
+    grant_type          varchar(255)  default null        comment '授权类型',
+    activity_timeout    int(11)       default 1800        comment 'token活跃超时时间',
+    timeout             int(11)       default 604800      comment 'token固定超时',
+    status              char(1)       default '0'         comment '状态（0正常 1停用）',
+    del_flag            char(1)       default '0'         comment '删除标志（0代表存在 2代表删除）',
+    create_dept         bigint(20)    default null        comment '创建部门',
+    create_by           bigint(20)    default null        comment '创建者',
+    create_time         datetime      default null        comment '创建时间',
+    update_by           bigint(20)    default null        comment '更新者',
+    update_time         datetime      default null        comment '更新时间',
     primary key (id)
 ) engine=innodb comment='系统授权表';
 
-insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password', 0, 0, 103, 1, sysdate(), 1, sysdate());
-insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms', 0, 0, 103, 1, sysdate(), 1, sysdate());
+insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
+insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
