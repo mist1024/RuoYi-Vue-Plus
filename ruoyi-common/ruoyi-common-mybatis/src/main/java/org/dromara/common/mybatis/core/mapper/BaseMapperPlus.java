@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @since 2021-05-13
  */
 @SuppressWarnings("unchecked")
-public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
+public interface BaseMapperPlus<T, V> extends CommonMapper<T> {
 
     Log log = LogFactory.getLog(BaseMapperPlus.class);
 
