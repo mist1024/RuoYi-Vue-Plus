@@ -1,6 +1,8 @@
 package org.dromara.system.service.impl;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.TenantConstants;
+import org.dromara.common.core.domain.dto.UserOnlineDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.SpringUtils;
@@ -18,10 +21,12 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.*;
+import org.dromara.system.domain.bo.SysOnlineUserBo;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.mapper.*;
 import org.dromara.system.service.ISysTenantService;
+import org.dromara.system.service.ISysUserOnlineService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -52,6 +57,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     private final SysDictTypeMapper dictTypeMapper;
     private final SysDictDataMapper dictDataMapper;
     private final SysConfigMapper configMapper;
+    private final ISysUserOnlineService onlineService;
 
     /**
      * 查询租户
@@ -261,6 +267,17 @@ public class SysTenantServiceImpl implements ISysTenantService {
     @CacheEvict(cacheNames = CacheNames.SYS_TENANT, key = "#bo.tenantId")
     @Override
     public int updateTenantStatus(SysTenantBo bo) {
+        // 停用租户时，要将租户下的所有在线用户全部剔除，避免依然有权限操作
+        if (Constants.FAIL.equals(bo.getStatus())) {
+            List<UserOnlineDTO> userOnlineDTOList = this.onlineService.getOnlineUsers(bo.getTenantId(), null);
+            for (UserOnlineDTO online : userOnlineDTOList) {
+                try {
+                    StpUtil.kickoutByTokenValue(online.getTokenId());
+                } catch (NotLoginException ignored) {
+                }
+            }
+        }
+
         SysTenant tenant = MapstructUtils.convert(bo, SysTenant.class);
         return baseMapper.updateById(tenant);
     }
