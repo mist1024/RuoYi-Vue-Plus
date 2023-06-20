@@ -1259,6 +1259,16 @@ INSERT sys_dict_data VALUES (27, N'000000', 1, N'成功', N'0', N'sys_common_sta
 GO
 INSERT sys_dict_data VALUES (28, N'000000', 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
+INSERT sys_dict_data VALUES (29, N'000000', 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'密码认证')
+GO
+INSERT sys_dict_data VALUES (30, N'000000', 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'短信认证')
+GO
+INSERT sys_dict_data VALUES (31, N'000000', 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'邮件认证')
+GO
+INSERT sys_dict_data VALUES (32, N'000000', 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'小程序认证')
+GO
+INSERT sys_dict_data VALUES (33, N'000000', 0, N'三方登录认证', N'`social`', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
+GO
 
 CREATE TABLE sys_dict_type
 (
@@ -1374,6 +1384,8 @@ GO
 INSERT sys_dict_type VALUES (9, N'000000', N'操作类型', N'sys_oper_type', N'0', 103, 1, getdate(), NULL, NULL, N'操作类型列表')
 GO
 INSERT sys_dict_type VALUES (10, N'000000', N'系统状态', N'sys_common_status', N'0', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
+GO
+INSERT sys_dict_type VALUES (10, N'000000', N'授权类型', N'sys_grant_type', N'0', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
 GO
 
 CREATE TABLE sys_logininfor
@@ -3177,7 +3189,7 @@ EXEC sp_addextendedproperty
 'TABLE', N'sys_client'
 GO
 
-INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO
-INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO

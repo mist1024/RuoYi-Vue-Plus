@@ -4,7 +4,6 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -33,8 +32,6 @@ import org.dromara.web.factory.AuthFactory;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
 import org.dromara.web.service.SysRegisterService;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,72 +61,24 @@ public class AuthController {
     /**
      * 登录方法
      *
-     * @param body 登录信息
+     * @param loginBody 登录信息
      * @return 结果
      */
     @PostMapping("/login")
-    public R<LoginVo> login(@Validated @RequestBody LoginBody body) {
-        LoginVo loginVo = new LoginVo();
-        // 生成令牌
-        String token = loginService.login(
-            body.getTenantId(),
-            body.getUsername(), body.getPassword(),
-            body.getCode(), body.getUuid());
-        loginVo.setToken(token);
-        return R.ok(loginVo);
+    public R<LoginVo> login(@Validated @RequestBody LoginBody loginBody) {
+        // 授权类型和客户端id
+        String clientId = loginBody.getClientId();
+        String grantType = loginBody.getGrantType();
+        IAuthStrategy authStrategy = AuthFactory.instance(grantType);
+        // 校验请求参数
+        authStrategy.validate(loginBody);
+        // 校验授权类型和客户端id
+        loginService.checkClientType(clientId, grantType);
+        // 校验租户
+        loginService.checkTenant(loginBody.getTenantId());
+        // 登录
+        return R.ok(authStrategy.login(clientId, loginBody));
     }
-
-    /**
-     * 短信登录
-     *
-     * @param body 登录信息
-     * @return 结果
-     */
-    @PostMapping("/smsLogin")
-    public R<LoginVo> smsLogin(@Validated @RequestBody SmsLoginBody body) {
-        LoginVo loginVo = new LoginVo();
-        // 生成令牌
-        String token = loginService.smsLogin(
-            body.getTenantId(),
-            body.getPhonenumber(),
-            body.getSmsCode());
-        loginVo.setToken(token);
-        return R.ok(loginVo);
-    }
-
-    /**
-     * 邮件登录
-     *
-     * @param body 登录信息
-     * @return 结果
-     */
-    @PostMapping("/emailLogin")
-    public R<LoginVo> emailLogin(@Validated @RequestBody EmailLoginBody body) {
-        LoginVo loginVo = new LoginVo();
-        // 生成令牌
-        String token = loginService.emailLogin(
-            body.getTenantId(),
-            body.getEmail(),
-            body.getEmailCode());
-        loginVo.setToken(token);
-        return R.ok(loginVo);
-    }
-
-    /**
-     * 小程序登录(示例)
-     *
-     * @param xcxCode 小程序code
-     * @return 结果
-     */
-    @PostMapping("/xcxLogin")
-    public R<LoginVo> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
-        LoginVo loginVo = new LoginVo();
-        // 生成令牌
-        String token = loginService.xcxLogin(xcxCode);
-        loginVo.setToken(token);
-        return R.ok(loginVo);
-    }
-
 
     /**
      * 认证授权

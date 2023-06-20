@@ -599,7 +599,8 @@ insert into sys_dict_type values(6, '000000', '系统是否', 'sys_yes_no',     
 insert into sys_dict_type values(7, '000000', '通知类型', 'sys_notice_type',     '0', 103, 1, sysdate(), null, null, '通知类型列表');
 insert into sys_dict_type values(8, '000000', '通知状态', 'sys_notice_status',   '0', 103, 1, sysdate(), null, null, '通知状态列表');
 insert into sys_dict_type values(9, '000000', '操作类型', 'sys_oper_type',       '0', 103, 1, sysdate(), null, null, '操作类型列表');
-insert into sys_dict_type values(10, '000000', '系统状态', 'sys_common_status',   '0', 103, 1, sysdate(), null, null, '登录状态列表');
+insert into sys_dict_type values(10, '000000', '系统状态', 'sys_common_status',  '0', 103, 1, sysdate(), null, null, '登录状态列表');
+insert into sys_dict_type values(11, '000000', '授权类型', 'sys_grant_type',     '0', 103, 1, sysdate(), null, null, '认证授权类型');
 
 
 -- ----------------------------
@@ -652,6 +653,11 @@ insert into sys_dict_data values(25, '000000', 8,  '生成代码', '8',       's
 insert into sys_dict_data values(26, '000000', 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', '0', 103, 1, sysdate(), null, null, '清空操作');
 insert into sys_dict_data values(27, '000000', 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', '0', 103, 1, sysdate(), null, null, '正常状态');
 insert into sys_dict_data values(28, '000000', 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', '0', 103, 1, sysdate(), null, null, '停用状态');
+insert into sys_dict_data values(29, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate(), null, null, '密码认证');
+insert into sys_dict_data values(30, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate(), null, null, '短信认证');
+insert into sys_dict_data values(31, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate(), null, null, '邮件认证');
+insert into sys_dict_data values(32, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate(), null, null, '小程序认证');
+insert into sys_dict_data values(33, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate(), null, null, '三方登录认证');
 
 
 -- ----------------------------
@@ -867,5 +873,5 @@ create table sys_client (
     primary key (id)
 ) engine=innodb comment='系统授权表';
 
-insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
-insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
+insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
+insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
