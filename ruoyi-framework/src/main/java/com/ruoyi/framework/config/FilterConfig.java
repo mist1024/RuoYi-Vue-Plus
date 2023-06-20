@@ -1,8 +1,10 @@
 package com.ruoyi.framework.config;
 
+import com.ruoyi.common.filter.CryptoFilter;
 import com.ruoyi.common.filter.RepeatableFilter;
 import com.ruoyi.common.filter.XssFilter;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.config.properties.RequestEncryptProperties;
 import com.ruoyi.framework.config.properties.XssProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,6 +26,27 @@ public class FilterConfig {
 
     @Autowired
     private XssProperties xssProperties;
+
+    @Autowired
+    private RequestEncryptProperties requestEncryptProperties;
+
+    @Bean
+    @ConditionalOnProperty(value = "request-encryptor.enable", havingValue = "true")
+    public FilterRegistrationBean<CryptoFilter> cryptoFilterRegistration() {
+        FilterRegistrationBean<CryptoFilter> registration = new FilterRegistrationBean<>();
+        registration.setDispatcherTypes(DispatcherType.REQUEST);
+        registration.setFilter(new CryptoFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("cryptoFilter");
+        HashMap<String, String> param = new HashMap<>();
+        param.put(CryptoFilter.CRYPTO_ENABLE, String.valueOf(requestEncryptProperties.getEnable()));
+        param.put(CryptoFilter.CRYPTO_PUBLIC_KEY, requestEncryptProperties.getPublicKey());
+        param.put(CryptoFilter.CRYPTO_PRIVATE_KEY, requestEncryptProperties.getPrivateKey());
+        param.put(CryptoFilter.CRYPTO_HEADER_FLAG, requestEncryptProperties.getHeaderFlag());
+        registration.setInitParameters(param);
+        registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
+        return registration;
+    }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
