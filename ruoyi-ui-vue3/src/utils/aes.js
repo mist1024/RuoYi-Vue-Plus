@@ -16,7 +16,6 @@ export const generateAesKey = () => {
  * @returns {string}
  */
 export const encryptWithAes = (message, aesKey) => {
-  console.log(message, aesKey)
   const encrypted = CryptoJS.AES.encrypt(message, aesKey, {
     "mode": CryptoJS.mode.ECB,
     "padding": CryptoJS.pad.Pkcs7
