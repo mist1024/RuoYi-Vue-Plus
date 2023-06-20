@@ -199,7 +199,7 @@ mybatis-encryptor:
 # 数据加密
 request-encryptor:
   # 是否开启加密
-  enable: true
+  enable: false
   # AES 加密头标识
   headerFlag: AES
   # 公私钥 非对称算法的公私钥 如：SM2，RSA

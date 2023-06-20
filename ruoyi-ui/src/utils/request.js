@@ -34,8 +34,7 @@ service.interceptors.request.use(config => {
   if (getToken() && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
-  // 是否需要加密
-  const isEncrypt = (config.headers || {}).isEncrypt === process.env.IS_ENCRYPT
+
   // get请求映射params参数
   if (config.method === 'get' && config.params) {
     let url = config.url + '?' + tansParams(config.params);
@@ -67,7 +66,7 @@ service.interceptors.request.use(config => {
     }
   }
   // 当开启参数加密
-  if (isEncrypt && (config.method === 'post' || config.method === 'put')) {
+  if (process.env.VUE_APP_IS_ENCRYPT === 'true' && (config.method === 'post' || config.method === 'put')) {
     // 生成一个 AES 密钥
     const aesKey = generateAesKey();
     config.headers['AES'] = encrypt(aesKey.toString(CryptoJS.enc.Base64));
