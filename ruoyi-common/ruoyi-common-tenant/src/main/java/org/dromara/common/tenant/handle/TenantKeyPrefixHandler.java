@@ -38,6 +38,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         }
 
         String tenantId = TENANT_ID.get();
+        TENANT_ID.remove();
         if (tenantId == null) {
             tenantId = TenantHelper.getTenantId();
         }
