@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.dromara.common.core.factory.YmlPropertySourceFactory;
+import org.dromara.common.mybatis.core.mapper.MySqlInjector;
 import org.dromara.common.mybatis.handler.InjectionMetaObjectHandler;
 import org.dromara.common.mybatis.interceptor.PlusDataPermissionInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
@@ -82,6 +83,14 @@ public class MybatisPlusConfig {
         return new DefaultIdentifierGenerator(NetUtil.getLocalhost());
     }
 
+    /**
+     * 全量更新
+     * @return
+     */
+    @Bean
+    public MySqlInjector sqlInjector() {
+        return new MySqlInjector();
+    }
     /**
      * PaginationInnerInterceptor 分页插件，自动识别数据库类型
      * https://baomidou.com/pages/97710a/
