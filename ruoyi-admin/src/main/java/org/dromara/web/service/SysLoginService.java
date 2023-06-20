@@ -7,6 +7,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.TenantConstants;
@@ -24,10 +26,13 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.bo.SysSocialBo;
+import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysClientMapper;
 import org.dromara.system.mapper.SysUserMapper;
+import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysPermissionService;
 import org.dromara.system.service.ISysTenantService;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,8 +61,67 @@ public class SysLoginService {
 
     private final ISysTenantService tenantService;
     private final ISysPermissionService permissionService;
+    private final ISysSocialService sysSocialService;
     private final SysUserMapper userMapper;
     private final SysClientMapper clientMapper;
+
+    /**
+     * 社交登录
+     *
+     * @param source   登录来源
+     * @param authUser 授权响应实体
+     * @return 统一响应实体
+     */
+    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser) {
+        // 判断授权响应是否成功
+        if (!authUser.ok()) {
+            return R.fail("对不起，授权信息验证不通过，请退出重试！");
+        }
+        AuthUser authUserData = authUser.getData();
+        SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
+        if (ObjectUtil.isNotNull(social)) {
+            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getUserId, social.getUserId()));
+            // 执行登录和记录登录信息操作
+            return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
+        } else {
+            // 判断是否已登录
+            if (!StpUtil.isLogin()) {
+                return R.fail("授权失败，请先登录才能绑定");
+            }
+            SysSocialBo bo = new SysSocialBo();
+            bo.setUserId(LoginHelper.getUserId());
+            bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
+            bo.setSource(authUserData.getSource());
+            bo.setUserName(authUserData.getUsername());
+            bo.setNickName(authUserData.getNickname());
+            bo.setAvatar(authUserData.getAvatar());
+            bo.setOpenId(authUserData.getUuid());
+            BeanUtils.copyProperties(authUserData.getToken(), bo);
+
+            sysSocialService.insertByBo(bo);
+            SysUserVo sysUser = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
+            // 执行登录和记录登录信息操作
+            return loginAndRecord(sysUser.getTenantId(), sysUser.getUserName(), authUserData);
+        }
+    }
+
+    /**
+     * 执行登录和记录登录信息操作
+     *
+     * @param tenantId 租户ID
+     * @param userName 用户名
+     * @param authUser 授权用户信息
+     * @return 统一响应实体
+     */
+    private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
+        checkTenant(tenantId);
+        SysUserVo user = loadUserByUsername(tenantId, userName);
+        LoginHelper.loginByDevice(buildLoginUser(user), DeviceType.SOCIAL);
+        recordLogininfor(user.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        recordLoginInfo(user.getUserId());
+        return R.ok(StpUtil.getTokenValue());
+    }
 
     /**
      * 退出登录
@@ -94,9 +158,122 @@ public class SysLoginService {
     }
 
     /**
+     * 校验短信验证码
+     */
+    private boolean validateSmsCode(String tenantId, String phonenumber, String smsCode) {
+        String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
+        if (StringUtils.isBlank(code)) {
+            recordLogininfor(tenantId, phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            throw new CaptchaExpireException();
+        }
+        return code.equals(smsCode);
+    }
+
+    /**
+     * 校验邮箱验证码
+     */
+    private boolean validateEmailCode(String tenantId, String email, String emailCode) {
+        String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + email);
+        if (StringUtils.isBlank(code)) {
+            recordLogininfor(tenantId, email, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            throw new CaptchaExpireException();
+        }
+        return code.equals(emailCode);
+    }
+
+    /**
+     * 校验验证码
+     *
+     * @param username 用户名
+     * @param code     验证码
+     * @param uuid     唯一标识
+     */
+    public void validateCaptcha(String tenantId, String username, String code, String uuid) {
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String captcha = RedisUtils.getCacheObject(verifyKey);
+        RedisUtils.deleteObject(verifyKey);
+        if (captcha == null) {
+            recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            throw new CaptchaExpireException();
+        }
+        if (!code.equalsIgnoreCase(captcha)) {
+            recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
+            throw new CaptchaException();
+        }
+    }
+
+    private SysUserVo loadUserByUsername(String tenantId, String username) {
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .select(SysUser::getUserName, SysUser::getStatus)
+                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+                .eq(SysUser::getUserName, username));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", username);
+            throw new UserException("user.not.exists", username);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", username);
+            throw new UserException("user.blocked", username);
+        }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByUserName(username, tenantId);
+        }
+        return userMapper.selectUserByUserName(username);
+    }
+
+    private SysUserVo loadUserByPhonenumber(String tenantId, String phonenumber) {
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .select(SysUser::getPhonenumber, SysUser::getStatus)
+                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+                .eq(SysUser::getPhonenumber, phonenumber));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", phonenumber);
+            throw new UserException("user.not.exists", phonenumber);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", phonenumber);
+            throw new UserException("user.blocked", phonenumber);
+        }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByPhonenumber(phonenumber, tenantId);
+        }
+        return userMapper.selectUserByPhonenumber(phonenumber);
+    }
+
+    private SysUserVo loadUserByEmail(String tenantId, String email) {
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getEmail, SysUser::getStatus)
+            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+            .eq(SysUser::getEmail, email));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", email);
+            throw new UserException("user.not.exists", email);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", email);
+            throw new UserException("user.blocked", email);
+        }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByEmail(email, tenantId);
+        }
+        return userMapper.selectUserByEmail(email);
+    }
+
+    private SysUserVo loadUserByOpenid(String openid) {
+        // 使用 openid 查询绑定用户 如未绑定用户 则根据业务自行处理 例如 创建默认用户
+        // todo 自行实现 userService.selectUserByOpenid(openid);
+        SysUserVo user = new SysUserVo();
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", openid);
+            // todo 用户不存在 业务逻辑自行实现
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", openid);
+            // todo 用户已被停用 业务逻辑自行实现
+        }
+        return user;
+    }
+
+    /**
      * 构建登录用户
      */
-    public LoginUser buildLoginUser(SysUserVo user) {
+    private LoginUser buildLoginUser(SysUserVo user) {
         LoginUser loginUser = new LoginUser();
         loginUser.setTenantId(user.getTenantId());
         loginUser.setUserId(user.getUserId());

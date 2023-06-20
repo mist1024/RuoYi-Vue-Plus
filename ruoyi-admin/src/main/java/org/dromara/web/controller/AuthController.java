@@ -2,15 +2,28 @@ package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.utils.AuthStateUtils;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.RegisterBody;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
+import org.dromara.common.social.config.properties.SocialProperties;
+import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
+import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.domain.vo.LoginTenantVo;
@@ -40,32 +53,137 @@ import java.util.List;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private final SocialProperties socialProperties;
     private final SysLoginService loginService;
     private final SysRegisterService registerService;
     private final ISysConfigService configService;
     private final ISysTenantService tenantService;
+    private final ISysSocialService socialUserService;
+
 
     /**
      * 登录方法
      *
-     * @param loginBody 登录信息
+     * @param body 登录信息
      * @return 结果
      */
     @PostMapping("/login")
-    public R<LoginVo> login(@Validated @RequestBody LoginBody loginBody) {
-        // 校验类型和id
-        String clientId = loginBody.getClientId();
-        String grantType = loginBody.getGrantType();
-        IAuthStrategy authStrategy = AuthFactory.instance(grantType);
-        // 校验请求参数
-        authStrategy.validate(loginBody);
-        // 校验授权类型和id
-        loginService.checkClientType(clientId, grantType);
-        // 校验租户
-        loginService.checkTenant(loginBody.getTenantId());
-        // 登录
-        return R.ok(authStrategy.login(clientId, loginBody));
+    public R<LoginVo> login(@Validated @RequestBody LoginBody body) {
+        LoginVo loginVo = new LoginVo();
+        // 生成令牌
+        String token = loginService.login(
+            body.getTenantId(),
+            body.getUsername(), body.getPassword(),
+            body.getCode(), body.getUuid());
+        loginVo.setToken(token);
+        return R.ok(loginVo);
     }
+
+    /**
+     * 短信登录
+     *
+     * @param body 登录信息
+     * @return 结果
+     */
+    @PostMapping("/smsLogin")
+    public R<LoginVo> smsLogin(@Validated @RequestBody SmsLoginBody body) {
+        LoginVo loginVo = new LoginVo();
+        // 生成令牌
+        String token = loginService.smsLogin(
+            body.getTenantId(),
+            body.getPhonenumber(),
+            body.getSmsCode());
+        loginVo.setToken(token);
+        return R.ok(loginVo);
+    }
+
+    /**
+     * 邮件登录
+     *
+     * @param body 登录信息
+     * @return 结果
+     */
+    @PostMapping("/emailLogin")
+    public R<LoginVo> emailLogin(@Validated @RequestBody EmailLoginBody body) {
+        LoginVo loginVo = new LoginVo();
+        // 生成令牌
+        String token = loginService.emailLogin(
+            body.getTenantId(),
+            body.getEmail(),
+            body.getEmailCode());
+        loginVo.setToken(token);
+        return R.ok(loginVo);
+    }
+
+    /**
+     * 小程序登录(示例)
+     *
+     * @param xcxCode 小程序code
+     * @return 结果
+     */
+    @PostMapping("/xcxLogin")
+    public R<LoginVo> xcxLogin(@NotBlank(message = "{xcx.code.not.blank}") String xcxCode) {
+        LoginVo loginVo = new LoginVo();
+        // 生成令牌
+        String token = loginService.xcxLogin(xcxCode);
+        loginVo.setToken(token);
+        return R.ok(loginVo);
+    }
+
+
+    /**
+     * 认证授权
+     *
+     * @param source 登录来源
+     * @return 结果
+     */
+    @GetMapping("/binding/{source}")
+    public R<String> authBinding(@PathVariable("source") String source) {
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
+        if (ObjectUtil.isNull(obj)) {
+            return R.fail(source + "平台账号暂不支持");
+        }
+        AuthRequest authRequest = SocialUtils.getAuthRequest(source,
+            obj.getClientId(),
+            obj.getClientSecret(),
+            obj.getRedirectUri());
+        String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
+        return R.ok(authorizeUrl);
+    }
+
+    /**
+     * 第三方登录回调业务处理
+     *
+     * @param source   登录来源
+     * @param callback 授权响应实体
+     * @return 结果
+     */
+    @SuppressWarnings("unchecked")
+    @GetMapping("/social-login/{source}")
+    public R<String> socialLogin(@PathVariable("source") String source, AuthCallback callback) {
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
+        if (ObjectUtil.isNull(obj)) {
+            return R.fail(source + "平台账号暂不支持");
+        }
+        AuthRequest authRequest = SocialUtils.getAuthRequest(source,
+            obj.getClientId(),
+            obj.getClientSecret(),
+            obj.getRedirectUri());
+        AuthResponse<AuthUser> response = authRequest.login(callback);
+        return loginService.socialLogin(source, response);
+    }
+
+    /**
+     * 取消授权
+     *
+     * @param socialId socialId
+     */
+    @DeleteMapping(value = "/unlock/{socialId}")
+    public R<Void> unlockSocial(@PathVariable Long socialId) {
+        Boolean rows = socialUserService.deleteWithValidById(socialId);
+        return rows ? R.ok() : R.fail("取消授权失败");
+    }
+
 
     /**
      * 退出登录
