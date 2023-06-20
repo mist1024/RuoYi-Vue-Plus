@@ -12,6 +12,15 @@ import org.dromara.common.tenant.helper.TenantHelper;
  */
 public class TenantKeyPrefixHandler extends KeyPrefixHandler {
 
+    // 用于获取指定租户下的缓存
+    private static final ThreadLocal<String> TENANT_ID = new ThreadLocal<>();
+
+    public static void setTenantId(String tenantId) {
+        if (StringUtils.isNotEmpty(tenantId)) {
+            TENANT_ID.set(tenantId);
+        }
+    }
+
     public TenantKeyPrefixHandler(String keyPrefix) {
         super(keyPrefix);
     }
@@ -27,7 +36,12 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
             return super.map(name);
         }
-        String tenantId = TenantHelper.getTenantId();
+
+        String tenantId = TENANT_ID.get();
+        TENANT_ID.remove();
+        if (tenantId == null) {
+            tenantId = TenantHelper.getTenantId();
+        }
         if (StringUtils.startsWith(name, tenantId)) {
             // 如果存在则直接返回
             return super.map(name);
