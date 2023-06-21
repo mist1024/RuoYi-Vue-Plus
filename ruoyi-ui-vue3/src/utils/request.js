@@ -6,6 +6,9 @@ import { tansParams, blobValidate } from '@/utils/ruoyi'
 import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
 import useUserStore from '@/store/modules/user'
+import {encryptWithAes, generateAesKey} from "@/utils/aes";
+import {encrypt} from "@/utils/jsencrypt";
+import CryptoJS from "crypto-js";
 
 let downloadLoadingInstance;
 // 是否显示重新登录
@@ -28,6 +31,8 @@ service.interceptors.request.use(config => {
   const isToken = (config.headers || {}).isToken === false
   // 是否需要防止数据重复提交
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
+  // 是否需要加密
+  const isEncrypt = (config.headers || {}).isEncrypt === true || import.meta.env.VITE_APP_IS_ENCRYPT === 'true'
   if (getToken() && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
@@ -60,6 +65,13 @@ service.interceptors.request.use(config => {
         cache.session.setJSON('sessionObj', requestObj)
       }
     }
+  }
+  // 当开启参数加密
+  if (isEncrypt && (config.method === 'post' || config.method === 'put')) {
+    // 生成一个 AES 密钥
+    const aesKey = generateAesKey();
+    config.headers['AES'] = encrypt(aesKey.toString(CryptoJS.enc.Base64));
+    config.data = typeof config.data === 'object' ? encryptWithAes(JSON.stringify(config.data), aesKey) : encryptWithAes(config.data, aesKey);
   }
   return config
 }, error => {
