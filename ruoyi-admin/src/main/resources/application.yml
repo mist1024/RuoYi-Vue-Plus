@@ -173,7 +173,7 @@ mybatis-encryptor:
 
 # api接口加密
 api-decrypt:
-  # 是否开启加密
+  # 是否开启全局接口加密
   enable: false
   # AES 加密头标识
   headerFlag: AES
