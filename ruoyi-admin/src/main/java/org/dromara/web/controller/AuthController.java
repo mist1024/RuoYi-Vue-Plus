@@ -23,6 +23,7 @@ import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.cryptapi.annotation.ApiDecrypt;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.service.ISysSocialService;
@@ -66,6 +67,7 @@ public class AuthController {
      * @return 结果
      */
     @PostMapping("/login")
+    @ApiDecrypt
     public R<LoginVo> login(@Validated @RequestBody LoginBody body) {
         LoginVo loginVo = new LoginVo();
         // 生成令牌
