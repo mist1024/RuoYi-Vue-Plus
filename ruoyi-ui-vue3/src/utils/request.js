@@ -31,6 +31,8 @@ service.interceptors.request.use(config => {
   const isToken = (config.headers || {}).isToken === false
   // 是否需要防止数据重复提交
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
+  // 是否需要加密
+  const isEncrypt = (config.headers || {}).isEncrypt === true || import.meta.env.VITE_APP_IS_ENCRYPT === 'true'
   if (getToken() && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
@@ -65,7 +67,7 @@ service.interceptors.request.use(config => {
     }
   }
   // 当开启参数加密
-  if (import.meta.env.VITE_APP_IS_ENCRYPT === 'true' && (config.method === 'post' || config.method === 'put')) {
+  if (isEncrypt && (config.method === 'post' || config.method === 'put')) {
     // 生成一个 AES 密钥
     const aesKey = generateAesKey();
     config.headers['AES'] = encrypt(aesKey.toString(CryptoJS.enc.Base64));
