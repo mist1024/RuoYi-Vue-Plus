@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
  * @author Michelle.Chung
  */
 @Slf4j
-@Service
+@Service("xcx" + IAuthStrategy.BASE_NAME)
 @RequiredArgsConstructor
 public class XcxAuthStrategy implements IAuthStrategy {
 
@@ -45,8 +45,6 @@ public class XcxAuthStrategy implements IAuthStrategy {
         String openid = "";
         // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
         SysUserVo user = loadUserByOpenid(openid);
-        // 校验租户
-        loginService.checkTenant(user.getTenantId());
 
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         XcxLoginUser loginUser = new XcxLoginUser();

@@ -1,5 +1,6 @@
 package org.dromara.system.service;
 
+import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -20,6 +21,11 @@ public interface ISysClientService {
      * 查询客户端管理
      */
     SysClientVo queryById(Long id);
+
+    /**
+     * 查询客户端信息基于客户端id
+     */
+    SysClient queryByClientId(String clientId);
 
     /**
      * 查询客户端管理列表

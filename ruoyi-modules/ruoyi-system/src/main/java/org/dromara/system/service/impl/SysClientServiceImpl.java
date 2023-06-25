@@ -1,26 +1,26 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.system.domain.vo.SysClientVo;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.mapper.SysClientMapper;
 import org.dromara.system.service.ISysClientService;
+import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * 客户端管理Service业务层处理
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * @author Michelle.Chung
  * @date 2023-06-18
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SysClientServiceImpl implements ISysClientService {
@@ -42,6 +43,15 @@ public class SysClientServiceImpl implements ISysClientService {
         SysClientVo vo = baseMapper.selectVoById(id);
         vo.setGrantTypeList(List.of(vo.getGrantType().split(",")));
         return vo;
+    }
+
+
+    /**
+     * 查询客户端管理
+     */
+    @Override
+    public SysClient queryByClientId(String clientId) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<SysClient>().eq(SysClient::getClientId, clientId));
     }
 
     /**

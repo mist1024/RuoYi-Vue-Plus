@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
  * @author Michelle.Chung
  */
 @Slf4j
-@Service
+@Service("password" + IAuthStrategy.BASE_NAME)
 @RequiredArgsConstructor
 public class PasswordAuthStrategy implements IAuthStrategy {
 

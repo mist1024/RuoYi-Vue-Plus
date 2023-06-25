@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * @author Michelle.Chung
  */
 @Slf4j
-@Service
+@Service("sms" + IAuthStrategy.BASE_NAME)
 @RequiredArgsConstructor
 public class SmsAuthStrategy implements IAuthStrategy {
 
@@ -53,8 +53,6 @@ public class SmsAuthStrategy implements IAuthStrategy {
         String phonenumber = loginBody.getPhonenumber();
         String smsCode = loginBody.getSmsCode();
 
-        // 校验租户
-        loginService.checkTenant(tenantId);
         // 通过手机号查找用户
         SysUserVo user = loadUserByPhonenumber(tenantId, phonenumber);
 

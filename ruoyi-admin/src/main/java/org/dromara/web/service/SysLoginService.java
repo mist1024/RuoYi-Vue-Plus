@@ -19,7 +19,6 @@ import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
 import org.dromara.common.core.enums.UserStatus;
-import org.dromara.common.core.exception.user.AuthTypeErrorException;
 import org.dromara.common.core.exception.user.CaptchaException;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.exception.user.UserException;
@@ -29,7 +28,6 @@ import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysSocialBo;
 import org.dromara.system.domain.vo.SysSocialVo;
@@ -37,8 +35,8 @@ import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysClientMapper;
 import org.dromara.system.mapper.SysUserMapper;
-import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysPermissionService;
+import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -279,7 +277,7 @@ public class SysLoginService {
     /**
      * 构建登录用户
      */
-    private LoginUser buildLoginUser(SysUserVo user) {
+    public LoginUser buildLoginUser(SysUserVo user) {
         LoginUser loginUser = new LoginUser();
         loginUser.setTenantId(user.getTenantId());
         loginUser.setUserId(user.getUserId());
@@ -365,20 +363,6 @@ public class SysLoginService {
             && new Date().after(tenant.getExpireTime())) {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");
-        }
-    }
-
-    /**
-     * 认证类型校验
-     */
-    public void checkClientType(String clientId, String grantType) {
-        Long count = clientMapper.selectCount(
-            new LambdaQueryWrapper<SysClient>()
-                .eq(SysClient::getClientId, clientId)
-                .like(SysClient::getGrantType, grantType));
-        if (count == 0) {
-            log.info("客户端id：{} 认证类型：{} 不存在.", clientId, grantType);
-            throw new AuthTypeErrorException();
         }
     }
 

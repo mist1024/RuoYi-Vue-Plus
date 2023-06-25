@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * @author Michelle.Chung
  */
 @Slf4j
-@Service
+@Service("email" + IAuthStrategy.BASE_NAME)
 @RequiredArgsConstructor
 public class EmailAuthStrategy implements IAuthStrategy {
 
@@ -53,8 +53,6 @@ public class EmailAuthStrategy implements IAuthStrategy {
         String email = loginBody.getEmail();
         String emailCode = loginBody.getEmailCode();
 
-        // 校验租户
-        loginService.checkTenant(tenantId);
         // 通过邮箱查找用户
         SysUserVo user = loadUserByEmail(tenantId, email);
 

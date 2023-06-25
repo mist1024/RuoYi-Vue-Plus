@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
@@ -14,21 +15,23 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.RegisterBody;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysTenantVo;
-import org.dromara.system.service.ISysSocialService;
+import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysConfigService;
+import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.domain.vo.LoginTenantVo;
 import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.domain.vo.TenantListVo;
-import org.dromara.web.factory.AuthFactory;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
 import org.dromara.web.service.SysRegisterService;
@@ -43,6 +46,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@Slf4j
 @SaIgnore
 @Validated
 @RequiredArgsConstructor
@@ -56,6 +60,7 @@ public class AuthController {
     private final ISysConfigService configService;
     private final ISysTenantService tenantService;
     private final ISysSocialService socialUserService;
+    private final ISysClientService clientService;
 
 
     /**
@@ -69,15 +74,16 @@ public class AuthController {
         // 授权类型和客户端id
         String clientId = loginBody.getClientId();
         String grantType = loginBody.getGrantType();
-        IAuthStrategy authStrategy = AuthFactory.instance(grantType);
-        // 校验请求参数
-        authStrategy.validate(loginBody);
-        // 校验授权类型和客户端id
-        loginService.checkClientType(clientId, grantType);
+        SysClient client = clientService.queryByClientId(clientId);
+        // 查询不到 client 或 client 内不包含 grantType
+        if (ObjectUtil.isNull(client) || !StringUtils.contains(client.getGrantType(), grantType)) {
+            log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
+            return R.fail(MessageUtils.message("auth.grant.type.error"));
+        }
         // 校验租户
         loginService.checkTenant(loginBody.getTenantId());
         // 登录
-        return R.ok(authStrategy.login(clientId, loginBody));
+        return R.ok(IAuthStrategy.login(loginBody));
     }
 
     /**
