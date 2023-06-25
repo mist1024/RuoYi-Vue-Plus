@@ -197,6 +197,11 @@ mybatis-encryptor:
   publicKey:
   privateKey:
 
+# 接口加密
+interface-encryptor:
+  enable: true
+  secret: abcdefghijklmnop
+
 # Swagger配置
 swagger:
   info:
