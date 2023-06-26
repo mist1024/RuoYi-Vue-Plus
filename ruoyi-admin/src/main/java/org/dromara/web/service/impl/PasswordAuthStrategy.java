@@ -1,6 +1,7 @@
 package org.dromara.web.service.impl;
 
 import cn.dev33.satoken.secure.BCrypt;
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -69,8 +70,14 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = loginService.buildLoginUser(user);
+        SaLoginModel model = new SaLoginModel();
+        model.setDevice(client.getDeviceType());
+        // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
+        // 例如: 后台用户30分钟过期 app用户1天过期
+        model.setTimeout(client.getTimeout());
+        model.setActiveTimeout(client.getActiveTimeout());
         // 生成token
-        LoginHelper.loginByDevice(loginUser, client.getDeviceType(), client.getActiveTimeout(), client.getTimeout());
+        LoginHelper.login(loginUser, model);
 
         loginService.recordLogininfor(loginUser.getTenantId(), username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());

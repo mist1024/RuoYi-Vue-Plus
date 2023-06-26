@@ -1,6 +1,7 @@
 package org.dromara.web.service;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -123,7 +124,10 @@ public class SysLoginService {
     private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
         checkTenant(tenantId);
         SysUserVo user = loadUserByUsername(tenantId, userName);
-        LoginHelper.loginByDevice(buildLoginUser(user), DeviceType.PC.getDevice(), activeTimeout, timeout);
+        SaLoginModel model = new SaLoginModel();
+        model.setDevice(DeviceType.PC.getDevice());
+        // 生成token
+        LoginHelper.login(buildLoginUser(user), model);
         recordLogininfor(user.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         recordLoginInfo(user.getUserId());
         return R.ok(StpUtil.getTokenValue());
