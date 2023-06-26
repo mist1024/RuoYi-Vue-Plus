@@ -1204,7 +1204,8 @@ create table sys_client (
     client_key          varchar(32)   default null,
     client_secret       varchar(255)  default null,
     grant_type          varchar(255)  default null,
-    activity_timeout    number(11)    default 1800,
+    device_type         varchar(32)   default null,
+    active_timeout      number(11)    default 1800,
     timeout             number(11)    default 604800,
     status              char(1)       default '0',
     del_flag            char(1)       default '0',
@@ -1223,7 +1224,8 @@ comment on column sys_client.client_id              is '客户端id';
 comment on column sys_client.client_key             is '客户端key';
 comment on column sys_client.client_secret          is '客户端秘钥';
 comment on column sys_client.grant_type             is '授权类型';
-comment on column sys_client.activity_timeout       is 'token活跃超时时间';
+comment on column sys_client.device_type            is '设备类型';
+comment on column sys_client.active_timeout         is 'token活跃超时时间';
 comment on column sys_client.timeout                is 'token固定超时';
 comment on column sys_client.status                 is '状态（0正常 1停用）';
 comment on column sys_client.del_flag               is '删除标志（0代表存在 2代表删除）';
@@ -1233,8 +1235,8 @@ comment on column sys_client.create_time            is '创建时间';
 comment on column sys_client.update_by              is '更新者';
 comment on column sys_client.update_time            is '更新时间';
 
-insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 1800, 604800, 0, 0, 103, 1, sysdate, 1, sysdate);
-insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 1800, 604800, 0, 0, 103, 1, sysdate, 1, sysdate);
+insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', 1800, 604800, 0, 0, 103, 1, sysdate, 1, sysdate);
+insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'app', 1800, 604800, 0, 0, 103, 1, sysdate, 1, sysdate);
 
 
 -- ----------------------------

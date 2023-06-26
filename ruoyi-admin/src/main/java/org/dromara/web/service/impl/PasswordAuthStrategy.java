@@ -10,7 +10,6 @@ import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.CaptchaException;
@@ -24,6 +23,7 @@ import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
+import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
@@ -52,7 +52,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
     }
 
     @Override
-    public LoginVo login(String clientId, LoginBody loginBody) {
+    public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
         String tenantId = loginBody.getTenantId();
         String username = loginBody.getUsername();
         String password = loginBody.getPassword();
@@ -70,7 +70,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = loginService.buildLoginUser(user);
         // 生成token
-        LoginHelper.loginByDevice(loginUser, DeviceType.PC);
+        LoginHelper.loginByDevice(loginUser, client.getDeviceType(), client.getActiveTimeout(), client.getTimeout());
 
         loginService.recordLogininfor(loginUser.getTenantId(), username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());

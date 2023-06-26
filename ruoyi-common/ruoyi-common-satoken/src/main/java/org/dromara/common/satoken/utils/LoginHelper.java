@@ -10,10 +10,10 @@ import cn.hutool.core.util.ObjectUtil;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.UserType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.StringUtils;
 
 import java.util.Set;
 
@@ -42,32 +42,30 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      */
     public static void login(LoginUser loginUser) {
-        loginByDevice(loginUser, null);
+        loginByDevice(loginUser, null, 1800L, 604800L);
     }
 
     /**
      * 登录系统 基于 设备类型
      * 针对相同用户体系不同设备
      *
-     * @param loginUser 登录用户信息
+     * @param loginUser     登录用户信息
+     * @param deviceType    设备类型
+     * @param activeTimeout token活跃超时时间
+     * @param timeout       token固定超时时间
      */
-    public static void loginByDevice(LoginUser loginUser, DeviceType deviceType) {
+    public static void loginByDevice(LoginUser loginUser, String deviceType, Long activeTimeout, Long timeout) {
         SaStorage storage = SaHolder.getStorage();
         storage.set(LOGIN_USER_KEY, loginUser);
         storage.set(TENANT_KEY, loginUser.getTenantId());
         storage.set(USER_KEY, loginUser.getUserId());
         SaLoginModel model = new SaLoginModel();
-        if (ObjectUtil.isNotNull(deviceType)) {
-            model.setDevice(deviceType.getDevice());
+        if (StringUtils.isNotEmpty(deviceType)) {
+            model.setDevice(deviceType);
         }
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
         // 例如: 后台用户30分钟过期 app用户1天过期
-//        UserType userType = UserType.getUserType(loginUser.getUserType());
-//        if (userType == UserType.SYS_USER) {
-//            model.setTimeout(86400).setActiveTimeout(1800);
-//        } else if (userType == UserType.APP_USER) {
-//            model.setTimeout(86400).setActiveTimeout(1800);
-//        }
+        model.setTimeout(timeout).setActiveTimeout(activeTimeout);
         StpUtil.stpLogic.setLoginType(loginUser.getUserType())
             .login(loginUser.getLoginId(),
                 model.setExtra(TENANT_KEY, loginUser.getTenantId())

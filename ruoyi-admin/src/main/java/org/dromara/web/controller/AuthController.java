@@ -83,7 +83,7 @@ public class AuthController {
         // 校验租户
         loginService.checkTenant(loginBody.getTenantId());
         // 登录
-        return R.ok(IAuthStrategy.login(loginBody));
+        return R.ok(IAuthStrategy.login(loginBody, client));
     }
 
     /**

@@ -3083,7 +3083,8 @@ CREATE TABLE sys_client
     client_key          nvarchar(255) DEFAULT ''            NULL,
     client_secret       nvarchar(255) DEFAULT ''            NULL,
     grant_type          nvarchar(255) DEFAULT ''            NULL,
-    activity_timeout    int           DEFAULT ((1800))      NULL,
+    device_type         nvarchar(32) DEFAULT ''            NULL,
+    active_timeout      int           DEFAULT ((1800))      NULL,
     timeout             int           DEFAULT ((604800))    NULL,
     status              nchar(1)      DEFAULT ('0')         NULL,
     del_flag            nchar(1)      DEFAULT ('0')         NULL,
@@ -3130,10 +3131,16 @@ EXEC sp_addextendedproperty
 'COLUMN', N'grant_type'
 GO
 EXEC sp_addextendedproperty
+'MS_Description', N'设备类型',
+'SCHEMA', N'dbo',
+'TABLE', N'sys_client',
+'COLUMN', N'device_type'
+GO
+EXEC sp_addextendedproperty
 'MS_Description', N'token活跃超时时间',
 'SCHEMA', N'dbo',
 'TABLE', N'sys_client',
-'COLUMN', N'activity_timeout'
+'COLUMN', N'active_timeout'
 GO
 EXEC sp_addextendedproperty
 'MS_Description', N'token固定超时',
@@ -3189,7 +3196,7 @@ EXEC sp_addextendedproperty
 'TABLE', N'sys_client'
 GO
 
-INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'1', N'e5cd7e4891bf95d1d19206ce24a7b32e', N'pc', N'pc123', N'password,social', N'pc', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO
-INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
+INSERT INTO sys_client VALUES (N'2', N'428a8310cd442757ae699df5d894f051', N'app', N'app123', N'password,sms,social', N'app', 1800, 604800, N'0', N'0', 103, 1, getdate(), 1, getdate())
 GO

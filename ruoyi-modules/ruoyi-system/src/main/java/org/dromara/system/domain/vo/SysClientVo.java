@@ -63,10 +63,15 @@ public class SysClientVo implements Serializable {
     private String grantType;
 
     /**
+     * 设备类型
+     */
+    private String deviceType;
+
+    /**
      * token活跃超时时间
      */
     @ExcelProperty(value = "token活跃超时时间")
-    private Long activityTimeout;
+    private Long activeTimeout;
 
     /**
      * token固定超时时间

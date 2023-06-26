@@ -7,12 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.XcxLoginUser;
-import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.auth.WechatGroup;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.service.IAuthStrategy;
@@ -37,7 +37,7 @@ public class XcxAuthStrategy implements IAuthStrategy {
     }
 
     @Override
-    public LoginVo login(String clientId, LoginBody loginBody) {
+    public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
         // xcxCode 为 小程序调用 wx.login 授权后获取
         String xcxCode = loginBody.getXcxCode();
         // todo 以下自行实现
@@ -54,7 +54,7 @@ public class XcxAuthStrategy implements IAuthStrategy {
         loginUser.setUserType(user.getUserType());
         loginUser.setOpenid(openid);
         // 生成token
-        LoginHelper.loginByDevice(loginUser, DeviceType.XCX);
+        LoginHelper.loginByDevice(loginUser, client.getDeviceType(), client.getActiveTimeout(), client.getTimeout());
 
         loginService.recordLogininfor(loginUser.getTenantId(), user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());
