@@ -66,10 +66,9 @@ public class LoginHelper {
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
         // 例如: 后台用户30分钟过期 app用户1天过期
         model.setTimeout(timeout).setActiveTimeout(activeTimeout);
-        StpUtil.stpLogic.setLoginType(loginUser.getUserType())
-            .login(loginUser.getLoginId(),
-                model.setExtra(TENANT_KEY, loginUser.getTenantId())
-                    .setExtra(USER_KEY, loginUser.getUserId()));
+        StpUtil.login(loginUser.getLoginId(),
+            model.setExtra(TENANT_KEY, loginUser.getTenantId())
+                .setExtra(USER_KEY, loginUser.getUserId()));
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
 
@@ -153,7 +152,7 @@ public class LoginHelper {
      * 获取用户类型
      */
     public static UserType getUserType() {
-        String loginType = StpUtil.stpLogic.getLoginType();
+        String loginType = StpUtil.getLoginIdAsString();
         return UserType.getUserType(loginType);
     }
 
