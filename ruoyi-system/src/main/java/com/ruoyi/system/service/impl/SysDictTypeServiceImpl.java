@@ -111,18 +111,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     }
 
     /**
-     * 根据字典类型查询信息
-     *
-     * @param dictType 字典类型
-     * @return 字典类型
-     */
-    @Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
-    @Override
-    public SysDictType selectDictTypeByType(String dictType) {
-        return baseMapper.selectById(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
-    }
-
-    /**
      * 批量删除字典类型信息
      *
      * @param dictIds 需要删除的字典ID
