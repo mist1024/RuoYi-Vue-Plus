@@ -61,12 +61,6 @@ public class SysLoginService {
     @Value("${user.password.lockTime}")
     private Integer lockTime;
 
-    @Value("sa-token.active-timeout")
-    private Long activeTimeout;
-
-    @Value("sa-token.timeout")
-    private Long timeout;
-
     private final ISysTenantService tenantService;
     private final ISysPermissionService permissionService;
     private final ISysSocialService sysSocialService;
