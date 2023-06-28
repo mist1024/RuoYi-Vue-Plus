@@ -118,13 +118,13 @@ insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'ap
 insert into sys_dict_type values(11, '000000', '授权类型', 'sys_grant_type',     '0', 103, 1, now(), null, null, '认证授权类型');
 insert into sys_dict_type values(12, '000000', '设备类型', 'sys_device_type',    '0', 103, 1, now(), null, null, '客户端设备类型');
 
-insert into sys_dict_data values(29, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '密码认证');
-insert into sys_dict_data values(30, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '短信认证');
-insert into sys_dict_data values(31, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '邮件认证');
-insert into sys_dict_data values(32, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '小程序认证');
-insert into sys_dict_data values(33, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '三方登录认证');
-insert into sys_dict_data values(34, '000000', 0,  'PC端', 'pc',            'sys_device_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, 'PC端');
-insert into sys_dict_data values(35, '000000', 0,  'APP端', 'app',          'sys_device_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, 'APP端');
+insert into sys_dict_data values(30, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '密码认证');
+insert into sys_dict_data values(31, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '短信认证');
+insert into sys_dict_data values(32, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '邮件认证');
+insert into sys_dict_data values(33, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '小程序认证');
+insert into sys_dict_data values(34, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, '三方登录认证');
+insert into sys_dict_data values(35, '000000', 0,  'PC端', 'pc',            'sys_device_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, 'PC端');
+insert into sys_dict_data values(36, '000000', 0,  'APP端', 'app',          'sys_device_type',   '',   'default', 'N', '0', 103, 1, now(), null, null, 'APP端');
 
 -- 二级菜单
 insert into sys_menu values('123',  '客户端管理',   '1',   '1', 'client',           'system/client/index',          '', '1', '0', 'C', '0', '0', 'system:client:list',          'international', 103, 1, now(), null, null, '客户端管理菜单');

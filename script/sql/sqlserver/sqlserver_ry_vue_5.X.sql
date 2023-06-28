@@ -1259,19 +1259,19 @@ INSERT sys_dict_data VALUES (27, N'000000', 1, N'成功', N'0', N'sys_common_sta
 GO
 INSERT sys_dict_data VALUES (28, N'000000', 2, N'失败', N'1', N'sys_common_status', N'', N'danger', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'停用状态')
 GO
-INSERT sys_dict_data VALUES (29, N'000000', 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'密码认证')
+INSERT sys_dict_data VALUES (30, N'000000', 0, N'密码认证', N'password', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'密码认证')
 GO
-INSERT sys_dict_data VALUES (30, N'000000', 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'短信认证')
+INSERT sys_dict_data VALUES (31, N'000000', 0, N'短信认证', N'sms', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'短信认证')
 GO
-INSERT sys_dict_data VALUES (31, N'000000', 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'邮件认证')
+INSERT sys_dict_data VALUES (32, N'000000', 0, N'邮件认证', N'email', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'邮件认证')
 GO
-INSERT sys_dict_data VALUES (32, N'000000', 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'小程序认证')
+INSERT sys_dict_data VALUES (33, N'000000', 0, N'小程序认证', N'xcx', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'小程序认证')
 GO
-INSERT sys_dict_data VALUES (33, N'000000', 0, N'三方登录认证', N'`social`', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
+INSERT sys_dict_data VALUES (34, N'000000', 0, N'三方登录认证', N'`social`', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
 GO
-INSERT sys_dict_data VALUES (34, N'000000', 0, N'PC端', N'`pc`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'PC端')
+INSERT sys_dict_data VALUES (35, N'000000', 0, N'PC端', N'`pc`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'PC端')
 GO
-INSERT sys_dict_data VALUES (35, N'000000', 0, N'APP端', N'`app`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'APP端')
+INSERT sys_dict_data VALUES (36, N'000000', 0, N'APP端', N'`app`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'APP端')
 GO
 
 CREATE TABLE sys_dict_type

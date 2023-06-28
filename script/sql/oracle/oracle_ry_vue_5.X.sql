@@ -872,13 +872,13 @@ insert into sys_dict_data values(25, '000000', 8,  '生成代码', '8',       's
 insert into sys_dict_data values(26, '000000', 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', '0', 103, 1, sysdate, null, null, '清空操作');
 insert into sys_dict_data values(27, '000000', 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', '0', 103, 1, sysdate, null, null, '正常状态');
 insert into sys_dict_data values(28, '000000', 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', '0', 103, 1, sysdate, null, null, '停用状态');
-insert into sys_dict_data values(29, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '密码认证');
-insert into sys_dict_data values(30, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '短信认证');
-insert into sys_dict_data values(31, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '邮件认证');
-insert into sys_dict_data values(32, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '小程序认证');
-insert into sys_dict_data values(33, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '三方登录认证');
-insert into sys_dict_data values(34, '000000', 0,  'PC端',      'pc',        'sys_device_type',  '',   'default', 'N', '0', 103, 1, sysdate, null, null, 'PC端');
-insert into sys_dict_data values(35, '000000', 0,  'APP端',     'app',       'sys_device_type',  '',   'default', 'N', '0', 103, 1, sysdate, null, null, 'APP端');
+insert into sys_dict_data values(30, '000000', 0,  '密码认证', 'password',   'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '密码认证');
+insert into sys_dict_data values(31, '000000', 0,  '短信认证', 'sms',        'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '短信认证');
+insert into sys_dict_data values(32, '000000', 0,  '邮件认证', 'email',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '邮件认证');
+insert into sys_dict_data values(33, '000000', 0,  '小程序认证', 'xcx',      'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '小程序认证');
+insert into sys_dict_data values(34, '000000', 0,  '三方登录认证', 'social', 'sys_grant_type',   '',   'default', 'N', '0', 103, 1, sysdate, null, null, '三方登录认证');
+insert into sys_dict_data values(35, '000000', 0,  'PC端',      'pc',        'sys_device_type',  '',   'default', 'N', '0', 103, 1, sysdate, null, null, 'PC端');
+insert into sys_dict_data values(36, '000000', 0,  'APP端',     'app',       'sys_device_type',  '',   'default', 'N', '0', 103, 1, sysdate, null, null, 'APP端');
 
 
 -- ----------------------------
