@@ -1269,6 +1269,10 @@ INSERT sys_dict_data VALUES (32, N'000000', 0, N'小程序认证', N'xcx', N'sys
 GO
 INSERT sys_dict_data VALUES (33, N'000000', 0, N'三方登录认证', N'`social`', N'sys_grant_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'三方登录认证')
 GO
+INSERT sys_dict_data VALUES (34, N'000000', 0, N'PC端', N'`pc`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'PC端')
+GO
+INSERT sys_dict_data VALUES (35, N'000000', 0, N'APP端', N'`app`', N'sys_device_type', N'', N'default', N'N', N'0', 103, 1, getdate(), NULL, NULL, N'APP端')
+GO
 
 CREATE TABLE sys_dict_type
 (
@@ -1385,7 +1389,9 @@ INSERT sys_dict_type VALUES (9, N'000000', N'操作类型', N'sys_oper_type', N'
 GO
 INSERT sys_dict_type VALUES (10, N'000000', N'系统状态', N'sys_common_status', N'0', 103, 1, getdate(), NULL, NULL, N'登录状态列表')
 GO
-INSERT sys_dict_type VALUES (10, N'000000', N'授权类型', N'sys_grant_type', N'0', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
+INSERT sys_dict_type VALUES (11, N'000000', N'授权类型', N'sys_grant_type', N'0', 103, 1, getdate(), NULL, NULL, N'认证授权类型')
+GO
+INSERT sys_dict_type VALUES (12, N'000000', N'设备类型', N'sys_device_type', N'0', 103, 1, getdate(), NULL, NULL, N'客户端设备类型')
 GO
 
 CREATE TABLE sys_logininfor
@@ -1673,7 +1679,7 @@ INSERT sys_menu VALUES (121, N'租户管理', 6, 1, N'tenant', N'system/tenant/i
 GO
 INSERT sys_menu VALUES (122, N'租户套餐管理', 6, 2, N'tenantPackage', N'system/tenantPackage/index', N'', 1, 0, N'C', N'0', N'0', N'system:tenantPackage:list', N'code', 103, 1, getdate(), NULL, NULL, N'租户套餐管理菜单')
 GO
-INSERT sys_menu VALUES (100, N'客户端管理', 1, 1, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
+INSERT sys_menu VALUES (123, N'客户端管理', 1, 1, N'client', N'system/client/index', N'', 1, 0, N'C', N'0', N'0', N'system:client:list', N'international', 103, 1, getdate(), NULL, NULL, N'客户端管理菜单')
 GO
 INSERT sys_menu VALUES (117, N'Admin监控', 2, 5, N'Admin', N'monitor/admin/index', N'', 1, 0, N'C', N'0', N'0', N'monitor:admin:list', N'dashboard', 103, 1, getdate(), NULL, NULL, N'Admin监控菜单');
 GO
