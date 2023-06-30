@@ -322,4 +322,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             .collect(Collectors.toList());
     }
 
+    /**
+     * @param str
+     * @function 判断输入的数据是否是大于等于零的整数
+     */
+    public static boolean isNumeric(String str) {
+        for (int i = str.length(); --i >= 0;) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

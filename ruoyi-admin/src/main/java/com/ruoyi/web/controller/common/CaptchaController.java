@@ -4,11 +4,18 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.CaptchaType;
+import com.ruoyi.common.enums.LimitType;
+import com.ruoyi.common.enums.UserStatus;
+import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.email.MailUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
@@ -18,7 +25,9 @@ import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.framework.config.properties.MailProperties;
 import com.ruoyi.sms.config.properties.SmsProperties;
 import com.ruoyi.sms.core.SmsTemplate;
+import com.ruoyi.sms.core.TelecomSendMsg;
 import com.ruoyi.sms.entity.SmsResult;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +59,7 @@ public class CaptchaController {
     private final SmsProperties smsProperties;
     private final ISysConfigService configService;
     private final MailProperties mailProperties;
+    private final SysUserMapper sysUserMapper;
 
     /**
      * 短信验证码
@@ -61,15 +71,22 @@ public class CaptchaController {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }
+        //判断系统中是否存在该人才
+        SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getPhonenumber, SysUser::getStatus)
+            .eq(SysUser::getPhonenumber, phonenumber));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", phonenumber);
+            throw new UserException("user.not.exists", phonenumber);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", phonenumber);
+            throw new UserException("user.blocked", phonenumber);
+        }
         String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
-        String code = RandomUtil.randomNumbers(4);
+        String code = RandomUtil.randomNumbers(6);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
-        // 验证码模板id 自行处理 (查数据库或写死均可)
-        String templateId = "";
-        Map<String, String> map = new HashMap<>(1);
-        map.put("code", code);
-        SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
-        SmsResult result = smsTemplate.send(phonenumber, templateId, map);
+        TelecomSendMsg smsTemplate = SpringUtils.getBean(TelecomSendMsg.class);
+        SmsResult result = smsTemplate.telecomSendCode(phonenumber, code, "login");
         if (!result.isSuccess()) {
             log.error("验证码短信发送异常 => {}", result);
             return R.fail(result.getMessage());

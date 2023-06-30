@@ -11,24 +11,26 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 人才认定消息配置
+ */
 @Configuration
-public class PluginDelayRabbitConfig {
+public class TalentsDelayRabbitConfig {
+    public static final String TALENTS_PLUGIN_DELAY_EXCHANGE =  "talentsPluginDelayExchange";
+    public static final String TALENTS_PLUGIN_DELAY_QUEUE =  "talentsPluginDelayQueue";
+    public static final String TALENTS_PLUGIN_DELAY_KEY =  "talentsPluginDelayKey";
 
-    public static final String PLUGIN_DELAY_EXCHANGE =  "pluginDelayExchange";
-    public static final String PLUGIN_DELAY_QUEUE =  "pluginDelayQueue";
-    public static final String PLUGIN_DELAY_KEY_TALENTS =  "pluginDelayKeyTalents";
-
-    @Bean(PLUGIN_DELAY_EXCHANGE)
-    public CustomExchange pluginDelayExchange() {
+    @Bean(TALENTS_PLUGIN_DELAY_EXCHANGE)
+    public CustomExchange talentsPluginDelayExchange() {
         Map<String, Object> argMap = new HashMap<>();
         argMap.put("x-delayed-type", "direct");//必须要配置这个类型，可以是direct,topic和fanout
         //第二个参数必须为x-delayed-message
-        return new CustomExchange(PLUGIN_DELAY_EXCHANGE,"x-delayed-message",true, false, argMap);
+        return new CustomExchange(TALENTS_PLUGIN_DELAY_EXCHANGE,"x-delayed-message",true, false, argMap);
     }
 
-    @Bean(PLUGIN_DELAY_QUEUE)
-    public Queue pluginDelayQueue(){
-        return new Queue(PLUGIN_DELAY_QUEUE,true,false,false);
+    @Bean(TALENTS_PLUGIN_DELAY_QUEUE)
+    public Queue talentsPluginDelayQueue(){
+        return new Queue(TALENTS_PLUGIN_DELAY_QUEUE,true,false,false);
     }
 
     //使用下 ImmediateRequeueMessageRecoverer 重新排队在RabbitMQConfiguration中配置
@@ -37,8 +39,8 @@ public class PluginDelayRabbitConfig {
         return new RepublishMessageRecoverer(rabbitTemplate,"test_dead_letter_exchange","test_dead_letter_key");
     }*/
 
-    @Bean("pluginDelayBinding")
-    public Binding pluginDelayBinding(@Qualifier(PLUGIN_DELAY_QUEUE) Queue queue, @Qualifier(PLUGIN_DELAY_EXCHANGE) CustomExchange customExchange){
-        return BindingBuilder.bind(queue).to(customExchange).with(PLUGIN_DELAY_KEY_TALENTS).noargs();
+    @Bean
+    public Binding talentsPluginDelayBinding(@Qualifier(TALENTS_PLUGIN_DELAY_QUEUE) Queue queue, @Qualifier(TALENTS_PLUGIN_DELAY_EXCHANGE) CustomExchange customExchange){
+        return BindingBuilder.bind(queue).to(customExchange).with(TALENTS_PLUGIN_DELAY_KEY).noargs();
     }
 }

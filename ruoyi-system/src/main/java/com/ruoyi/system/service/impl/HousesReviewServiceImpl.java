@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.CreditCodeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -11,6 +12,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.CardsUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.MyFileUtils;
 import com.ruoyi.common.utils.poi.DeleteFileUtil;
@@ -324,6 +326,12 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(HousesReview entity){
+        if (!CardsUtil.isIDCard(entity.getCard())){
+            throw new ServiceException("证件号码格式不正确");
+        }
+        if (!CreditCodeUtil.isCreditCode(entity.getCreditCode())){
+            throw new ServiceException("社会统一社会信用代码格式不正确");
+        }
         if (!"D".equals(entity.getTalentsType())){
             entity.setTypeExtend("");
         }

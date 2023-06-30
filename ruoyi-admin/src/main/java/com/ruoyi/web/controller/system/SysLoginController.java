@@ -16,6 +16,7 @@ import com.ruoyi.common.utils.StrUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.sms.core.SmsTemplate;
+import com.ruoyi.sms.core.TelecomSendMsg;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.domain.vo.RouterVo;
 import com.ruoyi.system.service.ISysMenuService;
@@ -43,6 +44,7 @@ public class SysLoginController {
     private final SysLoginService loginService;
     private final ISysMenuService menuService;
     private final ISysUserService userService;
+
 
     /**
      * 登录方法
@@ -220,7 +222,7 @@ public class SysLoginController {
         if (!matches) {
             return R.fail("手机号格式不正确");
         }
-       return sendMsg(phones,CacheConstants.RORGOT_PASSWORD_SEND_MSG+phones);
+       return sendMsg(phones,CacheConstants.RORGOT_PASSWORD_SEND_MSG+phones,"forgetPwd");
     }
 
     /**
@@ -236,7 +238,7 @@ public class SysLoginController {
         if (!matches) {
             return R.fail("手机号格式不正确");
         }
-        return sendMsg(phones,CacheConstants.REGISTER_SEND_MSG+phones);
+        return sendMsg(phones,CacheConstants.REGISTER_SEND_MSG+phones,"register");
     }
 
     /**
@@ -252,20 +254,20 @@ public class SysLoginController {
         if (!matches) {
             return R.fail("手机号格式不正确");
         }
-        return sendMsg(phones,CacheConstants.SMS_LOGIN_SEND_MSG+phones);
+        return sendMsg(phones,CacheConstants.SMS_LOGIN_SEND_MSG+phones,"login");
     }
 
-    public R<?> sendMsg(String phones,String key ){
+    public R<?> sendMsg(String phones,String key ,String type){
         //1.获取redis中是否存在该key
         Boolean aBoolean = RedisUtils.hasKey(key + phones);
         if (aBoolean) {
             return R.fail("当前账号验证码已发送,2分钟内有效,请勿再次点击");
         } else {
-            SmsTemplate smsTemplate = SpringUtils.getBean(SmsTemplate.class);
+            TelecomSendMsg smsTemplate = SpringUtils.getBean(TelecomSendMsg.class);
             Map<String, String> map = new HashMap<>(1);
             String code = StrUtils.getRandomString(6);
             map.put("code",code);
-            SmsResult send = smsTemplate.send(phones, "SMS_174992554", map);
+            SmsResult send = smsTemplate.telecomSendCode(phones, code, type);
             if (send.isSuccess()){
                 RedisUtils.setCacheObject(key + phones, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
                 return R.ok();

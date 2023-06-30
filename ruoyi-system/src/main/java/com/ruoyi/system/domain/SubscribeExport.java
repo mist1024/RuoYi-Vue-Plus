@@ -40,4 +40,6 @@ public class SubscribeExport extends BaseEntity {
 
     private String processKey;
 
+    private String exportStatus;
+
 }

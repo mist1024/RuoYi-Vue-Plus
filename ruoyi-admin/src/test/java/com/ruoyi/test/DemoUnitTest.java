@@ -3,6 +3,7 @@ package com.ruoyi.test;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -22,18 +23,23 @@ import com.antherd.smcrypto.sm2.Sm2;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.AesUtil;
+import com.ruoyi.common.utils.CardsUtil;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.MyFileUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.demo.domain.ImageDemoData;
+import com.ruoyi.mq.config.PluginDelayRabbitConfig;
+import com.ruoyi.mq.config.TalentsDelayRabbitConfig;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialTalentsVo;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.IBuyHousesService;
+import com.ruoyi.system.service.impl.BuyHousesServiceImpl;
 import com.ruoyi.system.service.impl.MaterialModuleServiceImpl;
 import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import com.ruoyi.work.domain.ActProcess;
@@ -41,7 +47,6 @@ import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.TProcess;
 import com.ruoyi.work.domain.vo.ActProcessVo;
 import com.ruoyi.work.domain.vo.ProcessVo;
-import com.ruoyi.work.dto.BusinessDTO;
 import com.ruoyi.work.dto.HousingConstructionBureauPushDto;
 import com.ruoyi.work.mapper.ActProcessMapper;
 import com.ruoyi.work.mapper.HisProcessMapper;
@@ -51,17 +56,23 @@ import com.ruoyi.work.utils.WorkComplyUtils;
 import org.apache.commons.text.CaseUtils;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.junit.jupiter.api.*;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ReflectionUtils;
 
 import javax.crypto.SecretKey;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -125,9 +136,13 @@ public class DemoUnitTest {
 
     @Autowired
     private OrderService orderService;
+    */
 
     @Autowired
-    private RabbitTemplate amqpTemplate;*/
+    private BuyHousesServiceImpl buyHousesService;
+
+    @Autowired
+    private RabbitTemplate amqpTemplate;
 
 
     @DisplayName("测试 @SpringBootTest @Test @DisplayName 注解")
@@ -585,7 +600,7 @@ public class DemoUnitTest {
         System.out.println("result2 = " + result2);
     }
 
-//String privateKey="9cefdfcb925a32e10206d3a693ba204632c59e5f9a171faebb814885191dd35e";
+    //String privateKey="9cefdfcb925a32e10206d3a693ba204632c59e5f9a171faebb814885191dd35e";
     @Test
     public void test0212311123123(){
         String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
@@ -783,12 +798,26 @@ public class DemoUnitTest {
      */
     @Test
     public void test0004(){
-        Keypair keypair = Sm2.generateKeyPairHex();
+        /*Keypair keypair = Sm2.generateKeyPairHex();
         String publicKey = keypair.getPublicKey();
         System.out.println("publicKey = " + publicKey);
 
         String privateKey = keypair.getPrivateKey();
-        System.out.println("privateKey = " + privateKey);
+        System.out.println("privateKey = " + privateKey);*/
+//        String substring = DesensitizedUtil.idCardNum("510503199602214055", 4, 0).substring(0, 9);
+//        System.out.println("card = " + substring);
+        buyHousesService.excelZip();
+
+
+    }
+
+    @Test
+    public void TestMessageAck() throws UnsupportedEncodingException {
+        String msg="消息4";
+        Message build = MessageBuilder.withBody(msg.getBytes()).build();
+        build.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+        build.getMessageProperties().setDelay(50000);
+        amqpTemplate.convertAndSend(TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_EXCHANGE,TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_KEY,build);
     }
 }
 

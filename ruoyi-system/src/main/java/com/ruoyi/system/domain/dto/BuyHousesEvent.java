@@ -168,7 +168,7 @@ public class BuyHousesEvent extends BaseEntity {
     private String companyId;
 
     @TableField(exist = false)
-    private String excelUserId;
+    private Long excelId;
 
     @TableField(exist = false)
     private List<BuyHousesMember> buyHousesMemberList;

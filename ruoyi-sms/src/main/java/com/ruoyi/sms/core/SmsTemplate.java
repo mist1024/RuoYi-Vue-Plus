@@ -23,4 +23,5 @@ public interface SmsTemplate {
      */
     SmsResult send(String phones, String templateId, Map<String, String> param);
 
+
 }

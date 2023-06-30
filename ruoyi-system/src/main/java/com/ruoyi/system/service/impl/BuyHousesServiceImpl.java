@@ -2,8 +2,12 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.CreditCodeUtil;
+import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -18,6 +22,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.CardsUtil;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.MyFileUtils;
@@ -83,9 +88,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     private String prefix;
 
     //正式地址
-//        private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
+        private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
     //测试地址
-    private final String URL = "https://mihuatang.xyz/gaoxin-api/candidates/getCardId";
+//    private final String URL = "https://mihuatang.xyz/gaoxin-api/candidates/getCardId";
     //本地地址
 //    private final String URL = "http://127.0.0.1:8010/candidates/getCardId";
 
@@ -152,6 +157,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         if (ObjectUtil.isNotNull(bo.getIds())){
             lqw.in(BuyHouses::getId,bo.getIds());
         }
+        lqw.eq(ObjectUtil.isNotNull(bo.getId()), BuyHouses::getId, bo.getId());
         lqw.eq(StringUtils.isNotBlank(bo.getInsidepageUrl()), BuyHouses::getInsidepageUrl, bo.getInsidepageUrl());
         lqw.eq(StringUtils.isNotBlank(bo.getCardId()), BuyHouses::getCardId, bo.getCardId());
         lqw.eq(StringUtils.isNotBlank(bo.getCommitmentUrl()), BuyHouses::getCommitmentUrl, bo.getCommitmentUrl());
@@ -313,6 +319,13 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     private void validEntityBeforeSave(BuyHouses entity){
         //TODO 做一些数据校验,如唯一约束
+        //数据校验
+        if (!CardsUtil.isIDCard(entity.getCardId())){
+            throw new ServiceException("证件号码格式不正确");
+        }
+        if (!CreditCodeUtil.isCreditCode(entity.getSocialCode())){
+            throw new ServiceException("社会统一社会信用代码格式不正确");
+        }
         //验证当前状态是否可以修改
         //判断数据库中是否存在该人才通过身份证去验证
         Long userId = LoginHelper.getUserId();
@@ -508,10 +521,11 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     @Override
     public R getGaoXinCandidateInfoByCardId(String cardId) {
-        HashMap<String, Object> paramMap = new HashMap<>();
-        paramMap.put("cardId", cardId);
-        String json = HttpUtil.get(URL, paramMap);
-        JSONObject entries = JSONUtil.parseObj(json);
+        HttpResponse execute = HttpRequest.get(URL)
+            .form("cardId",cardId)
+            .timeout(5000)
+            .execute();
+        JSONObject entries = JSONUtil.parseObj(execute.body());
         String code = String.valueOf(entries.get("code"));
         LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
         if (ObjectUtil.isNull(code)){
@@ -543,7 +557,20 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Override
     public R subscribeExport(BuyHousesEvent bo) {
         Long userId = LoginHelper.getUserId();
-        bo.setExcelUserId(userId.toString());
+        //判断是否存在正在导出记录
+        SubscribeExport subscribeExport1 = subscribeExportMapper.selectOne(new LambdaQueryWrapper<>(SubscribeExport.class)
+            .eq(SubscribeExport::getUserId, userId)
+            .eq(SubscribeExport::getExportStatus, "0"));
+        if (ObjectUtil.isNotNull(subscribeExport1)){
+            return R.fail("您已存在一条正在导出数据,请等待前一条导出之后再执行");
+        }
+        //添加导出记录
+        SubscribeExport subscribeExport = new SubscribeExport();
+        subscribeExport.setProcessKey(bo.getProcessKey());
+        subscribeExport.setDescription(bo.getDescription());
+        subscribeExport.setUserId(userId.toString());
+        subscribeExportMapper.insert(subscribeExport);
+        bo.setExcelId(subscribeExport.getId());
         SpringUtils.context().publishEvent(bo);
         return R.ok("预约成功");
     }
@@ -1257,10 +1284,142 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             System.out.println("url = " + url);
             SubscribeExport subscribeExport = new SubscribeExport();
             subscribeExport.setPath(url);
-            subscribeExport.setProcessKey(event.getProcessKey());
-            subscribeExport.setDescription(event.getDescription());
-            subscribeExport.setUserId(event.getExcelUserId());
-            subscribeExportMapper.insert(subscribeExport);
+            subscribeExport.setId(event.getExcelId());
+            subscribeExport.setExportStatus("1");
+            subscribeExportMapper.updateById(subscribeExport);
+        }
+    }
+
+    public void  excelZip(){
+        BuyHousesBo bo =new BuyHousesBo();
+        bo.setId(3L);
+        bo.setProcessStatus(Constants.SUCCEED);
+        LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
+        List<BuyHousesVo> buyHousesVoList = baseMapper.selectVoList(lqw);
+        if (buyHousesVoList.size() > 0) {
+            //查询家庭附件
+            List<Long> collect = buyHousesVoList.stream().map(BuyHousesVo::getId).collect(Collectors.toList());
+            List<BuyHousesMember> buyHousesMemberList = buyHousesMemberMapper.selectList(new LambdaQueryWrapper<>(BuyHousesMember.class).in(BuyHousesMember::getBuyHousesId, collect));
+            //对每一个HouseId分组
+            Map<String, List<BuyHousesMember>> buyHousesMemberMap = buyHousesMemberList.stream().collect(Collectors.groupingBy(BuyHousesMember::getBuyHousesId));
+            buyHousesVoList.stream().forEach(r -> {
+                String dir="D:\\gaoxin\\images\\house\\";
+                //护照或者身份证
+                if (ObjectUtil.isNotEmpty(r.getInsidepageUrl())){
+                    String insidepageUrl = r.getInsidepageUrl();
+                    String fileName =dir+insidepageUrl.substring(insidepageUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(insidepageUrl, fileName);
+                }
+                //申请表
+                if (ObjectUtil.isNotEmpty(r.getCommitmentUrl())){
+                    String commitmentUrl = r.getCommitmentUrl();
+                    String fileName= dir+commitmentUrl.substring(commitmentUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(commitmentUrl, fileName);
+                }
+                //申明书
+                if (ObjectUtil.isNotEmpty(r.getDeclarationUrl())){
+                    String declarationUrl = r.getDeclarationUrl();
+                    String fileName= dir+declarationUrl.substring(declarationUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(declarationUrl, fileName);
+                }
+
+                //身份证正面
+                if (ObjectUtil.isNotEmpty(r.getFrontUrl())){
+                    String frontUrl = r.getFrontUrl();
+                    String fileName= dir+frontUrl.substring(frontUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(frontUrl, fileName);
+                }
+
+                //房屋记录
+                if (ObjectUtil.isNotEmpty(r.getHomeRecordUrl())){
+                    String homeRecordUrl = r.getHomeRecordUrl();
+                    String fileName= dir+homeRecordUrl.substring(homeRecordUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(homeRecordUrl, fileName);
+                }
+
+
+                //户口簿主页
+                if (ObjectUtil.isNotEmpty(r.getHomepageUrl())){
+                    String homepageUrl = r.getHomepageUrl();
+                    String fileName= dir+homepageUrl.substring(homepageUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(homepageUrl, fileName);
+                }
+
+                //劳动合同
+                if (ObjectUtil.isNotEmpty(r.getLaborContractUrl())){
+                    String laborContractUrl = r.getLaborContractUrl();
+                    String fileName= dir+laborContractUrl.substring(laborContractUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(laborContractUrl, fileName);
+                }
+
+                //企业营业执照
+                if (ObjectUtil.isNotEmpty(r.getLicenseUrl())){
+                    String licenseUrl = r.getLicenseUrl();
+                    String fileName= dir+licenseUrl.substring(licenseUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(licenseUrl, fileName);
+                }
+
+                //户口簿主页
+                if (ObjectUtil.isNotEmpty(r.getHomepageUrl())){
+                    String homepageUrl = r.getHomepageUrl();
+                    String fileName= dir+homepageUrl.substring(homepageUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(homepageUrl, fileName);
+                }
+
+                //婚姻证明材料
+                if (ObjectUtil.isNotEmpty(r.getMaritalUrl())){
+                    String maritalUrl = r.getMaritalUrl();
+                    String fileName= dir+maritalUrl.substring(maritalUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(maritalUrl, fileName);
+                }
+
+                //身份证背面
+                if (ObjectUtil.isNotEmpty(r.getReverseUrl())){
+                    String reverseUrl = r.getReverseUrl();
+                    String fileName=dir+reverseUrl.substring(reverseUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(reverseUrl, fileName);
+                }
+
+                //社保证明
+                if (ObjectUtil.isNotEmpty(r.getSocialSecurityUrl())){
+                    String socialSecurityUrl = r.getSocialSecurityUrl();
+                    String fileName= dir+socialSecurityUrl.substring(socialSecurityUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(socialSecurityUrl, fileName);
+                }
+
+                //人才影像卡
+                if (ObjectUtil.isNotEmpty(r.getPictureInformationUrl())){
+                    String pictureInformationUrl = r.getPictureInformationUrl();
+                    String fileName= dir+pictureInformationUrl.substring(pictureInformationUrl.lastIndexOf("/") + 1);
+                    MyFileUtils.downLoadPic(pictureInformationUrl, fileName);
+                }
+                //家庭信息
+                List<BuyHousesMember> buyHousesMembers = buyHousesMemberMap.get(r.getId().toString());
+                if (ObjectUtil.isNotNull(buyHousesMembers)) {
+                    buyHousesMembers.stream().forEach(m -> {
+                        if (ObjectUtil.isNotEmpty(m.getFrontUrl())) {
+                            String frontUrl = m.getFrontUrl();
+                            String fileName = dir+frontUrl.substring(frontUrl.lastIndexOf("/") + 1);
+                            MyFileUtils.downLoadPic(frontUrl, fileName);
+                        }
+                        if (ObjectUtil.isNotEmpty(m.getInsidepageUrl())) {
+                            String insidepageUrl = m.getInsidepageUrl();
+                            String fileName =dir+ insidepageUrl.substring(insidepageUrl.lastIndexOf("/") + 1);
+                            MyFileUtils.downLoadPic(insidepageUrl, fileName);
+                        }
+                        if (ObjectUtil.isNotEmpty(m.getReverseUrl())) {
+                            String reverseUrl = m.getReverseUrl();
+                            String fileName =dir+ reverseUrl.substring(reverseUrl.lastIndexOf("/") + 1);
+                            MyFileUtils.downLoadPic(reverseUrl, fileName);
+                        }
+                        if (ObjectUtil.isNotEmpty(m.getHomeRecordUrl())) {
+                            String homeRecordUrl = m.getHomeRecordUrl();
+                            String fileName = dir+homeRecordUrl.substring(homeRecordUrl.lastIndexOf("/") + 1);
+                            MyFileUtils.downLoadPic(homeRecordUrl, fileName);
+                        }
+                    });
+                }
+            });
         }
     }
 }

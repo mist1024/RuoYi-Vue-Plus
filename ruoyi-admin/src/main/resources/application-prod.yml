@@ -114,7 +114,8 @@ spring:
     # 数据库索引
     database: 7
     # 密码(如没有密码请注释掉)
-    password: 123456
+    password: N8PTRAirBO
+#    password: 123456
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl

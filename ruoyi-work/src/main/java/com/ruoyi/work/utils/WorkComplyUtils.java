@@ -85,8 +85,8 @@ public class WorkComplyUtils {
         if (ObjectUtil.isNull(params)){
             throw new ServiceException("params不可为空");
         }
-
         ProcessVo tProcessByKey = processMapper.selectVoOne(lqw);
+        params.put("step",tProcessByKey.getStep());
         Object companyName = params.get("companyName");
         if (ObjectUtil.isNotNull(companyName)){
             actProcessVo.setCompanyName(String.valueOf(companyName));
@@ -818,7 +818,7 @@ public class WorkComplyUtils {
                     e.setChecked("1");//绿色
                 }else if ( new Integer(e.getStep()).equals(new Integer(a.getStep()))){
                     if (collect1.size()>0){
-                        e.setChecked("2");//红色
+                        e.setChecked("4");//红色
                     }else {
                         e.setChecked("1");
                     }
@@ -836,7 +836,7 @@ public class WorkComplyUtils {
                     if (auditLogs.size()>0){
                         AuditLog auditLog = auditLogs.get(auditLogs.size()-1);
                         if (auditLog.getAudit().equals(e.getAudit1()) && auditLog.getStep().equals(e.getStep()) && auditLog.getAuditType().equals(e.getCheckType())){
-                            e.setChecked("4");
+                            e.setChecked("2");
                         }
                     }
                 }else if (Constants.CANCEL.equals(process_status.toString())){

@@ -1,10 +1,12 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.lang.management.ManagementFactory;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -169,5 +171,25 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         LocalDateTime localDateTime = LocalDateTime.of(temporalAccessor, LocalTime.of(0, 0, 0));
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
+    }
+
+    /**
+     * 校验是否符合时间格式
+     * @param sDate
+     * @param format
+     * @return
+     */
+    public static boolean checkDate(String sDate,String format){
+        int legalLen = sDate.length();
+        if (ObjectUtil.isNull(legalLen) || legalLen==0){
+            return false;
+        }
+        DateFormat formatter = new SimpleDateFormat(format);
+        try {
+            Date date = formatter.parse(sDate);
+            return sDate.equals(formatter.format(date));
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

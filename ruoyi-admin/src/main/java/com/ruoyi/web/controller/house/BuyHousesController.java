@@ -126,6 +126,7 @@ public class BuyHousesController extends BaseController {
     /**
      * 首页购房申请表展示
      */
+//    @SaCheckPermission("system:houses:indexType")
     @GetMapping("/indexType")
     public R<?>getIndexType(){
         return iBuyHousesService.getIndexType();
@@ -134,6 +135,7 @@ public class BuyHousesController extends BaseController {
     /**
      * 首页企业所在地展示
      */
+//    @SaCheckPermission("system:houses:companyDistrict")
     @GetMapping("/companyDistrict")
     public R<?>getCompanyDistrict(){
         return iBuyHousesService.getCompanyDistrict();
@@ -141,6 +143,7 @@ public class BuyHousesController extends BaseController {
     /**
      * 首页国籍和婚姻状态展示
      */
+//    @SaCheckPermission("system:houses:nationalityAndMarital")
     @GetMapping("/nationalityAndMarital")
     public R<?>getNationalityAndMarital(){
         return iBuyHousesService.getNationalityAndMarital();
@@ -149,6 +152,7 @@ public class BuyHousesController extends BaseController {
     /**
      * 首页第一排基础数据
      */
+//    @SaCheckPermission("system:houses:basicData")
     @GetMapping("/basicData")
     public R getBasicData(){
         return iBuyHousesService.getBasicData();
@@ -157,6 +161,7 @@ public class BuyHousesController extends BaseController {
     /**
      * 复审柱状图
      */
+//    @SaCheckPermission("system:houses:histogram")
     @GetMapping("/histogram")
     public R getHistogram(String date){
         return iBuyHousesService.getHistogram(date);

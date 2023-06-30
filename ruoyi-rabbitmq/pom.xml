@@ -18,10 +18,10 @@
     <dependencies>
 
         <!-- 通用工具-->
-        <dependency>
+        <!--<dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common</artifactId>
-        </dependency>
+        </dependency>-->
         <!--rabbitmq-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

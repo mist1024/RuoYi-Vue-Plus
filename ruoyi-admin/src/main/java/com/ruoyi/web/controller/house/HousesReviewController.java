@@ -14,7 +14,9 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.excel.ExcelResult;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.HousesReview;
@@ -179,6 +181,19 @@ public class HousesReviewController extends BaseController {
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<HousesReviewVo> result = ExcelUtil.importExcel(file.getInputStream(), HousesReviewVo.class, true);
         List<HousesReviewVo> volist = result.getList();
+        //判断时间格式是否正确
+        volist.stream().forEach(v ->{
+            if (!DateUtils.checkDate(v.getQualificationConfirmTime(),DateUtils.YYYY_MM_DD_HH_MM_SS)){
+                throw new ServiceException("资格确认时间格式不正确,格式为:"+DateUtils.YYYY_MM_DD_HH_MM_SS);
+            }
+            if (!DateUtils.checkDate(v.getAuditTime(),DateUtils.YYYY_MM_DD)){
+                throw new ServiceException("审核时间格式不正确,格式为:"+DateUtils.YYYY_MM_DD);
+            }
+            if (!DateUtils.checkDate(v.getRegisterFailureTime(),DateUtils.YYYY_MM_DD)){
+                throw new ServiceException("登记失效时间格式不正确,格式为:"+DateUtils.YYYY_MM_DD);
+            }
+        });
+
         List<HousesReview> list = BeanUtil.copyToList(volist, HousesReview.class);
         //先获取到导入数据的身份证去购房一期数据库去查
         //过滤出导入表中的身份证号码
