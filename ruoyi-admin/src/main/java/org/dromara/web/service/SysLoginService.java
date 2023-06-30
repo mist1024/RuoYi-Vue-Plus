@@ -92,7 +92,7 @@ public class SysLoginService {
             SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getUserId, social.getUserId()));
             // 执行登录
-            return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
+            return loginAndRecord(user.getTenantId(), user.getUserName());
         } else {
             return R.fail("你还没有绑定第三方账号，绑定后才可以登录！");
         }
@@ -131,10 +131,9 @@ public class SysLoginService {
      *
      * @param tenantId 租户ID
      * @param userName 用户名
-     * @param authUser 授权用户信息
      * @return 统一响应实体
      */
-    private R<String> loginAndRecord(String tenantId, String userName, AuthUser authUser) {
+    private R<String> loginAndRecord(String tenantId, String userName) {
         checkTenant(tenantId);
         SysUserVo user = loadUserByUsername(tenantId, userName);
         SaLoginModel model = new SaLoginModel();
