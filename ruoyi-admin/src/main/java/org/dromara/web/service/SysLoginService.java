@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,45 +67,63 @@ public class SysLoginService {
     private final ISysSocialService sysSocialService;
     private final SysUserMapper userMapper;
 
+
+
     /**
      * 社交登录
      *
-     * @param source   登录来源
+     * @param tenantId   租户id
      * @param authUser 授权响应实体
      * @return 统一响应实体
      */
-    public R<String> socialLogin(String source, AuthResponse<AuthUser> authUser) {
+    public R<String> socialLogin(String tenantId, AuthResponse<AuthUser> authUser) {
         // 判断授权响应是否成功
         if (!authUser.ok()) {
             return R.fail("对不起，授权信息验证不通过，请退出重试！");
         }
         AuthUser authUserData = authUser.getData();
         SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
+        //验证授权表里面的租户id是否包含当前租户id
+        if (ObjectUtil.isNotNull(social) && StrUtil.isNotBlank(social.getTenantId())
+            && !social.getTenantId().contains(tenantId)) {
+            return R.fail("对不起，你没有权限登录当前租户！");
+        }
         if (ObjectUtil.isNotNull(social)) {
             SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getUserId, social.getUserId()));
-            // 执行登录和记录登录信息操作
+            // 执行登录
             return loginAndRecord(user.getTenantId(), user.getUserName(), authUserData);
         } else {
-            // 判断是否已登录
-            if (!StpUtil.isLogin()) {
-                return R.fail("授权失败，请先登录才能绑定");
-            }
-            SysSocialBo bo = new SysSocialBo();
-            bo.setUserId(LoginHelper.getUserId());
-            bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
-            bo.setSource(authUserData.getSource());
-            bo.setUserName(authUserData.getUsername());
-            bo.setNickName(authUserData.getNickname());
-            bo.setAvatar(authUserData.getAvatar());
-            bo.setOpenId(authUserData.getUuid());
-            BeanUtils.copyProperties(authUserData.getToken(), bo);
-
-            sysSocialService.insertByBo(bo);
-            SysUserVo sysUser = loadUserByUsername(LoginHelper.getTenantId(), LoginHelper.getUsername());
-            // 执行登录和记录登录信息操作
-            return loginAndRecord(sysUser.getTenantId(), sysUser.getUserName(), authUserData);
+            return R.fail("你还没有绑定第三方账号，绑定后才可以登录！");
         }
+    }
+
+
+    /**
+     * 绑定第三方用户
+     * @param authUser 授权响应实体
+     * @return 统一响应实体
+     */
+    public R<String> sociaRegister(AuthResponse<AuthUser> authUser){
+        if (!authUser.ok()) {
+            return R.fail("对不起，授权信息验证不通过，请退出重试！");
+        }
+        // 判断是否已登录
+        if (!StpUtil.isLogin()) {
+            return R.fail("授权失败，登录状态异常！");
+        }
+        AuthUser authUserData = authUser.getData();
+        SysSocialBo bo = new SysSocialBo();
+        bo.setUserId(LoginHelper.getUserId());
+        bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
+        bo.setSource(authUserData.getSource());
+        bo.setUserName(authUserData.getUsername());
+        bo.setNickName(authUserData.getNickname());
+        bo.setAvatar(authUserData.getAvatar());
+        bo.setOpenId(authUserData.getUuid());
+        BeanUtils.copyProperties(authUserData.getToken(), bo);
+
+        return sysSocialService.insertByBo(bo) ? R.ok("绑定成功！"):R.fail("绑定失败！");
     }
 
     /**
@@ -124,7 +143,7 @@ public class SysLoginService {
         LoginHelper.login(buildLoginUser(user), model);
         recordLogininfor(user.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         recordLoginInfo(user.getUserId());
-        return R.ok(StpUtil.getTokenValue());
+        return R.ok( "登录成功", StpUtil.getTokenValue());
     }
 
     /**

@@ -45,13 +45,15 @@ public class SocialUtils {
             case "alipay" ->
                 // 支付宝在创建回调地址时，不允许使用localhost或者127.0.0.1，所以这儿的回调地址使用的局域网内的ip
                 authRequest = new AuthAlipayRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret)
-                    .alipayPublicKey("").redirectUri(redirectUri).build());
+                    .redirectUri(redirectUri).build());
             case "qq" ->
                 authRequest = new AuthQqRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret)
                     .redirectUri(redirectUri).build());
             case "wechat_open" -> authRequest = new AuthWeChatOpenRequest(AuthConfig.builder().clientId(clientId)
                 .clientSecret(clientSecret).redirectUri(redirectUri).build());
             case "csdn" ->
+                //注意,经咨询CSDN官方客服得知，CSDN的授权开放平台已经下线。如果以前申请过的应用，可以继续使用，但是不再支持申请新的应用。
+                // so, 本项目中的CSDN登录只能针对少部分用户使用了
                 authRequest = new AuthCsdnRequest(AuthConfig.builder().clientId(clientId).clientSecret(clientSecret)
                     .redirectUri(redirectUri).build());
             case "taobao" ->

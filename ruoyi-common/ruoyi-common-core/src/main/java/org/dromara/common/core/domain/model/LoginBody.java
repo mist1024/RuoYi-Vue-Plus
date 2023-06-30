@@ -103,4 +103,9 @@ public class LoginBody {
     @NotBlank(message = "{xcx.code.not.blank}", groups = {WechatGroup.class})
     private String xcxCode;
 
+    /**
+     * 第三方登录平台
+     */
+    private String source;
+
 }
