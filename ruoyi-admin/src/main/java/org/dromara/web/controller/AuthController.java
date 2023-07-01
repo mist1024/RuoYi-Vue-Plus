@@ -110,23 +110,8 @@ public class AuthController {
      * @return 结果
      */
     @SuppressWarnings("unchecked")
-    @PostMapping("/social-login")
+    @PostMapping("/social/callback")
     public R<LoginVo> socialLogin(@RequestBody LoginBody loginBody) {
-        // 授权类型和客户端id
-        String clientId = loginBody.getClientId();
-        String grantType = loginBody.getGrantType();
-        SysClient client = clientService.queryByClientId(clientId);
-        // 查询不到 client 或 client 内不包含 grantType
-        if (ObjectUtil.isNull(client) || !StringUtils.contains(client.getGrantType(), grantType)) {
-            log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
-            return R.fail(MessageUtils.message("auth.grant.type.error"));
-        }
-        // 校验租户
-        loginService.checkTenant(loginBody.getTenantId());
-        //判断用户登录状态，如果已经登录那么就默认为注册，如果没有登录那么默认登录
-        if (!StpUtil.isLogin()) {
-            return R.ok(IAuthStrategy.login(loginBody, client));
-        }else {
             // 获取第三方登录信息
             AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
             AuthUser authUserData = response.getData();
@@ -135,7 +120,6 @@ public class AuthController {
                 return R.fail(response.getMsg());
             }
             return loginService.sociaRegister(authUserData);
-        }
     }
 
 
