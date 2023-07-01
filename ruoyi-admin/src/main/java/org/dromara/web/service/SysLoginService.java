@@ -1,12 +1,15 @@
 package org.dromara.web.service;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
@@ -14,14 +17,12 @@ import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.UserException;
-import org.dromara.common.core.utils.DateUtils;
-import org.dromara.common.core.utils.MessageUtils;
-import org.dromara.common.core.utils.ServletUtils;
-import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -29,13 +30,13 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysSocialBo;
+import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysPermissionService;
 import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
-import org.dromara.web.domain.vo.LoginVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -69,22 +70,80 @@ public class SysLoginService {
 
 
     /**
-     * 绑定第三方用户
-     * @param authUserData 授权响应实体
+     * 社交登录
+     *
+     * @param tenantId   租户id
+     * @param authUser 授权响应实体
      * @return 统一响应实体
      */
-    public R<LoginVo> sociaRegister(AuthUser authUserData ){
+    public R<String> socialLogin(String tenantId, AuthResponse<AuthUser> authUser) {
+        // 判断授权响应是否成功
+        if (!authUser.ok()) {
+            return R.fail("对不起，授权信息验证不通过，请退出重试！");
+        }
+        AuthUser authUserData = authUser.getData();
+        SysSocialVo social = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
+        //验证授权表里面的租户id是否包含当前租户id
+        if (ObjectUtil.isNotNull(social) && StrUtil.isNotBlank(social.getTenantId())
+            && !social.getTenantId().contains(tenantId)) {
+            return R.fail("对不起，你没有权限登录当前租户！");
+        }
+        if (ObjectUtil.isNotNull(social)) {
+            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getUserId, social.getUserId()));
+            // 执行登录
+            return loginAndRecord(user.getTenantId(), user.getUserName());
+        } else {
+            return R.fail("你还没有绑定第三方账号，绑定后才可以登录！");
+        }
+    }
+
+
+    /**
+     * 绑定第三方用户
+     * @param authUser 授权响应实体
+     * @return 统一响应实体
+     */
+    public R<String> sociaRegister(AuthResponse<AuthUser> authUser){
+        if (!authUser.ok()) {
+            return R.fail("对不起，授权信息验证不通过，请退出重试！");
+        }
+        // 判断是否已登录
+        if (!StpUtil.isLogin()) {
+            return R.fail("授权失败，登录状态异常！");
+        }
+        AuthUser authUserData = authUser.getData();
         SysSocialBo bo = new SysSocialBo();
         bo.setUserId(LoginHelper.getUserId());
         bo.setAuthId(authUserData.getSource() + authUserData.getUuid());
-        bo.setOpenId(authUserData.getUuid());
+        bo.setSource(authUserData.getSource());
         bo.setUserName(authUserData.getUsername());
-        BeanUtils.copyProperties(authUserData, bo);
+        bo.setNickName(authUserData.getNickname());
+        bo.setAvatar(authUserData.getAvatar());
+        bo.setOpenId(authUserData.getUuid());
         BeanUtils.copyProperties(authUserData.getToken(), bo);
-        sysSocialService.insertByBo(bo);
-        return R.ok();
+
+        return sysSocialService.insertByBo(bo) ? R.ok("绑定成功！"):R.fail("绑定失败！");
     }
 
+    /**
+     * 执行登录和记录登录信息操作
+     *
+     * @param tenantId 租户ID
+     * @param userName 用户名
+     * @return 统一响应实体
+     */
+    private R<String> loginAndRecord(String tenantId, String userName) {
+        checkTenant(tenantId);
+        SysUserVo user = loadUserByUsername(tenantId, userName);
+        SaLoginModel model = new SaLoginModel();
+        model.setDevice(DeviceType.PC.getDevice());
+        // 生成token
+        LoginHelper.login(buildLoginUser(user), model);
+        recordLogininfor(user.getTenantId(), userName, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        recordLoginInfo(user.getUserId());
+        return R.ok( "登录成功", StpUtil.getTokenValue());
+    }
 
     /**
      * 退出登录
@@ -118,6 +177,25 @@ public class SysLoginService {
         logininforEvent.setMessage(message);
         logininforEvent.setRequest(ServletUtils.getRequest());
         SpringUtils.context().publishEvent(logininforEvent);
+    }
+
+
+    private SysUserVo loadUserByUsername(String tenantId, String username) {
+        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .select(SysUser::getUserName, SysUser::getStatus)
+                .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+                .eq(SysUser::getUserName, username));
+        if (ObjectUtil.isNull(user)) {
+            log.info("登录用户：{} 不存在.", username);
+            throw new UserException("user.not.exists", username);
+        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            log.info("登录用户：{} 已被停用.", username);
+            throw new UserException("user.blocked", username);
+        }
+        if (TenantHelper.isEnable()) {
+            return userMapper.selectTenantUserByUserName(username, tenantId);
+        }
+        return userMapper.selectUserByUserName(username);
     }
 
     /**

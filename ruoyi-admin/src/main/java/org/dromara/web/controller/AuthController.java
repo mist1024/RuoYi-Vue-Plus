@@ -1,12 +1,13 @@
 package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
@@ -87,7 +88,7 @@ public class AuthController {
     }
 
     /**
-     * 第三方登录请求
+     * 认证授权
      *
      * @param source 登录来源
      * @return 结果
@@ -98,43 +99,49 @@ public class AuthController {
         if (ObjectUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
         }
-        AuthRequest authRequest = SocialUtils.getAuthRequest(source, socialProperties);
+        AuthRequest authRequest = SocialUtils.getAuthRequest(source,
+            obj.getClientId(),
+            obj.getClientSecret(),
+            obj.getRedirectUri());
         String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
         return R.ok(authorizeUrl);
     }
 
     /**
      * 第三方登录回调业务处理
-     *  绑定授权
-     * @param loginBody
+     *
+     * @param source   登录来源
+     * @param callback 授权响应实体
      * @return 结果
      */
     @SuppressWarnings("unchecked")
-    @PostMapping("/social-login")
-    public R<LoginVo> socialLogin(@RequestBody LoginBody loginBody) {
-        // 授权类型和客户端id
-        String clientId = loginBody.getClientId();
-        String grantType = loginBody.getGrantType();
+    @GetMapping("/social-login")
+    public R<String> socialLogin(String source,
+                                 String loginType,
+                                 String tenantId,
+                                 String clientId,
+                                 String grantType,
+                                 AuthCallback callback) {
+        SocialLoginConfigProperties obj = socialProperties.getType().get(source);
+        if (ObjectUtil.isNull(obj)) {
+            return R.fail(source + "平台账号暂不支持");
+        }
         SysClient client = clientService.queryByClientId(clientId);
         // 查询不到 client 或 client 内不包含 grantType
         if (ObjectUtil.isNull(client) || !StringUtils.contains(client.getGrantType(), grantType)) {
             log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
             return R.fail(MessageUtils.message("auth.grant.type.error"));
         }
-        // 校验租户
-        loginService.checkTenant(loginBody.getTenantId());
-        //判断用户登录状态，如果已经登录那么就默认为注册，如果没有登录那么默认登录
-        if (!StpUtil.isLogin()) {
-            return R.ok(IAuthStrategy.login(loginBody, client));
-        }else {
-            // 获取第三方登录信息
-            AuthResponse<AuthUser> response = SocialUtils.loginAuth(loginBody, socialProperties);
-            AuthUser authUserData = response.getData();
-            // 判断授权响应是否成功
-            if (!response.ok()) {
-                return R.fail(response.getMsg());
-            }
-            return loginService.sociaRegister(authUserData);
+        AuthRequest authRequest = SocialUtils.getAuthRequest(source,
+            obj.getClientId(),
+            obj.getClientSecret(),
+            obj.getRedirectUri());
+        AuthResponse<AuthUser> response = authRequest.login(callback);
+        //判断loginType是否为login,如果是login则为登录，否则为绑定
+        if (StrUtil.equals(loginType, "login")) {
+            return loginService.socialLogin(tenantId , response);
+        } else {
+            return loginService.sociaRegister(response);
         }
     }
 

@@ -3,7 +3,10 @@ package org.dromara.common.core.domain.model;
 import jakarta.validation.constraints.Email;
 import org.dromara.common.core.constant.UserConstants;
 import lombok.Data;
-import org.dromara.common.core.validate.auth.*;
+import org.dromara.common.core.validate.auth.EmailGroup;
+import org.dromara.common.core.validate.auth.PasswordGroup;
+import org.dromara.common.core.validate.auth.SmsGroup;
+import org.dromara.common.core.validate.auth.WechatGroup;
 import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.NotBlank;
@@ -103,18 +106,6 @@ public class LoginBody {
     /**
      * 第三方登录平台
      */
-    @NotBlank(message = "{social.source.not.blank}" , groups = {SocialGroup.class})
     private String source;
 
-    /**
-     * 第三方登录code
-     */
-    @NotBlank(message = "{social.code.not.blank}" , groups = {SocialGroup.class})
-    private String socialCode;
-
-    /**
-     * 第三方登录socialState
-     */
-    @NotBlank(message = "{social.state.not.blank}" , groups = {SocialGroup.class})
-    private String socialState;
 }
