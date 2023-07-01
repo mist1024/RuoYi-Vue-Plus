@@ -3,6 +3,7 @@ package org.dromara.web.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -115,18 +116,35 @@ public class AuthController {
      */
     @SuppressWarnings("unchecked")
     @GetMapping("/social-login")
-    public R<String> socialLogin(String source, AuthCallback callback) {
+    public R<String> socialLogin(String source,
+                                 String loginType,
+                                 String tenantId,
+                                 String clientId,
+                                 String grantType,
+                                 AuthCallback callback) {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
         if (ObjectUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
+        }
+        SysClient client = clientService.queryByClientId(clientId);
+        // 查询不到 client 或 client 内不包含 grantType
+        if (ObjectUtil.isNull(client) || !StringUtils.contains(client.getGrantType(), grantType)) {
+            log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
+            return R.fail(MessageUtils.message("auth.grant.type.error"));
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source,
             obj.getClientId(),
             obj.getClientSecret(),
             obj.getRedirectUri());
         AuthResponse<AuthUser> response = authRequest.login(callback);
-        return loginService.socialLogin(source, response);
+        //判断loginType是否为login,如果是login则为登录，否则为绑定
+        if (StrUtil.equals(loginType, "login")) {
+            return loginService.socialLogin(tenantId , response);
+        } else {
+            return loginService.sociaRegister(response);
+        }
     }
+
 
     /**
      * 取消授权
