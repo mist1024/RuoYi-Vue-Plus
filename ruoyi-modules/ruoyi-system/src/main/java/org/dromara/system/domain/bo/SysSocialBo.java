@@ -57,8 +57,9 @@ public class SysSocialBo extends TenantEntity {
     private String refreshToken;
 
     /**
-     * 平台唯一id
+     * 用户的 open id
      */
+    @NotBlank(message = "用户的 open id不能为空", groups = { AddGroup.class, EditGroup.class })
     private String openId;
 
     /**
@@ -136,7 +137,6 @@ public class SysSocialBo extends TenantEntity {
      * Twitter平台用户的附带属性，部分平台可能没有
      */
     private String oauthTokenSecret;
-
 
 
 }
