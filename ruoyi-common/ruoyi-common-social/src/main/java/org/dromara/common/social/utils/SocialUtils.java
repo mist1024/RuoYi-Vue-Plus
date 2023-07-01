@@ -10,16 +10,12 @@ import me.zhyd.oauth.request.*;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * 认证授权工具类
  *
  * @author thiszhc
  */
-@AutoConfiguration(before = SocialProperties.class)
-@EnableConfigurationProperties(SocialProperties.class)
 public class SocialUtils  {
     public static AuthResponse<AuthUser> loginAuth(LoginBody loginBody, SocialProperties socialProperties) throws AuthException {
         AuthRequest authRequest = getAuthRequest(loginBody.getSource(), socialProperties);
