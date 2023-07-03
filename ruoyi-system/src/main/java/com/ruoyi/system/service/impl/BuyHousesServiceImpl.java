@@ -756,6 +756,11 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         BuyHouses buyHouses = BeanUtil.toBean(bo, BuyHouses.class);
         buyHouses.setStep("1");
         BuyHouses buyHouses1 = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, buyHouses.getCardId()));
+        //判断该人才是否存在
+        if (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses1.getUserId().equals(buyHouses.getUserId())){
+            throw new ServiceException("当前用户已在系统存在");
+//            return R.fail("当前用户已在系统存在");
+        }
         if (ObjectUtil.isNull(buyHouses1)){
             //新增
             buyHouses.setProcessStatus(Constants.WAIT);
@@ -764,7 +769,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             buyHouses.setUpdateTime(new Date());
             int insert = baseMapper.insert(buyHouses);
             if (insert==0){
-                return R.fail("新增失败");
+                throw new ServiceException("新增失败");
+//                return R.fail("新增失败");
             }
             //创建关系材料表
             List<BuyHousesMember> buyHousesMemberList = buyHouses.getBuyHousesMemberList();
@@ -774,23 +780,21 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                 });
             }
             buyHousesMemberMapper.insertBatch(buyHousesMemberList);
-
         }else {
             //判断状态是否在可执行范围
             if (!Constants.WAIT.equals(buyHouses.getProcessStatus())
                 && !Constants.SUBMIT.equals(buyHouses.getProcessStatus())
                 && ! Constants.FAILD.equals(buyHouses.getProcessStatus())){
-                return R.fail("当前状态不在修改范围");
+                throw new ServiceException("当前状态不在修改范围");
+//                return R.fail("当前状态不在修改范围");
             }
             buyHouses.setId(buyHouses1.getId());
-            //判断该人才是否存在
-            if (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses1.getUserId().equals(buyHouses.getUserId())){
-                return R.fail("当前用户已在系统存在");
-            }
+
             //判断当前是否可以提交
             if (Constants.WAIT.equals(buyHouses1.getProcessStatus())
                 ||Constants.SUCCEED.equals(buyHouses1.getProcessStatus())){
-                return R.fail("当前状态不允许修改");
+                throw new ServiceException("当前状态不允许修改");
+//                return R.fail("当前状态不允许修改");
             }
             buyHouses.setUpdateTime(new Date());
             //删除关系表中得数据
@@ -798,7 +802,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             //修改数据
             int i = baseMapper.updateById(buyHouses);
             if (Constants.WAIT.equals(buyHouses.getProcessStatus()) && i==0){
-                return R.fail("修改失败");
+                throw new ServiceException("修改失败");
+//                return R.fail("修改失败");
             }
             //修改材料表中得数据
             List<BuyHousesMember> buyHousesMemberList = buyHouses.getBuyHousesMemberList();
@@ -1303,7 +1308,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             //对每一个HouseId分组
             Map<String, List<BuyHousesMember>> buyHousesMemberMap = buyHousesMemberList.stream().collect(Collectors.groupingBy(BuyHousesMember::getBuyHousesId));
             buyHousesVoList.stream().forEach(r -> {
-                String dir="D:\\gaoxin\\images\\house\\";
+                String dir="/usr/local/images/2023/07/01";
                 //护照或者身份证
                 if (ObjectUtil.isNotEmpty(r.getInsidepageUrl())){
                     String insidepageUrl = r.getInsidepageUrl();

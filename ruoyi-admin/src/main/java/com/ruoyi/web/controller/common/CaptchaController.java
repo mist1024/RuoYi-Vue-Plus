@@ -64,34 +64,36 @@ public class CaptchaController {
     /**
      * 短信验证码
      *
-     * @param phonenumber 用户手机号
+     * @param username 用户手机号
      */
     @GetMapping("/captchaSms")
-    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
+
+    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String username) {
         if (!smsProperties.getEnabled()) {
             return R.fail("当前系统没有开启短信功能！");
         }
         //判断系统中是否存在该人才
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getPhonenumber, SysUser::getStatus)
-            .eq(SysUser::getPhonenumber, phonenumber));
+            .eq(SysUser::getPhonenumber, username));
         if (ObjectUtil.isNull(user)) {
-            log.info("登录用户：{} 不存在.", phonenumber);
-            throw new UserException("user.not.exists", phonenumber);
+            log.info("登录用户：{} 不存在.", username);
+            throw new UserException("user.not.exists", username);
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-            log.info("登录用户：{} 已被停用.", phonenumber);
-            throw new UserException("user.blocked", phonenumber);
+            log.info("登录用户：{} 已被停用.", username);
+            throw new UserException("user.blocked", username);
         }
-        String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
+        String key = CacheConstants.CAPTCHA_CODE_KEY + username;
         String code = RandomUtil.randomNumbers(6);
+        System.out.println("code = " + code);
         RedisUtils.setCacheObject(key, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
         TelecomSendMsg smsTemplate = SpringUtils.getBean(TelecomSendMsg.class);
-        SmsResult result = smsTemplate.telecomSendCode(phonenumber, code, "login");
+        SmsResult result = smsTemplate.telecomSendCode(username, code, "login");
         if (!result.isSuccess()) {
             log.error("验证码短信发送异常 => {}", result);
             return R.fail(result.getMessage());
         }
-        return R.ok();
+        return R.ok("发送成功");
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.user;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
@@ -130,5 +131,11 @@ public class HouseController extends BaseController {
     public R<?> insertOpenBuyHouses(@Validated(EditGroup.class)@RequestBody BuyHousesBo bo){
         bo.setApiKey("gaoxingongyuanchengshiju");
         return  iBuyHousesService.insertOpenBuyHouses(bo);
+    }
+
+    @SaIgnore
+    @GetMapping("/excelZip")
+    public void excelZip(){
+        iBuyHousesService.excelZip();
     }
 }

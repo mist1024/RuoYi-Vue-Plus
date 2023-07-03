@@ -58,6 +58,7 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
     @Override
     public TableDataInfo<SubscribeExportVo> queryPageList(SubscribeExportBo bo, PageQuery pageQuery) {
         bo.setUserId(LoginHelper.getUserId().toString());
+        bo.setExportStatus("1");
         LambdaQueryWrapper<SubscribeExport> lqw = buildQueryWrapper(bo);
         lqw.orderByDesc(SubscribeExport::getCreateTime);
         Page<SubscribeExportVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);

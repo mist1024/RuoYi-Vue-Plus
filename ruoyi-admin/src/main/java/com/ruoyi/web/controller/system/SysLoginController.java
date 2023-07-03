@@ -79,7 +79,7 @@ public class SysLoginController {
         @RequestBody SmsLoginBody smsLoginBody) {
         Map<String, Object> ajax = new HashMap<>();
         // 生成令牌
-        String token = loginService.smsLogin(smsLoginBody.getPhonenumber(), smsLoginBody.getSmsCode());
+        String token = loginService.smsLogin(smsLoginBody.getUsername(), smsLoginBody.getVerificationCode());
         ajax.put(Constants.TOKEN, token);
         return R.ok(ajax);
     }

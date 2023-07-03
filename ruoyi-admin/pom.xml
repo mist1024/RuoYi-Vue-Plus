@@ -94,11 +94,10 @@
             <artifactId>ruoyi-file</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-rabbitmq</artifactId>
-            <version>4.7.0</version>
-        </dependency>
+        </dependency>-->
 
         <!-- skywalking 整合 logback -->
 <!--        <dependency>-->

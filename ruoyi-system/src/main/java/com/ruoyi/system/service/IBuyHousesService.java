@@ -123,4 +123,7 @@ public interface IBuyHousesService {
     R getBasicData();
 
     R getHistogram(String date);
+
+    void excelZip();
+
 }

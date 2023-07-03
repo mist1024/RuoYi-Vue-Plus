@@ -3,7 +3,6 @@ package com.ruoyi.test;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.resource.ClassPathResource;
-import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -26,14 +25,9 @@ import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.AesUtil;
-import com.ruoyi.common.utils.CardsUtil;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.MyFileUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.demo.domain.ImageDemoData;
-import com.ruoyi.mq.config.PluginDelayRabbitConfig;
-import com.ruoyi.mq.config.TalentsDelayRabbitConfig;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.domain.vo.HousesReviewVo;
 import com.ruoyi.system.domain.vo.MaterialTalentsVo;
@@ -56,13 +50,9 @@ import com.ruoyi.work.utils.WorkComplyUtils;
 import org.apache.commons.text.CaseUtils;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.junit.jupiter.api.*;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ReflectionUtils;
-
 import javax.crypto.SecretKey;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -71,7 +61,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -141,8 +130,8 @@ public class DemoUnitTest {
     @Autowired
     private BuyHousesServiceImpl buyHousesService;
 
-    @Autowired
-    private RabbitTemplate amqpTemplate;
+//    @Autowired
+//    private RabbitTemplate amqpTemplate;
 
 
     @DisplayName("测试 @SpringBootTest @Test @DisplayName 注解")
@@ -806,18 +795,23 @@ public class DemoUnitTest {
         System.out.println("privateKey = " + privateKey);*/
 //        String substring = DesensitizedUtil.idCardNum("510503199602214055", 4, 0).substring(0, 9);
 //        System.out.println("card = " + substring);
-        buyHousesService.excelZip();
 
+        String str ="https://gx.chengdutalent.cn:8010/upload/GXTalents/images/a6b742bc7843405da406b0159179dcfd.jpg";
+        String substring = str.substring(str.lastIndexOf("/") + 1);
+
+        String txt ="https://rcaj.cdhtgycs.cn/images/2023/07/01/"+substring;
+        buyHousesService.excelZip();
+        System.out.println("txt = " + txt);
 
     }
 
     @Test
     public void TestMessageAck() throws UnsupportedEncodingException {
-        String msg="消息4";
-        Message build = MessageBuilder.withBody(msg.getBytes()).build();
-        build.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
-        build.getMessageProperties().setDelay(50000);
-        amqpTemplate.convertAndSend(TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_EXCHANGE,TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_KEY,build);
+//        String msg="消息4";
+//        Message build = MessageBuilder.withBody(msg.getBytes()).build();
+//        build.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+//        build.getMessageProperties().setDelay(50000);
+//        amqpTemplate.convertAndSend(TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_EXCHANGE,TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_KEY,build);
     }
 }
 
