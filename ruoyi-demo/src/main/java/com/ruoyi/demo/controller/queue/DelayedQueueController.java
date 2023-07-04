@@ -38,6 +38,7 @@ public class DelayedQueueController {
         log.info("通道: {} 监听中......", queueName);
         // 项目初始化设置一次即可
         QueueUtils.subscribeBlockingQueue(queueName, (String orderNum) -> {
+            //注：如业务代码部分使用到了redis相关操作，需要将业务逻辑异步，否则将会报错：Sync methods can't be invoked from async/rx/reactive listeners
             // 观察接收时间
             log.info("通道: {}, 收到数据: {}", queueName, orderNum);
         });
