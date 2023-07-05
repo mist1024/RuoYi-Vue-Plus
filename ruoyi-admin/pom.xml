@@ -94,6 +94,8 @@
             <artifactId>ruoyi-file</artifactId>
         </dependency>
 
+
+
         <!--<dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-rabbitmq</artifactId>

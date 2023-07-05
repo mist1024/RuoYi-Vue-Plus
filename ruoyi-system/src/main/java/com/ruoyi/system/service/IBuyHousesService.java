@@ -11,6 +11,7 @@ import com.ruoyi.system.domain.vo.BuyHousesVo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 
@@ -126,4 +127,5 @@ public interface IBuyHousesService {
 
     void excelZip();
 
+    R push() throws ParseException;
 }

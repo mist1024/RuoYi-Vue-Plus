@@ -141,12 +141,13 @@ public class WorkController extends BaseController {
             hashMap.put("auditDepartName",deptName);
         }
         if (s.equals(Constants.NONENTITY)){
-            return R.fail("暂无审核");
+            throw new ServiceException("暂无审核");
+//            return R.fail("暂无审核");
         }else{
             if ("apply_house".equals(hisProcess.getProcessKey())) {
                 if (Constants.SUCCEED.equals(s)) {//审核成功推送数据
                     //公园城市局推送
-                    /*String virtualcode = String.valueOf(map.get("virtualcode"));
+                    String virtualcode = String.valueOf(map.get("virtualcode"));
                     map.put("virtualcode", virtualcode == "3" ? "010" : "009");
                     String cardType = String.valueOf(map.get("cardType"));
                     map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
@@ -156,7 +157,8 @@ public class WorkController extends BaseController {
                     map.put("buyHousesMemberList", "null");
                     map.put("buyHousesLogList", "null");
                     map.put("buyHousesLogList", "null");
-                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"253");*/
+//                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest", map, "253");
+                    housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "253");
                     //人才通推送
                     hashMap.put("status", "00T");
                 } else if (Constants.FAILD.equals(s)) {
@@ -170,7 +172,6 @@ public class WorkController extends BaseController {
                     housingConstructionBureauPushDto.send3(hashMap, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
                 }
             }
-
             Object step = map1.get("step");
             processMapper.updateCommonByBusinessId(tProcesses.get(0).getBean(),s, hisProcess.getBusinessId(),step);
         }

@@ -59,6 +59,7 @@ spring:
 #          password: 1234Qwer@
           #正式地址
           url: jdbc:mysql://172.12.9.1:3409/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+#          url: jdbc:mysql://182.138.107.22:3409/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
           #url: jdbc:mysql://localhost:3306/ry-vue-jinniu?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
           username: gxrc
           password: 45Uuq5!aADGD

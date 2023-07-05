@@ -1,15 +1,18 @@
 package com.ruoyi.test;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.crypto.Mode;
+import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.SM2;
+import cn.hutool.crypto.digest.MD5;
+import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SM4;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -26,6 +29,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.AesUtil;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.demo.domain.ImageDemoData;
 import com.ruoyi.system.domain.*;
@@ -47,13 +51,18 @@ import com.ruoyi.work.mapper.HisProcessMapper;
 import com.ruoyi.work.mapper.ProcessMapper;
 import com.ruoyi.work.service.impl.ProcessServiceImpl;
 import com.ruoyi.work.utils.WorkComplyUtils;
+import com.ruoyi.work.utils.WorkUtils;
 import org.apache.commons.text.CaseUtils;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ReflectionUtils;
-import javax.crypto.SecretKey;
+import sun.misc.BASE64Encoder;
+
+import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +70,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -483,10 +499,10 @@ public class DemoUnitTest {
 //        byte[] encoded = sm4.getEncoded();
 //        String encode = Base64.encode(encoded);
         String encode = "08H5sBeeEsvMrmLMvcetrQ==";
-        SM4 sm41 = SmUtil.sm4(Base64.decode(encode));
+//        SM4 sm41 = SmUtil.sm4(Base64.decode(encode));
 //        sm41.setMode(CipherMode.encrypt)
-        String s1 = sm41.encryptHex("12346");
-        System.out.println("s1 = " + s1);
+//        String s1 = sm41.encryptHex("12346");
+//        System.out.println("s1 = " + s1);
 //        System.out.println("encode = " + encode);
         /*SM4 sm41 = SmUtil.sm4(Base64.decode(encode));
         BuyHouses buyHouses = buyHousesMapper.selectById(820);
@@ -500,17 +516,17 @@ public class DemoUnitTest {
         byte[] privateEncoded = pair.getPrivate().getEncoded();
 
 
-        String PUBLIC_KEY = Base64.encode(publicEncoded);
-        System.out.println("publicKeyBase64 = " + PUBLIC_KEY);
+//        String PUBLIC_KEY = Base64.encode(publicEncoded);
+//        System.out.println("publicKeyBase64 = " + PUBLIC_KEY);
 
-        String PRIVATE_KEY = Base64.encode(privateEncoded);
-        System.out.println("privateKeyBase64 = " + PRIVATE_KEY);
-        SM2 sm2 = SmUtil.sm2(PRIVATE_KEY, VUE_PUBLIC_KEY);
-        sm2.setMode(SM2Engine.Mode.C1C3C2);
+//        String PRIVATE_KEY = Base64.encode(privateEncoded);
+//        System.out.println("privateKeyBase64 = " + PRIVATE_KEY);
+//        SM2 sm2 = SmUtil.sm2(PRIVATE_KEY, VUE_PUBLIC_KEY);
+//        sm2.setMode(SM2Engine.Mode.C1C3C2);
 
         //使用前端得公钥加密
-        String s = sm2.encryptBase64("123123", KeyType.PublicKey);
-        System.out.println("s = " + s);
+//        String s = sm2.encryptBase64("123123", KeyType.PublicKey);
+//        System.out.println("s = " + s);
 
         //解密使用后端得公钥加密,私钥来解密
 //        String s1 = sm2.decryptStr(s, KeyType.PrivateKey);
@@ -812,6 +828,57 @@ public class DemoUnitTest {
 //        build.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
 //        build.getMessageProperties().setDelay(50000);
 //        amqpTemplate.convertAndSend(TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_EXCHANGE,TalentsDelayRabbitConfig.TALENTS_PLUGIN_DELAY_KEY,build);
+    }
+
+    @Test
+    public void  testPush() throws ParseException {
+        Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses","2");
+        String virtualcode = String.valueOf(map.get("virtualcode"));
+        map.put("virtualcode", virtualcode == "3" ? "010" : "009");
+        String cardType = String.valueOf(map.get("cardType"));
+        map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
+        Object createTime = map.get("createTime");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        DateFormat cst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date format = sdf.parse(createTime.toString());
+        String dateString = cst.format(format);
+        map.put("qyStatus", "4");
+        map.put("creatTime",dateString);
+        map.put("gyStatus", "4");
+        map.put("shStatus", "4");
+        map.put("buyHousesMemberList", "null");
+        map.put("buyHousesLogList", "null");
+        String s = housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "253");
+    }
+
+    @Test
+    public void  paChon() throws Exception {
+        String appsecret ="JXYB7KpXlH9i0CL6";
+        String id="2023062804031";
+        String url ="http://162.14.100.54:9010/index.php/Api/renju/get_user_info";
+        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding,
+            // 密钥，可以自定义
+            "74242EAFE97F18BFAE9D2682590B6614".getBytes(),
+            // iv加盐，按照实际需求添加
+            "74242EAFE97F18BF".getBytes());
+        String param=aes.encryptBase64(new JSONObject()
+            .set("id_card","510503199602214056")
+            .toStringPretty());
+        System.out.println("param = " + param);
+        MD5 md5 = SecureUtil.md5();
+        String content=id+param+appsecret;
+        String sign=md5.digestHex(content);
+        System.out.println("sign = " + sign);
+        JSONObject jsonObject = new JSONObject()
+            .set("id",id)
+            .set("param",param)
+            .set("sign",sign);
+        String listContent = HttpRequest.post(url)
+            .body(jsonObject.toStringPretty())
+            .execute()
+            .body();
+        System.out.println("listContent = " + listContent);
+
     }
 }
 

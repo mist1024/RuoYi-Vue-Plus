@@ -44,12 +44,14 @@ import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.HousingConstructionBureauPushDto;
 import com.ruoyi.work.mapper.AuditLogMapper;
 import com.ruoyi.work.utils.WorkComplyUtils;
+import com.ruoyi.work.utils.WorkUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -58,6 +60,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -88,7 +92,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     private String prefix;
 
     //正式地址
-        private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
+    private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
     //测试地址
 //    private final String URL = "https://mihuatang.xyz/gaoxin-api/candidates/getCardId";
     //本地地址
@@ -914,14 +918,20 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         //获取二期市级和区级比例
         //市级
         int twoMunicipal = housesReviewList.stream().filter(f -> f.getSourceBy().equals("2")).collect(Collectors.toList()).size();
-        double div2 = NumberUtil.div(twoMunicipal,housesReviewList.size());
-        String twoMunicipalDecimalFormat = NumberUtil.decimalFormat("#.##%", div2);
-        map.put("twoMunicipal",twoMunicipalDecimalFormat);
-        //区级
-        int twoDistrict = housesReviewList.stream().filter(f -> f.getSourceBy().equals("1")).collect(Collectors.toList()).size();
-        double div1 = NumberUtil.div(twoDistrict,housesReviewList.size());
-        String twoDistrictDecimalFormat = NumberUtil.decimalFormat("#.##%", div1);
-        map.put("twoDistrict",twoDistrictDecimalFormat);
+        if (housesReviewList.size()>0) {
+            double div2 = NumberUtil.div(twoMunicipal, housesReviewList.size());
+            String twoMunicipalDecimalFormat = NumberUtil.decimalFormat("#.##%", div2);
+            map.put("twoMunicipal", twoMunicipalDecimalFormat);
+            //区级
+            int twoDistrict = housesReviewList.stream().filter(f -> f.getSourceBy().equals("1")).collect(Collectors.toList()).size();
+            double div1 = NumberUtil.div(twoDistrict,housesReviewList.size());
+            String twoDistrictDecimalFormat = NumberUtil.decimalFormat("#.##%", div1);
+            map.put("twoDistrict",twoDistrictDecimalFormat);
+        }else{
+            map.put("twoMunicipal", 0);
+            map.put("twoDistrict",0);
+        }
+
         //获取本月复审通过数
         Date date = DateUtil.date();
         //获得月份，从0开始计数
@@ -1297,7 +1307,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     public void  excelZip(){
         BuyHousesBo bo =new BuyHousesBo();
-        bo.setId(3L);
+//        bo.setId(3L);
         bo.setProcessStatus(Constants.SUCCEED);
         LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
         List<BuyHousesVo> buyHousesVoList = baseMapper.selectVoList(lqw);
@@ -1308,7 +1318,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             //对每一个HouseId分组
             Map<String, List<BuyHousesMember>> buyHousesMemberMap = buyHousesMemberList.stream().collect(Collectors.groupingBy(BuyHousesMember::getBuyHousesId));
             buyHousesVoList.stream().forEach(r -> {
-                String dir="/usr/local/images/2023/07/01";
+                String dir="/usr/local/images/2023/07/01/";
                 //护照或者身份证
                 if (ObjectUtil.isNotEmpty(r.getInsidepageUrl())){
                     String insidepageUrl = r.getInsidepageUrl();
@@ -1426,5 +1436,34 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                 }
             });
         }
+    }
+
+    /**
+     * 单独推送市局系统
+     * @return
+     */
+    @GetMapping("/push")
+    @Override
+    public R push() throws ParseException {
+        Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses","2");
+        String virtualcode = String.valueOf(map.get("virtualcode"));
+        map.put("virtualcode", virtualcode == "3" ? "010" : "009");
+        String cardType = String.valueOf(map.get("cardType"));
+        map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
+        Object createTime = map.get("createTime");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        DateFormat cst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date format = sdf.parse(createTime.toString());
+        String dateString = cst.format(format);
+        map.put("qyStatus", "4");
+        map.put("creatTime",dateString);
+        map.put("gyStatus", "4");
+        map.put("shStatus", "4");
+        map.put("buyHousesMemberList", "null");
+        map.put("buyHousesLogList", "null");
+//        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"253");
+        String s = housingConstructionBureauPushDto.openUrl("http://10.182.1.26/CCSRegistryCenter/rest", map, "253");
+        return null;
+
     }
 }

@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.house;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Arrays;
 
@@ -165,5 +166,12 @@ public class BuyHousesController extends BaseController {
     @GetMapping("/histogram")
     public R getHistogram(String date){
         return iBuyHousesService.getHistogram(date);
+    }
+
+    /**
+     * 对市局系统单独推送
+     */
+    public R push() throws ParseException {
+        return iBuyHousesService.push();
     }
 }

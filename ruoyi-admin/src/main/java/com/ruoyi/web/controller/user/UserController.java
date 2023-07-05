@@ -125,7 +125,7 @@ public class UserController extends BaseController {
     /**
      * 获取当前业务进行步骤
      */
-    @SaIgnore
+//    @SaIgnore
     @Log(title = "获取当前业务运行到那一步",businessType = BusinessType.OTHER)
     @PostMapping("/processPlan")
     public R<?> processPlan(@RequestBody ActProcess actProcess){
@@ -178,4 +178,5 @@ public class UserController extends BaseController {
         hashMap.put("list",processPlan);
         return R.ok(hashMap);
     }
+
 }

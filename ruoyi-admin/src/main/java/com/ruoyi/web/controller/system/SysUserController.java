@@ -172,7 +172,7 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping
-    public R<Void> remove(@PathVariable Long[] userIds) {
+    public R<Void> remove(Long[] userIds) {
         if (ArrayUtil.contains(userIds, getUserId())) {
             return R.fail("当前用户不能删除");
         }
