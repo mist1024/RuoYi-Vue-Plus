@@ -18,13 +18,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.entity.GaoXinCardInfo;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
-import com.ruoyi.common.utils.CardsUtil;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.file.MyFileUtils;
 import com.ruoyi.common.utils.poi.DeleteFileUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -91,12 +90,11 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Value("${file.prefix}")
     private String prefix;
 
-    //正式地址
-    private final String URL = "https://gx.chengdutalent.cn:8010/candidates/getCardId";
-    //测试地址
-//    private final String URL = "https://mihuatang.xyz/gaoxin-api/candidates/getCardId";
-    //本地地址
-//    private final String URL = "http://127.0.0.1:8010/candidates/getCardId";
+    @Value("${file.doc}")
+    private String doc;
+
+    @Value("${file.mapping}")
+    private String mapping;
 
     private final BuyHousesMapper baseMapper;
 
@@ -258,6 +256,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         if (buyHouses.size()>0){
             throw new ServiceException("当前人才已提交申请");
         }
+        bo.setStep("1");
         bo.setProcessStatus(Constants.WAIT);
         BuyHouses add = BeanUtil.toBean(bo, BuyHouses.class);
         boolean flag = baseMapper.insert(add) > 0;
@@ -378,7 +377,6 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         List<BuyHouses> buyHouses = baseMapper.selectList(
             new LambdaQueryWrapper<BuyHouses>()
                 .eq(BuyHouses::getCardId, cardId));
-
         if (buyHouses.size()>0){
             BuyHouses buyHouses1 = buyHouses.get(0);
             List<BuyHousesMember> buyHousesMembers = buyHousesMemberMapper.selectList(new LambdaQueryWrapper<>(BuyHousesMember.class)
@@ -433,9 +431,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         hashMap.put("type",buyHousesBo.getType());
         String fileName = UUID.randomUUID().toString();
         String templatePath = fileUpload + "Houses_template.docx";
-        String word = ExportWordUtil.createWord(templatePath, filePath, fileName, hashMap);
+        String word = ExportWordUtil.createWord(templatePath, doc, fileName, hashMap);
         System.out.println("word = " + word);
-        String file= download + prefix + "/" + fileName + ".docx";
+        String file= download + mapping + "/" + fileName + ".docx";
         map.put("file",file);
         return R.ok(map);
     }
@@ -488,32 +486,25 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             buyHousesVo.setBuyHousesMemberList(buyHousesMembers);
             return R.ok(buyHousesVo);
         }
-        HashMap<String, Object> paramMap = new HashMap<>();
-        paramMap.put("cardId", buyHouses.getCardId());
-        String json = HttpUtil.get(URL, paramMap);
-        JSONObject entrie = JSONUtil.parseObj(json);
-        String data = String.valueOf(entrie.get("data"));
-        if (ObjectUtil.isNull(data)){
-            return R.fail("获取失败");
-        }
-        JSONObject entries = JSONUtil.parseObj(data);
+        R rInfo = OpenUtils.getGaoXinCardInfo(buyHouses.getCardId());
+        GaoXinCardInfo gaoXinCardInfo = JsonUtils.parseObject(JSONUtil.toJsonPrettyStr(rInfo.getData()), GaoXinCardInfo.class);
         BuyHouses buyHousesDto = new BuyHouses();
-        buyHousesDto.setCardId(String.valueOf(entries.get("cardId")));
-        String nationality = String.valueOf(entries.get("nationality"));
+        buyHousesDto.setCardId(gaoXinCardInfo.getCard_id());
+        String nationality = gaoXinCardInfo.getNationality();
         if ("中国".contains(nationality)){
             buyHousesDto.setNationality("中国籍");
         }else {
             buyHousesDto.setNationality("外籍");
         }
-        buyHousesDto.setUserName(String.valueOf(entries.get("name")));
-        buyHousesDto.setPhone(String.valueOf(entries.get("phone")));
-        buyHousesDto.setCompanyName(String.valueOf(entries.get("companyName")));
-        buyHousesDto.setSex(String.valueOf(entries.get("sex")));
-        buyHousesDto.setEducation(String.valueOf(entries.get("education")));
+        buyHousesDto.setUserName(gaoXinCardInfo.getName());
+        buyHousesDto.setPhone(gaoXinCardInfo.getPhone());
+        buyHousesDto.setCompanyName(gaoXinCardInfo.getCompany_name());
+        buyHousesDto.setSex(gaoXinCardInfo.getSex());
+        buyHousesDto.setEducation(gaoXinCardInfo.getEducation());
         buyHousesDto.setDistrict("1");
         buyHousesDto.setProcessStatus(Constants.SUBMIT);
-        buyHousesDto.setType(String.valueOf(entries.get("type"))+"类");
-        buyHousesDto.setWorkAddress(String.valueOf(entries.get("district")));
+        buyHousesDto.setType(gaoXinCardInfo.getType());
+        buyHousesDto.setWorkAddress(gaoXinCardInfo.getDistrict());
         buyHousesDto.setProcessKey("apply_house");
         return R.ok(buyHousesDto);
     }
@@ -525,13 +516,30 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     @Override
     public R getGaoXinCandidateInfoByCardId(String cardId) {
-        HttpResponse execute = HttpRequest.get(URL)
+        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>(3);
+        R rInfo = OpenUtils.getGaoXinCardInfo(cardId);
+        if (rInfo.getCode()!=200){
+            return R.fail(rInfo.getMsg());
+        }
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, cardId));
+        if (ObjectUtil.isNotNull(buyHouses)){
+            hashMap.put("status",buyHouses.getProcessStatus());
+            hashMap.put("processKey",buyHouses.getProcessKey());
+            hashMap.put("businessId",buyHouses.getId());
+            return R.ok("获取成功",hashMap);
+        }
+        hashMap.put("status",Constants.SUBMIT);
+        hashMap.put("processKey","apply_house");
+        hashMap.put("businessId",null);
+        return R.ok("获取成功",hashMap);
+
+
+       /* HttpResponse execute = HttpRequest.get(URL)
             .form("cardId",cardId)
             .timeout(5000)
             .execute();
         JSONObject entries = JSONUtil.parseObj(execute.body());
         String code = String.valueOf(entries.get("code"));
-        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
         if (ObjectUtil.isNull(code)){
             return R.fail("获取人才信息失败");
         }else {
@@ -550,7 +558,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             }else {
                 return R.fail("暂无资格");
             }
-        }
+        }*/
     }
 
     /**
@@ -573,6 +581,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         subscribeExport.setProcessKey(bo.getProcessKey());
         subscribeExport.setDescription(bo.getDescription());
         subscribeExport.setUserId(userId.toString());
+        subscribeExport.setExportStatus("0");
         subscribeExportMapper.insert(subscribeExport);
         bo.setExcelId(subscribeExport.getId());
         SpringUtils.context().publishEvent(bo);
@@ -703,9 +712,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         hashMap.put("nationality", "中国籍".equals(buyHouses.getNationality()) ? "身份证" : "护照");
         String fileName = UUID.randomUUID().toString();
         String templatePath = fileUpload + "inform.docx";
-        String word = ExportWordUtil.createWord(templatePath, filePath, fileName, hashMap);
+        String word = ExportWordUtil.createWord(templatePath, doc, fileName, hashMap);
         System.out.println("word = " + word);
-        String file= download + prefix + "/" + fileName + ".docx";
+        String file= download + mapping + "/" + fileName + ".docx";
         System.out.println("file = " + file);
         map.put("file",file);
         return R.ok(map);
@@ -714,9 +723,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
 
     @Override
     public R<?> updateBuyHouses(BuyHouses buyHouses) {
+        BuyHouses houses = baseMapper.selectById(buyHouses.getId());
         LoginUser loginUser = LoginHelper.getLoginUser();
-        buyHouses.setProcessStatus(Constants.CANCEL);
-        int i = baseMapper.updateById(buyHouses);
         //添加取消资格日志
         AuditLog auditLog = new AuditLog();
         auditLog.setOtherId(String.valueOf(buyHouses.getId()));//业务id
@@ -731,20 +739,27 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         auditLog.setUpdateTime(new Date());
         auditLog.setStep("3");
         auditLogMapper.insert(auditLog);
+        buyHouses.setProcessStatus(Constants.CANCEL);
+        int i = baseMapper.updateById(buyHouses);
         if (i>0){
-            //todo 推送
-            Map<String, Object> map = new HashMap<>();
-            map.put("id",buyHouses.getId());
-            map.put("reason",buyHouses.getReply());//原因
-            map.put("userName",buyHouses.getUserName());
-            map.put("cardId",buyHouses.getCardId());
-            map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
-            map.put("note","人才信息有误");//备注
-            map.put("status", "00N");
-            System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
-//            housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"254");
-
-//            housingConstructionBureauPushDto.openUrl("https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback",map,"001");
+            if ("apply_house".equals(houses.getProcessKey())){
+                //todo 推送
+                Map<String, Object> map = new HashMap<>();
+                map.put("id",buyHouses.getId());
+                map.put("reason",buyHouses.getReply());//原因
+                map.put("userName",houses.getUserName());
+                map.put("cardId",houses.getCardId());
+                map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
+                map.put("note",buyHouses.getReply());//备注
+                map.put("status", "00N");
+                System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
+                housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"254");//正式
+//                housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "254");//测试
+                if (ObjectUtil.isNotNull(houses.getApiKey()) && String.valueOf(houses.getApiKey()).equals("gaoxingongyuanchengshiju")) {
+//                    housingConstructionBureauPushDto.send3(map, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");//测试
+                    housingConstructionBureauPushDto.send3(map, "https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback");//正式
+                }
+            }
             return R.ok();
         }
         return R.fail();
@@ -759,14 +774,15 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     public R<?> insertOpenBuyHouses(BuyHousesBo bo) {
         BuyHouses buyHouses = BeanUtil.toBean(bo, BuyHouses.class);
         buyHouses.setStep("1");
+        buyHouses.setVersion("2");
         BuyHouses buyHouses1 = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, buyHouses.getCardId()));
         //判断该人才是否存在
-        if (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses1.getUserId().equals(buyHouses.getUserId())){
+        if (ObjectUtil.isNotNull(buyHouses1) && (ObjectUtil.isEmpty(buyHouses1.getApiKey()) || !buyHouses1.getUserId().equals(buyHouses.getUserId()))){
             throw new ServiceException("当前用户已在系统存在");
-//            return R.fail("当前用户已在系统存在");
         }
         if (ObjectUtil.isNull(buyHouses1)){
             //新增
+            buyHouses.setId(null);
             buyHouses.setProcessStatus(Constants.WAIT);
             buyHouses.setProcessKey("apply_house");
             buyHouses.setCreateTime(new Date());
@@ -1305,10 +1321,11 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         }
     }
 
-    public void  excelZip(){
+    public void  excelZip(String id){
         BuyHousesBo bo =new BuyHousesBo();
-//        bo.setId(3L);
-        bo.setProcessStatus(Constants.SUCCEED);
+        if (ObjectUtil.isNotNull(id)){
+        bo.setId(Long.valueOf(id));
+        }
         LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
         List<BuyHousesVo> buyHousesVoList = baseMapper.selectVoList(lqw);
         if (buyHousesVoList.size() > 0) {
@@ -1319,6 +1336,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
             Map<String, List<BuyHousesMember>> buyHousesMemberMap = buyHousesMemberList.stream().collect(Collectors.groupingBy(BuyHousesMember::getBuyHousesId));
             buyHousesVoList.stream().forEach(r -> {
                 String dir="/usr/local/images/2023/07/01/";
+//                String dir="D:\\gaoxin\\images\\";
                 //护照或者身份证
                 if (ObjectUtil.isNotEmpty(r.getInsidepageUrl())){
                     String insidepageUrl = r.getInsidepageUrl();
@@ -1444,8 +1462,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
      */
     @GetMapping("/push")
     @Override
-    public R push() throws ParseException {
-        Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses","2");
+    public R push(String id) throws ParseException {
+        Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses",id);
         String virtualcode = String.valueOf(map.get("virtualcode"));
         map.put("virtualcode", virtualcode == "3" ? "010" : "009");
         String cardType = String.valueOf(map.get("cardType"));
@@ -1461,9 +1479,24 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         map.put("shStatus", "4");
         map.put("buyHousesMemberList", "null");
         map.put("buyHousesLogList", "null");
-//        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"253");
-        String s = housingConstructionBureauPushDto.openUrl("http://10.182.1.26/CCSRegistryCenter/rest", map, "253");
+        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"253");
+//        String s = housingConstructionBureauPushDto.openUrl("http://10.182.1.26/CCSRegistryCenter/rest", map, "253");
         return null;
+    }
 
+    @Override
+    public R logout(String id) {
+        BuyHouses buyHouses = baseMapper.selectById(id);
+        Map<String, Object> map = new HashMap<>();
+        map.put("id",buyHouses.getId());
+        map.put("reason","人才主动提交");//原因
+        map.put("userName",buyHouses.getUserName());
+        map.put("cardId",buyHouses.getCardId());
+        map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
+        map.put("note","人才主动撤销");//备注
+        map.put("status", "00N");
+        System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
+        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"254");//正式
+        return null;
     }
 }

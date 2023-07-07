@@ -140,7 +140,7 @@ public class HousesReviewEvent extends BaseEntity {
     private Date passTime;
 
     @TableField(exist = false)
-    private String excelUserId;
+    private Long excelId;
 
 
     @TableField(exist = false)

@@ -3,6 +3,7 @@ package com.ruoyi.common.advice;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.core.domain.RsaSecurity;
+import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.core.service.IRsaSecurityService2;
 import com.ruoyi.common.utils.RSAUtil;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -46,6 +47,10 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         try {
+            //判断系统是否在维护中
+            ConfigService sysConfigService = SpringUtils.getBean(ConfigService.class);
+            //系统升级提示
+            sysConfigService.selectConfigByConfigKey("system:maintenance:prompt");
             String path = inputMessage.getHeaders().getFirst("path");
             String method = inputMessage.getHeaders().getFirst("method");
             if (ObjectUtil.isNotNull(path)) {

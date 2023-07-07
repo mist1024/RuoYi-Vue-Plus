@@ -15,4 +15,11 @@ public interface ConfigService {
      */
     String getConfigValue(String configKey);
 
+    /**
+     * 根据key获取数据
+     * @param configKey
+     * @return
+     */
+    void selectConfigByConfigKey(String configKey);
+
 }

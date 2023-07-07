@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.user;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
@@ -32,18 +33,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user/house")
 public class HouseController extends BaseController {
     private final IBuyHousesService iBuyHousesService;
-
-    /**
-     * 购房申请添加
-     */
-  /*  @Log(title = "【购房申请添加】", businessType = BusinessType.INSERT)
-    @RepeatSubmit()
-    @PostMapping()
-    @RsaSecurityParameter(inDecode = true)
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody BuyHousesBo bo) {
-        return toAjax(iBuyHousesService.insertByBo(bo));
-    }*/
-
     /**
      * 购房申请修改
      */
@@ -68,6 +57,7 @@ public class HouseController extends BaseController {
     /**
      * 下载人才认定申请表
      */
+    @Log(title = "下载人才认定申请表", businessType = BusinessType.OTHER)
     @PostMapping("/download")
     @RateLimiter(count = 1, time = 10)
     public R downloadWord(@Validated(DownloadGroup.class) @RequestBody BuyHousesBo buyHousesBo){
@@ -95,6 +85,7 @@ public class HouseController extends BaseController {
     /**
      * 通过调用高新人才判断该身份证是否具备人才资格
      */
+    @Log(title = "通过调用高新人才判断该身份证是否具备人才资格", businessType = BusinessType.OTHER)
     @PostMapping("/CandidatesInfo")
     public R getGaoXinCandidateInfoByCardId(@RequestBody BuyHouses buyHouses){
         String cardId = buyHouses.getCardId();
@@ -130,12 +121,17 @@ public class HouseController extends BaseController {
     @PostMapping("/insertOpenBuyHouses")
     public R<?> insertOpenBuyHouses(@Validated(EditGroup.class)@RequestBody BuyHousesBo bo){
         bo.setApiKey("gaoxingongyuanchengshiju");
+        if (ObjectUtil.isNull(bo.getUserId())){
+            return R.fail("userId不可为空");
+        }
         return  iBuyHousesService.insertOpenBuyHouses(bo);
     }
 
     @SaIgnore
     @GetMapping("/excelZip")
-    public void excelZip(){
-        iBuyHousesService.excelZip();
+    public void excelZip(String id){
+        ThreadUtil.execAsync(() -> {
+                iBuyHousesService.excelZip(id);
+        });
     }
 }

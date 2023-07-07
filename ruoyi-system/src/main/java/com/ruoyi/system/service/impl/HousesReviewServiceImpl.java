@@ -426,7 +426,21 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     @Override
     public R subscribeExport(HousesReviewEvent bo){
         Long userId = LoginHelper.getUserId();
-        bo.setExcelUserId(userId.toString());
+        //判断是否存在正在导出记录
+        SubscribeExport subscribeExport1 = subscribeExportMapper.selectOne(new LambdaQueryWrapper<>(SubscribeExport.class)
+            .eq(SubscribeExport::getUserId, userId)
+            .eq(SubscribeExport::getExportStatus, "0"));
+        if (ObjectUtil.isNotNull(subscribeExport1)){
+            return R.fail("您已存在一条正在导出数据,请等待前一条导出之后再执行");
+        }
+        //添加导出记录
+        SubscribeExport subscribeExport = new SubscribeExport();
+        subscribeExport.setProcessKey(bo.getProcessKey());
+        subscribeExport.setExportStatus("0");
+        subscribeExport.setDescription(bo.getDescription());
+        subscribeExport.setUserId(userId.toString());
+        subscribeExportMapper.insert(subscribeExport);
+        bo.setExcelId(subscribeExport.getId());
         SpringUtils.context().publishEvent(bo);
         return R.ok("预约成功");
     }
@@ -512,10 +526,9 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             String url =download+prefix+"/"+zip;
             SubscribeExport subscribeExport = new SubscribeExport();
             subscribeExport.setPath(url);
-            subscribeExport.setDescription(event.getDescription());
-            subscribeExport.setProcessKey("house_review");
-            subscribeExport.setUserId(event.getExcelUserId());
-            subscribeExportMapper.insert(subscribeExport);
+            subscribeExport.setId(event.getExcelId());
+            subscribeExport.setExportStatus("1");
+            subscribeExportMapper.updateById(subscribeExport);
         }
     }
 }

@@ -112,12 +112,4 @@ public class AesUtil {
         }
         return null;
     }
-
-
-    public static void main(String[] args) throws Exception {
-        String s = encryptBASE64("http://192.168.0.200:8010/upload/GXTalents/images/843329b85e974ef5bae06d9c01bc909e.jpg");
-        System.out.println(s);
-        String s1 = decryptBASE64("aHR0cHM6Ly9neC5jaGVuZ2R1dGFsZW50LmNuOjgwMTAvdXBsb2FkL0dYVGFsZW50cy9pbWFnZXMvMTM2ODBlMmI0ZTY4NDI1N2ExM2UyNjI5MGQ1NDljODMucG5n");
-        System.out.println(s1);
-    }
 }

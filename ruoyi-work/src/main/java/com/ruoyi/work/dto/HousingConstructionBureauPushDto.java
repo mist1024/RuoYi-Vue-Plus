@@ -1,6 +1,7 @@
 package com.ruoyi.work.dto;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
@@ -98,14 +99,17 @@ public class HousingConstructionBureauPushDto {
                 .timeout(5000)
                 .body(JSONUtil.toJsonPrettyStr(httpRequestBody))
                 .execute().body();
+            if (ObjectUtil.isNull(result2) || ObjectUtil.isEmpty(result2)){
+                throw new ServiceException("推送市级系统失败!原因:返回值为空");
+            }
             JSONObject jsonObject = JSONUtil.parseObj(result2);
             String aFalse = jsonObject.getStr("result");
             String aStatus = jsonObject.getStr("status");
             String aMessage = jsonObject.getStr("message");
+            System.out.println("result1 = " + result2);
             if ("false".equals(aFalse) || "error".equals(aStatus)){
                 throw new ServiceException("推送市级系统失败!原因:"+aMessage);
             }
-            System.out.println("result2 = " + result2);
             return result2;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -113,7 +117,7 @@ public class HousingConstructionBureauPushDto {
     }
 
 
-    public String send3(HashMap params,String url){
+    public String send3(Map<String,Object> params,String url){
         //基本信息数据
         HttpRequestBody httpRequestBody = new HttpRequestBody();
         httpRequestBody.setApiKey("001");

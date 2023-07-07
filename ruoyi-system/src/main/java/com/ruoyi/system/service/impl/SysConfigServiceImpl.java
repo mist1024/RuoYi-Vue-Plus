@@ -63,6 +63,21 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     }
 
     /**
+     * 根据key获取配置信息
+     * @param key
+     * @return
+     */
+    @Override
+    public void selectConfigByConfigKey(String key) {
+        SysConfig aTrue = baseMapper.selectOne(new LambdaQueryWrapper<>(SysConfig.class)
+            .eq(SysConfig::getConfigKey, key)
+            .eq(SysConfig::getConfigValue, "true"));
+        if (ObjectUtil.isNotNull(aTrue)){
+            throw new ServiceException(aTrue.getRemark());
+        }
+    }
+
+    /**
      * 根据键名查询参数配置信息
      *
      * @param configKey 参数key

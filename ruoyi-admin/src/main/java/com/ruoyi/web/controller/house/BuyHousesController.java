@@ -171,7 +171,18 @@ public class BuyHousesController extends BaseController {
     /**
      * 对市局系统单独推送
      */
-    public R push() throws ParseException {
-        return iBuyHousesService.push();
+    @GetMapping("/push")
+    public R push(String id) throws ParseException {
+        return iBuyHousesService.push(id);
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/out")
+    public R logout(String id){
+        return iBuyHousesService.logout(id);
     }
 }

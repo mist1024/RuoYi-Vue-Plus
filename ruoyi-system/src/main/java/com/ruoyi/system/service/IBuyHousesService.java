@@ -125,7 +125,9 @@ public interface IBuyHousesService {
 
     R getHistogram(String date);
 
-    void excelZip();
+    void excelZip(String id);
 
-    R push() throws ParseException;
+    R push(String id) throws ParseException;
+
+    R logout(String id);
 }

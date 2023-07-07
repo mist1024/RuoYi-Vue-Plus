@@ -1,6 +1,7 @@
 package com.ruoyi.work.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.Constants;
@@ -24,14 +25,16 @@ import com.ruoyi.work.mapper.ProcessMapper;
 import com.ruoyi.work.utils.WorkComplyUtils;
 import com.ruoyi.work.utils.WorkUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +45,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/work")
 @Transactional(rollbackFor = Exception.class)
+@Slf4j
 public class WorkController extends BaseController {
     private final ProcessMapper processMapper;
     private  final HousingConstructionBureauPushDto housingConstructionBureauPushDto;
@@ -115,7 +119,7 @@ public class WorkController extends BaseController {
     @Log(title = "流程办理",businessType = BusinessType.OTHER)
 //    @SaCheckPermission("work:task:batchDeleted")
     @PostMapping("/batchDeleted")
-    public R<?> batchDeleted(@RequestBody HisProcess hisProcess){
+    public R<?> batchDeleted(@RequestBody HisProcess hisProcess) throws ParseException {
         if (ObjectUtil.isNull(hisProcess.getStatus())){
             return R.fail("状态不可为空");
         }
@@ -141,8 +145,7 @@ public class WorkController extends BaseController {
             hashMap.put("auditDepartName",deptName);
         }
         if (s.equals(Constants.NONENTITY)){
-            throw new ServiceException("暂无审核");
-//            return R.fail("暂无审核");
+            throw new ServiceException("当前数据已被他人审核,请刷新页面!");
         }else{
             if ("apply_house".equals(hisProcess.getProcessKey())) {
                 if (Constants.SUCCEED.equals(s)) {//审核成功推送数据
@@ -151,14 +154,22 @@ public class WorkController extends BaseController {
                     map.put("virtualcode", virtualcode == "3" ? "010" : "009");
                     String cardType = String.valueOf(map.get("cardType"));
                     map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
+                    Object createTime = map.get("createTime");
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                    DateFormat cst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date format = sdf.parse(createTime.toString());
+                    String dateString = cst.format(format);
+                    map.put("creatTime",dateString);
                     map.put("qyStatus", "4");
                     map.put("gyStatus", "4");
+                    map.put("status", "10");
                     map.put("shStatus", "4");
                     map.put("buyHousesMemberList", "null");
                     map.put("buyHousesLogList", "null");
-                    map.put("buyHousesLogList", "null");
-//                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest", map, "253");
-                    housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "253");
+                    String s1 = JSONUtil.toJsonPrettyStr(map);
+                    log.info("map:"+s1);
+                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest", map, "253");
+//                    housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "253");
                     //人才通推送
                     hashMap.put("status", "00T");
                 } else if (Constants.FAILD.equals(s)) {
@@ -169,7 +180,10 @@ public class WorkController extends BaseController {
                 }
                 Object apiKey = map.get("apiKey");
                 if (ObjectUtil.isNotNull(apiKey) && String.valueOf(apiKey).equals("gaoxingongyuanchengshiju")) {
-                    housingConstructionBureauPushDto.send3(hashMap, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
+                    String s1 = JSONUtil.toJsonPrettyStr(hashMap);
+                    log.info("hashMap:"+s1);
+//                    housingConstructionBureauPushDto.send3(hashMap, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
+                    housingConstructionBureauPushDto.send3(hashMap, "https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback");
                 }
             }
             Object step = map1.get("step");

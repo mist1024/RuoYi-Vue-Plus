@@ -26,10 +26,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.entity.GaoXinCardInfo;
 import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.utils.AesUtil;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.JsonUtils;
+import com.ruoyi.common.utils.OpenUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.demo.domain.ImageDemoData;
 import com.ruoyi.system.domain.*;
@@ -58,6 +61,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import sun.misc.BASE64Encoder;
 
 import javax.crypto.*;
@@ -223,7 +227,7 @@ public class DemoUnitTest {
         ProcessVo processVo = new ProcessVo();
         processVo.setProcessKey("apply_house");
         processVo.setStep("1");
-        BuyHouses buyHouses = buyHousesMapper.selectById("12");
+        BuyHouses buyHouses = buyHousesMapper.selectById("3181");
         buyHouses.setUpdateTime(DateUtils.getNowDate());
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         processVo.setParams(map);
@@ -614,14 +618,15 @@ public class DemoUnitTest {
         map.put("apiKey","gaoxingongyuanchengshiju");
         String s = JSONUtil.toJsonPrettyStr(map);
         String doEncrypt = Sm2.doEncrypt(s, publicKey);
-        String result2 = HttpRequest.post("http://192.168.0.54:8084/userOpenLogin")
-            .header("Referer","http://192.168.0.54:8084")
+        String result2 = HttpRequest.post("https://rcaj.cdhtgycs.cn/gx-api/userOpenLogin")
+            .header("Referer","https://rcaj.cdhtgycs.cn")
             .header("path","/userOpenLogin")
             .header("targe","weixin")
             .header("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhcHBfdXNlcjo0Mzc4OSIsInJuU3RyIjoiV05XZFFnaHpHYlRRRU5ObVpwbmhaaFp6MmtKaWtSR0MiLCJ1c2VySWQiOjQzNzg5fQ.QCsN3iIFk38dzTvXITGx2wV5c9kdPdvWZs7gjf6dFzc")
             .header("method","POST")
             .body(doEncrypt,"application/json")
             .execute().body();
+        System.out.println("result2 = " + result2);
     }
 
     /**
@@ -816,14 +821,18 @@ public class DemoUnitTest {
         String substring = str.substring(str.lastIndexOf("/") + 1);
 
         String txt ="https://rcaj.cdhtgycs.cn/images/2023/07/01/"+substring;
-        buyHousesService.excelZip();
+        buyHousesService.excelZip("");
         System.out.println("txt = " + txt);
 
     }
 
     @Test
     public void TestMessageAck() throws UnsupportedEncodingException {
-//        String msg="消息4";
+
+        String msg="A 类";
+        String trim = StringUtils.trimAllWhitespace(msg);
+        int length = trim.length();
+        System.out.println("length = " + length);
 //        Message build = MessageBuilder.withBody(msg.getBytes()).build();
 //        build.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
 //        build.getMessageProperties().setDelay(50000);
@@ -853,22 +862,23 @@ public class DemoUnitTest {
 
     @Test
     public void  paChon() throws Exception {
-        String appsecret ="JXYB7KpXlH9i0CL6";
+        buyHousesService.logout("3184");
+
+//        R gaoXinCardInfo = OpenUtils.getGaoXinCardInfo("510503199602214055");
+//        System.out.println("JSONUtil.toJsonPrettyStr(gaoXinCardInfo) = " + JSONUtil.toJsonPrettyStr(gaoXinCardInfo));
+       /* String appsecret ="JXYB7KpXlH9i0CL6";
+        String aesKey = "74242EAFE97F18BFAE9D2682590B6614";
+        String iv = "74242EAFE97F18BF";
         String id="2023062804031";
         String url ="http://162.14.100.54:9010/index.php/Api/renju/get_user_info";
-        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding,
-            // 密钥，可以自定义
-            "74242EAFE97F18BFAE9D2682590B6614".getBytes(),
-            // iv加盐，按照实际需求添加
-            "74242EAFE97F18BF".getBytes());
-        String param=aes.encryptBase64(new JSONObject()
+        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding,aesKey.getBytes(),iv.getBytes());
+        String param=aes.encryptBase64(
+            new JSONObject()
             .set("id_card","510503199602214056")
             .toStringPretty());
-        System.out.println("param = " + param);
         MD5 md5 = SecureUtil.md5();
         String content=id+param+appsecret;
         String sign=md5.digestHex(content);
-        System.out.println("sign = " + sign);
         JSONObject jsonObject = new JSONObject()
             .set("id",id)
             .set("param",param)
@@ -877,7 +887,7 @@ public class DemoUnitTest {
             .body(jsonObject.toStringPretty())
             .execute()
             .body();
-        System.out.println("listContent = " + listContent);
+        System.out.println("listContent = " + listContent);*/
 
     }
 }
