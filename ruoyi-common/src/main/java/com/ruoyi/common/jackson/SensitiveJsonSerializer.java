@@ -36,7 +36,7 @@ public class SensitiveJsonSerializer extends JsonSerializer<String> implements C
             } else {
                 gen.writeString(value);
             }
-        } catch (BeansException e) {
+        } catch (BeansException | NullPointerException e) {
             log.error("脱敏实现不存在, 采用默认处理 => {}", e.getMessage());
             gen.writeString(value);
         }
