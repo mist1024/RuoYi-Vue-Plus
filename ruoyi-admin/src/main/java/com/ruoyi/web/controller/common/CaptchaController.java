@@ -31,6 +31,10 @@ import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.sms4j.api.SmsBlend;
+import org.dromara.sms4j.api.entity.SmsResponse;
+import org.dromara.sms4j.core.factory.SmsFactory;
+import org.dromara.sms4j.provider.enumerate.SupplierType;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -56,7 +60,6 @@ import java.util.Map;
 public class CaptchaController {
 
     private final CaptchaProperties captchaProperties;
-    private final SmsProperties smsProperties;
     private final ISysConfigService configService;
     private final MailProperties mailProperties;
     private final SysUserMapper sysUserMapper;
@@ -67,6 +70,9 @@ public class CaptchaController {
      * @param username 用户手机号
      */
     @GetMapping("/captchaSms")
+    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
+        String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
+        String code = RandomUtil.randomNumbers(4);
 
     public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String username) {
         if (!smsProperties.getEnabled()) {
