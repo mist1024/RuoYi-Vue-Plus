@@ -752,8 +752,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
                 map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
                 map.put("note",buyHouses.getReply());//备注
                 map.put("status", "00N");
+                map.put("description",buyHouses.getReply());
                 System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
-                housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"254");//正式
+                housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"254");//正式
 //                housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "254");//测试
                 if (ObjectUtil.isNotNull(houses.getApiKey()) && String.valueOf(houses.getApiKey()).equals("gaoxingongyuanchengshiju")) {
 //                    housingConstructionBureauPushDto.send3(map, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");//测试
@@ -1496,7 +1497,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         map.put("note","人才主动撤销");//备注
         map.put("status", "00N");
         System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
-        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com//CCSRegistryCenter/rest",map,"254");//正式
+        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"254");//正式
         return null;
     }
 }

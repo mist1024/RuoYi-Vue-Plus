@@ -35,13 +35,13 @@ public class TelecomSendMsg{
             paramMap.put("Mobile",phones);
             String gbk = null;
             if ("register".equals(type)){
-                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户注册操作,我们不会向您索要此验证码,切勿告知他人本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
+                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户注册操作,我们不会向您索要此验证码,切勿告知他人。本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
             }else if ("login".equals(type)){
-                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户登录操作,我们不会向您索要此验证码,切勿告知他人本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
+                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户登录操作,我们不会向您索要此验证码,切勿告知他人。本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
             }else if ("forgetPwd".equals(type)){
-                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户忘记密码操作,我们不会向您索要此验证码,切勿告知他人本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
+                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户忘记密码操作,我们不会向您索要此验证码,切勿告知他人。本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
             }else if("updatePwd".equals(type)){
-                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户修改密码,我们不会向您索要此验证码,切勿告知他人本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
+                gbk = URLEncoder.encode("尊敬的用户,您正在办理用户修改密码,我们不会向您索要此验证码,切勿告知他人。本次验证码有效性为:"+ Constants.CAPTCHA_EXPIRATION +"分钟,本次验证码为:"+content+"【成都高新人才安居资格认定】", "GBK");
             }else if ("updatePhone".equals(type)){
 
             }

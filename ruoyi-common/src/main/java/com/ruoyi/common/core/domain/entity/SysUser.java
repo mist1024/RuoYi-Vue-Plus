@@ -128,6 +128,11 @@ public class SysUser extends BaseEntity {
     private String remark;
 
     /**
+     * 楼盘
+     */
+    private  String properties;
+
+    /**
      * 部门对象
      */
     @TableField(exist = false)

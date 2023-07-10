@@ -109,7 +109,7 @@ public class HousesReviewController extends BaseController {
     public TableDataInfo<HousesReview> list(HousesReviewBo bo, PageQuery pageQuery) {
         boolean admin = LoginHelper.isAdmin();
         if (!admin){
-            bo.setProjectName(LoginHelper.getUsername());
+            bo.setProjectName(LoginHelper.getLoginUser().getProperties());
         }
         return iHousesReviewService.queryPageList(bo, pageQuery);
     }

@@ -103,7 +103,7 @@ public class SysLoginService {
     public String smsLogin(String phonenumber, String smsCode) {
         // 通过手机号查找用户
         SysUser user = loadUserByPhonenumber(phonenumber);
-//        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode,CacheConstants.CAPTCHA_CODE_KEY));
+        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode,CacheConstants.CAPTCHA_CODE_KEY));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginSysUser(user);
         // 生成token
@@ -230,7 +230,6 @@ public class SysLoginService {
 
     private SysUser loadSysUserByUsername(String username) {
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserName, SysUser::getStatus)
             .eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
@@ -244,7 +243,6 @@ public class SysLoginService {
 
     private SysUser loadUserByPhonenumber(String phonenumber) {
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getPhonenumber, SysUser::getStatus)
             .eq(SysUser::getPhonenumber, phonenumber));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", phonenumber);
@@ -294,6 +292,7 @@ public class SysLoginService {
         loginUser.setUsername(user.getUserName());
         loginUser.setUserType(user.getUserType());
         loginUser.setNickName(user.getNickName());
+        loginUser.setProperties(user.getProperties());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user));
         loginUser.setRolePermission(permissionService.getRolePermission(user));
         loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());

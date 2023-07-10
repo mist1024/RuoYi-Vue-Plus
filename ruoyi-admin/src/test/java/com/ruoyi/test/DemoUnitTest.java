@@ -862,7 +862,11 @@ public class DemoUnitTest {
 
     @Test
     public void  paChon() throws Exception {
-        buyHousesService.logout("3184");
+        String str ="C2型人才国家级技能大师工作室领衔人";
+        String substring = str.substring(0,1);
+        System.out.println("substring = " + substring);
+
+//        buyHousesService.logout("3184");
 
 //        R gaoXinCardInfo = OpenUtils.getGaoXinCardInfo("510503199602214055");
 //        System.out.println("JSONUtil.toJsonPrettyStr(gaoXinCardInfo) = " + JSONUtil.toJsonPrettyStr(gaoXinCardInfo));

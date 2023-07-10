@@ -94,6 +94,11 @@ public class LoginUser implements Serializable {
 
     private String companyId;
 
+    /**
+     * 楼盘
+     */
+    private String properties;
+
 
 
     /**
