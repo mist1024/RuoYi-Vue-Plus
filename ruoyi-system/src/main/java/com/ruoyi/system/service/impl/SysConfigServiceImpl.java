@@ -139,7 +139,8 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
         int row = 0;
         if (config.getConfigId() != null) {
             SysConfig temp = baseMapper.selectById(config.getConfigId());
-            if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
+            //老的configKey ,和新的configKey 同, 那说明configValue可能发生了改变,需要清除缓存,否则#selectConfigByKey方法会获取到redis里面的老值
+            if (StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
                 CacheUtils.evict(CacheNames.SYS_CONFIG, temp.getConfigKey());
             }
             row = baseMapper.updateById(config);
