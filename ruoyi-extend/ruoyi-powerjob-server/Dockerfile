@@ -1,4 +1,5 @@
-FROM findepi/graalvm:java17-native
+#FROM findepi/graalvm:java17-native
+FROM ghcr.io/graalvm/graalvm-community:17.0.7
 
 MAINTAINER Lion Li
 
