@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.work.mapper.RollBackLogMapper">
+
+    <resultMap type="com.ruoyi.work.domain.RollBackLog" id="RollBackLogResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="createTime"/>
+        <result property="type" column="type"/>
+        <result property="reply" column="reply"/>
+        <result property="createBy" column="create_by"/>
+        <result property="param" column="param"/>
+    </resultMap>
+
+
+</mapper>

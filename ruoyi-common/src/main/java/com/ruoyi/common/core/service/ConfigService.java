@@ -1,5 +1,8 @@
 package com.ruoyi.common.core.service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 通用 参数配置服务
  *
@@ -14,5 +17,12 @@ public interface ConfigService {
      * @return 参数值
      */
     String getConfigValue(String configKey);
+
+    /**
+     * 根据key获取数据
+     * @param configKey
+     * @return
+     */
+    void selectConfigByConfigKey(String configKey);
 
 }

@@ -41,4 +41,20 @@ public interface CacheConstants {
      * 登录账户密码错误次数 redis key
      */
     String PWD_ERR_CNT_KEY = "pwd_err_cnt:";
+
+
+    /**
+     * 注册发送验证码
+     */
+     String REGISTER_SEND_MSG = "register_send_msg:";
+
+    /**
+     * 忘记密码发送验证码
+     */
+    String RORGOT_PASSWORD_SEND_MSG = "rorgot_password_send_msg:";
+
+    /**
+     * 短信登录发送验证码
+     */
+    String SMS_LOGIN_SEND_MSG = "sms_login_send_msg:";
 }

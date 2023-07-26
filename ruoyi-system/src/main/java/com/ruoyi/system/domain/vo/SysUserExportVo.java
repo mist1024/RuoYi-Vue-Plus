@@ -87,5 +87,4 @@ public class SysUserExportVo implements Serializable {
      */
     @ExcelProperty(value = "部门负责人")
     private String leader;
-
 }

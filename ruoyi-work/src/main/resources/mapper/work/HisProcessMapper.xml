@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.work.mapper.HisProcessMapper">
+
+    <resultMap type="com.ruoyi.work.domain.HisProcess" id="HisProcessResult">
+        <result property="id" column="id"/>
+        <result property="processId" column="process_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="businessId" column="business_id"/>
+        <result property="audit" column="audit"/>
+        <result property="checkType" column="check_type"/>
+        <result property="status" column="status"/>
+        <result property="endTime" column="end_time"/>
+        <result property="step" column="step"/>
+        <result property="type" column="type"/>
+        <result property="startUser" column="start_user"/>
+        <result property="companyName" column="companyName"/>
+        <result property="isNext" column="is_next"/>
+        <result property="userId" column="user_id"/>
+        <result property="description" column="description"/>
+        <result property="timeBetween" column="time_between"/>
+        <result property="cardId" column="card_id"/>
+    </resultMap>
+
+    <select id="selectVoListPage" resultType="com.ruoyi.work.domain.HisProcess" parameterType="com.ruoyi.work.domain.HisProcess">
+        SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,d.end_time AS endTime  ,
+        d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step,d.time_between,d.card_id AS cardId,d.company_name AS companyName
+        FROM
+        (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user,h.time_between,h.card_id,h.company_name
+        FROM
+        `his_process` h
+        WHERE h.id IN (SELECT MAX(id) FROM his_process
+         where  (
+         (audit = #{hisProcess.userId} AND check_type= 1)
+        OR
+        (check_type = 2 AND  audit =#{hisProcess.deptId})
+        OR
+        (check_type = 3 AND audit = #{hisProcess.roleId})
+        OR
+        (check_type = 4 AND audit = #{hisProcess.companyUserId})
+        )
+                                      GROUP BY business_id) ) d
+        INNER JOIN process  p  ON p.id = d.process_id
+        <where>
+            <if test="hisProcess.processKey !='' and hisProcess.processKey !=null">and p.process_key = #{hisProcess.processKey}</if>
+            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user like concat('%', #{hisProcess.startUser}, '%')</if>
+            <if test="hisProcess.cardId !='' and hisProcess.cardId !=null"> and d.card_id like concat('%', #{hisProcess.cardId}, '%')</if>
+            <if test="hisProcess.companyName !='' and hisProcess.companyName !=null"> and d.company_name like concat('%', #{hisProcess.companyName}, '%')</if>
+        </where>
+        ORDER BY d.end_time DESC
+    </select>
+    <select id="selectVoHisList" resultType="com.ruoyi.work.domain.HisProcess">
+        SELECT h.id,p.description,h.audit,h.check_type AS checkType,h.step,h.type,h.start_user AS startUser,h.company_name AS companyName,p.bean ,
+               h.business_id AS businessId,p.process_key AS processKey,p.id AS processId,h.is_next AS isNext,h.create_time AS createTime,h.user_id AS userId
+        FROM `his_process` h
+            INNER JOIN process p ON p.id = h.process_id
+            ${ew.getCustomSqlSegment}
+    </select>
+    <select id="selectListPageByCC" resultType="com.ruoyi.work.domain.HisProcess">
+        SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,
+               d.end_time AS endTime,d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step,d.time_between,
+        d.card_id AS cardId,d.company_name AS companyName
+        FROM
+            (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user,h.time_between,h.card_id,h.company_name
+             FROM
+                 `his_process` h
+             WHERE h.id IN (SELECT MAX(id) FROM his_process GROUP BY business_id) ) d
+                INNER JOIN process  p  ON p.id = d.process_id
+        <where>
+            FIND_IN_SET(#{hisProcess.userId},p.cc)
+            <if test="hisProcess.cardId !='' and hisProcess.cardId !=null"> and d.card_id like concat('%', #{hisProcess.cardId}, '%')</if>
+            <if test="hisProcess.companyName !='' and hisProcess.companyName !=null"> and d.company_name like concat('%', #{hisProcess.companyName}, '%')</if>
+            <if test="hisProcess.processKey !='' and hisProcess.processKey !=null">and p.process_key = #{hisProcess.processKey}</if>
+            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user like concat('%', #{hisProcess.startUser}, '%')</if>
+        </where>
+        ORDER BY
+        d.end_time DESC
+    </select>
+
+    <select id="selectListPageBySpecific" resultType="com.ruoyi.work.domain.HisProcess">
+        SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,
+        d.end_time AS endTime,d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step,d.time_between,
+        d.card_id AS cardId,d.company_name AS companyName
+        FROM
+        (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user,h.time_between,h.card_id,h.company_name
+        FROM
+        `his_process` h
+        WHERE h.id IN (SELECT MAX(id) FROM his_process GROUP BY business_id) ) d
+        INNER JOIN process  p  ON p.id = d.process_id
+        <where>
+            <if test="hisProcess.cardId !='' and hisProcess.cardId !=null"> and d.card_id like concat('%', #{hisProcess.cardId}, '%')</if>
+            <if test="hisProcess.companyName !='' and hisProcess.companyName !=null"> and d.company_name like concat('%', #{hisProcess.companyName}, '%')</if>
+            <if test="hisProcess.processKey !='' and hisProcess.processKey !=null">and p.process_key = #{hisProcess.processKey}</if>
+            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user like concat('%', #{hisProcess.startUser}, '%')</if>
+        </where>
+        ORDER BY
+        d.end_time DESC
+    </select>
+
+
+</mapper>

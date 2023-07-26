@@ -7,7 +7,6 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -33,7 +32,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,8 +111,8 @@ public class SysUserController extends BaseController {
      * @param userId 用户ID
      */
     @SaCheckPermission("system:user:query")
-    @GetMapping(value = {"/", "/{userId}"})
-    public R<Map<String, Object>> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    @GetMapping
+    public R<Map<String, Object>> getInfo(Long userId) {
         userService.checkUserDataScope(userId);
         Map<String, Object> ajax = new HashMap<>();
         List<SysRole> roles = roleService.selectRoleAll();
@@ -173,8 +171,8 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{userIds}")
-    public R<Void> remove(@PathVariable Long[] userIds) {
+    @DeleteMapping
+    public R<Void> remove(Long[] userIds) {
         if (ArrayUtil.contains(userIds, getUserId())) {
             return R.fail("当前用户不能删除");
         }
@@ -212,8 +210,8 @@ public class SysUserController extends BaseController {
      * @param userId 用户ID
      */
     @SaCheckPermission("system:user:query")
-    @GetMapping("/authRole/{userId}")
-    public R<Map<String, Object>> authRole(@PathVariable Long userId) {
+    @GetMapping("/authRole")
+    public R<Map<String, Object>> authRole( Long userId) {
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
         Map<String, Object> ajax = new HashMap<>();

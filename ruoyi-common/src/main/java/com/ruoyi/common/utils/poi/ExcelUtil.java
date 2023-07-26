@@ -54,9 +54,9 @@ public class ExcelUtil {
      * @param isValidate 是否 Validator 检验 默认为是
      * @return 转换后集合
      */
-    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate) {
+    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate,Integer num) {
         DefaultExcelListener<T> listener = new DefaultExcelListener<>(isValidate);
-        EasyExcel.read(is, clazz, listener).sheet().doRead();
+        EasyExcel.read(is, clazz, listener).sheet().headRowNumber(num).doRead();
         return listener.getExcelResult();
     }
 

@@ -5,6 +5,7 @@ import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -120,7 +121,10 @@ public class RateLimiterAspect {
         if (rateLimiter.limitType() == LimitType.IP) {
             // 获取请求ip
             stringBuffer.append(ServletUtils.getClientIP()).append(":");
-        } else if (rateLimiter.limitType() == LimitType.CLUSTER) {
+        }else if (rateLimiter.limitType() == LimitType.USERID){
+            // 获取用户ID
+            stringBuffer.append(String.valueOf(LoginHelper.getUserId())).append(":");
+        }else if (rateLimiter.limitType() == LimitType.CLUSTER) {
             // 获取客户端实例id
             stringBuffer.append(RedisUtils.getClient().getId()).append(":");
         }

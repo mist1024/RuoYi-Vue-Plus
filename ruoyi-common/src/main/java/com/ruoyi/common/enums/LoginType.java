@@ -41,4 +41,5 @@ public enum LoginType {
      * 登录重试限制计数提示
      */
     final String retryLimitCount;
+
 }

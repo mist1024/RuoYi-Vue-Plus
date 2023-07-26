@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -14,7 +13,6 @@ import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -57,8 +55,8 @@ public class SysConfigController extends BaseController {
      * @param configId 参数ID
      */
     @SaCheckPermission("system:config:query")
-    @GetMapping(value = "/{configId}")
-    public R<SysConfig> getInfo(@PathVariable Long configId) {
+    @GetMapping
+    public R<SysConfig> getInfo(Long configId) {
         return R.ok(configService.selectConfigById(configId));
     }
 
@@ -67,8 +65,8 @@ public class SysConfigController extends BaseController {
      *
      * @param configKey 参数Key
      */
-    @GetMapping(value = "/configKey/{configKey}")
-    public R<Void> getConfigKey(@PathVariable String configKey) {
+    @GetMapping(value = "/configKey")
+    public R<Void> getConfigKey(String configKey) {
         return R.ok(configService.selectConfigByKey(configKey));
     }
 
@@ -118,8 +116,8 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:remove")
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{configIds}")
-    public R<Void> remove(@PathVariable Long[] configIds) {
+    @DeleteMapping
+    public R<Void> remove(Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return R.ok();
     }

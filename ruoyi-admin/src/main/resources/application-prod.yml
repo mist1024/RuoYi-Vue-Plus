@@ -4,7 +4,7 @@ spring.servlet.multipart.location: /ruoyi/server/temp
 --- # 监控中心配置
 spring.boot.admin.client:
   # 增加客户端开关
-  enabled: true
+  enabled: false
   url: http://localhost:9090/admin
   instance:
     service-host-type: IP
@@ -14,7 +14,7 @@ spring.boot.admin.client:
 --- # xxl-job 配置
 xxl.job:
   # 执行器开关
-  enabled: true
+  enabled: false
   # 调度中心地址：如调度中心集群部署存在多个地址则用逗号分隔。
   admin-addresses: http://localhost:9100/xxl-job-admin
   # 执行器通讯TOKEN：非空时启用
@@ -40,7 +40,7 @@ spring:
     # 动态数据源文档 https://www.kancloud.cn/tracy5546/dynamic-datasource/content
     dynamic:
       # 性能分析插件(有性能损耗 不建议生产环境使用)
-      p6spy: false
+      p6spy: true
       # 设置默认的数据源或者数据源组,默认值即为 master
       primary: master
       # 严格模式 匹配不到数据源则报错
@@ -52,9 +52,17 @@ spring:
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
-          url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
-          username: root
-          password: root
+          #测试地址
+#          url: jdbc:mysql://182.150.40.133:3309/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+          #url: jdbc:mysql://localhost:3306/ry-vue-jinniu?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+#          username: root
+#          password: 1234Qwer@
+          #正式地址
+          url: jdbc:mysql://172.12.9.1:3409/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+#          url: jdbc:mysql://182.138.107.22:3409/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+          #url: jdbc:mysql://localhost:3306/ry-vue-jinniu?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+          username: gxrc
+          password: 45Uuq5!aADGD
         # 从库数据源
         slave:
           lazy: true
@@ -105,13 +113,16 @@ spring:
 spring:
   redis:
     # 地址
-    host: localhost
+#    host: 182.42.81.18
+    host: 172.12.9.2
+    #    host: 127.0.0.1
     # 端口，默认为6379
     port: 6379
     # 数据库索引
-    database: 0
+    database: 7
     # 密码(如没有密码请注释掉)
-    # password:
+    password: N8PTRAirBO
+#    password: 123456
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl
@@ -121,9 +132,9 @@ redisson:
   # redis key前缀
   keyPrefix:
   # 线程池数量
-  threads: 16
+  threads: 4
   # Netty线程池数量
-  nettyThreads: 32
+  nettyThreads: 8
   # 单节点配置
   singleServerConfig:
     # 客户端名称
@@ -187,3 +198,42 @@ sms:
     sdkAppId: appid
     #地域信息默认为 ap-guangzhou 如无特殊改变可不用设置
     territory: ap-guangzhou
+
+#    本地文件存储
+#windows
+#file:
+#  domain: http://192.168.0.54:8080
+#  path: D:\\gaoxin\\images
+#  prefix: /images
+#  size: 10
+#  template: D:\\gaoxin\\template\\
+#  doc: D:\\gaoxin\\doc\\
+#  mapping: /doc
+
+#Linux dev
+file:
+  domain: https://rcaj.cdhtgycs.cn
+  path: /usr/local/images
+  prefix: /images
+  size: 10
+  template: /usr/local/template/
+  doc: /usr/local/doc
+  mapping: /doc
+
+#    domain: 192.168.0.54:8080
+#    path: D:\\gaoxin\\images
+#    prefix: /images
+#    size: 10
+
+#图片识别
+ocr:
+  clientId: eo1xM8KcB6ICi6k1kVGsmnR9
+  #clientId: lUDaDgrPGRsMFN7qw21u5Cta
+  #clientSecret: znOBkwZwQ4G8PmeKT8ELDHoqdcPxnX4a
+  clientSecret: lZ9q4E6C0ftstwgL0Tt8UCroI5bOZ6YD
+license:
+  APPID: 2d33f6f6
+  API_KEY: bd1a2416dfae01a9c018bb28a28eb7cb
+  WEBOCR_URL: http://webapi.xfyun.cn/v1/service/v1/ocr/business_license
+  ENGINE_TYPE: business_license
+

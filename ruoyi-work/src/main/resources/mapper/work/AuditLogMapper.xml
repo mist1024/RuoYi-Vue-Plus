@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.work.mapper.AuditLogMapper">
+
+    <resultMap type="com.ruoyi.work.domain.AuditLog" id="AuditLogResult">
+        <result property="id" column="id"/>
+        <result property="auditId" column="audit_id"/>
+        <result property="adminUserName" column="admin_user_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="otherId" column="other_id"/>
+        <result property="reply" column="reply"/>
+        <result property="status" column="status"/>
+        <result property="roleName" column="role_name"/>
+        <result property="pushLog" column="push_log"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="auditType" column="audit_type"/>
+        <result property="processKey" column="process_key"/>
+        <result property="audit" column="audit"/>
+        <result property="step" column="step"/>
+    </resultMap>
+
+
+</mapper>

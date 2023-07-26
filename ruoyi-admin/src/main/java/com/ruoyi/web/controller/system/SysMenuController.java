@@ -13,7 +13,6 @@ import com.ruoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +46,8 @@ public class SysMenuController extends BaseController {
      * @param menuId 菜单ID
      */
     @SaCheckPermission("system:menu:query")
-    @GetMapping(value = "/{menuId}")
-    public R<SysMenu> getInfo(@PathVariable Long menuId) {
+    @GetMapping
+    public R<SysMenu> getInfo(Long menuId) {
         return R.ok(menuService.selectMenuById(menuId));
     }
 
@@ -66,8 +65,8 @@ public class SysMenuController extends BaseController {
      *
      * @param roleId 角色ID
      */
-    @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public R<Map<String, Object>> roleMenuTreeselect(@PathVariable("roleId") Long roleId) {
+    @GetMapping(value = "/roleMenuTreeselect")
+    public R<Map<String, Object>> roleMenuTreeselect(Long roleId) {
         List<SysMenu> menus = menuService.selectMenuList(getUserId());
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", menuService.selectMenuListByRoleId(roleId));
@@ -114,8 +113,8 @@ public class SysMenuController extends BaseController {
      */
     @SaCheckPermission("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{menuId}")
-    public R<Void> remove(@PathVariable("menuId") Long menuId) {
+    @DeleteMapping
+    public R<Void> remove(Long menuId) {
         if (menuService.hasChildByMenuId(menuId)) {
             return R.warn("存在子菜单,不允许删除");
         }

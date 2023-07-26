@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.HousesReviewMapper">
+
+    <resultMap type="com.ruoyi.system.domain.HousesReview" id="HousesReviewResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="cardType" column="card_type"/>
+        <result property="card" column="card"/>
+        <result property="name" column="name"/>
+        <result property="qualification" column="qualification"/>
+        <result property="auditTime" column="audit_time"/>
+        <result property="presellCard" column="presell_card"/>
+        <result property="dealType" column="deal_type"/>
+        <result property="projectName" column="project_name"/>
+        <result property="projectArea" column="project_area"/>
+        <result property="qualificationConfirmTime" column="qualification_confirm_time"/>
+        <result property="qualificationPreApplyTime" column="qualification_pre_apply_time"/>
+        <result property="familyType" column="family_type"/>
+        <result property="status" column="status"/>
+        <result property="registerFailureTime" column="register_failure_time"/>
+        <result property="nationality" column="nationality"/>
+        <result property="maritalStatus" column="marital_status"/>
+        <result property="companyType" column="company_type"/>
+        <result property="companyName" column="company_name"/>
+        <result property="talentsType" column="talents_type"/>
+        <result property="creditCode" column="credit_code"/>
+        <result property="companyAddress" column="company_address"/>
+        <result property="sourceBy" column="source_by"/>
+        <result property="processKey" column="process_key"/>
+        <result property="processStatus" column="process_status"/>
+        <result property="companyAddressArea" column="company_address_area"/>
+        <result property="typeExtend" column="type_extend"/>
+        <result property="passTime" column="pass_time"/>
+        <result property="step" column="step"/>
+    </resultMap>
+
+
+</mapper>

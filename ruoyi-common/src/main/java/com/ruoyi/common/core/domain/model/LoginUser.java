@@ -90,6 +90,17 @@ public class LoginUser implements Serializable {
      */
     private String username;
 
+    private String nickName;
+
+    private String companyId;
+
+    /**
+     * 楼盘
+     */
+    private String properties;
+
+
+
     /**
      * 角色对象
      */

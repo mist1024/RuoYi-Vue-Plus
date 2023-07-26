@@ -18,6 +18,12 @@ public enum LimitType {
     IP,
 
     /**
+     * 用户id
+     */
+    USERID,
+
+
+    /**
      * 实例限流(集群多后端实例)
      */
     CLUSTER

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BuyHouseCheckMapper">
+
+    <resultMap type="com.ruoyi.system.domain.BuyHouseCheck" id="BuyHouseCheckResult">
+        <result property="id" column="id"/>
+        <result property="remark" column="remark"/>
+        <result property="person" column="person"/>
+        <result property="otherKey" column="other_key"/>
+        <result property="cruxKey" column="crux_key"/>
+        <result property="step" column="step"/>
+    </resultMap>
+
+
+</mapper>

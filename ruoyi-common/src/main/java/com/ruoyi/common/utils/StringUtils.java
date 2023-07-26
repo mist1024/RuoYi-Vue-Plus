@@ -172,6 +172,15 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 字母转大写
+     * @param str
+     * @return
+     */
+    public static String toUpperCase(String str) {
+        return str.toUpperCase();
+    }
+
+    /**
      * 是否包含字符串
      *
      * @param str  验证字符串
@@ -320,6 +329,19 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             .filter(Objects::nonNull)
             .map(mapper)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * @param str
+     * @function 判断输入的数据是否是大于等于零的整数
+     */
+    public static boolean isNumeric(String str) {
+        for (int i = str.length(); --i >= 0;) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

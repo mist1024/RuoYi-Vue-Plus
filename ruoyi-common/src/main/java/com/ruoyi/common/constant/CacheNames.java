@@ -30,6 +30,9 @@ public interface CacheNames {
      */
     String SYS_DICT = "sys_dict";
 
+
+    String RSA_SECURITY = "rsa_security";
+
     /**
      * 用户账户
      */

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.work.mapper.ActProcessMapper">
+
+    <resultMap type="com.ruoyi.work.domain.ActProcess" id="ActProcessResult">
+        <result property="id" column="id"/>
+        <result property="processId" column="process_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="businessId" column="business_id"/>
+        <result property="audit" column="audit"/>
+        <result property="checkType" column="check_type"/>
+        <result property="step" column="step"/>
+        <result property="isNext" column="is_next"/>
+        <result property="type" column="type"/>
+        <result property="startUser" column="start_user"/>
+        <result property="companyName" column="company_name"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="bean" column="bean"/>
+        <result property="timeout" column="timeout"/>
+        <result property="userId" column="user_id"/>
+        <result property="description" column="description"/>
+        <result property="cardId" column="card_id"/>
+        <result property="companyName" column="company_name"/>
+
+    </resultMap>
+    <select id="selectVoListPage" resultType="com.ruoyi.work.domain.ActProcess" parameterType="com.ruoyi.work.domain.ActProcess">
+        SELECT a.create_time AS  createTime,a.business_id AS businessId,a.audit, a.step ,a.start_user AS startUser,a.id,p.process_key AS processKey,
+        p.`name`,p.description,p.bean,p.timeout,a.check_type AS checkType,a.company_name AS companyName,a.process_id,a.type,a.card_id AS cardId
+        FROM `act_process` a  INNER JOIN process p ON a.process_id= p.id
+        <where>
+            <if test="actProcess.processKey != null and actProcess.processKey != ''"> and p.process_key =#{actProcess.processKey}</if>
+            <if test="actProcess.startUser != null and actProcess.startUser != ''"> and a.start_user like concat('%', #{actProcess.startUser}, '%')</if>
+            <if test="actProcess.cardId != null and actProcess.cardId != ''"> and a.card_id like concat('%', #{actProcess.cardId}, '%')</if>
+            <if test="actProcess.companyName != null and actProcess.companyName != ''"> and a.company_name like concat('%', #{actProcess.companyName}, '%')</if>
+            <if test="actProcess.step != null and actProcess.step != ''"> and p.step =#{actProcess.step}</if>
+            <if test="actProcess.description != null and actProcess.description != ''"> and a.description  like concat('%', #{actProcess.description}, '%')</if>
+            and
+            (
+            (a.check_type= 1 AND a.audit = #{actProcess.userId} )
+            OR
+            (a.check_type = 2 AND  a.audit =#{actProcess.deptId})
+            OR
+            (a.check_type = 3 AND a.audit = #{actProcess.roleId})
+            OR
+            (a.check_type = 4 AND a.audit = #{actProcess.companyUserId})
+            )
+        </where>
+        ORDER BY a.create_time
+    </select>
+    <select id="selectCCList" resultType="com.ruoyi.work.domain.ActProcess">
+        SELECT a.create_time AS createTime,a.business_id AS businessId,a.process_id AS processId,a.audit,a.company_name AS companyName
+             ,a.step,a.start_user AS startUser,p.description,p.bean,p.`name`,p.timeout,a.check_type AS checkType,a.type,a.id,p.process_key AS processKey,
+        a.card_id AS cardId
+        FROM
+            ( SELECT DISTINCT(id),process_id,company_name,create_time,business_id,description,audit,step,start_user,check_type,type,card_id
+              FROM act_process
+              WHERE process_id IN
+                    (SELECT id FROM `process` WHERE FIND_IN_SET(#{actProcess.userId},cc))
+              GROUP BY business_id,process_id  ) AS a
+                INNER JOIN process p ON p.id = a.process_id
+        <where>
+            <if test="actProcess.processKey != null and actProcess.processKey != ''"> and p.process_key =#{actProcess.processKey}</if>
+            <if test="actProcess.startUser != null and actProcess.startUser != ''"> and a.start_user like concat('%', #{actProcess.startUser}, '%')</if>
+            <if test="actProcess.cardId != null and actProcess.cardId != ''"> and a.card_id like concat('%', #{actProcess.cardId}, '%')</if>
+            <if test="actProcess.companyName != null and actProcess.companyName != ''"> and a.company_name like concat('%', #{actProcess.companyName}, '%')</if>
+            <if test="actProcess.step != null and actProcess.step != ''"> and p.step =#{actProcess.step}</if>
+            <if test="actProcess.description != null and actProcess.description != ''"> and a.description  like concat('%', #{actProcess.description}, '%')</if>
+        </where>
+        ORDER BY a.create_time
+    </select>
+
+    <select id="selectSpecificList" resultType="com.ruoyi.work.domain.ActProcess">
+        SELECT a.create_time AS createTime,a.business_id AS businessId,a.process_id AS processId,a.audit,a.company_name AS companyName
+        ,a.step,a.start_user AS startUser,p.description,p.bean,p.`name`,p.timeout,a.check_type AS checkType,a.type,a.id,p.process_key AS processKey,
+        a.card_id AS cardId
+        FROM
+        ( SELECT DISTINCT(id),process_id,company_name,create_time,business_id,description,audit,step,start_user,check_type,type,card_id
+        FROM act_process
+        GROUP BY business_id,process_id  ) AS a
+        INNER JOIN process p ON p.id = a.process_id
+        <where>
+            <if test="actProcess.processKey != null and actProcess.processKey != ''"> and p.process_key =#{actProcess.processKey}</if>
+            <if test="actProcess.startUser != null and actProcess.startUser != ''"> and a.start_user like concat('%', #{actProcess.startUser}, '%')</if>
+            <if test="actProcess.cardId != null and actProcess.cardId != ''"> and a.card_id like concat('%', #{actProcess.cardId}, '%')</if>
+            <if test="actProcess.companyName != null and actProcess.companyName != ''"> and a.company_name like concat('%', #{actProcess.companyName}, '%')</if>
+            <if test="actProcess.step != null and actProcess.step != ''"> and p.step =#{actProcess.step}</if>
+            <if test="actProcess.description != null and actProcess.description != ''"> and a.description  like concat('%', #{actProcess.description}, '%')</if>
+        </where>
+        ORDER BY a.create_time
+    </select>
+
+    <select id="selectByIdResultBean2BusinessId" resultType="com.ruoyi.work.domain.ActProcess"
+            parameterType="java.lang.Long">
+        SELECT p.bean,a.business_id AS businessId ,p.process_key processKey ,a.start_user startUser    FROM process p INNER JOIN act_process a ON a.process_id  = p.id WHERE a.id = #{id}
+    </select>
+
+
+</mapper>

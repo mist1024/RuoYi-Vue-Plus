@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MaterialTalentsMapper">
+
+    <resultMap type="com.ruoyi.system.domain.MaterialTalents" id="MaterialTalentsResult">
+        <result property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="talentsValue" column="talents_value"/>
+        <result property="talentsName" column="talents_name"/>
+        <result property="version" column="version"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="selected" column="selected"/>
+        <result property="materials" column="materials"/>
+    </resultMap>
+    <select id="selectVoListSpecial" resultMap="MaterialTalentsResult">
+        SELECT
+        mt.id,
+        mt.parent_id,
+        mt.talents_name,
+        mt.talents_value,
+        mt.selected,
+        GROUP_CONCAT( mm.material_name ) AS materials
+        FROM
+        `material_talents` mt
+        LEFT JOIN material_module mm ON FIND_IN_SET( mm.id, mt.materials )
+        <where>
+            <if test="talentsName!='' and talentsName != null"> and mt.talents_name like concat('%', #{talentsName}, '%') </if>
+        </where>
+        GROUP BY mt.id
+
+    </select>
+
+
+</mapper>

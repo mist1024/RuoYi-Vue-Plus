@@ -49,7 +49,6 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         HttpServletRequest request = logininforEvent.getRequest();
         final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
         final String ip = ServletUtils.getClientIP(request);
-
         String address = AddressUtils.getRealAddressByIP(ip);
         StringBuilder s = new StringBuilder();
         s.append(getBlock(ip));

@@ -1,7 +1,12 @@
 package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -19,7 +24,6 @@ import com.ruoyi.system.service.SysPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +44,6 @@ public class SysRoleController extends BaseController {
     private final ISysUserService userService;
     private final ISysDeptService deptService;
     private final SysPermissionService permissionService;
-
     /**
      * 获取角色信息列表
      */
@@ -67,8 +70,8 @@ public class SysRoleController extends BaseController {
      * @param roleId 角色ID
      */
     @SaCheckPermission("system:role:query")
-    @GetMapping(value = "/{roleId}")
-    public R<SysRole> getInfo(@PathVariable Long roleId) {
+    @GetMapping
+    public R<SysRole> getInfo(Long roleId) {
         roleService.checkRoleDataScope(roleId);
         return R.ok(roleService.selectRoleById(roleId));
     }
@@ -143,8 +146,8 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{roleIds}")
-    public R<Void> remove(@PathVariable Long[] roleIds) {
+    @DeleteMapping
+    public R<Void> remove(Long[] roleIds) {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
@@ -218,8 +221,8 @@ public class SysRoleController extends BaseController {
      * @param roleId 角色ID
      */
     @SaCheckPermission("system:role:list")
-    @GetMapping(value = "/deptTree/{roleId}")
-    public R<Map<String, Object>> roleDeptTreeselect(@PathVariable("roleId") Long roleId) {
+    @GetMapping(value = "/deptTree")
+    public R<Map<String, Object>> roleDeptTreeselect(Long roleId) {
         Map<String, Object> ajax = new HashMap<>();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
         ajax.put("depts", deptService.selectDeptTreeList(new SysDept()));

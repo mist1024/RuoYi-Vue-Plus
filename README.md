@@ -121,6 +121,7 @@
 
 ### 其他
 
+
 * 同步升级 RuoYi-Vue
 * GitHub 地址 [RuoYi-Vue-Plus-github](https://github.com/dromara/RuoYi-Vue-Plus)
 * 单模块 分支 [RuoYi-Vue-Plus-fast](https://gitee.com/dromara/RuoYi-Vue-Plus/tree/fast/)

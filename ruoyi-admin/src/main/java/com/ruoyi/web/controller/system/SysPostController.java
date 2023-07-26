@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -14,7 +13,6 @@ import com.ruoyi.system.service.ISysPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -57,8 +55,8 @@ public class SysPostController extends BaseController {
      * @param postId 岗位ID
      */
     @SaCheckPermission("system:post:query")
-    @GetMapping(value = "/{postId}")
-    public R<SysPost> getInfo(@PathVariable Long postId) {
+    @GetMapping
+    public R<SysPost> getInfo(Long postId) {
         return R.ok(postService.selectPostById(postId));
     }
 
@@ -99,7 +97,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{postIds}")
+    @DeleteMapping
     public R<Void> remove(@PathVariable Long[] postIds) {
         return toAjax(postService.deletePostByIds(postIds));
     }

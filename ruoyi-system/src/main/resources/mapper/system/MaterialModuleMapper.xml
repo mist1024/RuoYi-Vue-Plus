@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MaterialModuleMapper">
+
+    <resultMap type="com.ruoyi.system.domain.MaterialModule" id="MaterialModuleResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="materialName" column="material_name"/>
+        <result property="materialKey" column="material_key"/>
+        <result property="auditDept" column="audit_dept"/>
+        <result property="description" column="description"/>
+        <result property="sort" column="sort"/>
+        <result property="isMust" column="is_must"/>
+        <result property="interfacePath" column="interface_path"/>
+        <result property="interfaceType" column="interface_type"/>
+        <result property="interfaceName" column="interface_name"/>
+    </resultMap>
+    <select id="selectVoPageList" resultMap="MaterialModuleResult">
+        SELECT
+            m.id,
+            material_name,
+            `material_key`,
+            GROUP_CONCAT(s.dept_name) AS audit_dept,
+            description,
+            m.sort,
+            m.is_must,
+            m.interface_path,
+            m.interface_type,
+            m.interface_name
+        FROM
+            `material_module` m
+                LEFT JOIN sys_dept s ON FIND_IN_SET(s.dept_id ,m.audit_dept)
+            ${ew.getCustomSqlSegment}
+        GROUP BY m.id
+    </select>
+
+
+</mapper>

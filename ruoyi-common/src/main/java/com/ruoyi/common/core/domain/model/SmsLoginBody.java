@@ -17,12 +17,12 @@ public class SmsLoginBody {
      * 手机号
      */
     @NotBlank(message = "{user.phonenumber.not.blank}")
-    private String phonenumber;
+    private String username;
 
     /**
      * 短信code
      */
     @NotBlank(message = "{sms.code.not.blank}")
-    private String smsCode;
+    private String verificationCode;
 
 }

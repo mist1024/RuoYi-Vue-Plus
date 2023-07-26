@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
@@ -14,7 +13,6 @@ import com.ruoyi.system.service.ISysDictTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -57,8 +55,8 @@ public class SysDictTypeController extends BaseController {
      * @param dictId 字典ID
      */
     @SaCheckPermission("system:dict:query")
-    @GetMapping(value = "/{dictId}")
-    public R<SysDictType> getInfo(@PathVariable Long dictId) {
+    @GetMapping
+    public R<SysDictType> getInfo(Long dictId) {
         return R.ok(dictTypeService.selectDictTypeById(dictId));
     }
 
@@ -97,8 +95,8 @@ public class SysDictTypeController extends BaseController {
      */
     @SaCheckPermission("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{dictIds}")
-    public R<Void> remove(@PathVariable Long[] dictIds) {
+    @DeleteMapping
+    public R<Void> remove(Long[] dictIds) {
         dictTypeService.deleteDictTypeByIds(dictIds);
         return R.ok();
     }

@@ -121,8 +121,9 @@ public interface UserConstants {
     /**
      * 密码长度限制
      */
-    int PASSWORD_MIN_LENGTH = 5;
+    int PASSWORD_MIN_LENGTH = 8;
     int PASSWORD_MAX_LENGTH = 20;
+    String PASSWORD_Pattern = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,18}$";
 
     /**
      * 管理员ID

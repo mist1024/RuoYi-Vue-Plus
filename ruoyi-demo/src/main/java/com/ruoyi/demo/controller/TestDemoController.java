@@ -74,7 +74,7 @@ public class TestDemoController extends BaseController {
     @SaCheckPermission("demo:demo:import")
     @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
-        ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
+        ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true,0);
         List<TestDemoImportVo> volist = excelResult.getList();
         List<TestDemo> list = BeanUtil.copyToList(volist, TestDemo.class);
         iTestDemoService.saveBatch(list);

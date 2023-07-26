@@ -33,7 +33,7 @@ public class SysUser extends BaseEntity {
     /**
      * 用户ID
      */
-    @TableId(value = "user_id")
+    @TableId(value = "user_id",type = IdType.AUTO)
     private Long userId;
 
     /**
@@ -127,6 +127,11 @@ public class SysUser extends BaseEntity {
      * 备注
      */
     private String remark;
+
+    /**
+     * 楼盘
+     */
+    private  String properties;
 
     /**
      * 部门对象

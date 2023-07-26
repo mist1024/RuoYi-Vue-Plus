@@ -3,6 +3,7 @@ package com.ruoyi.framework.interceptor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
 import com.alibaba.ttl.TransmittableThreadLocal;
+import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.filter.RepeatedlyRequestWrapper;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -34,6 +35,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+//        response.sendRedirect("https://dbxqtalents.cn/");
         if (!prodProfile.equals(SpringUtils.getActiveProfile())) {
             String url = request.getMethod() + " " + request.getRequestURI();
 
@@ -59,6 +61,10 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
             invokeTimeTL.set(stopWatch);
             stopWatch.start();
         }
+        //判断系统是否在维护中
+        ConfigService sysConfigService = SpringUtils.getBean(ConfigService.class);
+        //系统升级提示
+        sysConfigService.selectConfigByConfigKey("system:maintenance:prompt");
         return true;
     }
 

@@ -45,7 +45,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SysUserServiceImpl implements ISysUserService, UserService {
+public class SysUserServiceImpl implements ISysUserService, UserService{
 
     private final SysUserMapper baseMapper;
     private final SysDeptMapper deptMapper;

@@ -6,11 +6,13 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.CacheNames;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.redis.CacheUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
@@ -21,7 +23,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +65,20 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @DS("master")
     public SysConfig selectConfigById(Long configId) {
         return baseMapper.selectById(configId);
+    }
+
+    /**
+     * 根据key获取配置信息
+     * @param key
+     * @return
+     */
+    @Override
+    public void selectConfigByConfigKey(String key) {
+        String s = selectConfigByKey(key);
+        if ("true".equals(s)){
+            throw new ServiceException("系统升级维护中!感谢您的等待!");
+        }
+        System.out.println("s = " + s);
     }
 
     /**
