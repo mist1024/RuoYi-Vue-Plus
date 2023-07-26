@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
 
-    <resultMap type="SysUser" id="SysUserResult">
+    <resultMap type="com.ruoyi.common.core.domain.entity.SysUser" id="SysUserResult">
         <id property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
         <result property="userName" column="user_name"/>
@@ -24,6 +24,7 @@
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
+        <result property="properties" column="properties"/>
         <association property="dept" column="dept_id" javaType="SysDept" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>
@@ -65,6 +66,7 @@
                u.create_by,
                u.create_time,
                u.remark,
+               u.properties,
                d.dept_id,
                d.parent_id,
                d.ancestors,
@@ -85,7 +87,7 @@
     </sql>
 
     <select id="selectPageUserList" resultMap="SysUserResult">
-        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.properties,u.email, u.avatar, u.phonenumber, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader
         from sys_user u
             left join sys_dept d on u.dept_id = d.dept_id
@@ -93,7 +95,7 @@
     </select>
 
     <select id="selectUserList" resultMap="SysUserResult">
-        select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+        select u.user_id, u.dept_id, u.nick_name, u.user_name,u.properties, u.email, u.avatar, u.phonenumber, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader
         from sys_user u
             left join sys_dept d on u.dept_id = d.dept_id
@@ -101,7 +103,7 @@
     </select>
 
     <select id="selectAllocatedList" resultMap="SysUserResult">
-        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status, u.create_time
+        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email,u.properties, u.phonenumber, u.status, u.create_time
         from sys_user u
              left join sys_dept d on u.dept_id = d.dept_id
              left join sys_user_role sur on u.user_id = sur.user_id
@@ -110,7 +112,7 @@
     </select>
 
     <select id="selectUnallocatedList" resultMap="SysUserResult">
-        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.phonenumber, u.status, u.create_time
+        select distinct u.user_id, u.dept_id, u.user_name, u.nick_name,u.properties, u.email, u.phonenumber, u.status, u.create_time
         from sys_user u
              left join sys_dept d on u.dept_id = d.dept_id
              left join sys_user_role sur on u.user_id = sur.user_id

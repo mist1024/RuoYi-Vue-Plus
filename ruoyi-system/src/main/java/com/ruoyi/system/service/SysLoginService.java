@@ -93,8 +93,6 @@ public class SysLoginService {
         SysUser user = loadSysUserByUsername(username);
         checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-        LoginUser loginUser = buildLoginUser(user);
-        // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginSysUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
@@ -110,10 +108,6 @@ public class SysLoginService {
         checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode,CacheConstants.CAPTCHA_CODE_KEY));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginSysUser(user);
-
-        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode));
-        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-        LoginUser loginUser = buildLoginUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.APP);
 
@@ -358,7 +352,7 @@ public class SysLoginService {
             } else {
                 // 未达到规定错误次数
                 recordLogininfor(username, loginFail, MessageUtils.message(loginType.getRetryLimitCount(), errorNumber));
-                throw new UserException(loginType.getRetryLimitCount(), errorNumber);
+                throw new UserException(loginType.getRetryLimitCount(), errorNumber,maxRetryCount-errorNumber);
             }
         }
         // 登录成功 清空错误次数

@@ -57,5 +57,4 @@ public interface IUserService {
      */
     int resetUserPwd(String userName, String password);
 
-    R<?> getUserCandidateInfo(String cardId) throws Exception;
 }

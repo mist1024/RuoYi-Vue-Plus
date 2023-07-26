@@ -38,7 +38,7 @@ public class ActProcess {
      */
     private String audit;
     /**
-     * 审核类型（1，人员，2.部门，3角色）
+     * 审核类型（1，人员，2.部门，3角色,4公司）
      */
     private String checkType;
     /**
@@ -91,6 +91,12 @@ public class ActProcess {
 
     @TableField(exist = false)
     private String apiKey;
+
+    /**
+     * 特定标识
+     */
+    @TableField(exist = false)
+    private String tiger;
 
 
 }

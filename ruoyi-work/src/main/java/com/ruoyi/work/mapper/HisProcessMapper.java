@@ -25,4 +25,5 @@ public interface HisProcessMapper extends BaseMapperPlus<HisProcessMapper, HisPr
     List<HisProcess> selectVoHisList( @Param(Constants.WRAPPER) Wrapper<HisProcess> queryWrapper);
 
     Page<HisProcess> selectListPageByCC(@Param("page") Page<HisProcess> page, @Param("hisProcess") HisProcess hisProcess);
+    Page<HisProcess> selectListPageBySpecific(@Param("page") Page<HisProcess> page, @Param("hisProcess") HisProcess hisProcess);
 }

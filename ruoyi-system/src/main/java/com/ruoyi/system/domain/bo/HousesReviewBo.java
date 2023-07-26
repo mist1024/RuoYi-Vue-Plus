@@ -99,7 +99,7 @@ public class HousesReviewBo extends BaseEntity {
     /**
      * 资格预申请时间
      */
-    @NotBlank(message = "资格预申请时间不能为空", groups = { AddGroup.class, EditGroup.class })
+//    @NotBlank(message = "资格预申请时间不能为空", groups = { AddGroup.class, EditGroup.class })
     private String qualificationPreApplyTime;
 
     /**

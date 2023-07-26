@@ -39,9 +39,6 @@ public class ResourcesConfig implements WebMvcConfigurer {
         registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
     }
 
-   /* @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    }*/
 
     /**
      * 跨域配置
@@ -83,8 +80,9 @@ public class ResourcesConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // 设置允许跨域的路由
         registry.addMapping(localFilePrefix  + "/**")
-            // 设置允许跨域请求的域名
             .allowedOrigins("*")
+            .allowCredentials(true)
+            .maxAge(3000)
             // 设置允许的方法
             .allowedMethods("GET");
     }

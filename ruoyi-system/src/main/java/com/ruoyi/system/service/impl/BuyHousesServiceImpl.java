@@ -156,7 +156,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     private LambdaQueryWrapper<BuyHouses> buildQueryWrapper(BuyHousesBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<BuyHouses> lqw = Wrappers.lambdaQuery();
-        if (ObjectUtil.isNotNull(bo.getIds())){
+        if (ObjectUtil.isNotNull(bo.getIds()) && bo.getIds().length>0){
             lqw.in(BuyHouses::getId,bo.getIds());
         }
         lqw.eq(ObjectUtil.isNotNull(bo.getId()), BuyHouses::getId, bo.getId());
@@ -227,12 +227,12 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         lqw.eq(StringUtils.isNotBlank(bo.getSocialSecurityUrl()), BuyHouses::getSocialSecurityUrl, bo.getSocialSecurityUrl());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BuyHouses::getStatus, bo.getStatus());
         lqw.eq(bo.getUserId() != null, BuyHouses::getUserId, bo.getUserId());
-
         lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()),BuyHouses::getProcessStatus,bo.getProcessStatus());
         lqw.ge(StringUtils.isBlank(bo.getProcessStatus()),BuyHouses::getProcessStatus,Constants.SUCCEED);
-        lqw.and(StringUtils.isNotBlank(bo.getUserName()),t ->t.like(BuyHouses::getUserName,bo.getUserName())
-            .or().like(BuyHouses::getPhone,bo.getUserName())
-            .or().like(BuyHouses::getCardId,bo.getUserName()));
+        lqw.and(StringUtils.isNotBlank(bo.getUserName()),t ->
+            t.like(BuyHouses::getUserName,bo.getUserName())
+                .or().like(BuyHouses::getPhone,bo.getUserName())
+                .or().like(BuyHouses::getCardId,bo.getUserName()));
         lqw.eq(StringUtils.isNotBlank(bo.getDistrict()),BuyHouses::getDistrict,bo.getDistrict());
         lqw.like(StringUtils.isNotBlank(bo.getType()),BuyHouses::getType,bo.getType());
 
@@ -489,7 +489,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         R rInfo = OpenUtils.getGaoXinCardInfo(buyHouses.getCardId());
         GaoXinCardInfo gaoXinCardInfo = JsonUtils.parseObject(JSONUtil.toJsonPrettyStr(rInfo.getData()), GaoXinCardInfo.class);
         BuyHouses buyHousesDto = new BuyHouses();
-        buyHousesDto.setCardId(gaoXinCardInfo.getCard_id());
+        buyHousesDto.setCardId(StringUtils.toUpperCase(gaoXinCardInfo.getCard_id()));
         String nationality = gaoXinCardInfo.getNationality();
         if ("中国".contains(nationality)){
             buyHousesDto.setNationality("中国籍");
@@ -532,33 +532,6 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         hashMap.put("processKey","apply_house");
         hashMap.put("businessId",null);
         return R.ok("获取成功",hashMap);
-
-
-       /* HttpResponse execute = HttpRequest.get(URL)
-            .form("cardId",cardId)
-            .timeout(5000)
-            .execute();
-        JSONObject entries = JSONUtil.parseObj(execute.body());
-        String code = String.valueOf(entries.get("code"));
-        if (ObjectUtil.isNull(code)){
-            return R.fail("获取人才信息失败");
-        }else {
-            if ("666666".equals(code)){
-                BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, cardId));
-                if (ObjectUtil.isNotNull(buyHouses)){
-                    hashMap.put("status",buyHouses.getProcessStatus());
-                    hashMap.put("processKey",buyHouses.getProcessKey());
-                    hashMap.put("businessId",buyHouses.getId());
-                    return R.ok("获取成功",hashMap);
-                }
-                hashMap.put("status",Constants.SUBMIT);
-                hashMap.put("processKey","apply_house");
-                hashMap.put("businessId",null);
-                return R.ok("获取成功",hashMap);
-            }else {
-                return R.fail("暂无资格");
-            }
-        }*/
     }
 
     /**
@@ -1325,7 +1298,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     public void  excelZip(String id){
         BuyHousesBo bo =new BuyHousesBo();
         if (ObjectUtil.isNotNull(id)){
-        bo.setId(Long.valueOf(id));
+            bo.setId(Long.valueOf(id));
         }
         LambdaQueryWrapper<BuyHouses> lqw = buildQueryWrapper(bo);
         List<BuyHousesVo> buyHousesVoList = baseMapper.selectVoList(lqw);
@@ -1467,9 +1440,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses",id);
         String virtualcode = String.valueOf(map.get("virtualcode"));
         map.put("virtualcode", virtualcode == "3" ? "010" : "009");
-        String cardType = String.valueOf(map.get("cardType"));
+        String cardType = String.valueOf(map.get("nationality"));
         map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
-        Object createTime = map.get("createTime");
+        Object createTime = map.get("passTime");
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
         DateFormat cst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date format = sdf.parse(createTime.toString());
@@ -1495,7 +1468,6 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         map.put("cardId",buyHouses.getCardId());
         map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
         map.put("note","人才主动撤销");//备注
-        map.put("status", "00N");
         System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
         housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"254");//正式
         return null;

@@ -117,7 +117,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     private LambdaQueryWrapper<HousesReview> buildQueryWrapper3(HousesReviewBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<HousesReview> lqw = Wrappers.lambdaQuery();
-        if (ObjectUtil.isNotNull(bo.getIds())){
+        if (ObjectUtil.isNotNull(bo.getIds()) && bo.getIds().length>0){
             lqw.in(HousesReview::getId,bo.getIds());
         }
         lqw.and(StringUtils.isNotBlank(bo.getName()),t ->

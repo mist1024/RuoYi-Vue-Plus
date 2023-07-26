@@ -20,5 +20,7 @@ public interface ActProcessMapper extends BaseMapperPlus<ActProcessMapper, ActPr
 
     Page<ActProcess> selectCCList(@Param("page") Page<ActProcess> page, @Param("actProcess") ActProcess actProcess);
 
+    Page<ActProcess> selectSpecificList(@Param("page") Page<ActProcess> page, @Param("actProcess") ActProcess actProcess);
+
     ActProcess selectByIdResultBean2BusinessId(@Param("id") Long id);
 }

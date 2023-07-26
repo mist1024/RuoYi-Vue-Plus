@@ -4,8 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpRequest;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.utils.AesUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -143,23 +141,5 @@ public class UserServiceImpl implements IUserService {
             new LambdaUpdateWrapper<User>()
                 .set(User::getPassword, password)
                 .eq(User::getLoginName, userName));
-    }
-
-    @Override
-    public R<?> getUserCandidateInfo(String cardId) throws Exception {
-        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
-        hashMap.put("loginName",AesUtil.decryptBASE64("18716148446"));
-        hashMap.put("password",AesUtil.decryptBASE64("1234Qwer"));
-        try {
-            HttpRequest.post("https://gx.chengdutalent.cn:8010/user/login")
-                .form(hashMap)
-                .timeout(20000)
-                .execute().body();
-        } catch (Exception e) {
-            throw new RuntimeException("调用接口超时");
-        }
-        //调用高新的接口
-        return null;
-
     }
 }

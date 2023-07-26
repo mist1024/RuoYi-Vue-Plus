@@ -179,7 +179,7 @@ public class HousesReviewController extends BaseController {
     @SaCheckPermission("system:review:import")
     @PostMapping(value = "/review/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
-        ExcelResult<HousesReviewVo> result = ExcelUtil.importExcel(file.getInputStream(), HousesReviewVo.class, true);
+        ExcelResult<HousesReviewVo> result = ExcelUtil.importExcel(file.getInputStream(), HousesReviewVo.class, true,3);
         List<HousesReviewVo> volist = result.getList();
         //判断时间格式是否正确
         volist.stream().forEach(v ->{
@@ -197,11 +197,19 @@ public class HousesReviewController extends BaseController {
         List<HousesReview> list = BeanUtil.copyToList(volist, HousesReview.class);
         //先获取到导入数据的身份证去购房一期数据库去查
         //过滤出导入表中的身份证号码
-        List<String> collect = list.stream().filter( e ->ObjectUtil.isNotEmpty(e.getCard())).map(HousesReview::getCard).collect(Collectors.toList());
+        List<String> collect = list.stream()
+            .filter( e ->ObjectUtil.isNotEmpty(e.getCard()))
+            .map(HousesReview::getCard)
+            .collect(Collectors.toList());
         if (collect.size()>0 && list.size()>0) {
-            LambdaQueryWrapper<BuyHouses> queryWrapper = new LambdaQueryWrapper<BuyHouses>().in(BuyHouses::getCardId, collect);
+            LambdaQueryWrapper<BuyHouses> queryWrapper = new LambdaQueryWrapper<BuyHouses>()
+                .in(BuyHouses::getCardId, collect)
+                .eq(BuyHouses::getProcessStatus,Constants.SUCCEED);
             //查询出导入数据中的身份证有那些是属于区级人才的
-            List<String> collect1 = buyHousesMapper.selectList(queryWrapper).stream().map(BuyHouses::getCardId).collect(Collectors.toList());
+            List<String> collect1 = buyHousesMapper.selectList(queryWrapper)
+                .stream()
+                .map(BuyHouses::getCardId)
+                .collect(Collectors.toList());
             for (HousesReview housesReview : list) {
                 housesReview.setProcessKey("house_review");
                 housesReview.setProcessStatus(Constants.SUBMIT);

@@ -37,7 +37,7 @@ public class RepeatableFilter implements Filter {
             && StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE) ) {
             requestWrapper = new RepeatedlyRequestWrapper((HttpServletRequest) request, response);
         }
-        if (!isSafe((HttpServletRequest) request)) {
+        if (!isSafe((HttpServletRequest) request,(HttpServletResponse) response)) {
             ((HttpServletResponse) response).setStatus(403);
             return;
         }
@@ -59,7 +59,7 @@ public class RepeatableFilter implements Filter {
      * @param request
      * @return
      */
-    private boolean isSafe(HttpServletRequest request) {
+    private boolean isSafe(HttpServletRequest request,HttpServletResponse response) {
         ConfigService sysConfigService = SpringUtils.getBean(ConfigService.class);
         String configValue = sysConfigService.getConfigValue("sys:preventing:hotlinking");
         List<String> strings = Arrays.asList(configValue.split(","));
@@ -71,7 +71,7 @@ public class RepeatableFilter implements Filter {
         if (referer == null || "".equals(referer)) {
             // 获取不到防盗链头部信息 -> 拦截
             System.out.println("referer为空进行拦截");
-            return false;
+            return true;
         }
         for (String white : strings) {
             if (white.contains("*.")) {

@@ -57,7 +57,9 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
      */
     @Override
     public TableDataInfo<SubscribeExportVo> queryPageList(SubscribeExportBo bo, PageQuery pageQuery) {
-        bo.setUserId(LoginHelper.getUserId().toString());
+        if (!LoginHelper.isAdmin()){
+            bo.setUserId(LoginHelper.getUserId().toString());
+        }
         bo.setExportStatus("1");
         LambdaQueryWrapper<SubscribeExport> lqw = buildQueryWrapper(bo);
         lqw.orderByDesc(SubscribeExport::getCreateTime);
@@ -78,6 +80,7 @@ public class SubscribeExportServiceImpl implements ISubscribeExportService {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<SubscribeExport> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getPath()), SubscribeExport::getPath, bo.getPath());
+        lqw.eq(StringUtils.isNotBlank(bo.getExportStatus()), SubscribeExport::getExportStatus, bo.getExportStatus());
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), SubscribeExport::getUserId, bo.getUserId());
         lqw.eq(StringUtils.isNotBlank(bo.getProcessKey()), SubscribeExport::getProcessKey, bo.getProcessKey());
         return lqw;

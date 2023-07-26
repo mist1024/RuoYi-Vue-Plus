@@ -2,10 +2,14 @@ package com.ruoyi.common.advice;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.useragent.Platform;
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.ruoyi.common.core.domain.RsaSecurity;
 import com.ruoyi.common.core.service.ConfigService;
 import com.ruoyi.common.core.service.IRsaSecurityService2;
 import com.ruoyi.common.utils.RSAUtil;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,10 +51,6 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         try {
-            //判断系统是否在维护中
-            ConfigService sysConfigService = SpringUtils.getBean(ConfigService.class);
-            //系统升级提示
-            sysConfigService.selectConfigByConfigKey("system:maintenance:prompt");
             String path = inputMessage.getHeaders().getFirst("path");
             String method = inputMessage.getHeaders().getFirst("method");
             if (ObjectUtil.isNotNull(path)) {
@@ -123,12 +123,13 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
                     String content = null;
                     try {
                         logger.info("解密密文:"+requestData);
-                        if ("weixin".equals(targe)){
-                            content = RSAUtil.privateKeyDecryptStr(requestData,privateKey);
-                        }else {
+                        String substring1 = StringUtils.substring(requestData, 0, 1);
+                        if ("\"".equals(substring1)){
                             String data1 = requestData.substring(1);
                             String substring = requestData.substring(1, data1.length());
                             content = RSAUtil.privateKeyDecryptStr(substring,privateKey);
+                        }else {
+                            content = RSAUtil.privateKeyDecryptStr(requestData,privateKey);
                         }
                         logger.info("解密明文:"+content);
                     } catch (Exception e) {

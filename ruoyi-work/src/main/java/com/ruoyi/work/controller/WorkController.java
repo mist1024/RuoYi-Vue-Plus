@@ -1,5 +1,6 @@
 package com.ruoyi.work.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -8,10 +9,12 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.domain.event.PushLogEvent;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.helper.LoginHelper;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.work.domain.ActProcess;
 import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.RollBackLog;
@@ -119,7 +122,7 @@ public class WorkController extends BaseController {
     @Log(title = "流程办理",businessType = BusinessType.OTHER)
 //    @SaCheckPermission("work:task:batchDeleted")
     @PostMapping("/batchDeleted")
-    public R<?> batchDeleted(@RequestBody HisProcess hisProcess) throws ParseException {
+    public R<?> batchDeleted(@RequestBody HisProcess hisProcess){
         if (ObjectUtil.isNull(hisProcess.getStatus())){
             return R.fail("状态不可为空");
         }
@@ -129,12 +132,22 @@ public class WorkController extends BaseController {
         if (ObjectUtil.isNull(hisProcess.getBusinessId())){
             return R.fail("业务id不可为空");
         }
+        return batchDeletedCommon(hisProcess);
+    }
+
+    /**
+     * 流程办理公共方法
+     * @param hisProcess
+     * @return
+     */
+    private R batchDeletedCommon(HisProcess hisProcess){
+        System.out.println("hisProcess.getBusinessId() = " + hisProcess.getBusinessId());
         List<TProcess> tProcesses = processMapper.selectList(new LambdaQueryWrapper<TProcess>()
             .eq(TProcess::getProcessKey, hisProcess.getProcessKey()));
         if (tProcesses.size()==0){
             throw new ServiceException("当前流程不存在");
         }
-        Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(),hisProcess.getBusinessId());
+        Map<String, Object> map = WorkUtils.getInfoToMap(tProcesses.get(0).getBean(), hisProcess.getBusinessId());
         hisProcess.setParams(map);
         Map map1 = WorkComplyUtils.batchDeleted(hisProcess,tProcesses.stream().map(TProcess::getId).collect(Collectors.toList()));
         String s = String.valueOf(map1.get("status"));
@@ -152,13 +165,9 @@ public class WorkController extends BaseController {
                     //公园城市局推送
                     String virtualcode = String.valueOf(map.get("virtualcode"));
                     map.put("virtualcode", virtualcode == "3" ? "010" : "009");
-                    String cardType = String.valueOf(map.get("cardType"));
+                    String cardType = String.valueOf(map.get("nationality"));
                     map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
-                    Object createTime = map.get("createTime");
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-                    DateFormat cst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date format = sdf.parse(createTime.toString());
-                    String dateString = cst.format(format);
+                    String dateString = DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS);
                     map.put("creatTime",dateString);
                     map.put("qyStatus", "4");
                     map.put("gyStatus", "4");
@@ -191,6 +200,26 @@ public class WorkController extends BaseController {
         }
         System.out.println("s = " + s);
         return R.ok();
+    }
+
+    /**
+     * 流程批量办理
+     */
+    @Log(title = "流程批量办理",businessType = BusinessType.OTHER)
+    @SaCheckPermission("work:task:batchReviewPassed")
+    @PostMapping("/batchReviewPassed")
+    public R<?> batchReviewPassed(@RequestBody HisProcess hisProcess){
+        hisProcess.setStatus("2");
+        hisProcess.setProcessKey("house_review");
+        if (ObjectUtil.isNull(hisProcess.getIds()) || hisProcess.getIds().length==0){
+            return R.fail("业务id不可为空");
+        }
+        for (String id : hisProcess.getIds()) {
+            //调用方法
+            hisProcess.setBusinessId(id);
+            batchDeletedCommon(hisProcess);
+        }
+        return R.ok("批量办理失败!");
     }
 
     /**
@@ -240,5 +269,6 @@ public class WorkController extends BaseController {
         rollBackLog.setParams(map);
         return toAjax(WorkComplyUtils.rollBack(rollBackLog)>1?1:0);
     }
+
 }
 

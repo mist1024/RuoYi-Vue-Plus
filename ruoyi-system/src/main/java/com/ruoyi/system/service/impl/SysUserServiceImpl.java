@@ -27,7 +27,6 @@ import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.work.service.IWorkSysUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,7 +45,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SysUserServiceImpl implements ISysUserService, UserService, IWorkSysUserService {
+public class SysUserServiceImpl implements ISysUserService, UserService{
 
     private final SysUserMapper baseMapper;
     private final SysDeptMapper deptMapper;

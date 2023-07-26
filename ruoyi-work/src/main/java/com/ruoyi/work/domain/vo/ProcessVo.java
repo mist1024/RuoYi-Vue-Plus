@@ -130,6 +130,9 @@ public class ProcessVo {
 
     private String cardId;
 
+    @TableField(exist = false)
+    private String userId;
+
 
 
 

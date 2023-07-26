@@ -100,6 +100,7 @@ public class MyFileUtils extends FileUtils
             conn.setRequestMethod("GET");//POST
             //防止屏蔽程序抓取而返回403错误
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+            conn.setRequestProperty("Referer","https://rcaj.cdhtgycs.cn");
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
             int responseCode = conn.getResponseCode();

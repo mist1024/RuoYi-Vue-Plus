@@ -23,18 +23,12 @@ import com.ruoyi.common.utils.reflect.ReflectUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.config.properties.CaptchaProperties;
 import com.ruoyi.framework.config.properties.MailProperties;
-import com.ruoyi.sms.config.properties.SmsProperties;
-import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.core.TelecomSendMsg;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.sms4j.api.SmsBlend;
-import org.dromara.sms4j.api.entity.SmsResponse;
-import org.dromara.sms4j.core.factory.SmsFactory;
-import org.dromara.sms4j.provider.enumerate.SupplierType;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -70,14 +64,7 @@ public class CaptchaController {
      * @param username 用户手机号
      */
     @GetMapping("/captchaSms")
-    public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String phonenumber) {
-        String key = CacheConstants.CAPTCHA_CODE_KEY + phonenumber;
-        String code = RandomUtil.randomNumbers(4);
-
     public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String username) {
-        if (!smsProperties.getEnabled()) {
-            return R.fail("当前系统没有开启短信功能！");
-        }
         //判断系统中是否存在该人才
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getPhonenumber, SysUser::getStatus)

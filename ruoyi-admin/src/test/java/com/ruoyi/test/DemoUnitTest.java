@@ -16,6 +16,8 @@ import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SM4;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.EasyExcel;
@@ -29,10 +31,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.domain.entity.GaoXinCardInfo;
 import com.ruoyi.common.helper.DataBaseHelper;
-import com.ruoyi.common.utils.AesUtil;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.OpenUtils;
+import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.demo.domain.ImageDemoData;
 import com.ruoyi.system.domain.*;
@@ -67,6 +66,8 @@ import sun.misc.BASE64Encoder;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -227,7 +228,7 @@ public class DemoUnitTest {
         ProcessVo processVo = new ProcessVo();
         processVo.setProcessKey("apply_house");
         processVo.setStep("1");
-        BuyHouses buyHouses = buyHousesMapper.selectById("3181");
+        BuyHouses buyHouses = buyHousesMapper.selectById("3136");
         buyHouses.setUpdateTime(DateUtils.getNowDate());
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         processVo.setParams(map);
@@ -425,21 +426,9 @@ public class DemoUnitTest {
             .header("Cookie","security.session.id=e1eee749-70da-48a5-8390-b99c7e1749e0")
             .execute()
             .body();*/
-        String s = AesUtil.encryptBASE64("18716148446");
-        System.out.println("s = " + s);
-        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
-        JSONObject json1 = JSONUtil.createObj()
-            .set("loginName", AesUtil.encryptBASE64("15881326343"))
-            .set("password",AesUtil.encryptBASE64("Feng19891217"));
 //        hashMap.put("loginName", AesUtil.encryptBASE64("18716148446"));
 //        hashMap.put("password",AesUtil.encryptBASE64("1234Qwer"));
 
-        String http = HttpRequest.post("https://gx.chengdutalent.cn:8010/user/login")
-            .header("Content-Type","application/json;charset=UTF-8")
-            .body(String.valueOf(json1))
-            .execute().body();
-        String backURL = String.valueOf(JSONUtil.parseObj(http).get("backURL"));
-        System.out.println("http = " + http);
        /* BuyHouses buyHouses = buyHousesMapper.selectById(1011L);
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         List<MaterialModuleVo> materialInfo = materialModuleService.getMaterialInfo(map);
@@ -614,7 +603,7 @@ public class DemoUnitTest {
     public void test0212311123123(){
         String publicKey="0435661bb2d13bba88f47af0bbe243fcded8f27ac298932661787f88ea283c2b31fe427e1aa8410826a963e9114fe5ffab4ad278aeeb7f1f161e735d1f50570e78";
         HashMap<String, Object> map = new HashMap<>();
-        map.put("username","15808234569");
+        map.put("username","o6Jx05A8ze3Icr6KC59n8I0DBp14");
         map.put("apiKey","gaoxingongyuanchengshiju");
         String s = JSONUtil.toJsonPrettyStr(map);
         String doEncrypt = Sm2.doEncrypt(s, publicKey);
@@ -761,10 +750,11 @@ public class DemoUnitTest {
     @Test
     public void test0121123(){
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("id","1");
-        hashMap.put("status","00T");
+        hashMap.put("id","3212");
+        hashMap.put("status","00D");
         hashMap.put("description","测试");
-        housingConstructionBureauPushDto.send3(hashMap,"http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
+        hashMap.put("auditDepartName","数字经济局功能区建设推进处");
+        housingConstructionBureauPushDto.send3(hashMap,"https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback");
     }
 
     @Test
@@ -841,10 +831,10 @@ public class DemoUnitTest {
 
     @Test
     public void  testPush() throws ParseException {
-        Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses","2");
+        Map<String, Object> map = WorkUtils.getInfoToMap("buy_houses","3218");
         String virtualcode = String.valueOf(map.get("virtualcode"));
         map.put("virtualcode", virtualcode == "3" ? "010" : "009");
-        String cardType = String.valueOf(map.get("cardType"));
+        String cardType = String.valueOf(map.get("nationality"));
         map.put("cardType", "中国籍".equals(cardType) ? 1 : 4);
         Object createTime = map.get("createTime");
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
@@ -859,13 +849,27 @@ public class DemoUnitTest {
         map.put("buyHousesLogList", "null");
         String s = housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "253");
     }
+    @Test
+    public void testOut(){
+        BuyHouses buyHouses = buyHousesMapper.selectById(3218);
+        Map<String, Object> map = new HashMap<>();
+        map.put("id",buyHouses.getId());
+        map.put("reason","人才主动提交");//原因
+        map.put("userName",buyHouses.getUserName());
+        map.put("cardId",buyHouses.getCardId());
+        map.put("cancelTime", DateUtils.dateTime("yyyy-MM-dd HH:mm:ss"));
+        map.put("note","人才主动撤销");//备注
+        map.put("status", "00N");
+        System.out.println("JSONUtil.toJsonPrettyStr(map) = " + JSONUtil.toJsonPrettyStr(map));
+        housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest",map,"254");//正式
+    }
 
     @Test
     public void  paChon() throws Exception {
-        String str ="C2型人才国家级技能大师工作室领衔人";
-        String substring = str.substring(0,1);
-        System.out.println("substring = " + substring);
-
+//        R rInfo = OpenUtils.getGaoXinCardInfo("510503199602214055");
+//        System.out.println("rInfo = " + rInfo);
+        String s = com.ruoyi.common.utils.StringUtils.toUpperCase("510503199602214055l");
+        System.out.println("s = " + s);
 //        buyHousesService.logout("3184");
 
 //        R gaoXinCardInfo = OpenUtils.getGaoXinCardInfo("510503199602214055");
@@ -892,6 +896,20 @@ public class DemoUnitTest {
             .execute()
             .body();
         System.out.println("listContent = " + listContent);*/
+
+    }
+
+    @Test
+    public void test45656() {
+        HttpRequest.get("https://rcaj.cdhtgycs.cn/gx-api/user/house/excelZip?id=3136")
+            .header("Referer", "https://rcaj.cdhtgycs.cn")
+            .execute()
+            .body();
+    }
+
+    @Test
+    public void  testtttt(HttpServletResponse response) throws IOException {
+        response.sendRedirect("https://dbxqtalents.cn/111.html");
 
     }
 }

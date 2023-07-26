@@ -114,6 +114,16 @@ public class HisProcess{
      */
     private  String cardId;
 
+    /**
+     * 特定标识
+     */
+    @TableField(exist = false)
+    private String tiger;
+
+
+    @TableField(exist = false)
+    private String[] ids;
+
 
 
 

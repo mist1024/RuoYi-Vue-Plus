@@ -1,16 +1,12 @@
 package com.ruoyi.work.utils;
-
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -31,14 +27,9 @@ import com.ruoyi.work.dto.BusinessDTO;
 import com.ruoyi.work.dto.HisProcessVoResultDto;
 import com.ruoyi.work.dto.ProcessVoResultDto;
 import com.ruoyi.work.mapper.*;
-import com.ruoyi.work.service.IWorkSysDeptService;
-import com.ruoyi.work.service.IWorkSysRoleService;
-import com.ruoyi.work.service.IWorkSysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.swing.text.AbstractDocument;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,19 +40,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(rollbackFor = Exception.class)
 public class WorkComplyUtils {
-
     private static final ProcessMapper processMapper = SpringUtils.getBean(ProcessMapper.class);
     private static final ActProcessMapper actProcessMapper = SpringUtils.getBean(ActProcessMapper.class);
     private static final HisProcessMapper hisProcessMapper = SpringUtils.getBean(HisProcessMapper.class);
-
-    private static final IWorkSysRoleService sysRoleMapper= SpringUtils.getBean(IWorkSysRoleService.class);
-
     private static final RollBackLogMapper rollBackLogMapper= SpringUtils.getBean(RollBackLogMapper.class);
-
-    private static final IWorkSysUserService sysUserMapper = SpringUtils.getBean(IWorkSysUserService.class);
-
-    private static final IWorkSysDeptService sysDeptMapper = SpringUtils.getBean(IWorkSysDeptService.class);
-
     private static final AuditLogMapper auditLogMapper  =SpringUtils.getBean(AuditLogMapper.class);
 
 
@@ -71,13 +53,12 @@ public class WorkComplyUtils {
      */
     public  static  void comply(ProcessVo processVo){
         ActProcess actProcessVo = new ActProcess();
-        LambdaQueryWrapper<TProcess> lqw = Wrappers.lambdaQuery();
-        lqw.eq( TProcess::getProcessKey, processVo.getProcessKey());
-        lqw.eq(TProcess::getStep, processVo.getStep());
+        List<ProcessVo> processVoList = processMapper.selectVoList(new LambdaQueryWrapper<>(TProcess.class)
+            .eq(TProcess::getProcessKey, processVo.getProcessKey()));
         //判断这条业务是否在进行中
-        LambdaQueryWrapper<ActProcess> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ActProcess::getBusinessId,processVo.getBusinessId());
-        List<ActProcessVo> actProcessVos = actProcessMapper.selectVoList(queryWrapper);
+        List<ActProcessVo> actProcessVos = actProcessMapper.selectVoList(new LambdaQueryWrapper<>(ActProcess.class)
+            .eq(ActProcess::getBusinessId,processVo.getBusinessId())
+            .in(ActProcess::getProcessId,processVoList.stream().map(ProcessVo::getId).collect(Collectors.toList())));
         if (actProcessVos.size()>0){
             throw new ServiceException("当前业务正在审核中,请耐心等待");
         }
@@ -85,7 +66,7 @@ public class WorkComplyUtils {
         if (ObjectUtil.isNull(params)){
             throw new ServiceException("params不可为空");
         }
-        ProcessVo tProcessByKey = processMapper.selectVoOne(lqw);
+        ProcessVo tProcessByKey =processVoList.stream().filter(p ->p.getStep().equals(processVo.getStep())).collect(Collectors.toList()).get(0);
         params.put("step",tProcessByKey.getStep());
         Object companyName = params.get("companyName");
         if (ObjectUtil.isNotNull(companyName)){
@@ -100,7 +81,11 @@ public class WorkComplyUtils {
         if (ObjectUtil.isNotNull(card)){
             actProcessVo.setCardId(String.valueOf(card));
         }
-        actProcessVo.setUserId(String.valueOf(LoginHelper.getUserId()));
+        if (ObjectUtil.isNotNull(processVo.getUserId())){
+            actProcessVo.setUserId(processVo.getUserId());
+        }else {
+            actProcessVo.setUserId(String.valueOf(LoginHelper.getUserId()));
+        }
         actProcessVo.setCardId(processVo.getCardId());
         actProcessVo.setCompanyName(processVo.getCompanyName());
         actProcessVo.setCreateTime(DateUtils.getNowDate());
@@ -242,6 +227,7 @@ public class WorkComplyUtils {
                     hisProcess.setCompanyName(hisProcess.getParams().get("companyName").toString());
                     hisProcess.setAudit(actProcessVo.getAudit());
                 }
+                hisProcess.setId(null);
                 //先添加一个属于当前用户的记录
                 hisProcessMapper.insert(hisProcess);
                 //todo 保存一条审核日志
@@ -436,13 +422,13 @@ public class WorkComplyUtils {
                     hisProcessVo.setAudit1(hisProcessVo.getCompanyName());
                 } else if ("1".equals(hisProcessVo.getCheckType())) {
                     //根据id获取人员信息
-                    SysUser sysUser = sysUserMapper.selectUserById(new Long(hisProcessVo.getAudit()));
+                    SysUser sysUser = processMapper.selectUserById(new Long(hisProcessVo.getAudit()));
                     hisProcessVo.setAudit1(sysUser.getUserName());
                 } else if ("2".equals(hisProcessVo.getCheckType())) {
-                    SysDept sysDept = sysDeptMapper.selectDeptById(new Long(hisProcessVo.getAudit()));
+                    SysDept sysDept = processMapper.selectDeptById(new Long(hisProcessVo.getAudit()));
                     hisProcessVo.setAudit1(sysDept.getDeptName());
                 } else if ("3".equals(hisProcessVo.getCheckType())) {
-                    SysRole sysRole = sysRoleMapper.selectRoleById(new Long(hisProcessVo.getAudit()));
+                    SysRole sysRole = processMapper.selectRoleById(new Long(hisProcessVo.getAudit()));
                     hisProcessVo.setAudit1(sysRole.getRoleName());
                 }
             }
@@ -473,9 +459,13 @@ public class WorkComplyUtils {
             hisProcess.setCompanyUserId(ObjectUtil.isNotNull(loginUser.getUserId())?loginUser.getUserId().toString():"");
         }
         Page<HisProcess> hisProcessPage = new Page<>();
-        hisProcessPage = hisProcessMapper.selectVoListPage(pageQuery.build(), hisProcess);
-        if (hisProcessPage.getRecords().size()==0){
-            hisProcessPage = hisProcessMapper.selectListPageByCC(pageQuery.build(),hisProcess);
+        if ("specific".equals(hisProcess.getTiger())){
+            hisProcessPage = hisProcessMapper.selectListPageBySpecific(pageQuery.build(), hisProcess);
+        }else {
+            hisProcessPage = hisProcessMapper.selectVoListPage(pageQuery.build(), hisProcess);
+            if (hisProcessPage.getRecords().size() == 0) {
+                hisProcessPage = hisProcessMapper.selectListPageByCC(pageQuery.build(), hisProcess);
+            }
         }
         List<HisProcess> records = hisProcessPage.getRecords();
         for (HisProcess record : records) {
@@ -483,13 +473,13 @@ public class WorkComplyUtils {
                 record.setAudit(record.getCompanyName());
             }else if("1".equals(record.getCheckType())) {
                 //根据id获取人员信息
-                SysUser sysUser = sysUserMapper.selectUserById(new Long( record.getAudit()));
+                SysUser sysUser = processMapper.selectUserById(new Long( record.getAudit()));
                 record.setAudit(sysUser.getUserName());
             }else if ("2".equals(record.getCheckType())){
-                SysDept sysDept = sysDeptMapper.selectDeptById(new Long(record.getAudit()));
+                SysDept sysDept = processMapper.selectDeptById(new Long(record.getAudit()));
                 record.setAudit(sysDept.getDeptName());
             }else if ("3".equals(record.getCheckType())){
-                SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
+                SysRole sysRole = processMapper.selectRoleById(new Long(record.getAudit()));
                 record.setAudit(sysRole.getRoleName());
             }
         }
@@ -507,27 +497,32 @@ public class WorkComplyUtils {
         actProcess.setUserId(loginUser.getUserId().toString());
         //获取所有流程中的抄送人员
         //后台查看待审核页面
-        if (!"4".equals(actProcess)) {
-            Page<ActProcess> actProcessVoCCList = actProcessMapper.selectCCList(pageQuery.build(), actProcess);
+        if (!"4".equals(actProcess.getCheckType())){
+            Page<ActProcess> actProcessVoCCList =new Page<>();
+            if ("specific".equals(actProcess.getTiger())){
+                actProcessVoCCList = actProcessMapper.selectSpecificList(pageQuery.build(), actProcess);
+            }else {
+                actProcessVoCCList = actProcessMapper.selectCCList(pageQuery.build(), actProcess);
+            }
             if (actProcessVoCCList.getRecords().size() > 0) {
                 for (ActProcess record : actProcessVoCCList.getRecords()) {
                     if ("4".equals(record.getCheckType())){//公司
                         record.setAudit(record.getCompanyName());
                     }else if("1".equals(record.getCheckType())) {
                         //根据id获取人员信息
-                        SysUser sysUser = sysUserMapper.selectUserById(new Long( record.getAudit()));
+                        SysUser sysUser = processMapper.selectUserById(new Long( record.getAudit()));
                         if (ObjectUtil.isNull(sysUser)){
                             throw new ServiceException("用户获取失败");
                         }
                         record.setAudit(sysUser.getUserName());
                     }else if ("2".equals(record.getCheckType())){
-                        SysDept sysDept = sysDeptMapper.selectDeptById(new Long(record.getAudit()));
+                        SysDept sysDept = processMapper.selectDeptById(new Long(record.getAudit()));
                         if (ObjectUtil.isNull(sysDept)){
                             throw new ServiceException("部门获取失败");
                         }
                         record.setAudit(sysDept.getDeptName());
                     }else if ("3".equals(record.getCheckType())){
-                        SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
+                        SysRole sysRole = processMapper.selectRoleById(new Long(record.getAudit()));
                         if (ObjectUtil.isNull(sysRole)){
                             throw new ServiceException("角色获取失败");
                         }
@@ -579,13 +574,13 @@ public class WorkComplyUtils {
         for (ActProcess record : records) {
             if("1".equals(record.getCheckType())) {
                 //根据id获取人员信息
-                SysUser sysUser = sysUserMapper.selectUserById(new Long( record.getAudit()));
+                SysUser sysUser = processMapper.selectUserById(new Long( record.getAudit()));
                 record.setAudit(sysUser.getUserName());
             }else if ("2".equals(record.getCheckType())){
-                SysDept sysDept = sysDeptMapper.selectDeptById(new Long(record.getAudit()));
+                SysDept sysDept = processMapper.selectDeptById(new Long(record.getAudit()));
                 record.setAudit(sysDept.getDeptName());
             }else if ("3".equals(record.getCheckType())){
-                SysRole sysRole = sysRoleMapper.selectRoleById(new Long(record.getAudit()));
+                SysRole sysRole = processMapper.selectRoleById(new Long(record.getAudit()));
                 record.setAudit(sysRole.getRoleName());
             }
             if (ObjectUtil.isNotEmpty(record.getTimeout())&& ObjectUtil.isNotNull(record.getTimeout())){
@@ -788,21 +783,21 @@ public class WorkComplyUtils {
             e.setAudit(o);
         }else if("1".equals(e.getCheckType()) || "5".equals(e.getChecked())) {
             //根据id获取人员信息
-            SysUser sysUser = sysUserMapper.selectUserById(Long.valueOf(e.getAudit()));
+            SysUser sysUser = processMapper.selectUserById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysUser)){
                 throw new ServiceException("根据id获取人员信息失败");
             }
             e.setAudit1(e.getAudit());
             e.setAudit(sysUser.getNickName());
         }else if ("2".equals(e.getCheckType())){
-            SysDept sysDept = sysDeptMapper.selectDeptById(Long.valueOf(e.getAudit()));
+            SysDept sysDept = processMapper.selectDeptById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysDept)){
                 throw new ServiceException("根据id获取部门信息失败");
             }
             e.setAudit1(e.getAudit());
             e.setAudit(sysDept.getDeptName());
         }else if ("3".equals(e.getCheckType())){
-            SysRole sysRole = sysRoleMapper.selectRoleById(Long.valueOf(e.getAudit()));
+            SysRole sysRole = processMapper.selectRoleById(Long.valueOf(e.getAudit()));
             if(ObjectUtil.isNull(sysRole)){
                 throw new ServiceException("根据id获取角色信息失败");
             }
@@ -953,5 +948,4 @@ public class WorkComplyUtils {
         List<AuditLog> auditLogs = auditLogMapper.selectList(wrapper);
         return R.ok(auditLogs);
     }
-
 }

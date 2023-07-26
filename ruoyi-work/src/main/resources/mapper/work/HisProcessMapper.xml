@@ -79,5 +79,25 @@
         d.end_time DESC
     </select>
 
+    <select id="selectListPageBySpecific" resultType="com.ruoyi.work.domain.HisProcess">
+        SELECT p.`name` ,process_key AS processKey,d.audit,d.check_type AS checkType ,d.type,p.bean,d.`status`,d.create_time AS createTime,
+        d.end_time AS endTime,d.business_id AS businessId,d.start_user AS startUser,p.cc,p.description,d.step,d.time_between,
+        d.card_id AS cardId,d.company_name AS companyName
+        FROM
+        (SELECT process_id,h.create_time,business_id,h.audit,h.check_type,h.`status`,end_time,h.step,h.type,h.start_user,h.time_between,h.card_id,h.company_name
+        FROM
+        `his_process` h
+        WHERE h.id IN (SELECT MAX(id) FROM his_process GROUP BY business_id) ) d
+        INNER JOIN process  p  ON p.id = d.process_id
+        <where>
+            <if test="hisProcess.cardId !='' and hisProcess.cardId !=null"> and d.card_id like concat('%', #{hisProcess.cardId}, '%')</if>
+            <if test="hisProcess.companyName !='' and hisProcess.companyName !=null"> and d.company_name like concat('%', #{hisProcess.companyName}, '%')</if>
+            <if test="hisProcess.processKey !='' and hisProcess.processKey !=null">and p.process_key = #{hisProcess.processKey}</if>
+            <if test="hisProcess.startUser !='' and hisProcess.startUser !=null"> and d.start_user like concat('%', #{hisProcess.startUser}, '%')</if>
+        </where>
+        ORDER BY
+        d.end_time DESC
+    </select>
+
 
 </mapper>

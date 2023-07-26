@@ -172,6 +172,15 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 字母转大写
+     * @param str
+     * @return
+     */
+    public static String toUpperCase(String str) {
+        return str.toUpperCase();
+    }
+
+    /**
      * 是否包含字符串
      *
      * @param str  验证字符串

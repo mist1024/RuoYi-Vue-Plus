@@ -43,6 +43,7 @@ public class BuyHousesController extends BaseController {
      * 一期后台接口查询列表
      */
     @SaCheckPermission("system:houses:list")
+    @Log(title = "获取数据库一期数据", businessType = BusinessType.OTHER)
     @GetMapping("/list")
     public TableDataInfo<BuyHousesVo> list(BuyHousesBo bo, PageQuery pageQuery) {
         return iBuyHousesService.queryPageList(bo, pageQuery);

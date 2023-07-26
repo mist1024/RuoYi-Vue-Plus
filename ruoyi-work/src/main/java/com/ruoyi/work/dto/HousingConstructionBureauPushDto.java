@@ -6,7 +6,9 @@ import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.ruoyi.common.core.domain.event.PushLogEvent;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.work.utils.CCSMessageDigest;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Component;
@@ -72,6 +74,8 @@ public class HousingConstructionBureauPushDto {
     }*/
 
     public  String openUrl(String url,Map<String, Object> param, String interfaceId) {
+        PushLogEvent pushLogEvent = new PushLogEvent();
+        pushLogEvent.setPushData(JSONUtil.toJsonPrettyStr(param));
         final HttpRequestBody httpRequestBody = new HttpRequestBody();
         httpRequestBody.setRegioncode(DEFAULT_REGIONCODE);
         httpRequestBody.setData(param);
@@ -102,6 +106,8 @@ public class HousingConstructionBureauPushDto {
             if (ObjectUtil.isNull(result2) || ObjectUtil.isEmpty(result2)){
                 throw new ServiceException("推送市级系统失败!原因:返回值为空");
             }
+            pushLogEvent.setResultData(result2);
+            SpringUtils.context().publishEvent(pushLogEvent);
             JSONObject jsonObject = JSONUtil.parseObj(result2);
             String aFalse = jsonObject.getStr("result");
             String aStatus = jsonObject.getStr("status");
@@ -118,6 +124,8 @@ public class HousingConstructionBureauPushDto {
 
 
     public String send3(Map<String,Object> params,String url){
+        PushLogEvent pushLogEvent = new PushLogEvent();
+        pushLogEvent.setPushData(JSONUtil.toJsonPrettyStr(params));
         //基本信息数据
         HttpRequestBody httpRequestBody = new HttpRequestBody();
         httpRequestBody.setApiKey("001");
@@ -145,11 +153,15 @@ public class HousingConstructionBureauPushDto {
             e.printStackTrace();
         }
         httpRequestBody.setSignature(signature);
+
         //调用接口
         try {
             String result2 = HttpRequest.post(url)
+                .header("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0")
                 .body(JSONUtil.toJsonPrettyStr(httpRequestBody))
                 .execute().body();
+            pushLogEvent.setResultData(result2);
+            SpringUtils.context().publishEvent(pushLogEvent);
             System.out.println("result2 = " + result2);
             JSONObject jsonObject = JSONUtil.parseObj(result2);
             String rsCode = jsonObject.getStr("rsCode");

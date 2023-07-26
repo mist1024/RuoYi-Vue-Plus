@@ -21,7 +21,63 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="timeout" column="timeout"/>
         <result property="paramName" column="param_name"/>
         <result property="description" column="description"/>
+    </resultMap>
 
+    <resultMap type="SysRole" id="SysRoleResult">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleKey" column="role_key"/>
+        <result property="roleSort" column="role_sort"/>
+        <result property="dataScope" column="data_scope"/>
+        <result property="menuCheckStrictly" column="menu_check_strictly"/>
+        <result property="deptCheckStrictly" column="dept_check_strictly"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <resultMap type="SysDept" id="SysDeptResult">
+        <id property="deptId" column="dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="ancestors" column="ancestors"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="leader" column="leader"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="parentName" column="parent_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id property="userId" column="user_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="userType" column="user_type"/>
+        <result property="email" column="email"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
     <update id="updateCommonByBusinessId">
         update ${bean}
@@ -32,6 +88,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </set>
          where id = #{businessId}
     </update>
+    <select id="selectRoleById" resultMap="SysRoleResult" parameterType="java.lang.Long">
+        SELECT * FROM sys_role WHERE role_id =#{roleId}
+    </select>
+    <select id="selectDeptById" resultMap="SysDeptResult" parameterType="java.lang.Long">
+        SELECT * FROM sys_dept WHERE dept_id =#{deptId}
+    </select>
+    <select id="selectUserById" resultMap="SysUserResult" parameterType="java.lang.Long">
+        SELECT * FROM sys_user WHERE user_id =#{userId}
+    </select>
 
 
 </mapper>

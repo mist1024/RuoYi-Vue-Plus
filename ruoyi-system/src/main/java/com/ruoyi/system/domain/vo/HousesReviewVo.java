@@ -38,6 +38,9 @@ public class HousesReviewVo implements Serializable {
     private Long id;
 
     private String step;
+
+    @ExcelProperty(value = "序号")
+    private String number;
     /**
      * 证件类型
      */

@@ -15,7 +15,6 @@ import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.StrUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.sms.core.SmsTemplate;
 import com.ruoyi.sms.core.TelecomSendMsg;
 import com.ruoyi.sms.entity.SmsResult;
 import com.ruoyi.system.domain.vo.RouterVo;
@@ -162,7 +161,7 @@ public class SysLoginController {
     @RateLimiter(count = 2, time = 10)
     @PostMapping("/userLogin")
     public R userLogin(
-//        @Validated({LoginBody.passwordLogin.class})
+        @Validated({LoginBody.passwordLogin.class})
         @RequestBody LoginBody loginBody) {
         // 生成令牌
         return R.ok("登录成功",loginService.userLogin(loginBody.getUsername(), loginBody.getPassword()));

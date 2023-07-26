@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.user;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
@@ -115,14 +116,6 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 判断这个人是否具备申请购房资格
-     */
-    @GetMapping("cardId/{cardId}")
-    public R<?>getUserCandidateInfo(@PathVariable(value = "cardId") String cardId) throws Exception {
-        return iUserService.getUserCandidateInfo(cardId);
-    }
-
-    /**
      * 获取当前业务进行步骤
      */
 //    @SaIgnore
@@ -178,5 +171,9 @@ public class UserController extends BaseController {
         hashMap.put("list",processPlan);
         return R.ok(hashMap);
     }
-
+    @SaIgnore
+    @GetMapping("/model")
+    public void module(HttpServletResponse response) throws IOException {
+        response.sendRedirect("https://dbxqtalents.cn/");
+    }
 }

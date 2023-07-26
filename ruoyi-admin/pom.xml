@@ -112,6 +112,11 @@
 <!--            <artifactId>apm-toolkit-trace</artifactId>-->
 <!--            <version>${与你的agent探针版本保持一致}</version>-->
 <!--        </dependency>-->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>4.2.3</version>
+        </dependency>
 
     </dependencies>
 

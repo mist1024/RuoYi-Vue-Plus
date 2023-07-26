@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
@@ -51,14 +52,36 @@ public class OpenUtils {
             Object data = jsonObject1.get("data");
             String message = jsonObject1.getStr("message");
             if (code==200){
-                if (ObjectUtil.isNull(data)){
-                    return R.fail("暂未获取到当前"+cardId+"人才认定信息");
+                if (ObjectUtil.isNull(data) || ObjectUtil.isEmpty(data)){
+                    return R.fail("暂未获取到当前"+cardId+"人才认定信息,如有疑问请联系客服人员! 电话:19940594954");
                 }else {
                     GaoXinCardInfo gaoXinCardInfo = JsonUtils.parseObject(JSONUtil.toJsonPrettyStr(data), GaoXinCardInfo.class);
+                    //判断值是否为空
+                    if (ObjectUtil.isEmpty(gaoXinCardInfo.getName())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:姓名为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getCard_id())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:身份证为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getSex())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:性别为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getNationality())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:国籍为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getEducation())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:学历为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getDistrict())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:单位区域为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getPhone())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:手机号为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getCompany_name())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:公司名称为空!请联系客服人员! 电话:19940594954");
+                    }else if (ObjectUtil.isEmpty(gaoXinCardInfo.getType())){
+                        return R.fail("获取人才认定数据接口返回异常,异常信息:人才类型为空!请联系客服人员! 电话:19940594954");
+                    }
+                    gaoXinCardInfo.setType(gaoXinCardInfo.getType());
+                    gaoXinCardInfo.setNationality(gaoXinCardInfo.getNationality());
                     return R.ok(gaoXinCardInfo);
                 }
             }else if (code==400){
-                return R.fail(message);
+                return R.fail("获取人才认定数据接口返回异常,异常信息:"+message+"请联系客服人员! 电话:19940594954");
             }else {
                 return R.fail("人才认定接口请求未知异常");
             }

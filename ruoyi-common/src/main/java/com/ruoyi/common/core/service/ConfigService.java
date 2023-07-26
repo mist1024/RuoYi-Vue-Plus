@@ -1,5 +1,8 @@
 package com.ruoyi.common.core.service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 通用 参数配置服务
  *

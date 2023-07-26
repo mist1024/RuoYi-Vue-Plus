@@ -1,6 +1,7 @@
 package com.ruoyi.common.core.domain.entity;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.exception.ServiceException;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * @author Administrator
  * 高新人才接口返回所需
  */
+
 @Data
 public class GaoXinCardInfo implements Serializable {
 
@@ -50,6 +52,7 @@ public class GaoXinCardInfo implements Serializable {
      */
     private  String education;
 
+
     public String getType() {
         return type;
     }
@@ -61,6 +64,21 @@ public class GaoXinCardInfo implements Serializable {
                 this.type = type + "类";
             }else {
                 this.type = type;
+            }
+        }
+    }
+
+    public String getNationality() {
+        return nationality;
+    }
+
+    public void setNationality(String nationality) {
+        if (ObjectUtil.isNotNull(nationality) && ObjectUtil.isNotEmpty(nationality)) {
+            nationality = StringUtils.trimAllWhitespace(nationality);
+            if ("中国".equals(nationality)) {
+                this.nationality = nationality + "籍";
+            }else {
+                this.nationality = nationality;
             }
         }
     }

@@ -21,7 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * @date 2018/10/25 20:17
  */
 @ControllerAdvice
-//@RsaSecurityParameter()
 public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
     private final static Logger logger = LoggerFactory.getLogger(EncodeResponseBodyAdvice.class);
     private static final IRsaSecurityService2 rsaSecurityService=SpringUtils.getBean(IRsaSecurityService2.class);
@@ -36,17 +35,17 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
     public Object beforeBodyWrite(Object body, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
         // 此处要用反射将字段中的注解解析出来
         String method = serverHttpRequest.getMethod().name();
-            String path = serverHttpRequest.getURI().getPath();
-            RsaSecurity info = rsaSecurityService.getInfo(path,method);
-            if (ObjectUtil.isNotNull(info)) {
-                if ("1".equals(info.getRestricted())){
-                    return R.fail("接口已限制请求");
-                }
-                if ("1".equals(info.getOutEncode())) {
-                    serverHttpResponse.getHeaders().add("isRsaencrypt","true");
-                    return encodeRsa(methodParameter, body, info.getPublicKey());
-                }
+        String path = serverHttpRequest.getURI().getPath();
+        RsaSecurity info = rsaSecurityService.getInfo(path,method);
+        if (ObjectUtil.isNotNull(info)) {
+            if ("1".equals(info.getRestricted())){
+                return R.fail("接口已限制请求");
             }
+            if ("1".equals(info.getOutEncode())) {
+                serverHttpResponse.getHeaders().add("isRsaencrypt","true");
+                return encodeRsa(methodParameter, body, info.getPublicKey());
+            }
+        }
         serverHttpResponse.getHeaders().add("isRsaencrypt","false");
         return body;
         /*if (methodParameter.getMethod().isAnnotationPresent(RsaSecurityParameter.class)) {
