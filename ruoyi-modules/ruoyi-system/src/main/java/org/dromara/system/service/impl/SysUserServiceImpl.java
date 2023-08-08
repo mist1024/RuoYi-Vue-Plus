@@ -521,9 +521,9 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      */
     @Override
     public List<SysUserVo> selectUserListByDept(Long deptId) {
-        SysUserBo sysUserBo = new SysUserBo();
-        sysUserBo.setDeptId(deptId);
-        return baseMapper.selectUserList(this.buildQueryWrapper(sysUserBo));
+        LambdaQueryWrapper<SysUser> lqw = Wrappers.lambdaQuery();
+        lqw.eq(deptId!=null,SysUser::getDeptId,deptId);
+        return baseMapper.selectVoList(lqw);
     }
 
     @Cacheable(cacheNames = CacheNames.SYS_USER_NAME, key = "#userId")

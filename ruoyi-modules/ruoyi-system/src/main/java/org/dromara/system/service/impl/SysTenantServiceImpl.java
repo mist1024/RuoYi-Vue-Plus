@@ -132,7 +132,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         SysDept dept = new SysDept();
         dept.setTenantId(tenantId);
         dept.setDeptName(bo.getCompanyName());
-        dept.setLeader(bo.getUsername());
+        //部门负责人变更为存储userid，不自动设置。如需设置为当前新增用户，则新增用户后，修改dept表
         dept.setParentId(Constants.TOP_PARENT_ID);
         dept.setAncestors(Constants.TOP_PARENT_ID.toString());
         deptMapper.insert(dept);
