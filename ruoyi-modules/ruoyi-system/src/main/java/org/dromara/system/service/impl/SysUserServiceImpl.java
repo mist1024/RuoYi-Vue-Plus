@@ -522,7 +522,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     public List<SysUserVo> selectUserListByDept(Long deptId) {
         LambdaQueryWrapper<SysUser> lqw = Wrappers.lambdaQuery();
-        lqw.eq(deptId!=null,SysUser::getDeptId,deptId);
+        lqw.eq(SysUser::getDeptId, deptId);
         return baseMapper.selectVoList(lqw);
     }
 
