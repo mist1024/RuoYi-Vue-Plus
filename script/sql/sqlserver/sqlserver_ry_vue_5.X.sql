@@ -1053,7 +1053,7 @@ INSERT sys_dept VALUES (101, N'000000', 100, N'0,100', N'深圳总公司', 1, NU
 GO
 INSERT sys_dept VALUES (102, N'000000', 100, N'0,100', N'长沙分公司', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
-INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
+INSERT sys_dept VALUES (103, N'000000', 101, N'0,100,101', N'研发部门', 1, 1, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
 INSERT sys_dept VALUES (104, N'000000', 101, N'0,100,101', N'市场部门', 2, NULL, N'15888888888', N'xxx@qq.com', N'0', N'0', 103, 1, getdate(), NULL, NULL)
 GO
