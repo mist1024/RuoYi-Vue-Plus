@@ -10,6 +10,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
  */
 @AutoConfiguration
 //@EnableConfigurationProperties(SmsProperties.class)
-public class SmsConfig {
+public class SmsAutoConfig {
 
 }
