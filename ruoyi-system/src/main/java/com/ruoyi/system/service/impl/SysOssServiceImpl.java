@@ -94,7 +94,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         return lqw;
     }
 
-    @Cacheable(cacheNames = CacheNames.SYS_OSS, key = "#ossId")
+    @Cacheable(cacheNames = CacheNames.SYS_OSS, key = "#ossId", condition = "#ossId!=null")
     @Override
     public SysOssVo getById(Long ossId) {
         return baseMapper.selectVoById(ossId);
