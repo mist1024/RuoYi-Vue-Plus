@@ -3,6 +3,8 @@ package com.ruoyi.common.filter;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ruoyi.common.core.service.ConfigService;
+import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import org.springframework.http.HttpHeaders;
@@ -60,7 +62,31 @@ public class RepeatableFilter implements Filter {
      * @return
      */
     private boolean isSafe(HttpServletRequest request,HttpServletResponse response) {
+        String clientIP = ServletUtils.getClientIP(request);
+        System.out.println("clientIP = " + clientIP);
         ConfigService sysConfigService = SpringUtils.getBean(ConfigService.class);
+        //黑名单限制
+        String prompt = sysConfigService.getConfigValue("system:black:ip");
+        if (ObjectUtil.isNotNull(prompt) && ObjectUtil.isNotEmpty(prompt)){
+            String trimAllWhitespace = org.springframework.util.StringUtils.trimAllWhitespace(prompt);
+            List<String> blackIp = StringUtils.splitList(trimAllWhitespace);
+            for (String ip : blackIp) {
+                int indexOf = ip.indexOf("/");
+                if (indexOf>0) {
+                    String substring = StringUtils.substring(ip, 0, ip.lastIndexOf("."));
+                    String substring1 = StringUtils.substring(clientIP, 0, clientIP.lastIndexOf("."));
+                    if (substring1.equals(substring)){
+                        return false;
+                    }
+                }else{
+                    if (ip.equals(clientIP)){
+                        return false;
+                    }
+                }
+
+            }
+        }
+        //防盗链设置
         String configValue = sysConfigService.getConfigValue("sys:preventing:hotlinking");
         List<String> strings = Arrays.asList(configValue.split(","));
         if (ObjectUtil.isEmpty(configValue)) {
@@ -71,7 +97,7 @@ public class RepeatableFilter implements Filter {
         if (referer == null || "".equals(referer)) {
             // 获取不到防盗链头部信息 -> 拦截
             System.out.println("referer为空进行拦截");
-            return true;
+            return false;
         }
         for (String white : strings) {
             if (white.contains("*.")) {

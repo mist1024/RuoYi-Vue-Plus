@@ -490,6 +490,10 @@ public class WorkComplyUtils {
      * 获取待办业务
      */
     public static TableDataInfo<ActProcess> getWaitTaskList(ActProcess actProcess,PageQuery pageQuery){
+        if (ObjectUtil.isNotNull(actProcess.getStepList()) && actProcess.getStepList().length>0){
+            actProcess.setProcessKey(actProcess.getStepList()[0]);
+            actProcess.setStep(actProcess.getStepList()[1]);
+        }
         LoginUser loginUser = LoginHelper.getLoginUser();
         if (ObjectUtil.isNull(loginUser.getUserId())){
             throw new ServiceException("请先登录");

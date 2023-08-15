@@ -193,6 +193,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         lqw.eq(StringUtils.isNotBlank(bo.getPictureInformationUrl()), BuyHouses::getPictureInformationUrl, bo.getPictureInformationUrl());
         lqw.eq(StringUtils.isNotBlank(bo.getWorkAddress()), BuyHouses::getWorkAddress, bo.getWorkAddress());
         lqw.eq(StringUtils.isNotBlank(bo.getProcessStatus()), BuyHouses::getProcessStatus, bo.getProcessStatus());
+        lqw.eq(StringUtils.isNotEmpty(bo.getApiKey()),BuyHouses::getApiKey,bo.getApiKey());
         return lqw;
     }
 
@@ -239,6 +240,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         lqw.eq(bo.getPassTime() != null, BuyHouses::getPassTime, bo.getPassTime());
         lqw.eq(StringUtils.isNotBlank(bo.getPictureInformationUrl()), BuyHouses::getPictureInformationUrl, bo.getPictureInformationUrl());
         lqw.eq(StringUtils.isNotBlank(bo.getWorkAddress()), BuyHouses::getWorkAddress, bo.getWorkAddress());
+        lqw.eq(StringUtils.isNotEmpty(bo.getApiKey()),BuyHouses::getApiKey,bo.getApiKey());
         return lqw;
     }
 

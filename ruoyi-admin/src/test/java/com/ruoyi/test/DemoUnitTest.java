@@ -1,6 +1,8 @@
 package com.ruoyi.test;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -43,12 +45,14 @@ import com.ruoyi.system.service.impl.BuyHousesServiceImpl;
 import com.ruoyi.system.service.impl.MaterialModuleServiceImpl;
 import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import com.ruoyi.work.domain.ActProcess;
+import com.ruoyi.work.domain.AuditLog;
 import com.ruoyi.work.domain.HisProcess;
 import com.ruoyi.work.domain.TProcess;
 import com.ruoyi.work.domain.vo.ActProcessVo;
 import com.ruoyi.work.domain.vo.ProcessVo;
 import com.ruoyi.work.dto.HousingConstructionBureauPushDto;
 import com.ruoyi.work.mapper.ActProcessMapper;
+import com.ruoyi.work.mapper.AuditLogMapper;
 import com.ruoyi.work.mapper.HisProcessMapper;
 import com.ruoyi.work.mapper.ProcessMapper;
 import com.ruoyi.work.service.impl.ProcessServiceImpl;
@@ -73,6 +77,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -140,6 +145,9 @@ public class DemoUnitTest {
 
     @Autowired
     private HousingConstructionBureauPushDto housingConstructionBureauPushDto;
+
+    @Autowired
+    private AuditLogMapper auditLogMapper;
 
     /*@Autowired
     private Produceras providerCustomer;
@@ -228,7 +236,7 @@ public class DemoUnitTest {
         ProcessVo processVo = new ProcessVo();
         processVo.setProcessKey("apply_house");
         processVo.setStep("1");
-        BuyHouses buyHouses = buyHousesMapper.selectById("3136");
+        BuyHouses buyHouses = buyHousesMapper.selectById("3247");
         buyHouses.setUpdateTime(DateUtils.getNowDate());
         Map<String, Object> map = BeanUtil.beanToMap(buyHouses);
         processVo.setParams(map);
@@ -238,6 +246,8 @@ public class DemoUnitTest {
         processVo.setCompanyName(buyHouses.getCompanyName());
         WorkComplyUtils.comply(processVo);
     }
+
+
 
     @Test
     public void test003(){
@@ -901,15 +911,88 @@ public class DemoUnitTest {
 
     @Test
     public void test45656() {
-        HttpRequest.get("https://rcaj.cdhtgycs.cn/gx-api/user/house/excelZip?id=3136")
-            .header("Referer", "https://rcaj.cdhtgycs.cn")
-            .execute()
-            .body();
+        int chushi = 0 ;
+        int num =5;
+        String dateStr = "2023-08-13";
+//        7天为一个节点
+        //7
+//        星期天是1
+        //查询数据库中大于当前时间的所有节假日时间
+
+            DateTime nowDate = DateUtil.parse(dateStr);//开始时间
+            int i1 = DateTime.of(nowDate).dayOfWeek();
+            if (i1==1 || i1==7){
+
+            }
+
+
+        System.out.println("i1 = " + i1);
     }
 
     @Test
-    public void  testtttt(HttpServletResponse response) throws IOException {
-        response.sendRedirect("https://dbxqtalents.cn/111.html");
+    public void  testtttt() throws IOException {
+
+        List<AuditLog> auditLogList = auditLogMapper.selectList(new LambdaQueryWrapper<>(AuditLog.class)
+            .isNotNull(AuditLog::getAuditId)
+            .isNull(AuditLog::getStep)
+            .orderByAsc(AuditLog::getOtherId));
+        List<HisProcess> list = new ArrayList<>();
+        auditLogList.forEach(a ->{
+            HisProcess hisProcess = new HisProcess();
+            BuyHouses buyHouses = buyHousesMapper.selectById(a.getOtherId());
+            if (ObjectUtil.isNotNull(buyHouses)) {
+                hisProcess.setStartUser(buyHouses.getUserName());
+                hisProcess.setCompanyName(buyHouses.getCompanyName());
+                hisProcess.setUserId(ObjectUtil.isNull(buyHouses.getUserId()) ? null : buyHouses.getUserId().toString());
+                hisProcess.setCardId(buyHouses.getCardId());
+                if (a.getStatus().equals("5") || a.getStatus().equals("3") || a.getStatus().equals("4")) {
+                    hisProcess.setStep("1");
+                    hisProcess.setProcessId("2");
+                    hisProcess.setType("1");
+                    hisProcess.setIsNext(true);
+                    hisProcess.setDescription("受理");
+                } else if (a.getStatus().equals("8") || a.getStatus().equals("6") || a.getStatus().equals("7")) {
+                    hisProcess.setStep("2");
+                    hisProcess.setProcessId("3");
+                    hisProcess.setType("2");
+                    hisProcess.setIsNext(true);
+                    hisProcess.setDescription("初审");
+                } else if (a.getStatus().equals("10") || a.getStatus().equals("11") || a.getStatus().equals("12") || a.getStatus().equals("9")) {
+                    hisProcess.setStep("3");
+                    hisProcess.setProcessId("4");
+                    hisProcess.setType("1");
+                    hisProcess.setIsNext(false);
+                    hisProcess.setDescription("审定");
+                }
+                if ("5,8,10".indexOf(a.getStatus()) >= 0) {
+                    hisProcess.setStatus("2");
+                } else {
+                    hisProcess.setStatus("1");
+                }
+                if (a.getAuditId().equals("17")) {
+                    hisProcess.setAudit("123");
+                } else if (a.getAuditId().equals("18")) {
+                    hisProcess.setAudit("122");
+                } else if (a.getAuditId().equals("19")) {
+                    hisProcess.setAudit("124");
+                } else if (a.getAuditId().equals("20")) {
+                    hisProcess.setAudit("126");
+                } else if (a.getAuditId().equals("22")) {
+                    hisProcess.setAudit("115");
+                } else if (a.getAuditId().equals("39")) {
+                    hisProcess.setAudit("125");
+                } else if (a.getAuditId().equals("47")) {
+                    hisProcess.setAudit("124");
+                }
+                hisProcess.setBusinessId(a.getOtherId());
+                hisProcess.setCreateTime(a.getCreateTime());
+                hisProcess.setEndTime(a.getCreateTime());
+                hisProcess.setCheckType("2");
+                list.add(hisProcess);
+            }
+        });
+        hisProcessMapper.insertBatch(list);
+
 
     }
 }

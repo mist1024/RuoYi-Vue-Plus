@@ -35,10 +35,8 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//        response.sendRedirect("https://dbxqtalents.cn/");
         if (!prodProfile.equals(SpringUtils.getActiveProfile())) {
             String url = request.getMethod() + " " + request.getRequestURI();
-
             // 打印请求参数
             if (isJsonRequest(request)) {
                 String jsonParam = "";

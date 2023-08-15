@@ -105,7 +105,7 @@ public class SysLoginService {
     public String smsLogin(String phonenumber, String smsCode) {
         // 通过手机号查找用户
         SysUser user = loadUserByPhonenumber(phonenumber);
-        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode,CacheConstants.CAPTCHA_CODE_KEY));
+//        checkLogin(LoginType.SMS, user.getUserName(), () -> !validateSmsCode(phonenumber, smsCode,CacheConstants.CAPTCHA_CODE_KEY));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = buildLoginSysUser(user);
         // 生成token

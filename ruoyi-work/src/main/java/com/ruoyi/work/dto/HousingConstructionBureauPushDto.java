@@ -100,7 +100,7 @@ public class HousingConstructionBureauPushDto {
         //调用接口
         try {
             String result2 = HttpRequest.post(url)
-                .timeout(5000)
+                .timeout(10000)
                 .body(JSONUtil.toJsonPrettyStr(httpRequestBody))
                 .execute().body();
             if (ObjectUtil.isNull(result2) || ObjectUtil.isEmpty(result2)){
@@ -157,6 +157,7 @@ public class HousingConstructionBureauPushDto {
         //调用接口
         try {
             String result2 = HttpRequest.post(url)
+                .timeout(10000)
                 .header("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0")
                 .body(JSONUtil.toJsonPrettyStr(httpRequestBody))
                 .execute().body();

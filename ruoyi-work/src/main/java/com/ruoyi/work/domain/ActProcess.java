@@ -98,5 +98,8 @@ public class ActProcess {
     @TableField(exist = false)
     private String tiger;
 
+    @TableField(exist = false)
+    private String[] stepList;
+
 
 }

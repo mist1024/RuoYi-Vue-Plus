@@ -4,6 +4,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpRequest;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.sms.entity.SmsResult;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,9 @@ import java.util.HashMap;
  */
 @Service
 public class TelecomSendMsg{
-    private final String url ="https://msg.cdht.org.cn:8082/apigbk/BatchSend2";
+
+//    private final String url ="https://msg.cdht.org.cn:8082/apigbk/BatchSend2";
+    private final String url ="http://10.31.245.122:8081/apigbk/BatchSend2";
     private final String CorpID ="jxxc";
     private final String Pwd ="ULul@2023";
 
@@ -46,6 +49,8 @@ public class TelecomSendMsg{
 
             }
             paramMap.put("Content",gbk);
+            String param = JsonUtils.toJsonString(paramMap);
+            System.out.println("sendParam = " + param);
             String result = HttpRequest.get(url)
                 .form(paramMap)//表单内容
                 .timeout(20000)//超时，毫秒
