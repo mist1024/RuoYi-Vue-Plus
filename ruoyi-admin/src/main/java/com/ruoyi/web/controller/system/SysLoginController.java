@@ -85,7 +85,6 @@ public class SysLoginController {
 
     /**
      * 邮件登录
-     *
      * @param body 登录信息
      * @return 结果
      */
@@ -100,7 +99,6 @@ public class SysLoginController {
 
     /**
      * 小程序登录(示例)
-     *
      * @param xcxCode 小程序code
      * @return 结果
      */
@@ -141,7 +139,6 @@ public class SysLoginController {
 
     /**
      * 获取路由信息
-     *
      * @return 路由信息
      */
     @GetMapping("getRouters")

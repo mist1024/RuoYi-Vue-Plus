@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -876,10 +877,16 @@ public class DemoUnitTest {
 
     @Test
     public void  paChon() throws Exception {
+        Set<String> set = new HashSet<>();
+        set.add("1");
+        set.add("2");
+        set.add("1");
+        String collect = set.stream().collect(Collectors.joining(","));
+        System.out.println("collect = " + set);
 //        R rInfo = OpenUtils.getGaoXinCardInfo("510503199602214055");
 //        System.out.println("rInfo = " + rInfo);
-        String s = com.ruoyi.common.utils.StringUtils.toUpperCase("510503199602214055l");
-        System.out.println("s = " + s);
+//        String s = com.ruoyi.common.utils.StringUtils.toUpperCase("510503199602214055l");
+//        System.out.println("s = " + s);
 //        buyHousesService.logout("3184");
 
 //        R gaoXinCardInfo = OpenUtils.getGaoXinCardInfo("510503199602214055");
@@ -919,11 +926,11 @@ public class DemoUnitTest {
 //        星期天是1
         //查询数据库中大于当前时间的所有节假日时间
 
-            DateTime nowDate = DateUtil.parse(dateStr);//开始时间
-            int i1 = DateTime.of(nowDate).dayOfWeek();
-            if (i1==1 || i1==7){
+        DateTime nowDate = DateUtil.parse(dateStr);//开始时间
+        int i1 = DateTime.of(nowDate).dayOfWeek();
+        if (i1==1 || i1==7){
 
-            }
+        }
 
 
         System.out.println("i1 = " + i1);

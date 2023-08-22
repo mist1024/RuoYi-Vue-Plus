@@ -631,8 +631,8 @@ public class WorkComplyUtils {
 
         List<AuditLog> auditLogs = auditLogMapper.selectList(new LambdaQueryWrapper<AuditLog>()
             .eq(AuditLog::getProcessKey, processKey)
-            .eq(AuditLog::getOtherId, businessId)
-            .orderByAsc(AuditLog::getCreateTime));
+            .eq(AuditLog::getOtherId, businessId));
+//            .orderByAsc(AuditLog::getCreateTime));
         List<ProcessVo> list1 = new ArrayList<>();
         processVos.stream().forEach(e ->{
             e.setAuditLogList1(auditLogs);
@@ -834,7 +834,7 @@ public class WorkComplyUtils {
                 }else if (Constants.FAILD.equals(process_status.toString())){
                     if (auditLogs.size()>0){
                         AuditLog auditLog = auditLogs.get(auditLogs.size()-1);
-                        if (auditLog.getAudit().equals(e.getAudit1()) && auditLog.getStep().equals(e.getStep()) && auditLog.getAuditType().equals(e.getCheckType())){
+                        if (e.getAudit1().equals(auditLog.getAudit()) && e.getStep().equals(auditLog.getStep()) && e.getCheckType().equals(auditLog.getAuditType())){
                             e.setChecked("2");
                         }
                     }
@@ -926,8 +926,38 @@ public class WorkComplyUtils {
                             case "2":
                                 a.setStatus(e.getDescription()+"成功");
                                 break;
+                            case "3":
+                                a.setStatus("受理退件");
+                                break;
+                            case "4":
+                                a.setStatus("受理驳回");
+                                break;
+                            case "5":
+                                a.setStatus("受理成功");
+                                break;
+                            case "6":
+                                a.setStatus("初审不通过");
+                                break;
+                            case "7":
+                                a.setStatus("初审退件");
+                                break;
+                            case "8":
+                                a.setStatus("初审成功");
+                                break;
+                            case "9":
+                                a.setStatus("审定不通过");
+                                break;
+                            case "10":
+                                a.setStatus("审定通过");
+                                break;
+                            case "11":
+                                a.setStatus("审定退件");
+                                break;
+                            case "12":
+                                a.setStatus("资格取消");
+                                break;
                             default:
-                                a.setStatus(e.getDescription()+"未知状态");
+                                a.setStatus("未知状态");
                                 break;
                         }
                     }

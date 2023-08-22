@@ -1,7 +1,9 @@
 package com.ruoyi.web.controller.house;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.annotation.RepeatSubmit;
@@ -31,12 +33,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -181,8 +180,13 @@ public class HousesReviewController extends BaseController {
     public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<HousesReviewVo> result = ExcelUtil.importExcel(file.getInputStream(), HousesReviewVo.class, true,3);
         List<HousesReviewVo> volist = result.getList();
+        Set<String> set = new HashSet<>();
         //判断时间格式是否正确
         volist.stream().forEach(v ->{
+            if (ObjectUtil.isEmpty(v.getProjectName())){
+                throw new ServiceException("项目名称不可为空");
+            }
+            set.add(v.getProjectName());
             if (!DateUtils.checkDate(v.getQualificationConfirmTime(),DateUtils.YYYY_MM_DD_HH_MM_SS)){
                 throw new ServiceException("资格确认时间格式不正确,格式为:"+DateUtils.YYYY_MM_DD_HH_MM_SS);
             }
@@ -193,7 +197,6 @@ public class HousesReviewController extends BaseController {
                 throw new ServiceException("登记失效时间格式不正确,格式为:"+DateUtils.YYYY_MM_DD);
             }
         });
-
         List<HousesReview> list = BeanUtil.copyToList(volist, HousesReview.class);
         //先获取到导入数据的身份证去购房一期数据库去查
         //过滤出导入表中的身份证号码
@@ -202,6 +205,17 @@ public class HousesReviewController extends BaseController {
             .map(HousesReview::getCard)
             .collect(Collectors.toList());
         if (collect.size()>0 && list.size()>0) {
+            //判断同一个项目是否存在同一个身份证
+            List<HousesReview> housesReviewList = iHousesReviewService.selectListByCardList(collect,set);
+            if (housesReviewList.size()>0){
+                List<String> cardList = housesReviewList.stream().map(HousesReview::getCard).collect(Collectors.toList());
+                collect = CollectionUtil.subtract(collect, cardList).stream().collect(Collectors.toList());
+            }
+            if (collect.size()==0){
+                throw new ServiceException("当前所有数据已在"+set+"项目中导入，请核实之后再导入");
+            }
+            List<String> finalCollect = collect;
+            list = list.stream().filter(h -> finalCollect.contains(h.getCard())).collect(Collectors.toList());
             LambdaQueryWrapper<BuyHouses> queryWrapper = new LambdaQueryWrapper<BuyHouses>()
                 .in(BuyHouses::getCardId, collect)
                 .eq(BuyHouses::getProcessStatus,Constants.SUCCEED);
@@ -221,7 +235,7 @@ public class HousesReviewController extends BaseController {
             }
         }
         iHousesReviewService.saveBatch(list);
-        return R.ok(result.getAnalysis());
+        return R.ok("恭喜您，全部读取成功！共"+volist.size()+"条,成功导入"+list.size()+"条");
     }
 
     /**

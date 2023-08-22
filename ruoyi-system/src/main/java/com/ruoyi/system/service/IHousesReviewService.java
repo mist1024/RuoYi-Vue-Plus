@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 购房复审登记Service接口
@@ -73,4 +75,6 @@ public interface IHousesReviewService {
     void exportExcel(HousesReviewBo bo, HttpServletResponse response);
 
     TableDataInfo<HousesReview> managerQueryPageList(HousesReviewBo bo, PageQuery pageQuery);
+
+    List<HousesReview> selectListByCardList(List<String> collect, Set<String> projectName);
 }

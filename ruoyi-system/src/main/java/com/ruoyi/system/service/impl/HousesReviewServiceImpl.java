@@ -5,6 +5,7 @@ import cn.hutool.core.util.CreditCodeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.PageQuery;
@@ -44,6 +45,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -157,14 +159,14 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         lqw.orderByAsc(HousesReview::getProcessStatus);
         lqw.orderByDesc(HousesReview::getUpdateTime);
         lqw.eq(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
-        lqw.eq(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
+        lqw.like(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
         lqw.like(StringUtils.isNotBlank(bo.getName()), HousesReview::getName, bo.getName());
         lqw.eq(StringUtils.isNotBlank(bo.getQualification()), HousesReview::getQualification, bo.getQualification());
         lqw.eq(StringUtils.isNotBlank(bo.getAuditTime()), HousesReview::getAuditTime, bo.getAuditTime());
         lqw.eq(StringUtils.isNotBlank(bo.getPresellCard()), HousesReview::getPresellCard, bo.getPresellCard());
         lqw.eq(StringUtils.isNotBlank(bo.getDealType()), HousesReview::getDealType, bo.getDealType());
-        lqw.eq(StringUtils.isNotBlank(bo.getProjectName()), HousesReview::getProjectName, bo.getProjectName());
-        lqw.eq(StringUtils.isNotBlank(bo.getProjectArea()), HousesReview::getProjectArea, bo.getProjectArea());
+        lqw.like(StringUtils.isNotBlank(bo.getProjectName()), HousesReview::getProjectName, bo.getProjectName());
+        lqw.like(StringUtils.isNotBlank(bo.getProjectArea()), HousesReview::getProjectArea, bo.getProjectArea());
         lqw.eq(StringUtils.isNotBlank(bo.getQualificationConfirmTime()), HousesReview::getQualificationConfirmTime, bo.getQualificationConfirmTime());
         lqw.eq(StringUtils.isNotBlank(bo.getQualificationPreApplyTime()), HousesReview::getQualificationPreApplyTime, bo.getQualificationPreApplyTime());
         lqw.eq(StringUtils.isNotBlank(bo.getFamilyType()), HousesReview::getFamilyType, bo.getFamilyType());
@@ -470,6 +472,21 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper3(bo);
         Page<HousesReview> result = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
+    }
+
+    /**
+     * 根据身份证和项目名称查询
+     * @param collect
+     * @param projectName
+     * @return
+     */
+    @Override
+    public List<HousesReview> selectListByCardList(List<String> collect, Set<String> projectName) {
+        List<HousesReview> housesReviewList = baseMapper.selectList(new LambdaQueryWrapper<>(HousesReview.class)
+            .in(HousesReview::getCard, collect)
+            .in(HousesReview::getProjectName,projectName));
+        return housesReviewList;
+
     }
 
     @Async

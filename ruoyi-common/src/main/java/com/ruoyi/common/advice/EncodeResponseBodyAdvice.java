@@ -23,7 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @ControllerAdvice
 public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
     private final static Logger logger = LoggerFactory.getLogger(EncodeResponseBodyAdvice.class);
-    private static final IRsaSecurityService2 rsaSecurityService=SpringUtils.getBean(IRsaSecurityService2.class);
+    private static final IRsaSecurityService2 rsaSecurityService2=SpringUtils.getBean(IRsaSecurityService2.class);
 
 
     @Override
@@ -36,7 +36,7 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
         // 此处要用反射将字段中的注解解析出来
         String method = serverHttpRequest.getMethod().name();
         String path = serverHttpRequest.getURI().getPath();
-        RsaSecurity info = rsaSecurityService.getInfo(path,method);
+        RsaSecurity info = rsaSecurityService2.getInfo(path,method);
         if (ObjectUtil.isNotNull(info)) {
             if ("1".equals(info.getRestricted())){
                 return R.fail("接口已限制请求");
@@ -48,25 +48,6 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
         }
         serverHttpResponse.getHeaders().add("isRsaencrypt","false");
         return body;
-        /*if (methodParameter.getMethod().isAnnotationPresent(RsaSecurityParameter.class)) {
-            //获取注解配置的包含和去除字段
-            RsaSecurityParameter serializedField = methodParameter.getMethodAnnotation(RsaSecurityParameter.class);
-            //出参是否需要加密
-            if (serializedField.outEncode()) {
-                return encodeRsa(methodParameter, body,serializedField.outPublicKey());
-            }
-        }
-        JSONObject jsonObject = JSONUtil.parseObj(body);
-        Object code = jsonObject.get("code");
-        String num = "500";
-        String num2 ="401";
-        String num3 ="403";
-        if (ObjectUtil.isNotNull(code)){
-            if (num.equals(code.toString()) || num2.equals(code.toString()) || num3.equals(code.toString())){
-                return encodeRsa(methodParameter, body,"");
-            }
-        }
-        return  body;*/
     }
 
     /**

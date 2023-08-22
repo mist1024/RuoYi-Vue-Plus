@@ -21,6 +21,7 @@ public class LoginBody {
      */
     @NotBlank(message = "{user.username.not.blank}",groups = {passwordLogin.class,smgLogin.class,forgetPasswordLogin.class,registerUser.class,userOpenLogin.class})
     @Length(min = UserConstants.USERNAME_MIN_LENGTH, max = UserConstants.USERNAME_MAX_LENGTH, message = "{user.username.length.valid}",groups = {passwordLogin.class,smgLogin.class,forgetPasswordLogin.class,registerUser.class})
+//    @Pattern(regexp =UserConstants.CHECK_PHONE,message = "{user.mobile.phone.number.not.valid}",groups = {registerUser.class,smgLogin.class})
     private String username;
 
     /**

@@ -53,6 +53,7 @@ public class GaoXinCardInfo implements Serializable {
     private  String education;
 
 
+
     public String getType() {
         return type;
     }

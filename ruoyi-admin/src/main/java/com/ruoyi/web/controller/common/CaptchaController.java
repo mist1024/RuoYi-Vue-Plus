@@ -66,6 +66,7 @@ public class CaptchaController {
     @GetMapping("/captchaSms")
     public R<Void> smsCaptcha(@NotBlank(message = "{user.phonenumber.not.blank}") String username) {
         //判断系统中是否存在该人才
+        username = org.springframework.util.StringUtils.trimAllWhitespace(username);
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getPhonenumber, SysUser::getStatus)
             .eq(SysUser::getPhonenumber, username));

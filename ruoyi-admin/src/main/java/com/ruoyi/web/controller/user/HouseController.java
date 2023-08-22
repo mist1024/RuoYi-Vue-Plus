@@ -17,6 +17,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.DownloadGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.BuyHouses;
 import com.ruoyi.system.domain.bo.BuyHousesBo;
 import com.ruoyi.system.service.IBuyHousesService;
@@ -124,6 +125,8 @@ public class HouseController extends BaseController {
         if (ObjectUtil.isNull(bo.getUserId())){
             return R.fail("userId不可为空");
         }
+        String cardId = bo.getCardId();
+        bo.setCardId(StringUtils.toUpperCase(cardId));
         return  iBuyHousesService.insertOpenBuyHouses(bo);
     }
 

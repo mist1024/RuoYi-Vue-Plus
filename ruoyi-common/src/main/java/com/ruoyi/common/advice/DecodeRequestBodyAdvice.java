@@ -36,7 +36,7 @@ import java.util.List;
 public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
 
     private static final Logger logger = LoggerFactory.getLogger(DecodeRequestBodyAdvice.class);
-    private static final IRsaSecurityService2 rsaSecurityService= SpringUtils.getBean(IRsaSecurityService2.class);
+    private static final IRsaSecurityService2 rsaSecurityService2= SpringUtils.getBean(IRsaSecurityService2.class);
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
@@ -54,7 +54,7 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
             String path = inputMessage.getHeaders().getFirst("path");
             String method = inputMessage.getHeaders().getFirst("method");
             if (ObjectUtil.isNotNull(path)) {
-                RsaSecurity info = rsaSecurityService.getInfo(path, StringUtils.toRootUpperCase(method));
+                RsaSecurity info = rsaSecurityService2.getInfo(path, StringUtils.toRootUpperCase(method));
                 if (ObjectUtil.isNotNull(info)) {
                     if ("1".equals(info.getRestricted())){
                         throw new ServerException("接口已限制请求");
@@ -65,15 +65,6 @@ public class DecodeRequestBodyAdvice implements RequestBodyAdvice {
 
                 }
             }
-            /*if (methodParameter.getMethod().isAnnotationPresent(RsaSecurityParameter.class)) {
-                //获取注解配置的包含和去除字段
-                RsaSecurityParameter serializedField = methodParameter.getMethodAnnotation(RsaSecurityParameter.class);
-                //入参是否需要解密
-                if (serializedField.inDecode()) {
-                    logger.info("注解RsaSecurityParameter,对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行解密");
-                    return new RsaHttpInputMessage(inputMessage);
-                }
-            }*/
             return inputMessage;
         } catch (Exception e) {
             e.printStackTrace();

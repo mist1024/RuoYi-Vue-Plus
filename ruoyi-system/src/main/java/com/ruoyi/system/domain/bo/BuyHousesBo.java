@@ -220,7 +220,7 @@ public class BuyHousesBo extends BaseEntity {
     /**
      *工作地址
      */
-    @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "工作地址不能为空", groups = { AddGroup.class, EditGroup.class })
     private String workAddress;
 
     /**

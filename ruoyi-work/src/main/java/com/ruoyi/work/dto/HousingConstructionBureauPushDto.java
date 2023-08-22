@@ -118,6 +118,8 @@ public class HousingConstructionBureauPushDto {
             }
             return result2;
         } catch (Exception e) {
+            pushLogEvent.setResultData("接口推送超时:"+e);
+            SpringUtils.context().publishEvent(pushLogEvent);
             throw new RuntimeException(e);
         }
     }
