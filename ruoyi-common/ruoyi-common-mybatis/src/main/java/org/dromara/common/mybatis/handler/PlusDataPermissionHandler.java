@@ -1,5 +1,6 @@
 package org.dromara.common.mybatis.handler;
 
+import cn.dev33.satoken.spring.SpringMVCUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
@@ -70,6 +71,10 @@ public class PlusDataPermissionHandler {
         DataColumn[] dataColumns = findAnnotation(mappedStatementId);
         if (ArrayUtil.isEmpty(dataColumns)) {
             invalidCacheSet.add(mappedStatementId);
+            return where;
+        }
+        // scheduler 为非web环境，参考为admin
+        if (!SpringMVCUtil.isWeb()) {
             return where;
         }
         LoginUser currentUser = DataPermissionHelper.getVariable("user");
