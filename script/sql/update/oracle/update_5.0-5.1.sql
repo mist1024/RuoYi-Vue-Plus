@@ -147,5 +147,5 @@ insert into sys_role_menu values ('2', '1064');
 insert into sys_role_menu values ('2', '1065');
 
 
-update sys_dept set leader = null;
-ALTER TABLE sys_dept MODIFY (leader NUMBER(20))
+update sys_dept set leader_id = null;
+ALTER TABLE sys_dept MODIFY (leader_id NUMBER(20))

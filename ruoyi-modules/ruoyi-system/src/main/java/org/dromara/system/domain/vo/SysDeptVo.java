@@ -60,7 +60,7 @@ public class SysDeptVo implements Serializable {
     /**
      * 负责人ID
      */
-    private Long leader;
+    private Long leaderId;
 
     /**
      * 负责人

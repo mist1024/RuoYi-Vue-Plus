@@ -403,7 +403,7 @@ INSERT sys_role_menu VALUES (2, 1065)
 GO
 
 
-UPDATE sys_dept SET leader = null
+UPDATE sys_dept SET leader_id = null
 GO
-ALTER TABLE sys_dept ALTER COLUMN leader bigint NULL
+ALTER TABLE sys_dept ALTER COLUMN leader_id bigint NULL
 GO
