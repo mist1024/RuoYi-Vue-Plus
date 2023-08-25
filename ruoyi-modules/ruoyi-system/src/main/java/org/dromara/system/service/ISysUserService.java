@@ -201,12 +201,5 @@ public interface ISysUserService {
      * @return 结果
      */
     int deleteUserByIds(Long[] userIds);
-
-    /**
-     * 通过部门id查询当前部门所有用户
-     *
-     * @param deptId
-     * @return
-     */
-    List<SysUserVo> selectUserListByDept(Long deptId);
+    
 }

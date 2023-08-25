@@ -266,12 +266,4 @@ public class SysUserController extends BaseController {
         return R.ok(deptService.selectDeptTreeList(dept));
     }
 
-    /**
-     * 获取部门下的所有用户信息
-     */
-    @SaCheckPermission("system:user:list")
-    @GetMapping("/list/dept/{deptId}")
-    public R<List<SysUserVo>> listByDept(@PathVariable @NotNull Long deptId) {
-        return R.ok(userService.selectUserListByDept(deptId));
-    }
 }
