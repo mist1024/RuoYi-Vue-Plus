@@ -106,7 +106,7 @@ create table sys_dept (
     ancestors         varchar(500)    default ''                 comment '祖级列表',
     dept_name         varchar(30)     default ''                 comment '部门名称',
     order_num         int(4)          default 0                  comment '显示顺序',
-    leader            bigint(20)      default null               comment '负责人',
+    leader_id         bigint(20)      default null               comment '负责人',
     phone             varchar(11)     default null               comment '联系电话',
     email             varchar(50)     default null               comment '邮箱',
     status            char(1)         default '0'                comment '部门状态（0正常 1停用）',

@@ -928,7 +928,7 @@ CREATE TABLE sys_dept
     ancestors   nvarchar(500)DEFAULT ''    NULL,
     dept_name   nvarchar(30) DEFAULT ''    NULL,
     order_num   int          DEFAULT ((0)) NULL,
-    leader      bigint                     NULL,
+    leader_id   bigint                     NULL,
     phone       nvarchar(11)               NULL,
     email       nvarchar(50)               NULL,
     status      nchar(1)     DEFAULT ('0') NULL,
@@ -985,7 +985,7 @@ EXEC sys.sp_addextendedproperty
     'MS_Description', N'负责人' ,
     'SCHEMA', N'dbo',
     'TABLE', N'sys_dept',
-    'COLUMN', N'leader'
+    'COLUMN', N'leader_id'
 GO
 EXEC sys.sp_addextendedproperty
     'MS_Description', N'联系电话' ,

@@ -166,7 +166,7 @@ create table sys_dept (
   ancestors         varchar2(500)   default '',
   dept_name         varchar2(30)    default '',
   order_num         number(4)       default 0,
-  leader            number(20)     default null,
+  leader_id         number(20)      default null,
   phone             varchar2(11)    default null,
   email             varchar2(50)    default null,
   status            char(1)         default '0',
@@ -187,7 +187,7 @@ comment on column sys_dept.parent_id    is '父部门id';
 comment on column sys_dept.ancestors    is '祖级列表';
 comment on column sys_dept.dept_name    is '部门名称';
 comment on column sys_dept.order_num    is '显示顺序';
-comment on column sys_dept.leader       is '负责人';
+comment on column sys_dept.leader_id    is '负责人';
 comment on column sys_dept.phone        is '联系电话';
 comment on column sys_dept.email        is '邮箱';
 comment on column sys_dept.status       is '部门状态（0正常 1停用）';

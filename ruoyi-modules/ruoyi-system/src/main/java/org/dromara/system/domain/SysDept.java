@@ -1,8 +1,6 @@
 package org.dromara.system.domain;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import org.dromara.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,7 +45,8 @@ public class SysDept extends TenantEntity {
     /**
      * 负责人
      */
-    private Long leader;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
+    private Long leaderId;
 
     /**
      * 联系电话

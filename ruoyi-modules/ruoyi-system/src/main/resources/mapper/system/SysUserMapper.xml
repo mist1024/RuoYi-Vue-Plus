@@ -49,7 +49,7 @@
                d.ancestors,
                d.dept_name,
                d.order_num,
-               d.leader,
+               d.leader_id,
                d.status as dept_status,
                d.email as dept_email,
                d.create_time as dept_cteate_time,
@@ -68,20 +68,20 @@
     <select id="selectPageUserList" resultMap="SysUserResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
-            d.dept_name, d.leader, u1.user_name as leaderName
+            d.dept_name, d.leader_id, u1.user_name as leaderName
         from sys_user u
             left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user u1 on u1.user_id = d.leader
+            left join sys_user u1 on u1.user_id = d.leader_id
         ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectUserList" resultMap="SysUserResult">
         select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
-            d.dept_name, d.leader, u1.user_name as leaderName
+            d.dept_name, d.leader_id, u1.user_name as leaderName
         from sys_user u
             left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user u1 on u1.user_id = d.leader
+            left join sys_user u1 on u1.user_id = d.leader_id
         ${ew.getCustomSqlSegment}
     </select>
 
