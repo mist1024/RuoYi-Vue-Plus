@@ -101,5 +101,10 @@ public class ActProcess {
     @TableField(exist = false)
     private String[] stepList;
 
+    /**
+     * 项目名称
+     */
+    private String projectName;
+
 
 }

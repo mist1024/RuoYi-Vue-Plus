@@ -96,6 +96,7 @@ public class WorkComplyUtils {
         actProcessVo.setBusinessId(processVo.getBusinessId());
         actProcessVo.setDescription(tProcessByKey.getDescription());
         actProcessVo.setIsNext(tProcessByKey.getIsNext());
+        actProcessVo.setProjectName(processVo.getProjectName());
         if ("1".equals(tProcessByKey.getType())){//普通流程,只需要将人员设置到运行流程中即可
             actProcessVo.setType(tProcessByKey.getType());
             if (1L==tProcessByKey.getProcessCheck()) {
@@ -207,6 +208,7 @@ public class WorkComplyUtils {
                 hisProcess.setDescription(actProcessVo.getDescription());
                 hisProcess.setStartUser(actProcessVo.getStartUser());
                 hisProcess.setIsNext(actProcessVo.getIsNext());
+                hisProcess.setProjectName(actProcessVo.getProjectName());
                 //获取当前业务处理耗时
                 Date date1 = hisProcess.getCreateTime();
                 Date date2 = hisProcess.getEndTime();
@@ -269,6 +271,7 @@ public class WorkComplyUtils {
                             processVo.setStartUser(actProcessVo.getStartUser());
                             processVo.setCompanyName(actProcessVo.getCompanyName());
                             processVo.setCardId(actProcessVo.getCardId());
+                            processVo.setProjectName(actProcessVo.getProjectName());
                             comply(processVo);
                             map.put("status",Constants.WAIT);
                             map.put("step",step);
@@ -350,6 +353,7 @@ public class WorkComplyUtils {
         actProcess.setBusinessId(hisProcess.getBusinessId());
         actProcess.setAudit(hisProcess.getAudit());
         actProcess.setProcessId(hisProcess.getProcessId());
+        actProcess.setProjectName(hisProcess.getProjectName());
         int insert =  actProcessMapper.insert(actProcess);
         rollBackLog.setCreateTime(DateUtils.getNowDate());
         rollBackLog.setParam(param);

@@ -124,6 +124,11 @@ public class HisProcess{
     @TableField(exist = false)
     private String[] ids;
 
+    /**
+     * 项目名称
+     */
+    private String projectName;
+
 
 
 

@@ -12,6 +12,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.helper.DataBaseHelper;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.CardsUtil;
 import com.ruoyi.common.utils.StringUtils;
@@ -165,7 +166,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         lqw.eq(StringUtils.isNotBlank(bo.getAuditTime()), HousesReview::getAuditTime, bo.getAuditTime());
         lqw.eq(StringUtils.isNotBlank(bo.getPresellCard()), HousesReview::getPresellCard, bo.getPresellCard());
         lqw.eq(StringUtils.isNotBlank(bo.getDealType()), HousesReview::getDealType, bo.getDealType());
-        lqw.like(StringUtils.isNotBlank(bo.getProjectName()), HousesReview::getProjectName, bo.getProjectName());
+        lqw.apply(StringUtils.isNotBlank(bo.getProjectName()), "find_in_set(project_name , '" + bo.getProjectName() + "') <> 0", bo.getProjectName());
         lqw.like(StringUtils.isNotBlank(bo.getProjectArea()), HousesReview::getProjectArea, bo.getProjectArea());
         lqw.eq(StringUtils.isNotBlank(bo.getQualificationConfirmTime()), HousesReview::getQualificationConfirmTime, bo.getQualificationConfirmTime());
         lqw.eq(StringUtils.isNotBlank(bo.getQualificationPreApplyTime()), HousesReview::getQualificationPreApplyTime, bo.getQualificationPreApplyTime());
@@ -319,6 +320,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             processVo.setStartUser(bo.getName());
             processVo.setCompanyName(bo.getCompanyName());
             processVo.setCardId(bo.getCard());
+            processVo.setProjectName(bo.getProjectName());
             WorkComplyUtils.comply(processVo);
         }
         return i>0;

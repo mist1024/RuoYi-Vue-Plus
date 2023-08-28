@@ -177,7 +177,7 @@ public class WorkController extends BaseController {
                     map.put("buyHousesLogList", "null");
                     String s1 = JSONUtil.toJsonPrettyStr(map);
                     log.info("map:"+s1);
-                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest", map, "253");
+//                    housingConstructionBureauPushDto.openUrl("https://jcfw.cdzjryb.com/CCSRegistryCenter/rest", map, "253");
 //                    housingConstructionBureauPushDto.openUrl("https://171.221.172.13:8088/CCSRegistryCenter/rest", map, "253");
                     //人才通推送
                     hashMap.put("status", "00T");
@@ -192,7 +192,7 @@ public class WorkController extends BaseController {
                     String s1 = JSONUtil.toJsonPrettyStr(hashMap);
                     log.info("hashMap:"+s1);
 //                    housingConstructionBureauPushDto.send3(hashMap, "http://218.89.220.30:9200/rctopen/api/anju/openBuyHousesCallback");
-                    housingConstructionBureauPushDto.send3(hashMap, "https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback");
+//                    housingConstructionBureauPushDto.send3(hashMap, "https://www.cdhtrct.com/route/open/api/anju/openBuyHousesCallback");
                 }
             }
             Object step = map1.get("step");

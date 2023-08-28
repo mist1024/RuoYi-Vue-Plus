@@ -62,5 +62,10 @@ public class ActProcessBo {
      */
     private  String cardId;
 
+    /**
+     * 项目名称
+     */
+    private String projectName;
+
 
 }

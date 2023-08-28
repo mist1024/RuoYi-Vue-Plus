@@ -67,5 +67,10 @@ public class HisProcessBo extends BaseEntity {
      */
     private  String cardId;
 
+    /**
+     * 项目名称
+     */
+    private String projectName;
+
 
 }

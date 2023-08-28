@@ -84,5 +84,10 @@ public class ActProcessVo {
 
     private String companyName;
 
+    /**
+     * 项目名称
+     */
+    private String projectName;
+
 
 }

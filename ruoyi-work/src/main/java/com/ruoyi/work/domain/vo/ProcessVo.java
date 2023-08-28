@@ -133,6 +133,9 @@ public class ProcessVo {
     @TableField(exist = false)
     private String userId;
 
+    @TableField(exist = false)
+    private String projectName;
+
 
 
 

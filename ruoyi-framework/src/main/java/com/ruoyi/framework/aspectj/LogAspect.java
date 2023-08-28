@@ -134,11 +134,13 @@ public class LogAspect {
         if (MapUtil.isEmpty(paramsMap)
             && HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
             String params = argsArrayToString(joinPoint.getArgs(), excludeParamNames);
-            operLog.setOperParam(StringUtils.substring(params, 0, 2000));
+//            operLog.setOperParam(StringUtils.substring(params, 0, 2000));
+            operLog.setOperParam(params);
         } else {
             MapUtil.removeAny(paramsMap, EXCLUDE_PROPERTIES);
             MapUtil.removeAny(paramsMap, excludeParamNames);
-            operLog.setOperParam(StringUtils.substring(JsonUtils.toJsonString(paramsMap), 0, 2000));
+//            operLog.setOperParam(StringUtils.substring(JsonUtils.toJsonString(paramsMap), 0, 2000));
+            operLog.setOperParam(JsonUtils.toJsonString(paramsMap));
         }
     }
 
