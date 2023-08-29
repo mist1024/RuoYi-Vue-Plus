@@ -27,6 +27,7 @@ import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysUserBo;
+import org.dromara.system.domain.vo.SysDeptVo;
 import org.dromara.system.domain.vo.SysPostVo;
 import org.dromara.system.domain.vo.SysRoleVo;
 import org.dromara.system.domain.vo.SysUserVo;
@@ -273,6 +274,13 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertUser(SysUserBo user) {
+        // 检测部门操作权限
+        if (ObjectUtil.isNotNull(user.getDeptId()) && !LoginHelper.isSuperAdmin()){
+            SysDeptVo dept = deptMapper.selectDeptById(user.getDeptId());
+            if (ObjectUtil.isNull(dept)) {
+                throw new ServiceException("没有权限访问部门数据！");
+            }
+        }
         SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
         // 新增用户信息
         int rows = baseMapper.insert(sysUser);
@@ -308,6 +316,13 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateUser(SysUserBo user) {
+        // 检测部门操作权限
+        if (ObjectUtil.isNotNull(user.getDeptId()) && !LoginHelper.isSuperAdmin()){
+            SysDeptVo dept = deptMapper.selectDeptById(user.getDeptId());
+            if (ObjectUtil.isNull(dept)) {
+                throw new ServiceException("没有权限访问部门数据！");
+            }
+        }
         // 新增用户与角色管理
         insertUserRole(user, true);
         // 新增用户与岗位管理
