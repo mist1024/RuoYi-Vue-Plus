@@ -58,7 +58,7 @@ public class HouseController extends BaseController {
     /**
      * 下载人才认定申请表
      */
-    @Log(title = "下载人才认定申请表", businessType = BusinessType.OTHER)
+    @Log(title = "申请并下载申请表", businessType = BusinessType.OTHER)
     @PostMapping("/download")
     @RateLimiter(count = 1, time = 10)
     public R downloadWord(@Validated(DownloadGroup.class) @RequestBody BuyHousesBo buyHousesBo){

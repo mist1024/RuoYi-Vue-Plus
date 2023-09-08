@@ -431,6 +431,7 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         hashMap.put("cardId",buyHousesBo.getCardId());
         hashMap.put("education",buyHousesBo.getEducation());
         hashMap.put("type",buyHousesBo.getType());
+        hashMap.put("sex",buyHousesBo.getSex());
         String fileName = UUID.randomUUID().toString();
         String templatePath = fileUpload + "Houses_template.docx";
         String word = ExportWordUtil.createWord(templatePath, doc, fileName, hashMap);
@@ -449,7 +450,9 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         ArrayList<DeclareListDTO> list = new ArrayList<>();
         //查询购房信息
         Long userId = LoginHelper.getUserId();
-        List<BuyHouses> buyHouses = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
+        List<BuyHouses> buyHouses = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class)
+            .eq(BuyHouses::getUserId, userId)
+            .isNull(BuyHouses::getApiKey));
         if (buyHouses.size()>0) {
             buyHouses.stream().forEach(e -> {
                 DeclareListDTO declareListDTO = new DeclareListDTO();
@@ -475,7 +478,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     public R<?> getInfo(BuyHouses buyHouses) {
         Long userId = LoginHelper.getUserId();
         //先判断本地数据库是否有值
-        BuyHousesVo buyHousesVo = baseMapper.selectVoOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId,userId));
+        BuyHousesVo buyHousesVo = baseMapper.selectVoOne(new LambdaQueryWrapper<>(BuyHouses.class)
+            .eq(BuyHouses::getUserId,userId));
         if (ObjectUtil.isNotNull(buyHousesVo)){
             LambdaQueryWrapper<MaterialProof> wrapper = new LambdaQueryWrapper<MaterialProof>()
                 .eq(MaterialProof::getHouseId, buyHousesVo.getId())
@@ -523,7 +527,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
         if (rInfo.getCode()!=200){
             return R.fail(rInfo.getMsg());
         }
-        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getCardId, cardId));
+        BuyHouses buyHouses = baseMapper.selectOne(new LambdaQueryWrapper<>(BuyHouses.class)
+            .eq(BuyHouses::getCardId, cardId));
         if (ObjectUtil.isNotNull(buyHouses)){
             hashMap.put("status",buyHouses.getProcessStatus());
             hashMap.put("processKey",buyHouses.getProcessKey());
@@ -585,7 +590,8 @@ public class BuyHousesServiceImpl implements IBuyHousesService {
     @Override
     public R checkStatus() {
         Long userId = LoginHelper.getUserId();
-        List<BuyHouses> buyHousesList = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class).eq(BuyHouses::getUserId, userId));
+        List<BuyHouses> buyHousesList = baseMapper.selectList(new LambdaQueryWrapper<>(BuyHouses.class)
+            .eq(BuyHouses::getUserId, userId));
         if (buyHousesList.size()>0){
             return R.ok();
         }

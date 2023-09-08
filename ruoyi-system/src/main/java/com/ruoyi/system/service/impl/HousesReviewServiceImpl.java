@@ -123,11 +123,14 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
         if (ObjectUtil.isNotNull(bo.getIds()) && bo.getIds().length>0){
             lqw.in(HousesReview::getId,bo.getIds());
         }
-        lqw.and(StringUtils.isNotBlank(bo.getName()),t ->
+       /* lqw.and(StringUtils.isNotBlank(bo.getName()),t ->
             t.like(HousesReview::getName,bo.getName())
                 .or().like(HousesReview::getCard,bo.getName())
-                .or().like(HousesReview::getProjectName,bo.getName()));
-        lqw.orderByDesc(HousesReview::getUpdateTime);
+                .or().like(HousesReview::getProjectName,bo.getName()));*/
+
+        lqw.like(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
+        lqw.like(StringUtils.isNotBlank(bo.getName()), HousesReview::getName, bo.getName());
+        lqw.like(StringUtils.isNotBlank(bo.getProjectName()), HousesReview::getProjectName, bo.getProjectName());
         lqw.like(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
         lqw.eq(StringUtils.isNotBlank(bo.getQualification()), HousesReview::getQualification, bo.getQualification());
         lqw.eq(StringUtils.isNotBlank(bo.getAuditTime()), HousesReview::getAuditTime, bo.getAuditTime());
@@ -192,7 +195,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
             lqw.in(HousesReview::getId,bo.getIds());
         }
         lqw.eq(StringUtils.isNotBlank(bo.getCardType()), HousesReview::getCardType, bo.getCardType());
-        lqw.eq(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
+        lqw.like(StringUtils.isNotBlank(bo.getCard()), HousesReview::getCard, bo.getCard());
         lqw.like(StringUtils.isNotBlank(bo.getName()), HousesReview::getName, bo.getName());
         lqw.eq(StringUtils.isNotBlank(bo.getQualification()), HousesReview::getQualification, bo.getQualification());
         lqw.eq(StringUtils.isNotBlank(bo.getAuditTime()), HousesReview::getAuditTime, bo.getAuditTime());
@@ -472,6 +475,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     public TableDataInfo<HousesReview> managerQueryPageList(HousesReviewBo bo, PageQuery pageQuery) {
         bo.setProcessStatus(Constants.SUCCEED);
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper3(bo);
+        lqw.orderByDesc(HousesReview::getUpdateTime);
         Page<HousesReview> result = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
@@ -496,6 +500,7 @@ public class HousesReviewServiceImpl implements IHousesReviewService {
     public void export(HousesReviewEvent event) throws IOException {
         HousesReviewBo bo = BeanUtil.toBean(event, HousesReviewBo.class);
         LambdaQueryWrapper<HousesReview> lqw = buildQueryWrapper3(bo);
+        lqw.orderByDesc(HousesReview::getUpdateTime);
         List<HousesReviewVo>  housesReviews = baseMapper.selectVoList(lqw);
         String title = "人才认定申请表";
         String separator = File.separator;

@@ -1,7 +1,7 @@
 --- # 监控中心配置
 spring.boot.admin.client:
   # 增加客户端开关
-  enabled: false
+  enabled: true
   url: http://localhost:9090/admin
   instance:
     service-host-type: IP
@@ -52,12 +52,12 @@ spring:
 #          url: jdbc:mysql://182.150.40.133:3309/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&useAffectedRows=true
 #          username: root
 #          password: 1234Qwer@
-#          url: jdbc:mysql://182.138.107.22:3409/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
-#          username: gxrc
-#          password: 45Uuq5!aADGD
-          url: jdbc:mysql://localhost:3306/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
-          username: root
-          password: 123456
+          url: jdbc:mysql://182.138.107.22:3409/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+          username: gxrc
+          password: 45Uuq5!aADGD
+#          url: jdbc:mysql://localhost:3306/ry-vue-house?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+#          username: root
+#          password: 123456
         # 从库数据源
         slave:
           lazy: true

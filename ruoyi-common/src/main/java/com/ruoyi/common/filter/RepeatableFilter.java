@@ -39,10 +39,10 @@ public class RepeatableFilter implements Filter {
             && StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE) ) {
             requestWrapper = new RepeatedlyRequestWrapper((HttpServletRequest) request, response);
         }
-        if (!isSafe((HttpServletRequest) request,(HttpServletResponse) response)) {
+       /* if (!isSafe((HttpServletRequest) request,(HttpServletResponse) response)) {
             ((HttpServletResponse) response).setStatus(403);
             return;
-        }
+        }*/
         if (null == requestWrapper) {
             chain.doFilter(request, response);
         } else {
@@ -86,7 +86,7 @@ public class RepeatableFilter implements Filter {
 
             }
         }
-        //防盗链设置
+        /*//防盗链设置
         String configValue = sysConfigService.getConfigValue("sys:preventing:hotlinking");
         List<String> strings = Arrays.asList(configValue.split(","));
         if (ObjectUtil.isEmpty(configValue)) {
@@ -108,8 +108,8 @@ public class RepeatableFilter implements Filter {
             if (referer.contains(white)) {
                 return true;
             }
-        }
-        return false;
+        }*/
+        return true;
     }
 
     /**

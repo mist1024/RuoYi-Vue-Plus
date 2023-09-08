@@ -110,7 +110,6 @@ public class SysLoginService {
         LoginUser loginUser = buildLoginSysUser(user);
         // 生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.APP);
-
         recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         recordLoginInfo(user.getUserId(), user.getUserName());
         return StpUtil.getTokenValue();
