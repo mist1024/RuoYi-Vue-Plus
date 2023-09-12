@@ -1,3 +1,8 @@
+USE ry-vue;
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP TABLE if EXISTS test_demo;
 CREATE TABLE test_demo
 (
@@ -173,3 +178,4 @@ INSERT INTO test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, ver
 INSERT INTO test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) VALUES (11, '000000', 7, 108, 3, '子节点77', 0, 103, sysdate(), 1, NULL, NULL, 0);
 INSERT INTO test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) VALUES (12, '000000', 10, 108, 3, '子节点88', 0, 103, sysdate(), 1, NULL, NULL, 0);
 INSERT INTO test_tree(id, tenant_id, parent_id, dept_id, user_id, tree_name, version, create_dept, create_time, create_by, update_time, update_by, del_flag) VALUES (13, '000000', 10, 108, 3, '子节点99', 0, 103, sysdate(), 1, NULL, NULL, 0);
+SET FOREIGN_KEY_CHECKS = 1;
