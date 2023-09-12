@@ -1,23 +1,17 @@
 version: '3'
 
 services:
-  mysql:
-    image: mysql:8.0.33
-    container_name: mysql
+  plus-mysql:
+    build:
+      context: ./sql
     environment:
-      # 时区上海
-      TZ: Asia/Shanghai
-      # root 密码
+      MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: root
-      # 初始化数据库(后续的初始化sql会在这个库执行)
-      MYSQL_DATABASE: ry-vue
+    restart: always
+    container_name: plus-mysql
+    image: plus-mysql
     ports:
       - "3306:3306"
-    volumes:
-      # 数据挂载
-      - /docker/mysql/data/:/var/lib/mysql/
-      # 配置挂载
-      - /docker/mysql/conf/:/etc/mysql/conf.d/
     command:
       # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
       --default-authentication-plugin=mysql_native_password

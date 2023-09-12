@@ -1,3 +1,8 @@
+USE ry-vue;
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- ----------------------------
 -- Table structure for pj_app_info
 -- ----------------------------
@@ -231,3 +236,6 @@ CREATE TABLE `pj_workflow_node_info`  (
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `idx01_workflow_node_info`(`workflow_id`, `gmt_create`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 ROW_FORMAT = Dynamic;
+
+
+SET FOREIGN_KEY_CHECKS = 1;
