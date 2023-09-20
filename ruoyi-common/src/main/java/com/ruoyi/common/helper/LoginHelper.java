@@ -57,6 +57,7 @@ public class LoginHelper {
         }
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
         // 例如: 后台用户30分钟过期 app用户1天过期
+        // 注意: 需要配置sa-token.dynamic-active-timeout=true，才能让setActiveTimeout有效
 //        UserType userType = UserType.getUserType(loginUser.getUserType());
 //        if (userType == UserType.SYS_USER) {
 //            model.setTimeout(86400).setActiveTimeout(1800);
