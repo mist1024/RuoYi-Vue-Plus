@@ -77,7 +77,7 @@ public class LoginHelper {
      */
     public static LoginUser getLoginUser(String token) {
         Object loginId = StpUtil.getLoginIdByToken(token);
-        SaSession session = StpUtil.getSessionByLoginId(loginId);
+        SaSession session = StpUtil.getStpLogic().getSessionByLoginId(loginId,false);
         if (ObjectUtil.isNull(session)) {
             return null;
         }
