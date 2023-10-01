@@ -66,4 +66,8 @@ public class MailProperties {
      * Socket连接超时值，单位毫秒，缺省值不超时
      */
     private Long connectionTimeout;
+    /**
+     * 设置是否打开调试模式，调试模式会显示与邮件服务器通信过程，默认不开启
+     */
+    private Boolean debug;
 }

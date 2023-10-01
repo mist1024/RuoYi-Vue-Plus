@@ -26,6 +26,7 @@ public class MailConfig {
         account.setFrom(mailProperties.getFrom());
         account.setUser(mailProperties.getUser());
         account.setPass(mailProperties.getPass());
+        account.setDebug(mailProperties.getDebug());
         account.setSocketFactoryPort(mailProperties.getPort());
         account.setStarttlsEnable(mailProperties.getStarttlsEnable());
         account.setSslEnable(mailProperties.getSslEnable());
