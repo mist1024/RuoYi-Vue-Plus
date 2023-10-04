@@ -43,11 +43,7 @@ public class R<T> implements Serializable {
         return restResult(data, SUCCESS, "操作成功");
     }
 
-    public static <T> R<T> ok(String msg) {
-        return restResult(null, SUCCESS, msg);
-    }
-
-    public static <T> R<T> ok(String msg, T data) {
+    public static <T> R<T> ok(T data, String msg) {
         return restResult(data, SUCCESS, msg);
     }
 

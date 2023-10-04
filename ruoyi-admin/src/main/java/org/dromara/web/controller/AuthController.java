@@ -99,7 +99,7 @@ public class AuthController {
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source, socialProperties);
         String authorizeUrl = authRequest.authorize(AuthStateUtils.createState());
-        return R.ok("操作成功", authorizeUrl);
+        return R.ok(authorizeUrl);
     }
 
     /**
@@ -140,7 +140,7 @@ public class AuthController {
     @PostMapping("/logout")
     public R<Void> logout() {
         loginService.logout();
-        return R.ok("退出成功");
+        return R.ok(null, "退出成功");
     }
 
     /**
