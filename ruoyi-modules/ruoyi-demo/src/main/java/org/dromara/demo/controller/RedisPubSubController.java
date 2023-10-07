@@ -28,7 +28,7 @@ public class RedisPubSubController {
         RedisUtils.publish(key, value, consumer -> {
             System.out.println("发布通道 => " + key + ", 发送值 => " + value);
         });
-        return R.ok("操作成功");
+        return R.ok();
     }
 
     /**
@@ -41,7 +41,7 @@ public class RedisPubSubController {
         RedisUtils.subscribe(key, String.class, msg -> {
             System.out.println("订阅通道 => " + key + ", 接收值 => " + msg);
         });
-        return R.ok("操作成功");
+        return R.ok();
     }
 
 }

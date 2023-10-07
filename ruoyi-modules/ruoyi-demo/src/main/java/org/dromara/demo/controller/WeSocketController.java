@@ -28,6 +28,6 @@ public class WeSocketController {
     @GetMapping("/send")
     public R<Void> send(WebSocketMessageDto dto) throws InterruptedException {
         WebSocketUtils.publishMessage(dto);
-        return R.ok("操作成功");
+        return R.ok();
     }
 }

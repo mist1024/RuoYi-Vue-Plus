@@ -40,7 +40,7 @@ public class RedisLockController {
             e.printStackTrace();
         }
         System.out.println("end :" + key + ",time:" + LocalTime.now().toString());
-        return R.ok("操作成功", value);
+        return R.ok(value);
     }
 
     /**
@@ -65,7 +65,7 @@ public class RedisLockController {
             lockTemplate.releaseLock(lockInfo);
         }
         //结束
-        return R.ok("操作成功", value);
+        return R.ok(value);
     }
 
 }

@@ -55,7 +55,7 @@ public class BoundedQueueController {
                 log.info("通道: {} , 发送数据: {}", queueName, data);
             }
         }
-        return R.ok("操作成功");
+        return R.ok();
     }
 
     /**
@@ -71,7 +71,7 @@ public class BoundedQueueController {
         } else {
             return R.fail("操作失败");
         }
-        return R.ok("操作成功");
+        return R.ok();
     }
 
     /**
@@ -86,7 +86,7 @@ public class BoundedQueueController {
             data = QueueUtils.getBoundedQueueObject(queueName);
             log.info("通道: {} , 获取数据: {}", queueName, data);
         } while (data != null);
-        return R.ok("操作成功");
+        return R.ok();
     }
 
 }

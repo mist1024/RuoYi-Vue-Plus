@@ -41,7 +41,7 @@ public class DelayedQueueController {
             // 观察接收时间
             log.info("通道: {}, 收到数据: {}", queueName, orderNum);
         });
-        return R.ok("操作成功");
+        return R.ok();
     }
 
     /**
@@ -56,7 +56,7 @@ public class DelayedQueueController {
         QueueUtils.addDelayedQueueObject(queueName, orderNum, time, TimeUnit.SECONDS);
         // 观察发送时间
         log.info("通道: {} , 发送数据: {}", queueName, orderNum);
-        return R.ok("操作成功");
+        return R.ok();
     }
 
     /**
@@ -72,7 +72,7 @@ public class DelayedQueueController {
         } else {
             return R.fail("操作失败");
         }
-        return R.ok("操作成功");
+        return R.ok();
     }
 
     /**
@@ -84,7 +84,7 @@ public class DelayedQueueController {
     public R<Void> destroy(String queueName) {
         // 用完了一定要销毁 否则会一直存在
         QueueUtils.destroyDelayedQueue(queueName);
-        return R.ok("操作成功");
+        return R.ok();
     }
 
 }

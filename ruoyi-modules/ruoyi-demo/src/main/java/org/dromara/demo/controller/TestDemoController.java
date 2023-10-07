@@ -73,7 +73,7 @@ public class TestDemoController extends BaseController {
     @Log(title = "测试单表", businessType = BusinessType.IMPORT)
     @SaCheckPermission("demo:demo:import")
     @PostMapping(value = "/importData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R<Void> importData(@RequestPart("file") MultipartFile file) throws Exception {
+    public R<String> importData(@RequestPart("file") MultipartFile file) throws Exception {
         ExcelResult<TestDemoImportVo> excelResult = ExcelUtil.importExcel(file.getInputStream(), TestDemoImportVo.class, true);
         List<TestDemo> list = MapstructUtils.convert(excelResult.getList(), TestDemo.class);
         testDemoService.saveBatch(list);
