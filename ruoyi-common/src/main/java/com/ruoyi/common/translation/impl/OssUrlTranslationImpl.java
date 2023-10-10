@@ -20,7 +20,7 @@ public class OssUrlTranslationImpl implements TranslationInterface<String> {
     private final OssService ossService;
 
     @Override
-    public String translation(Object key, String other) {
+    public String translate(Object key, String other) {
         return ossService.selectUrlByIds(key.toString());
     }
 }
