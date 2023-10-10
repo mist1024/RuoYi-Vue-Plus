@@ -454,10 +454,13 @@ public class SysRoleServiceImpl implements ISysRoleService {
                 return;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);
-            if (ObjectUtil.isNotNull(loginUser) && loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
-                try {
-                    StpUtil.logoutByTokenValue(token);
-                } catch (NotLoginException ignored) {
+            if (ObjectUtil.isNotNull(loginUser)) {
+                if (loginUser.getUserType().equals(UserConstants.SYS_USER)
+                    && loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
+                    try {
+                        StpUtil.logoutByTokenValue(token);
+                    } catch (NotLoginException ignored) {
+                    }
                 }
             }
         });
