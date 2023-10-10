@@ -20,7 +20,7 @@ public class DeptNameTranslationImpl implements TranslationInterface<String> {
     private final DeptService deptService;
     
     @Override
-    public String translation(Object key, String other) {
+    public String translate(Object key, String other) {
         return deptService.selectDeptNameByIds(key.toString());
     }
 }
