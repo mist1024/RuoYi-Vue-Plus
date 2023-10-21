@@ -30,6 +30,11 @@ public class LogininforEvent implements Serializable {
     private String username;
 
     /**
+     * 用户类型
+     */
+    private String userType;
+
+    /**
      * 登录状态 0成功 1失败
      */
     private String status;

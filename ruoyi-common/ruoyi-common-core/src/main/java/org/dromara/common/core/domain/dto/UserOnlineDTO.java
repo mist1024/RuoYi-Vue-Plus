@@ -35,6 +35,21 @@ public class UserOnlineDTO implements Serializable {
     private String userName;
 
     /**
+     * 用户类型
+     */
+    private String userType;
+
+    /**
+     * 客户端
+     */
+    private String client;
+
+    /**
+     * 设备类型
+     */
+    private String deviceType;
+
+    /**
      * 登录IP地址
      */
     private String ipaddr;

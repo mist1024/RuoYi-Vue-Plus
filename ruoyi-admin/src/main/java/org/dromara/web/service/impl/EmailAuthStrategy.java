@@ -56,10 +56,11 @@ public class EmailAuthStrategy implements IAuthStrategy {
 
         // 通过邮箱查找用户
         SysUserVo user = loadUserByEmail(tenantId, email);
+        String userType = user.getUserType();
 
-        loginService.checkLogin(LoginType.EMAIL, tenantId, user.getUserName(), () -> !validateEmailCode(tenantId, email, emailCode));
+        loginService.checkLogin(LoginType.EMAIL, tenantId, user.getUserName(), userType, () -> !validateEmailCode(tenantId, email, emailCode, userType));
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-        LoginUser loginUser = loginService.buildLoginUser(user);
+        LoginUser loginUser = loginService.buildLoginUser(user, client.getClientKey(), client.getDeviceType());
         SaLoginModel model = new SaLoginModel();
         model.setDevice(client.getDeviceType());
         // 自定义分配 不同用户体系 不同 token 授权时间 不设置默认走全局 yml 配置
@@ -70,7 +71,7 @@ public class EmailAuthStrategy implements IAuthStrategy {
         // 生成token
         LoginHelper.login(loginUser, model);
 
-        loginService.recordLogininfor(loginUser.getTenantId(), user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        loginService.recordLogininfor(loginUser.getTenantId(), user.getUserName(), userType, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());
 
         LoginVo loginVo = new LoginVo();
@@ -83,10 +84,10 @@ public class EmailAuthStrategy implements IAuthStrategy {
     /**
      * 校验邮箱验证码
      */
-    private boolean validateEmailCode(String tenantId, String email, String emailCode) {
+    private boolean validateEmailCode(String tenantId, String email, String emailCode, String userType) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + email);
         if (StringUtils.isBlank(code)) {
-            loginService.recordLogininfor(tenantId, email, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLogininfor(tenantId, email, userType, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         return code.equals(emailCode);
