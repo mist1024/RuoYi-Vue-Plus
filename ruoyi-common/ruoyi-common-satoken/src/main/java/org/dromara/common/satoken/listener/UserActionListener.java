@@ -50,7 +50,7 @@ public class UserActionListener implements SaTokenListener {
             dto.setTokenId(tokenValue);
             dto.setUserName(user.getUsername());
             dto.setUserType(user.getUserType());
-            dto.setClient(user.getClient());
+            dto.setClientKey(user.getClientKey());
             dto.setDeviceType(user.getDeviceType());
             dto.setDeptName(user.getDeptName());
             if(tokenConfig.getTimeout() == -1) {

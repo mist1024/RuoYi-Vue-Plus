@@ -13,6 +13,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysLogininfor;
 import org.dromara.system.domain.bo.SysLogininforBo;
@@ -45,7 +46,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
 
     private final SysLogininforMapper baseMapper;
 
-    private final ISysClientService iSysClientService;
+    private final ISysClientService clientService;
 
     /**
      * 记录登录信息
@@ -59,10 +60,10 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
         final String ip = ServletUtils.getClientIP(request);
         // 客户端信息
-        String clientid = request.getHeader("Clientid");
+        String clientid = request.getHeader(LoginHelper.CLIENT_KEY);
         SysClient client = null;
         if (StringUtils.isNotBlank(clientid)) {
-            client = iSysClientService.queryByClientId(clientid);
+            client = clientService.queryByClientId(clientid);
         }
 
         String address = AddressUtils.getRealAddressByIP(ip);
@@ -84,7 +85,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         logininfor.setUserName(logininforEvent.getUsername());
         logininfor.setUserType(logininforEvent.getUserType());
         if (ObjectUtil.isNotNull(client)) {
-            logininfor.setClient(client.getClientKey());
+            logininfor.setClientKey(client.getClientKey());
             logininfor.setDeviceType(client.getDeviceType());
         }
         logininfor.setIpaddr(ip);

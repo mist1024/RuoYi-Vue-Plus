@@ -133,7 +133,7 @@ public class SysLoginService {
     /**
      * 构建登录用户
      */
-    public LoginUser buildLoginUser(SysUserVo user, String client, String deviceType) {
+    public LoginUser buildLoginUser(SysUserVo user) {
         LoginUser loginUser = new LoginUser();
         loginUser.setTenantId(user.getTenantId());
         loginUser.setUserId(user.getUserId());
@@ -141,8 +141,6 @@ public class SysLoginService {
         loginUser.setUsername(user.getUserName());
         loginUser.setNickname(user.getNickName());
         loginUser.setUserType(user.getUserType());
-        loginUser.setClient(client);
-        loginUser.setDeviceType(deviceType);
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
         loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());

@@ -55,7 +55,7 @@ public class SysLogininforVo implements Serializable {
      * 客户端
      */
     @ExcelProperty(value = "客户端")
-    private String client;
+    private String clientKey;
 
     /**
      * 设备类型

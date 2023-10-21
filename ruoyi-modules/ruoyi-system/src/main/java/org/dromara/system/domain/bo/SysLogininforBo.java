@@ -41,7 +41,7 @@ public class SysLogininforBo {
     /**
      * 客户端
      */
-    private String client;
+    private String clientKey;
 
     /**
      * 设备类型

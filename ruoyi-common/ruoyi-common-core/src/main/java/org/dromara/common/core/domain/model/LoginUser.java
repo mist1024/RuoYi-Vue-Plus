@@ -115,7 +115,7 @@ public class LoginUser implements Serializable {
     /**
      * 客户端
      */
-    private String client;
+    private String clientKey;
 
     /**
      * 设备类型
