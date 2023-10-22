@@ -56,9 +56,8 @@ public class SmsAuthStrategy implements IAuthStrategy {
 
         // 通过手机号查找用户
         SysUserVo user = loadUserByPhonenumber(tenantId, phonenumber);
-        String userType = user.getUserType();
 
-        loginService.checkLogin(LoginType.SMS, tenantId, user.getUserName(), userType, () -> !validateSmsCode(tenantId, phonenumber, smsCode, userType));
+        loginService.checkLogin(LoginType.SMS, tenantId, user.getUserName(), () -> !validateSmsCode(tenantId, phonenumber, smsCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());
@@ -73,7 +72,7 @@ public class SmsAuthStrategy implements IAuthStrategy {
         // 生成token
         LoginHelper.login(loginUser, model);
 
-        loginService.recordLogininfor(loginUser.getTenantId(), user.getUserName(), userType, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        loginService.recordLogininfor(loginUser.getTenantId(), user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());
 
         LoginVo loginVo = new LoginVo();
@@ -86,10 +85,10 @@ public class SmsAuthStrategy implements IAuthStrategy {
     /**
      * 校验短信验证码
      */
-    private boolean validateSmsCode(String tenantId, String phonenumber, String smsCode, String userType) {
+    private boolean validateSmsCode(String tenantId, String phonenumber, String smsCode) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
         if (StringUtils.isBlank(code)) {
-            loginService.recordLogininfor(tenantId, phonenumber, userType, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLogininfor(tenantId, phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         return code.equals(smsCode);

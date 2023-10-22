@@ -46,12 +46,6 @@ public class SysLogininforVo implements Serializable {
     private String userName;
 
     /**
-     * 用户类型
-     */
-    @ExcelProperty(value = "用户类型")
-    private String userType;
-
-    /**
      * 客户端
      */
     @ExcelProperty(value = "客户端")

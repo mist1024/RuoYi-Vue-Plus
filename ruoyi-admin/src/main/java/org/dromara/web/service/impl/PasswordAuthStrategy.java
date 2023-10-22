@@ -60,16 +60,14 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         String code = loginBody.getCode();
         String uuid = loginBody.getUuid();
 
-        SysUserVo user = loadUserByUsername(tenantId, username);
-        String userType = user.getUserType();
-
         boolean captchaEnabled = captchaProperties.getEnable();
         // 验证码开关
         if (captchaEnabled) {
-            validateCaptcha(tenantId, username, userType, code, uuid);
+            validateCaptcha(tenantId, username, code, uuid);
         }
 
-        loginService.checkLogin(LoginType.PASSWORD, tenantId, username, userType, () -> !BCrypt.checkpw(password, user.getPassword()));
+        SysUserVo user = loadUserByUsername(tenantId, username);
+        loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));
         // 此处可根据登录用户的数据不同 自行创建 loginUser
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());
@@ -84,7 +82,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         // 生成token
         LoginHelper.login(loginUser, model);
 
-        loginService.recordLogininfor(loginUser.getTenantId(), username, userType, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        loginService.recordLogininfor(loginUser.getTenantId(), username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
         loginService.recordLoginInfo(user.getUserId());
 
         LoginVo loginVo = new LoginVo();
@@ -101,16 +99,16 @@ public class PasswordAuthStrategy implements IAuthStrategy {
      * @param code     验证码
      * @param uuid     唯一标识
      */
-    private void validateCaptcha(String tenantId, String username, String userType, String code, String uuid) {
+    private void validateCaptcha(String tenantId, String username, String code, String uuid) {
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
-            loginService.recordLogininfor(tenantId, username, userType, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         if (!code.equalsIgnoreCase(captcha)) {
-            loginService.recordLogininfor(tenantId, username, userType, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
+            loginService.recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }
     }
