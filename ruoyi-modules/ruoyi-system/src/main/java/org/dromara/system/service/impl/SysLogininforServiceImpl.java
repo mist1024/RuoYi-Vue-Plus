@@ -83,7 +83,6 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         SysLogininforBo logininfor = new SysLogininforBo();
         logininfor.setTenantId(logininforEvent.getTenantId());
         logininfor.setUserName(logininforEvent.getUsername());
-        logininfor.setUserType(logininforEvent.getUserType());
         if (ObjectUtil.isNotNull(client)) {
             logininfor.setClientKey(client.getClientKey());
             logininfor.setDeviceType(client.getDeviceType());
