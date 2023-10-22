@@ -49,7 +49,6 @@ public class UserActionListener implements SaTokenListener {
             dto.setLoginTime(System.currentTimeMillis());
             dto.setTokenId(tokenValue);
             dto.setUserName(user.getUsername());
-            dto.setUserType(user.getUserType());
             dto.setClientKey(user.getClientKey());
             dto.setDeviceType(user.getDeviceType());
             dto.setDeptName(user.getDeptName());
