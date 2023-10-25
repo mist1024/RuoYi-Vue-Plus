@@ -13,6 +13,7 @@ import me.zhyd.oauth.utils.AuthStateUtils;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.RegisterBody;
+import org.dromara.common.core.enums.ClientStatus;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -78,6 +79,9 @@ public class AuthController {
         if (ObjectUtil.isNull(client) || !StringUtils.contains(client.getGrantType(), grantType)) {
             log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
             return R.fail(MessageUtils.message("auth.grant.type.error"));
+        } else if (!ClientStatus.OK.getCode().equals(client.getStatus())) {
+            log.info("客户端id: {} 认证类型：{} 客户端状态: {} 异常!.", clientId, grantType, client.getStatus());
+            return R.fail(MessageUtils.message("auth.client.status.error"));
         }
         // 校验租户
         loginService.checkTenant(loginBody.getTenantId());
