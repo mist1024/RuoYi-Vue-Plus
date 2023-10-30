@@ -1,4 +1,4 @@
-package org.dromara.web.service;
+package org.dromara.auth.service;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.ObjectUtil;

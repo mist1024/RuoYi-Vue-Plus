@@ -1,4 +1,4 @@
-package org.dromara.web.service.impl;
+package org.dromara.auth.service.impl;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
@@ -17,7 +17,7 @@ import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.SmsGroup;
+import org.dromara.common.core.validate.auth.EmailGroup;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -25,39 +25,39 @@ import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
-import org.dromara.web.domain.vo.LoginVo;
-import org.dromara.web.service.IAuthStrategy;
-import org.dromara.web.service.SysLoginService;
+import org.dromara.auth.domain.vo.LoginVo;
+import org.dromara.auth.service.IAuthStrategy;
+import org.dromara.auth.service.SysLoginService;
 import org.springframework.stereotype.Service;
 
 /**
- * 短信认证策略
+ * 邮件认证策略
  *
  * @author Michelle.Chung
  */
 @Slf4j
-@Service("sms" + IAuthStrategy.BASE_NAME)
+@Service("email" + IAuthStrategy.BASE_NAME)
 @RequiredArgsConstructor
-public class SmsAuthStrategy implements IAuthStrategy {
+public class EmailAuthStrategy implements IAuthStrategy {
 
     private final SysLoginService loginService;
     private final SysUserMapper userMapper;
 
     @Override
     public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, SmsGroup.class);
+        ValidatorUtils.validate(loginBody, EmailGroup.class);
     }
 
     @Override
     public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
         String tenantId = loginBody.getTenantId();
-        String phonenumber = loginBody.getPhonenumber();
-        String smsCode = loginBody.getSmsCode();
+        String email = loginBody.getEmail();
+        String emailCode = loginBody.getEmailCode();
 
-        // 通过手机号查找用户
-        SysUserVo user = loadUserByPhonenumber(tenantId, phonenumber);
+        // 通过邮箱查找用户
+        SysUserVo user = loadUserByEmail(tenantId, email);
 
-        loginService.checkLogin(LoginType.SMS, tenantId, user.getUserName(), () -> !validateSmsCode(tenantId, phonenumber, smsCode));
+        loginService.checkLogin(LoginType.EMAIL, tenantId, user.getUserName(), () -> !validateEmailCode(tenantId, email, emailCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         LoginUser loginUser = loginService.buildLoginUser(user);
         loginUser.setClientKey(client.getClientKey());
@@ -83,33 +83,33 @@ public class SmsAuthStrategy implements IAuthStrategy {
     }
 
     /**
-     * 校验短信验证码
+     * 校验邮箱验证码
      */
-    private boolean validateSmsCode(String tenantId, String phonenumber, String smsCode) {
-        String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
+    private boolean validateEmailCode(String tenantId, String email, String emailCode) {
+        String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + email);
         if (StringUtils.isBlank(code)) {
-            loginService.recordLogininfor(tenantId, phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLogininfor(tenantId, email, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
-        return code.equals(smsCode);
+        return code.equals(emailCode);
     }
 
-    private SysUserVo loadUserByPhonenumber(String tenantId, String phonenumber) {
+    private SysUserVo loadUserByEmail(String tenantId, String email) {
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getPhonenumber, SysUser::getStatus)
+            .select(SysUser::getEmail, SysUser::getStatus)
             .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-            .eq(SysUser::getPhonenumber, phonenumber));
+            .eq(SysUser::getEmail, email));
         if (ObjectUtil.isNull(user)) {
-            log.info("登录用户：{} 不存在.", phonenumber);
-            throw new UserException("user.not.exists", phonenumber);
+            log.info("登录用户：{} 不存在.", email);
+            throw new UserException("user.not.exists", email);
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-            log.info("登录用户：{} 已被停用.", phonenumber);
-            throw new UserException("user.blocked", phonenumber);
+            log.info("登录用户：{} 已被停用.", email);
+            throw new UserException("user.blocked", email);
         }
         if (TenantHelper.isEnable()) {
-            return userMapper.selectTenantUserByPhonenumber(phonenumber, tenantId);
+            return userMapper.selectTenantUserByEmail(email, tenantId);
         }
-        return userMapper.selectUserByPhonenumber(phonenumber);
+        return userMapper.selectUserByEmail(email);
     }
 
 }

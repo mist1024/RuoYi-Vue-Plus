@@ -1,4 +1,4 @@
-package org.dromara.web.controller;
+package org.dromara.auth.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.hutool.captcha.AbstractCaptcha;
@@ -20,7 +20,7 @@ import org.dromara.sms4j.api.SmsBlend;
 import org.dromara.sms4j.api.entity.SmsResponse;
 import org.dromara.sms4j.core.factory.SmsFactory;
 import org.dromara.sms4j.provider.enumerate.SupplierType;
-import org.dromara.web.domain.vo.CaptchaVo;
+import org.dromara.auth.domain.vo.CaptchaVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

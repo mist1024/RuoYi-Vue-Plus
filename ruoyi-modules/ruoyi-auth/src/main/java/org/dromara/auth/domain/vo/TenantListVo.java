@@ -1,4 +1,4 @@
-package org.dromara.web.domain.vo;
+package org.dromara.auth.domain.vo;
 
 import org.dromara.system.domain.vo.SysTenantVo;
 import io.github.linpeilie.annotations.AutoMapper;
