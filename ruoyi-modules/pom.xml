@@ -14,6 +14,7 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-job</module>
         <module>ruoyi-system</module>
+        <module>ruoyi-auth</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>
@@ -22,5 +23,15 @@
     <description>
         ruoyi-modules 业务模块
     </description>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-dependencies</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

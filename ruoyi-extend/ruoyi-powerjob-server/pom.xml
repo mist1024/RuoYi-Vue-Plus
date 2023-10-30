@@ -12,6 +12,7 @@
     <properties>
         <spring-boot.version>2.7.17</spring-boot.version>
         <spring-boot-admin.version>2.7.11</spring-boot-admin.version>
+        <powerjob.version>4.3.3</powerjob.version>
     </properties>
     <dependencyManagement>
         <dependencies>

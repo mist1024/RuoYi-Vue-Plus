@@ -29,12 +29,12 @@ import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
-import org.dromara.web.domain.vo.LoginTenantVo;
-import org.dromara.web.domain.vo.LoginVo;
-import org.dromara.web.domain.vo.TenantListVo;
-import org.dromara.web.service.IAuthStrategy;
-import org.dromara.web.service.SysLoginService;
-import org.dromara.web.service.SysRegisterService;
+import org.dromara.auth.domain.vo.LoginTenantVo;
+import org.dromara.auth.domain.vo.LoginVo;
+import org.dromara.auth.domain.vo.TenantListVo;
+import org.dromara.auth.service.IAuthStrategy;
+import org.dromara.auth.service.SysLoginService;
+import org.dromara.auth.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
