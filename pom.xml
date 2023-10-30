@@ -72,6 +72,7 @@
         <module>ruoyi-extend</module>
         <module>ruoyi-modules</module>
         <module>ruoyi-dependencies</module>
+        <module>ruoyi-front</module>
     </modules>
     <packaging>pom</packaging>
 
