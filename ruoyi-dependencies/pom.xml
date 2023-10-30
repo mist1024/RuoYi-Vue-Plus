@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <spring-boot.mybatis>3.0.2</spring-boot.mybatis>
         <springdoc.version>2.2.0</springdoc.version>
         <poi.version>5.2.3</poi.version>
@@ -49,8 +50,19 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.yaml</groupId>
+                        <artifactId>snakeyaml</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
-
+            <!-- 临时修复 snakeyaml 漏洞 -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
             <!-- hutool 的依赖配置-->
             <dependency>
                 <groupId>cn.hutool</groupId>
