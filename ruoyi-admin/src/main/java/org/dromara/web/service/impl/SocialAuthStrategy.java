@@ -17,10 +17,11 @@ import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.exception.user.AuthException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
-import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.SocialGroup;
+import org.dromara.common.core.utils.ServletUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
@@ -53,8 +54,19 @@ public class SocialAuthStrategy implements IAuthStrategy {
 
 
     @Override
-    public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, SocialGroup.class);
+    public void validate() {
+        String source = ServletUtils.getParamFromBody("source");
+        String socialCode = ServletUtils.getParamFromBody("socialCode");
+        String socialState = ServletUtils.getParamFromBody("socialState");
+        if (StringUtils.isBlank(source)) {
+            throw new AuthException("social.source.not.blank");
+        }
+        if (StringUtils.isBlank(socialCode)) {
+            throw new AuthException("social.code.not.blank");
+        }
+        if (StringUtils.isBlank(socialState)) {
+            throw new AuthException("social.state.not.blank");
+        }
     }
 
     /**

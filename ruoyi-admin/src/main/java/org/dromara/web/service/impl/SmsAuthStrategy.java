@@ -12,12 +12,12 @@ import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.UserStatus;
+import org.dromara.common.core.exception.user.AuthException;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.SmsGroup;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -44,15 +44,22 @@ public class SmsAuthStrategy implements IAuthStrategy {
     private final SysUserMapper userMapper;
 
     @Override
-    public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, SmsGroup.class);
+    public void validate() {
+        String phonenumber = ServletUtils.getParamFromBody("phonenumber");
+        String smsCode = ServletUtils.getParamFromBody("smsCode");
+        if (StringUtils.isBlank(phonenumber)) {
+            throw new AuthException("user.phonenumber.not.blank");
+        }
+        if (StringUtils.isBlank(smsCode)) {
+            throw new AuthException("sms.code.not.blank");
+        }
     }
 
     @Override
     public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
         String tenantId = loginBody.getTenantId();
-        String phonenumber = loginBody.getPhonenumber();
-        String smsCode = loginBody.getSmsCode();
+        String phonenumber = ServletUtils.getParamFromBody("phonenumber");
+        String smsCode = ServletUtils.getParamFromBody("smsCode");
 
         // 通过手机号查找用户
         SysUserVo user = loadUserByPhonenumber(tenantId, phonenumber);

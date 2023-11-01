@@ -3,6 +3,8 @@ package org.dromara.common.core.utils;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.http.HttpStatus;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,10 +21,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 客户端工具类
@@ -97,6 +96,39 @@ public class ServletUtils extends JakartaServletUtil {
             params.put(entry.getKey(), StringUtils.join(entry.getValue(), StringUtils.SEPARATOR));
         }
         return params;
+    }
+
+    /**
+     * 获取请求体
+     *
+     * @return json
+     */
+    public static JSONObject getParamBody() {
+        String body = ServletUtils.getBody(Objects.requireNonNull(ServletUtils.getRequest()));
+        return StringUtils.isBlank(body) ? new JSONObject() : new JSONObject(body);
+    }
+
+    /**
+     * 获取请求体 json 参数值
+     *
+     * @param key   json key
+     * @return 参数值
+     */
+    public static String getParamFromBody(String key) {
+        return getParamFromBody(key, String.class);
+    }
+
+    /**
+     * 获取请求体 json 参数值
+     *
+     * @param key   json key
+     * @param clazz 参数类
+     * @param <T>   参数类型
+     * @return 参数值
+     */
+    public static <T> T getParamFromBody(String key, Class<T> clazz) {
+        JSONObject body = getParamBody();
+        return !JSONUtil.isNull(body) ? body.get(key, clazz) : null;
     }
 
     /**

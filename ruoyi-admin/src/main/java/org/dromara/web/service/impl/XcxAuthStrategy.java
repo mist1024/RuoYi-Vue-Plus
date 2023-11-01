@@ -9,9 +9,10 @@ import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.XcxLoginUser;
 import org.dromara.common.core.enums.UserStatus;
+import org.dromara.common.core.exception.user.AuthException;
 import org.dromara.common.core.utils.MessageUtils;
-import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.WechatGroup;
+import org.dromara.common.core.utils.ServletUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.vo.SysUserVo;
@@ -33,14 +34,17 @@ public class XcxAuthStrategy implements IAuthStrategy {
     private final SysLoginService loginService;
 
     @Override
-    public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, WechatGroup.class);
+    public void validate() {
+        String xcxCode = ServletUtils.getParamFromBody("xcxCode");
+        if (StringUtils.isBlank(xcxCode)) {
+            throw new AuthException("xcx.code.not.blank");
+        }
     }
 
     @Override
     public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
         // xcxCode 为 小程序调用 wx.login 授权后获取
-        String xcxCode = loginBody.getXcxCode();
+        String xcxCode = ServletUtils.getParamFromBody("xcxCode");
         // todo 以下自行实现
         // 校验 appid + appsrcret + xcxCode 调用登录凭证校验接口 获取 session_key 与 openid
         String openid = "";

@@ -2,6 +2,7 @@ package org.dromara.web.service.impl;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +13,12 @@ import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.UserStatus;
+import org.dromara.common.core.exception.user.AuthException;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.ValidatorUtils;
-import org.dromara.common.core.validate.auth.EmailGroup;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -44,15 +45,26 @@ public class EmailAuthStrategy implements IAuthStrategy {
     private final SysUserMapper userMapper;
 
     @Override
-    public void validate(LoginBody loginBody) {
-        ValidatorUtils.validate(loginBody, EmailGroup.class);
+    public void validate() {
+        String email = ServletUtils.getParamFromBody("email");
+        String emailCode = ServletUtils.getParamFromBody("emailCode");
+        if (StringUtils.isBlank(email)) {
+            throw new AuthException("user.email.not.blank");
+        }
+        if (StringUtils.isBlank(emailCode)) {
+            throw new AuthException("email.code.not.blank");
+        }
+        // 校验邮箱是否合法
+        if (!Validator.isEmail(email, true)) {
+            throw new AuthException("user.email.not.valid");
+        }
     }
 
     @Override
     public LoginVo login(String clientId, LoginBody loginBody, SysClient client) {
         String tenantId = loginBody.getTenantId();
-        String email = loginBody.getEmail();
-        String emailCode = loginBody.getEmailCode();
+        String email = ServletUtils.getParamFromBody("email");
+        String emailCode = ServletUtils.getParamFromBody("emailCode");
 
         // 通过邮箱查找用户
         SysUserVo user = loadUserByEmail(tenantId, email);
