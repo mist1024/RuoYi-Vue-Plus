@@ -28,14 +28,14 @@ public interface IAuthStrategy {
             throw new ServiceException("授权类型不正确!");
         }
         IAuthStrategy instance = SpringUtils.getBean(beanName);
-        instance.validate(loginBody);
+        instance.validate();
         return instance.login(clientId, loginBody, client);
     }
 
     /**
      * 参数校验
      */
-    void validate(LoginBody loginBody);
+    void validate();
 
     /**
      * 登录

@@ -8,6 +8,7 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.*;
 import org.dromara.common.core.domain.model.LoginBody;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
@@ -24,10 +25,13 @@ public class SocialUtils  {
 
     @SuppressWarnings("unchecked")
     public static AuthResponse<AuthUser> loginAuth(LoginBody loginBody, SocialProperties socialProperties) throws AuthException {
-        AuthRequest authRequest = getAuthRequest(loginBody.getSource(), socialProperties);
+        String source = ServletUtils.getParamFromBody("source");
+        String socialCode = ServletUtils.getParamFromBody("socialCode");
+        String socialState = ServletUtils.getParamFromBody("socialState");
+        AuthRequest authRequest = getAuthRequest(source, socialProperties);
         AuthCallback callback = new AuthCallback();
-        callback.setCode(loginBody.getSocialCode());
-        callback.setState(loginBody.getSocialState());
+        callback.setCode(socialCode);
+        callback.setState(socialState);
         return authRequest.login(callback);
     }
 
