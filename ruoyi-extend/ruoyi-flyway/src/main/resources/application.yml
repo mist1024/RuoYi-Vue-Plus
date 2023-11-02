@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ry-vue?characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: root
+  flyway:
+    enabled: true    #是否开启flyway，默认true.
+    baseline-on-migrate: true
+    # 默认1 , 从 0 开始可以规避版本1 不执行问题
+    baseline-version: 0
+    out-of-order: true
+    # 避免数据被意外清空
+    clean-disabled: false
+    #数据库连接配置
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    placeholder-replacement: false
+    init-sqls:
+      - CREATE DATABASE IF NOT EXISTS `ry-vue` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
