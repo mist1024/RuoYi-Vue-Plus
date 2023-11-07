@@ -85,6 +85,9 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
             ${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
 #end
 #end
+#if($column.javaField == 'delFlag')
+        lqw.eq(${ClassName}::getDelFlag, 0);
+#end
 #end
         return lqw;
     }
