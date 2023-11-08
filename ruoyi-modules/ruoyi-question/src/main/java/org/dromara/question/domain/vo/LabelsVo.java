@@ -1,6 +1,6 @@
 package org.dromara.question.domain.vo;
 
-import org.dromara.question.domain.Title;
+import org.dromara.question.domain.Labels;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import org.dromara.common.excel.annotation.ExcelDictFormat;
@@ -15,32 +15,36 @@ import java.util.Date;
 
 
 /**
- * 题目视图对象 f_questions
+ * 题目标签视图对象 f_labels
  *
  * @author Lion Li
  * @date 2023-11-08
  */
 @Data
-@AutoMapper(target = Title.class)
-public class TitleVo implements Serializable {
+@ExcelIgnoreUnannotated
+@AutoMapper(target = Labels.class)
+public class LabelsVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 
      */
+    @ExcelProperty(value = "")
     private Long id;
 
     /**
-     * 题目
+     * 标签名称
      */
-    private String question;
+    @ExcelProperty(value = "标签名称")
+    private String label;
 
     /**
-     * 题目标签类型
+     * 标签状态 1：启用 0：禁用
      */
-    private Long labelId;
+    @ExcelProperty(value = "标签状态 1：启用 0：禁用")
+    private Integer status;
 
 
 }

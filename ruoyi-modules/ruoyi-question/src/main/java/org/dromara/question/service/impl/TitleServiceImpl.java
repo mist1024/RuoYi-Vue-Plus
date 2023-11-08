@@ -8,6 +8,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.question.domain.Options;
+import org.dromara.question.domain.bo.TitleResp;
+import org.dromara.question.domain.vo.OptionVo;
+import org.dromara.question.mapper.OptionMapper;
 import org.springframework.stereotype.Service;
 import org.dromara.question.domain.bo.TitleBo;
 import org.dromara.question.domain.vo.TitleVo;
@@ -31,12 +35,20 @@ public class TitleServiceImpl implements ITitleService {
 
     private final TitleMapper baseMapper;
 
+    private final OptionMapper optionMapper;
+
     /**
      * 查询题目
      */
     @Override
-    public TitleVo queryById(Long id){
-        return baseMapper.selectVoById(id);
+    public TitleResp queryById(Long id){
+        TitleVo titleVo = baseMapper.selectVoById(id);
+        List<OptionVo> options = optionMapper.selectVoList(new LambdaQueryWrapper<Options>()
+            .eq(Options::getQuestionId, titleVo.getId()));
+
+        TitleResp resp = new TitleResp();
+        resp.setOptionVoList(options);
+        return resp;
     }
 
     /**
@@ -59,7 +71,6 @@ public class TitleServiceImpl implements ITitleService {
     }
 
     private LambdaQueryWrapper<Title> buildQueryWrapper(TitleBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<Title> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getQuestion()), Title::getQuestion, bo.getQuestion());
         lqw.eq(bo.getLabelId() != null, Title::getLabelId, bo.getLabelId());

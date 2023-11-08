@@ -1,6 +1,7 @@
 package org.dromara.question.service;
 
 import org.dromara.question.domain.Title;
+import org.dromara.question.domain.bo.TitleResp;
 import org.dromara.question.domain.vo.TitleVo;
 import org.dromara.question.domain.bo.TitleBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -20,7 +21,7 @@ public interface ITitleService {
     /**
      * 查询题目
      */
-    TitleVo queryById(Long id);
+    TitleResp queryById(Long id);
 
     /**
      * 查询题目列表

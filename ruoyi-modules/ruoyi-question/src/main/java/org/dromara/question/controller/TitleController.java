@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.question.domain.bo.TitleResp;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -63,7 +64,7 @@ public class TitleController extends BaseController {
      */
     @SaCheckPermission("question:title:query")
     @GetMapping("/{id}")
-    public R<TitleVo> getInfo(@NotNull(message = "主键不能为空")
+    public R<TitleResp> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
         return R.ok(titleService.queryById(id));
     }
