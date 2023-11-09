@@ -1,8 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.ObjectUtil;
-import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.sensitive.core.SensitiveService;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -27,9 +26,21 @@ public class SysSensitiveServiceImpl implements SensitiveService {
         if (!StpUtil.isLogin()){
             return true;
         }
-        if (StpUtil.hasRole(roleKey) || StpUtil.hasPermission(perms)){
-            return false;
+
+        if (StringUtils.isNotEmpty(roleKey) && StringUtils.isNotEmpty(perms)){
+            if (StpUtil.hasRole(roleKey) && StpUtil.hasPermission(perms)){
+                return false;
+            }
+        }else if (StringUtils.isNotEmpty(roleKey)){
+            if (StpUtil.hasRole(roleKey)){
+                return false;
+            }
+        }else if (StringUtils.isNotEmpty(perms)){
+            if (StpUtil.hasPermission(perms)){
+                return false;
+            }
         }
+
         if (TenantHelper.isEnable()) {
             return !LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin();
         }
