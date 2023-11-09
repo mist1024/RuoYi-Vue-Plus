@@ -27,16 +27,8 @@ public class SysSensitiveServiceImpl implements SensitiveService {
         if (!StpUtil.isLogin()){
             return true;
         }
-        LoginUser loginUser = LoginHelper.getLoginUser();
-        if (ObjectUtil.isNotNull(loginUser)) {
-            boolean roleSensitiveFlag = loginUser.getRolePermission().stream().anyMatch(role -> role.contains(roleKey));
-            if (roleSensitiveFlag) {
-                return false;
-            }
-            boolean permsSensitiveFlag = loginUser.getMenuPermission().stream().anyMatch(menu -> menu.contains(perms));
-            if (permsSensitiveFlag) {
-                return false;
-            }
+        if (StpUtil.hasRole(roleKey) || StpUtil.hasPermission(perms)){
+            return false;
         }
         if (TenantHelper.isEnable()) {
             return !LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin();

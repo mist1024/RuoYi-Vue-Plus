@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 public @interface Sensitive {
     SensitiveStrategy strategy();
 
-    String roleKey() default UserConstants.SENSITIVE;
+    String roleKey() default "";
 
-    String perms() default UserConstants.SENSITIVE;
+    String perms() default "";
 }

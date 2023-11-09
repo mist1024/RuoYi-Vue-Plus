@@ -139,9 +139,4 @@ public interface UserConstants {
      */
     Long SUPER_ADMIN_ID = 1L;
 
-    /**
-     * 角色及菜单权限脱敏标识
-     */
-    String SENSITIVE = "sensitive";
-
 }
