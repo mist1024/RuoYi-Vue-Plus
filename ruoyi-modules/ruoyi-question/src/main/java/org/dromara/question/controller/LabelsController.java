@@ -90,6 +90,14 @@ public class LabelsController extends BaseController {
         return toAjax(labelsService.updateByBo(bo));
     }
 
+    @SaCheckPermission("question:label:edit")
+    @Log(title = "题目标签", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("changeStatus")
+    public R<Void> changeStatus(@RequestBody LabelsBo bo) {
+        return toAjax(labelsService.updateStatusByBo(bo));
+    }
+
     /**
      * 删除题目标签
      *

@@ -29,7 +29,7 @@ public class LabelsVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private Long id;
@@ -43,7 +43,7 @@ public class LabelsVo implements Serializable {
     /**
      * 标签状态 1：启用 0：禁用
      */
-    @ExcelProperty(value = "标签状态 1：启用 0：禁用")
+    @ExcelProperty(value = "标签状态")
     private Integer status;
 
 

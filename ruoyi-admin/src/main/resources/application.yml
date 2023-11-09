@@ -127,7 +127,7 @@ security:
 # 多租户配置
 tenant:
   # 是否开启
-  enable: true
+  enable: false
   # 排除表
   excludes:
     - sys_menu
@@ -138,6 +138,8 @@ tenant:
     - sys_user_post
     - sys_user_role
     - sys_client
+    - f_labels
+    - f_questions
 
 # MyBatisPlus配置
 # https://baomidou.com/config/

@@ -1,10 +1,9 @@
 package org.dromara.question.service;
 
-import org.dromara.question.domain.Labels;
-import org.dromara.question.domain.vo.LabelsVo;
-import org.dromara.question.domain.bo.LabelsBo;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.question.domain.bo.LabelsBo;
+import org.dromara.question.domain.vo.LabelsVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +40,7 @@ public interface ILabelsService {
      * 修改题目标签
      */
     Boolean updateByBo(LabelsBo bo);
+    Boolean updateStatusByBo(LabelsBo bo);
 
     /**
      * 校验并批量删除题目标签信息

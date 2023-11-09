@@ -1,5 +1,6 @@
 package org.dromara.question.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -59,7 +60,6 @@ public class LabelsServiceImpl implements ILabelsService {
     }
 
     private LambdaQueryWrapper<Labels> buildQueryWrapper(LabelsBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<Labels> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getLabel()), Labels::getLabel, bo.getLabel());
         lqw.eq(bo.getStatus() != null, Labels::getStatus, bo.getStatus());
@@ -85,6 +85,13 @@ public class LabelsServiceImpl implements ILabelsService {
      */
     @Override
     public Boolean updateByBo(LabelsBo bo) {
+        Labels update = MapstructUtils.convert(bo, Labels.class);
+        validEntityBeforeSave(update);
+        return baseMapper.updateById(update) > 0;
+    }
+
+    @Override
+    public Boolean updateStatusByBo(LabelsBo bo) {
         Labels update = MapstructUtils.convert(bo, Labels.class);
         validEntityBeforeSave(update);
         return baseMapper.updateById(update) > 0;
