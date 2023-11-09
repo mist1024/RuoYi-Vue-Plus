@@ -116,7 +116,7 @@ public class SysMenu extends BaseEntity {
      * 获取路由名称
      */
     public String getRouteName() {
-        String routerName = StringUtils.capitalize(path);
+        String routerName = StringUtils.capitalize(path) + menuId;
         // 非外链并且是一级目录（类型为目录）
         if (isMenuFrame()) {
             routerName = StringUtils.EMPTY;
