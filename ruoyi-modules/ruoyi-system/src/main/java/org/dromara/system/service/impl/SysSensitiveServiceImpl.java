@@ -22,19 +22,19 @@ public class SysSensitiveServiceImpl implements SensitiveService {
      * 是否脱敏
      */
     @Override
-    public boolean isSensitive(String roleKey,String perms) {
-        if (!StpUtil.isLogin()){
+    public boolean isSensitive(String roleKey, String perms) {
+        if (!StpUtil.isLogin()) {
             return true;
         }
         boolean roleExist = StringUtils.isNotEmpty(roleKey);
         boolean permsExist = StringUtils.isNotEmpty(perms);
-        if (roleExist && permsExist){
-            if (StpUtil.hasRole(roleKey) && StpUtil.hasPermission(perms)){
+        if (roleExist && permsExist) {
+            if (StpUtil.hasRole(roleKey) && StpUtil.hasPermission(perms)) {
                 return false;
             }
-        }else if (roleExist && StpUtil.hasRole(roleKey)){
+        } else if (roleExist && StpUtil.hasRole(roleKey)) {
             return false;
-        }else if (permsExist && StpUtil.hasPermission(perms)){
+        } else if (permsExist && StpUtil.hasPermission(perms)) {
             return false;
         }
 
