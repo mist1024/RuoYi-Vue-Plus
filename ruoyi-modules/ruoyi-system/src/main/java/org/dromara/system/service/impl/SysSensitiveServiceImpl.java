@@ -26,19 +26,16 @@ public class SysSensitiveServiceImpl implements SensitiveService {
         if (!StpUtil.isLogin()){
             return true;
         }
-
-        if (StringUtils.isNotEmpty(roleKey) && StringUtils.isNotEmpty(perms)){
+        boolean roleExist = StringUtils.isNotEmpty(roleKey);
+        boolean permsExist = StringUtils.isNotEmpty(perms);
+        if (roleExist && permsExist){
             if (StpUtil.hasRole(roleKey) && StpUtil.hasPermission(perms)){
                 return false;
             }
-        }else if (StringUtils.isNotEmpty(roleKey)){
-            if (StpUtil.hasRole(roleKey)){
-                return false;
-            }
-        }else if (StringUtils.isNotEmpty(perms)){
-            if (StpUtil.hasPermission(perms)){
-                return false;
-            }
+        }else if (roleExist && StpUtil.hasRole(roleKey)){
+            return false;
+        }else if (permsExist && StpUtil.hasPermission(perms)){
+            return false;
         }
 
         if (TenantHelper.isEnable()) {
