@@ -1,5 +1,8 @@
 package org.dromara.system.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.ObjectUtil;
+import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.sensitive.core.SensitiveService;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -20,7 +23,21 @@ public class SysSensitiveServiceImpl implements SensitiveService {
      * 是否脱敏
      */
     @Override
-    public boolean isSensitive() {
+    public boolean isSensitive(String roleKey,String perms) {
+        if (!StpUtil.isLogin()){
+            return true;
+        }
+        LoginUser loginUser = LoginHelper.getLoginUser();
+        if (ObjectUtil.isNotNull(loginUser)) {
+            boolean roleSensitiveFlag = loginUser.getRolePermission().stream().anyMatch(role -> role.contains(roleKey));
+            if (roleSensitiveFlag) {
+                return false;
+            }
+            boolean permsSensitiveFlag = loginUser.getMenuPermission().stream().anyMatch(menu -> menu.contains(perms));
+            if (permsSensitiveFlag) {
+                return false;
+            }
+        }
         if (TenantHelper.isEnable()) {
             return !LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin();
         }
