@@ -42,7 +42,7 @@ public class TitleController extends BaseController {
      */
     @SaCheckPermission("question:title:list")
     @GetMapping("/list")
-    public TableDataInfo<TitleVo> list(TitleBo bo, PageQuery pageQuery) {
+    public TableDataInfo<TitleResp> list(TitleBo bo, PageQuery pageQuery) {
         return titleService.queryPageList(bo, pageQuery);
     }
 

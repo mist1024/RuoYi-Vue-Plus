@@ -26,7 +26,7 @@ public interface ITitleService {
     /**
      * 查询题目列表
      */
-    TableDataInfo<TitleVo> queryPageList(TitleBo bo, PageQuery pageQuery);
+    TableDataInfo<TitleResp> queryPageList(TitleBo bo, PageQuery pageQuery);
 
     /**
      * 查询题目列表

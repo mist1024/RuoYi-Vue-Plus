@@ -27,7 +27,7 @@ public class TitleResp implements Serializable {
     /**
      * 题目标签类型
      */
-    private Long labelName;
+    private String labelName;
 
     private List<OptionVo> optionVoList;
 }
