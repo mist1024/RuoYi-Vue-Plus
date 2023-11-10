@@ -1,11 +1,9 @@
 package org.dromara.question.domain;
 
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.io.Serial;
+import java.util.Date;
 
 /**
  * 题目对象 f_questions
@@ -14,17 +12,13 @@ import java.io.Serial;
  * @date 2023-11-08
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @TableName("f_questions")
-public class Title extends BaseEntity {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class Title {
 
     /**
-     * 
+     *
      */
-    @TableId(value = "id")
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -36,6 +30,18 @@ public class Title extends BaseEntity {
      * 题目标签类型
      */
     private Long labelId;
+
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date updateTime;
 
 
 }

@@ -1,6 +1,7 @@
 package org.dromara.question.service;
 
 import org.dromara.question.domain.Title;
+import org.dromara.question.domain.bo.TitleReq;
 import org.dromara.question.domain.bo.TitleResp;
 import org.dromara.question.domain.vo.TitleVo;
 import org.dromara.question.domain.bo.TitleBo;
@@ -36,7 +37,7 @@ public interface ITitleService {
     /**
      * 新增题目
      */
-    Boolean insertByBo(TitleBo bo);
+    Boolean insertByBo(TitleReq bo);
 
     /**
      * 修改题目

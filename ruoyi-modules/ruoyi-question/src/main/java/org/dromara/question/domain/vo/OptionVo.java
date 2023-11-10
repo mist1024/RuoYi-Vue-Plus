@@ -1,10 +1,9 @@
 package org.dromara.question.domain.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
-import org.dromara.question.domain.Title;
+import org.dromara.question.domain.Options;
 
 import java.io.Serializable;
 
@@ -16,7 +15,7 @@ import java.io.Serializable;
  **/
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = Title.class)
+@AutoMapper(target = Options.class)
 public class OptionVo implements Serializable {
 
     /**
@@ -37,5 +36,5 @@ public class OptionVo implements Serializable {
     /**
      * 选项内容
      */
-    private Long optionContent;
+    private String optionContent;
 }

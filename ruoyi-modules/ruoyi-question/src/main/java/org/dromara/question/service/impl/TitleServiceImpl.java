@@ -4,13 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.question.domain.Options;
 import org.dromara.question.domain.Title;
+import org.dromara.question.domain.bo.OptionBo;
 import org.dromara.question.domain.bo.TitleBo;
+import org.dromara.question.domain.bo.TitleReq;
 import org.dromara.question.domain.bo.TitleResp;
 import org.dromara.question.domain.vo.LabelsVo;
 import org.dromara.question.domain.vo.OptionVo;
@@ -19,8 +22,11 @@ import org.dromara.question.mapper.LabelsMapper;
 import org.dromara.question.mapper.OptionMapper;
 import org.dromara.question.mapper.TitleMapper;
 import org.dromara.question.service.ITitleService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.rmi.server.ServerCloneException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -115,13 +121,24 @@ public class TitleServiceImpl implements ITitleService {
      * 新增题目
      */
     @Override
-    public Boolean insertByBo(TitleBo bo) {
-        Title add = MapstructUtils.convert(bo, Title.class);
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean insertByBo(TitleReq bo) {
+        TitleBo titleBo = new TitleBo();
+        BeanUtils.copyProperties(bo, titleBo);
+        Title add = MapstructUtils.convert(titleBo, Title.class);
+        if (add == null) {
+            throw new ServiceException("数据获取失败");
+        }
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
         }
+
+        List<OptionVo> optionList = bo.getOptionList();
+        optionList.forEach(option -> option.setQuestionId(bo.getId()));
+        List<Options> options = MapstructUtils.convert(optionList, Options.class);
+        optionMapper.insertBatch(options);
         return flag;
     }
 

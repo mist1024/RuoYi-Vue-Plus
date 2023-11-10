@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.question.domain.bo.TitleReq;
 import org.dromara.question.domain.bo.TitleResp;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -76,7 +77,7 @@ public class TitleController extends BaseController {
     @Log(title = "题目", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody TitleBo bo) {
+    public R<Void> add(@Validated(AddGroup.class) @RequestBody TitleReq bo) {
         return toAjax(titleService.insertByBo(bo));
     }
 
