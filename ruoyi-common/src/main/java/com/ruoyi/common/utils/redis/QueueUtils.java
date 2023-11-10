@@ -227,6 +227,7 @@ public class QueueUtils {
     public static <T> void subscribeBlockingQueue(String queueName, Consumer<T> consumer) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
         queue.subscribeOnElements(consumer);
+        CLIENT.getDelayedQueue(queue);
     }
 
 }
