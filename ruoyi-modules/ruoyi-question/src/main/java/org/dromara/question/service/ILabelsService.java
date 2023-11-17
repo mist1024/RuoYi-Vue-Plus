@@ -3,6 +3,7 @@ package org.dromara.question.service;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.question.domain.bo.LabelsBo;
+import org.dromara.question.domain.vo.LabelOptionVo;
 import org.dromara.question.domain.vo.LabelsVo;
 
 import java.util.Collection;
@@ -41,6 +42,8 @@ public interface ILabelsService {
      */
     Boolean updateByBo(LabelsBo bo);
     Boolean updateStatusByBo(LabelsBo bo);
+
+    List<LabelOptionVo> queryLabels();
 
     /**
      * 校验并批量删除题目标签信息

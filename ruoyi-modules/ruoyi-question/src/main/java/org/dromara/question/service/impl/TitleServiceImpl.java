@@ -1,5 +1,6 @@
 package org.dromara.question.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -54,10 +55,15 @@ public class TitleServiceImpl implements ITitleService {
     @Override
     public TitleResp queryById(Long id) {
         TitleVo titleVo = baseMapper.selectVoById(id);
+        LabelsVo labelsVo = labelsMapper.selectVoById(titleVo.getLabelId());
         List<OptionVo> options = optionMapper.selectVoList(new LambdaQueryWrapper<Options>()
             .eq(Options::getQuestionId, titleVo.getId()));
 
         TitleResp resp = new TitleResp();
+        resp.setId(titleVo.getId());
+        resp.setQuestion(titleVo.getQuestion());
+        resp.setLabelName(labelsVo.getLabel());
+        resp.setLabelId(labelsVo.getId());
         resp.setOptionVoList(options);
         return resp;
     }
@@ -87,6 +93,7 @@ public class TitleServiceImpl implements ITitleService {
             dto.setQuestion(p.getQuestion());
             List<LabelsVo> labelsVos1 = labelsVoMap.get(p.getLabelId());
             dto.setLabelName(labelsVos1.get(0).getLabel());
+            dto.setLabelId(labelsVos1.get(0).getId());
             List<OptionVo> optionVos1 = optionsMap.get(p.getId());
             dto.setOptionVoList(optionVos1);
             return dto;
@@ -123,6 +130,10 @@ public class TitleServiceImpl implements ITitleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(TitleReq bo) {
+        List<OptionVo> optionList = bo.getOptionList();
+        if (CollectionUtil.isEmpty(optionList)) {
+            throw new ServiceException("选项不能为空");
+        }
         TitleBo titleBo = new TitleBo();
         BeanUtils.copyProperties(bo, titleBo);
         Title add = MapstructUtils.convert(titleBo, Title.class);
@@ -135,7 +146,6 @@ public class TitleServiceImpl implements ITitleService {
             bo.setId(add.getId());
         }
 
-        List<OptionVo> optionList = bo.getOptionList();
         optionList.forEach(option -> option.setQuestionId(bo.getId()));
         List<Options> options = MapstructUtils.convert(optionList, Options.class);
         optionMapper.insertBatch(options);

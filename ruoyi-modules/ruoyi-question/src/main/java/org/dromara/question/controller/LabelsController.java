@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.question.domain.vo.LabelOptionVo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -43,6 +44,12 @@ public class LabelsController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<LabelsVo> list(LabelsBo bo, PageQuery pageQuery) {
         return labelsService.queryPageList(bo, pageQuery);
+    }
+
+    @SaCheckPermission("question:label:list")
+    @GetMapping("queryLabels")
+    public R<List<LabelOptionVo>> queryLabels() {
+        return R.ok(labelsService.queryLabels());
     }
 
     /**

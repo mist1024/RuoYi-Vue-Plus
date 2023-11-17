@@ -1,24 +1,28 @@
 package org.dromara.question.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.dromara.question.domain.bo.LabelsBo;
-import org.dromara.question.domain.vo.LabelsVo;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.question.domain.Labels;
+import org.dromara.question.domain.Title;
+import org.dromara.question.domain.bo.LabelsBo;
+import org.dromara.question.domain.vo.LabelOptionVo;
+import org.dromara.question.domain.vo.LabelsVo;
+import org.dromara.question.domain.vo.TitleVo;
 import org.dromara.question.mapper.LabelsMapper;
+import org.dromara.question.mapper.TitleMapper;
 import org.dromara.question.service.ILabelsService;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 题目标签Service业务层处理
@@ -32,11 +36,13 @@ public class LabelsServiceImpl implements ILabelsService {
 
     private final LabelsMapper baseMapper;
 
+    private final TitleMapper titleMapper;
+
     /**
      * 查询题目标签
      */
     @Override
-    public LabelsVo queryById(Long id){
+    public LabelsVo queryById(Long id) {
         return baseMapper.selectVoById(id);
     }
 
@@ -48,6 +54,19 @@ public class LabelsServiceImpl implements ILabelsService {
         LambdaQueryWrapper<Labels> lqw = buildQueryWrapper(bo);
         Page<LabelsVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
+    }
+
+    @Override
+    public List<LabelOptionVo> queryLabels() {
+        LambdaQueryWrapper<Labels> lqw = Wrappers.lambdaQuery();
+        lqw.eq(Labels::getStatus, 0);
+        List<LabelsVo> labelsVos = baseMapper.selectVoList(lqw);
+        return labelsVos.stream().map(p -> {
+            LabelOptionVo vo = new LabelOptionVo();
+            vo.setValue(p.getId().toString());
+            vo.setLabel(p.getLabel());
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -92,6 +111,13 @@ public class LabelsServiceImpl implements ILabelsService {
 
     @Override
     public Boolean updateStatusByBo(LabelsBo bo) {
+        // 禁用标签时校验标签是否正在被使用
+        TitleVo titleVo = titleMapper.selectVoOne(new LambdaQueryWrapper<Title>()
+            .eq(Title::getLabelId, bo.getId()));
+        if (titleVo != null && bo.getStatus() == 1) {
+            throw new ServiceException("该标签已绑定题库，请先解绑再禁用");
+        }
+
         Labels update = MapstructUtils.convert(bo, Labels.class);
         validEntityBeforeSave(update);
         return baseMapper.updateById(update) > 0;
@@ -100,7 +126,7 @@ public class LabelsServiceImpl implements ILabelsService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(Labels entity){
+    private void validEntityBeforeSave(Labels entity) {
         //TODO 做一些数据校验,如唯一约束
     }
 
@@ -109,7 +135,7 @@ public class LabelsServiceImpl implements ILabelsService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;

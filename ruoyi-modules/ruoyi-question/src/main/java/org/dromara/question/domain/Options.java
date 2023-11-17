@@ -2,10 +2,7 @@ package org.dromara.question.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -17,7 +14,6 @@ import java.util.Date;
 @Data
 @TableName("f_options")
 public class Options {
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
