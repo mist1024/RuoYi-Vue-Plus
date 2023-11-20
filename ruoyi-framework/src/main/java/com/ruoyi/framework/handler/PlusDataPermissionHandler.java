@@ -2,6 +2,7 @@ package com.ruoyi.framework.handler;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.DataColumn;
@@ -62,6 +63,10 @@ public class PlusDataPermissionHandler {
 
     public Expression getSqlSegment(Expression where, String mappedStatementId, boolean isSelect) {
         DataColumn[] dataColumns = findAnnotation(mappedStatementId);
+        if (ArrayUtil.isEmpty(dataColumns)) {
+            return where;
+        }
+
         LoginUser currentUser = DataPermissionHelper.getVariable("user");
         if (ObjectUtil.isNull(currentUser)) {
             currentUser = LoginHelper.getLoginUser();
