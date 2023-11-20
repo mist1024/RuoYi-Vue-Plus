@@ -3,6 +3,7 @@ package org.dromara.common.encrypt.filter;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.properties.ApiDecryptProperties;
 import org.springframework.http.HttpMethod;
@@ -25,8 +26,12 @@ public class CryptoFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        boolean encryptFlag = properties.getResponseEnabled();
         ServletRequest requestWrapper = null;
+        ServletResponse responseWrapper = null;
+        EncryptResponseBodyWrapper responseBodyWrapper = null;
         HttpServletRequest servletRequest = (HttpServletRequest) request;
+        HttpServletResponse servletResponse = (HttpServletResponse) response;
         // 是否为 json 请求
         if (StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE)) {
             // 是否为 put 或者 post 请求
@@ -36,14 +41,29 @@ public class CryptoFilter implements Filter {
                 if (StringUtils.isNotBlank(headerValue)) {
                     requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPublicKey(), properties.getPrivateKey(), properties.getHeaderFlag());
                 }
+                // 判断是否响应加密
+                if (encryptFlag) {
+                    responseBodyWrapper = new EncryptResponseBodyWrapper(servletResponse);
+                    responseWrapper = responseBodyWrapper;
+                }
             }
         }
 
-        chain.doFilter(ObjectUtil.defaultIfNull(requestWrapper, request), response);
+        chain.doFilter(
+            ObjectUtil.defaultIfNull(requestWrapper, request),
+            ObjectUtil.defaultIfNull(responseWrapper, response));
+
+        if (encryptFlag) {
+            servletResponse.reset();
+            // 对原始内容加密
+            String encryptContent = responseBodyWrapper.getEncryptContent(
+                servletResponse, properties.getResponsePublicKey(), properties.getHeaderFlag());
+            // 对加密后的内容写出
+            servletResponse.getWriter().write(encryptContent);
+        }
     }
 
     @Override
     public void destroy() {
-
     }
 }

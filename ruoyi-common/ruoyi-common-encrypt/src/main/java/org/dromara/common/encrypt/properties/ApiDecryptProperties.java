@@ -17,18 +17,33 @@ public class ApiDecryptProperties {
     private Boolean enabled;
 
     /**
+     * 响应加密开关
+     */
+    private Boolean responseEnabled;
+
+    /**
      * 头部标识
      */
     private String headerFlag;
 
-
     /**
-     * 公钥
+     * 请求加密公钥
      */
     private String publicKey;
 
     /**
-     * 私钥
+     * 请求加密私钥
      */
     private String privateKey;
+
+    /**
+     * 响应加密公钥
+     */
+    private String responsePublicKey;
+
+    /**
+     * 响应加密私钥
+     */
+    private String responsePrivateKey;
+
 }
