@@ -2,8 +2,6 @@ package org.dromara.web.service.impl;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
@@ -11,20 +9,15 @@ import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.model.EmailLoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
-import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysClient;
-import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysUserVo;
-import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
@@ -41,7 +34,6 @@ import org.springframework.stereotype.Service;
 public class EmailAuthStrategy implements IAuthStrategy {
 
     private final SysLoginService loginService;
-    private final SysUserMapper userMapper;
 
     @Override
     public LoginVo login(String body, SysClient client) {
@@ -52,7 +44,7 @@ public class EmailAuthStrategy implements IAuthStrategy {
         String emailCode = loginBody.getEmailCode();
 
         // 通过邮箱查找用户
-        SysUserVo user = loadUserByEmail(tenantId, email);
+        SysUserVo user = loginService.loadUser(LoginType.EMAIL, tenantId, email);
 
         loginService.checkLogin(LoginType.EMAIL, tenantId, user.getUserName(), () -> !validateEmailCode(tenantId, email, emailCode));
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
@@ -87,21 +79,4 @@ public class EmailAuthStrategy implements IAuthStrategy {
         }
         return code.equals(emailCode);
     }
-
-    private SysUserVo loadUserByEmail(String tenantId, String email) {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .select(SysUser::getEmail, SysUser::getStatus)
-                .eq(SysUser::getEmail, email));
-            if (ObjectUtil.isNull(user)) {
-                log.info("登录用户：{} 不存在.", email);
-                throw new UserException("user.not.exists", email);
-            } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-                log.info("登录用户：{} 已被停用.", email);
-                throw new UserException("user.blocked", email);
-            }
-            return userMapper.selectUserByEmail(email);
-        });
-    }
-
 }

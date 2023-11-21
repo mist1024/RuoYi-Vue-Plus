@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
@@ -15,6 +16,7 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
+import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.log.event.LogininforEvent;
@@ -61,6 +63,26 @@ public class SysLoginService {
     private final ISysSocialService sysSocialService;
     private final SysUserMapper userMapper;
 
+    public SysUserVo loadUser(LoginType loginType, String tenantId, String account) {
+        return TenantHelper.dynamic(tenantId, () -> {
+            SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .select(SysUser::getUserId, SysUser::getStatus)
+                .eq(LoginType.SMS == loginType, SysUser::getPhonenumber, account)
+                .eq(LoginType.EMAIL == loginType, SysUser::getEmail, account)
+                .eq(LoginType.PASSWORD == loginType, SysUser::getUserName, account)
+                .eq(LoginType.SOCIAL == loginType, SysUser::getUserId, account));
+
+            if (ObjectUtil.isNull(user)) {
+                log.info("登录用户：{} 不存在.", account);
+                throw new UserException("user.not.exists", account);
+            } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+                log.info("登录用户：{} 已被停用.", account);
+                throw new UserException("user.blocked", account);
+            }
+
+            return userMapper.selectUser(loginType, account);
+        });
+    }
 
     /**
      * 绑定第三方用户
