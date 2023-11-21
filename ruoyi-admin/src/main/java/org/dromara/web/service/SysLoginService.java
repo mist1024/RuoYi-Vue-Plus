@@ -80,14 +80,7 @@ public class SysLoginService {
                 throw new UserException("user.blocked", account);
             }
 
-            SysUserVo sysUserVo = null;
-            switch (loginType) {
-                case SMS: sysUserVo = userMapper.selectUserByPhonenumber(account); break;
-                case EMAIL: sysUserVo = userMapper.selectUserByEmail(account); break;
-                case PASSWORD: sysUserVo = userMapper.selectUserByUserName(account); break;
-                case SOCIAL: sysUserVo = userMapper.selectUserById(Long.parseLong(account)); break;
-            }
-            return sysUserVo;
+            return userMapper.selectUser(loginType, account);
         });
     }
 

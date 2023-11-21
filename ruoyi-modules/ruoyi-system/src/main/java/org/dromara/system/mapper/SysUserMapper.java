@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
@@ -60,6 +61,14 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "userName", value = "u.user_id")
     })
     Page<SysUserVo> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+
+    /**
+     * 通过用户名查询用户
+     *
+     * @param account 账号：手机/邮箱/密码/UserId
+     * @return 用户对象信息
+     */
+    SysUserVo selectUser(LoginType loginType, String account);
 
     /**
      * 通过用户名查询用户
