@@ -66,6 +66,7 @@ public class SysLoginService {
     public SysUserVo loadUser(LoginType loginType, String tenantId, String account) {
         return TenantHelper.dynamic(tenantId, () -> {
             SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .select(SysUser::getUserId, SysUser::getStatus)
                 .eq(LoginType.SMS == loginType, SysUser::getPhonenumber, account)
                 .eq(LoginType.EMAIL == loginType, SysUser::getEmail, account)
                 .eq(LoginType.PASSWORD == loginType, SysUser::getUserName, account)
@@ -78,7 +79,15 @@ public class SysLoginService {
                 log.info("登录用户：{} 已被停用.", account);
                 throw new UserException("user.blocked", account);
             }
-            return MapstructUtils.convert(user, SysUserVo.class);
+
+            SysUserVo sysUserVo = null;
+            switch (loginType) {
+                case SMS: sysUserVo = userMapper.selectUserByPhonenumber(account); break;
+                case EMAIL: sysUserVo = userMapper.selectUserByEmail(account); break;
+                case PASSWORD: sysUserVo = userMapper.selectUserByUserName(account); break;
+                case SOCIAL: sysUserVo = userMapper.selectUserById(Long.parseLong(account)); break;
+            }
+            return sysUserVo;
         });
     }
 
