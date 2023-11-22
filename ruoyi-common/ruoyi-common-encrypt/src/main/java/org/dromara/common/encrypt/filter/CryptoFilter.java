@@ -46,16 +46,18 @@ public class CryptoFilter implements Filter {
         if (StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE)) {
             // 是否为 put 或者 post 请求
             if (HttpMethod.PUT.matches(servletRequest.getMethod()) || HttpMethod.POST.matches(servletRequest.getMethod())) {
-                // 获取加密注解
-                ApiEncrypt apiEncrypt = this.getApiEncryptAnnotation(servletRequest);
-                encryptFlag = apiEncrypt.response();
                 // 是否存在加密标头
                 String headerValue = servletRequest.getHeader(properties.getHeaderFlag());
                 if (StringUtils.isNotBlank(headerValue)) {
+                    // 请求解密
                     requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPrivateKey(), properties.getHeaderFlag());
-                } else {
-                    // 是否有注解，有就报错，没有放行
+                    // 获取加密注解
+                    ApiEncrypt apiEncrypt = this.getApiEncryptAnnotation(servletRequest);
                     if (ObjectUtil.isNotNull(apiEncrypt)) {
+                        // 响应加密标志
+                        encryptFlag = apiEncrypt.response();
+                    } else {
+                        // 是否有注解，有就报错，没有放行
                         HandlerExceptionResolver exceptionResolver = SpringUtils.getBean("handlerExceptionResolver");
                         exceptionResolver.resolveException(
                             servletRequest, servletResponse, null,
