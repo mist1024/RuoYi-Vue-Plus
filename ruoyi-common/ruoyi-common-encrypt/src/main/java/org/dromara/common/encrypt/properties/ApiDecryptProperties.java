@@ -12,6 +12,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApiDecryptProperties {
 
     /**
+     * 加密开关
+     */
+    private Boolean enabled;
+
+    /**
      * 头部标识
      */
     private String headerFlag;
