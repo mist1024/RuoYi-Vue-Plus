@@ -3,10 +3,7 @@ package org.dromara.web.service.impl;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.http.Method;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +14,7 @@ import org.dromara.common.core.domain.model.SocialLoginBody;
 import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -29,6 +27,7 @@ import org.dromara.system.domain.vo.SysSocialVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysSocialService;
+import org.dromara.web.domain.event.GiteeStarEvent;
 import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
@@ -70,13 +69,9 @@ public class SocialAuthStrategy implements IAuthStrategy {
         }
         AuthUser authUserData = response.getData();
         if ("GITEE".equals(authUserData.getSource())) {
-            // 如用户使用 gitee 登录顺手 star 给作者一点支持 拒绝白嫖
-            HttpUtil.createRequest(Method.PUT, "https://gitee.com/api/v5/user/starred/dromara/RuoYi-Vue-Plus")
-                    .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
-                    .executeAsync();
-            HttpUtil.createRequest(Method.PUT, "https://gitee.com/api/v5/user/starred/dromara/RuoYi-Cloud-Plus")
-                    .formStr(MapUtil.of("access_token", authUserData.getToken().getAccessToken()))
-                    .executeAsync();
+            GiteeStarEvent event = new GiteeStarEvent();
+            event.setAccessToken(authUserData.getToken().getAccessToken());
+            SpringUtils.context().publishEvent(event);
         }
 
         List<SysSocialVo> list = sysSocialService.selectByAuthId(authUserData.getSource() + authUserData.getUuid());
