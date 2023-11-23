@@ -49,9 +49,14 @@ public class OssFactory {
         String key = properties.getTenantId() + ":" + configKey;
         OssClient client = CLIENT_CACHE.get(key);
         if (client == null) {
-            CLIENT_CACHE.put(key, new OssClient(configKey, properties));
-            log.info("创建OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(key);
+            synchronized (CLIENT_CACHE) {
+                client = CLIENT_CACHE.get(key);
+                if (client == null) {
+                    CLIENT_CACHE.put(key, new OssClient(configKey, properties));
+                    log.info("创建OSS实例 key => {}", configKey);
+                    return CLIENT_CACHE.get(key);
+                }
+            }
         }
         // 配置不相同则重新构建
         if (!client.checkPropertiesSame(properties)) {
