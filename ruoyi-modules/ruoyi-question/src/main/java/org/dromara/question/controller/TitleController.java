@@ -88,7 +88,7 @@ public class TitleController extends BaseController {
     @Log(title = "题目", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody TitleBo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody TitleReq bo) {
         return toAjax(titleService.updateByBo(bo));
     }
 

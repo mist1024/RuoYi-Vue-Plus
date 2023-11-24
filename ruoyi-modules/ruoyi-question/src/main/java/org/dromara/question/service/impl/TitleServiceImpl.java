@@ -130,10 +130,6 @@ public class TitleServiceImpl implements ITitleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(TitleReq bo) {
-        List<OptionVo> optionList = bo.getOptionList();
-        if (CollectionUtil.isEmpty(optionList)) {
-            throw new ServiceException("选项不能为空");
-        }
         TitleBo titleBo = new TitleBo();
         BeanUtils.copyProperties(bo, titleBo);
         Title add = MapstructUtils.convert(titleBo, Title.class);
@@ -146,6 +142,7 @@ public class TitleServiceImpl implements ITitleService {
             bo.setId(add.getId());
         }
 
+        List<OptionVo> optionList = bo.getOptionVoList();
         optionList.forEach(option -> option.setQuestionId(bo.getId()));
         List<Options> options = MapstructUtils.convert(optionList, Options.class);
         optionMapper.insertBatch(options);
@@ -156,10 +153,34 @@ public class TitleServiceImpl implements ITitleService {
      * 修改题目
      */
     @Override
-    public Boolean updateByBo(TitleBo bo) {
-        Title update = MapstructUtils.convert(bo, Title.class);
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean updateByBo(TitleReq bo) {
+        TitleBo titleBo = new TitleBo();
+        BeanUtils.copyProperties(bo, titleBo);
+        Title update = MapstructUtils.convert(titleBo, Title.class);
+        if (update == null) {
+            throw new ServiceException("数据获取失败");
+        }
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+
+        boolean flag = baseMapper.updateById(update) > 0;
+        if (!flag) {
+            throw new ServiceException("数据保存失败");
+        }
+        // 先查询之前是否绑定过
+        List<OptionVo> optionVos = optionMapper.selectVoList(new LambdaQueryWrapper<Options>()
+            .eq(Options::getQuestionId, bo.getId()));
+        //  删除之前的绑定
+        if (!CollectionUtil.isEmpty(optionVos)) {
+            List<Long> optionIds = optionVos.stream().map(OptionVo::getId).collect(Collectors.toList());
+            optionMapper.deleteBatchIds(optionIds);
+        }
+        //  重新组装数据
+        List<OptionVo> optionList = bo.getOptionVoList();
+        optionList.forEach(option -> option.setQuestionId(bo.getId()));
+        List<Options> options = MapstructUtils.convert(optionList, Options.class);
+        optionMapper.insertBatch(options);
+        return flag;
     }
 
     /**

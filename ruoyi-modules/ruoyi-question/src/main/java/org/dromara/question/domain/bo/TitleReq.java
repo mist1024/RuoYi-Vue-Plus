@@ -1,6 +1,7 @@
 package org.dromara.question.domain.bo;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
@@ -36,5 +37,6 @@ public class TitleReq implements Serializable {
     @NotNull(message = "题目标签类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long labelId;
 
-    List<OptionVo> optionList;
+    @NotEmpty(message = "选项数据不能为空", groups = { AddGroup.class, EditGroup.class })
+    private List<OptionVo> optionVoList;
 }

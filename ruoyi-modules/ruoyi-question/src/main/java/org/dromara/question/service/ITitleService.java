@@ -41,7 +41,7 @@ public interface ITitleService {
     /**
      * 修改题目
      */
-    Boolean updateByBo(TitleBo bo);
+    Boolean updateByBo(TitleReq bo);
 
     /**
      * 校验并批量删除题目信息
