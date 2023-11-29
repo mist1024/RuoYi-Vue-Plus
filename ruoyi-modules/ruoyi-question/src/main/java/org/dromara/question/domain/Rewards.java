@@ -1,42 +1,51 @@
 package org.dromara.question.domain;
 
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author : lvxudong
- * @date : 2023/11/8 17:39
- * @className : Options
- * @description :
- **/
+ * 奖品管理对象 f_rewards
+ *
+ * @author lvxudong
+ * @date 2023-11-27
+ */
 @Data
-@TableName("f_options")
-public class Options implements Serializable {
+@TableName("f_rewards")
+public class Rewards implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键id
+     *
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 选项序号
+     * 奖励类型
      */
-    private Integer serial;
+    private Integer type;
 
     /**
-     * 题目id
+     * 奖励名称
      */
-    private Long questionId;
+    private String name;
 
     /**
-     * 选项内容
+     * 奖励图片
      */
-    private String optionContent;
+    private String image;
+
+    /**
+     * 图片描述
+     */
+    private String imgDescribe;
 
     /**
      * 创建时间
