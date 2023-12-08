@@ -105,15 +105,22 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                             }
                         }
                     } else {
-                        RepeatCell firstCell = map.get(mergeFields.get(0));
-                        if (repeatCell.getCurrent() != firstCell.getCurrent()) {
+                        if (!cellValue.equals(val)) {
                             if (i - repeatCell.getCurrent() > 1) {
                                 cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
                             }
                             map.put(field, new RepeatCell(val, i));
-                        } else if (i == list.size() - 1) {
-                            if (i > repeatCell.getCurrent()) {
-                                cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
+                        } else {
+                            RepeatCell firstCell = map.get(mergeFields.get(0));
+                            if (repeatCell.getCurrent() != firstCell.getCurrent()) {
+                                if (i - repeatCell.getCurrent() > 1) {
+                                    cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
+                                }
+                                map.put(field, new RepeatCell(val, i));
+                            } else if (i == list.size() - 1) {
+                                if (i > repeatCell.getCurrent()) {
+                                    cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
+                                }
                             }
                         }
                     }
