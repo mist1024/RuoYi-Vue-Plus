@@ -74,6 +74,8 @@ public class SysLoginService {
         SysSocialBo bo = BeanUtil.toBean(authUserData, SysSocialBo.class);
         BeanUtil.copyProperties(authUserData.getToken(), bo);
         bo.setUserId(LoginHelper.getUserId());
+        //绑定当前登录用户租户ID
+        bo.setTenantId(LoginHelper.getTenantId());
         bo.setAuthId(authId);
         bo.setOpenId(authUserData.getUuid());
         bo.setUserName(authUserData.getUsername());
