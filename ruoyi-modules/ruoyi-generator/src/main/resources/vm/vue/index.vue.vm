@@ -436,10 +436,11 @@ const submitForm = () => {
       #end
       if (form.value.${pkColumn.javaField}) {
         await update${BusinessName}(form.value).finally(() =>  buttonLoading.value = false);
+        proxy?.#[[$modal]]#.msgSuccess("修改成功");
       } else {
         await add${BusinessName}(form.value).finally(() =>  buttonLoading.value = false);
+        proxy?.#[[$modal]]#.msgSuccess("添加成功");
       }
-      proxy?.#[[$modal]]#.msgSuccess("修改成功");
       dialog.visible = false;
       await getList();
     }
