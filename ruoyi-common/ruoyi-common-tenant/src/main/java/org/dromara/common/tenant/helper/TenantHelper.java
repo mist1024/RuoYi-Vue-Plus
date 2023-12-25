@@ -2,7 +2,6 @@ package org.dromara.common.tenant.helper;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
@@ -28,7 +27,7 @@ public class TenantHelper {
 
     private static final String DYNAMIC_TENANT_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "dynamicTenant";
 
-    private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new TransmittableThreadLocal<>();
+    private static final String TENANT_ID_KEY = "tempDynamicTenant";
 
     /**
      * 租户功能是否启用
@@ -89,7 +88,7 @@ public class TenantHelper {
             return;
         }
         if (!isLogin()) {
-            TEMP_DYNAMIC_TENANT.set(tenantId);
+            ThreadLocalHolder.set(TENANT_ID_KEY, tenantId);
             return;
         }
         String cacheKey = DYNAMIC_TENANT_KEY + ":" + LoginHelper.getUserId();
@@ -107,7 +106,7 @@ public class TenantHelper {
             return null;
         }
         if (!isLogin()) {
-            return TEMP_DYNAMIC_TENANT.get();
+            return ThreadLocalHolder.get(TENANT_ID_KEY);
         }
         String cacheKey = DYNAMIC_TENANT_KEY + ":" + LoginHelper.getUserId();
         String tenantId = ThreadLocalHolder.get(cacheKey);
@@ -127,7 +126,7 @@ public class TenantHelper {
             return;
         }
         if (!isLogin()) {
-            TEMP_DYNAMIC_TENANT.remove();
+            ThreadLocalHolder.remove(TENANT_ID_KEY);
             return;
         }
         String cacheKey = DYNAMIC_TENANT_KEY + ":" + LoginHelper.getUserId();

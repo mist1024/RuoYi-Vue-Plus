@@ -5,6 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import org.dromara.common.core.constant.GlobalConstants;
+import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MessageUtils;
@@ -36,7 +37,7 @@ import java.util.StringJoiner;
 @Aspect
 public class RepeatSubmitAspect {
 
-    private static final ThreadLocal<String> KEY_CACHE = new ThreadLocal<>();
+    private static final String KEY_CACHE = "keyCache";
 
     @Before("@annotation(repeatSubmit)")
     public void doBefore(JoinPoint point, RepeatSubmit repeatSubmit) throws Throwable {
@@ -59,7 +60,7 @@ public class RepeatSubmitAspect {
         // 唯一标识（指定key + url + 消息头）
         String cacheRepeatKey = GlobalConstants.REPEAT_SUBMIT_KEY + url + submitKey;
         if (RedisUtils.setObjectIfAbsent(cacheRepeatKey, "", Duration.ofMillis(interval))) {
-            KEY_CACHE.set(cacheRepeatKey);
+            ThreadLocalHolder.set(KEY_CACHE, cacheRepeatKey);
         } else {
             String message = repeatSubmit.message();
             if (StringUtils.startsWith(message, "{") && StringUtils.endsWith(message, "}")) {
@@ -82,9 +83,9 @@ public class RepeatSubmitAspect {
                 if (r.getCode() == R.SUCCESS) {
                     return;
                 }
-                RedisUtils.deleteObject(KEY_CACHE.get());
+                RedisUtils.deleteObject((String) ThreadLocalHolder.get(KEY_CACHE));
             } finally {
-                KEY_CACHE.remove();
+                ThreadLocalHolder.remove(KEY_CACHE);
             }
         }
     }
@@ -97,8 +98,8 @@ public class RepeatSubmitAspect {
      */
     @AfterThrowing(value = "@annotation(repeatSubmit)", throwing = "e")
     public void doAfterThrowing(JoinPoint joinPoint, RepeatSubmit repeatSubmit, Exception e) {
-        RedisUtils.deleteObject(KEY_CACHE.get());
-        KEY_CACHE.remove();
+        RedisUtils.deleteObject((String) ThreadLocalHolder.get(KEY_CACHE));
+        ThreadLocalHolder.remove(KEY_CACHE);
     }
 
     /**
