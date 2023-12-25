@@ -8,6 +8,7 @@ import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.core.context.ThreadLocalHolder;
 import org.dromara.common.security.config.properties.SecurityProperties;
 import org.dromara.common.security.handler.AllUrlHandler;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                             "-100", "客户端ID与Token不匹配",
                             StpUtil.getTokenValue());
                     }
+
+                    // 保存用户信息
+                    ThreadLocalHolder.set(LoginHelper.LOGIN_USER_KEY, LoginHelper.getLoginUser());
 
                     // 有效率影响 用于临时测试
                     // if (log.isDebugEnabled()) {

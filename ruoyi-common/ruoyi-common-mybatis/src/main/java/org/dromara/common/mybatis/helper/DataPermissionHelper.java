@@ -1,12 +1,11 @@
 package org.dromara.common.mybatis.helper;
 
-import cn.dev33.satoken.context.SaHolder;
-import cn.dev33.satoken.context.model.SaStorage;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.context.ThreadLocalHolder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,11 +35,10 @@ public class DataPermissionHelper {
     }
 
     public static Map<String, Object> getContext() {
-        SaStorage saStorage = SaHolder.getStorage();
-        Object attribute = saStorage.get(DATA_PERMISSION_KEY);
+        Object attribute = ThreadLocalHolder.get(DATA_PERMISSION_KEY);
         if (ObjectUtil.isNull(attribute)) {
-            saStorage.set(DATA_PERMISSION_KEY, new HashMap<>());
-            attribute = saStorage.get(DATA_PERMISSION_KEY);
+            ThreadLocalHolder.set(DATA_PERMISSION_KEY, new HashMap<>());
+            attribute = ThreadLocalHolder.get(DATA_PERMISSION_KEY);
         }
         if (attribute instanceof Map map) {
             return map;
