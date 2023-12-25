@@ -1,7 +1,6 @@
 package org.dromara.common.web.config;
 
 import org.dromara.common.web.interceptor.PlusWebInvokeTimeInterceptor;
-import org.dromara.common.web.interceptor.UserInfoInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,8 +22,6 @@ public class ResourcesConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 全局访问性能拦截
         registry.addInterceptor(new PlusWebInvokeTimeInterceptor());
-        // 用户信息拦截
-        registry.addInterceptor(new UserInfoInterceptor());
     }
 
     @Override

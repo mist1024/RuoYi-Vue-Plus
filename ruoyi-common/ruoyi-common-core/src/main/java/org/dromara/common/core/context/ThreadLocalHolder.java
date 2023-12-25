@@ -11,9 +11,14 @@ import java.util.Map;
 public class ThreadLocalHolder {
 
     /**
-     * 初始化
+     * 初始化 (支持异步)
      */
-    private static final ThreadLocal<Map<String, Object>> THREAD_LOCAL = ThreadLocal.withInitial(HashMap::new);
+    private static final ThreadLocal<Map<String, Object>> THREAD_LOCAL = new InheritableThreadLocal<>() {
+        @Override
+        protected Map<String, Object> initialValue() {
+            return new HashMap<>();
+        }
+    };
 
     /**
      * 设置值
