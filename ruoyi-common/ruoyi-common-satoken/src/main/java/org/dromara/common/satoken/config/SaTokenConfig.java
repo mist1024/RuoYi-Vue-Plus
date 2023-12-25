@@ -7,6 +7,7 @@ import cn.dev33.satoken.stp.StpLogic;
 import org.dromara.common.core.factory.YmlPropertySourceFactory;
 import org.dromara.common.satoken.core.dao.PlusSaTokenDao;
 import org.dromara.common.satoken.core.service.SaPermissionImpl;
+import org.dromara.common.satoken.handler.UserInfoThreadHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
@@ -40,6 +41,11 @@ public class SaTokenConfig {
     @Bean
     public SaTokenDao saTokenDao() {
         return new PlusSaTokenDao();
+    }
+
+    @Bean
+    public UserInfoThreadHandler userInfoThreadHandler() {
+        return new UserInfoThreadHandler();
     }
 
 }
