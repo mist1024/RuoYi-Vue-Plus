@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
 
-    public static final String LOGIN_USER_KEY = UserConstants.LOGIN_USER_KEY;
+    public static final String LOGIN_USER_KEY = "loginUser";
     public static final String TENANT_KEY = "tenantId";
     public static final String USER_KEY = "userId";
     public static final String DEPT_KEY = "deptId";

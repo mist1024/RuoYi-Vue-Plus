@@ -139,9 +139,4 @@ public interface UserConstants {
      */
     Long SUPER_ADMIN_ID = 1L;
 
-    /**
-     * 登录用户 key
-     */
-    String LOGIN_USER_KEY = "loginUser";
-
 }

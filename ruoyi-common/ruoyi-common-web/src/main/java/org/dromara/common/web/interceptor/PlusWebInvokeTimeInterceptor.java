@@ -73,7 +73,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
             StopWatch stopWatch = ThreadLocalHolder.get(STOP_WATCH_KEY);
             stopWatch.stop();
             log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
-            ThreadLocalHolder.remove(STOP_WATCH_KEY);
+            ThreadLocalHolder.clear();
         }
     }
 
