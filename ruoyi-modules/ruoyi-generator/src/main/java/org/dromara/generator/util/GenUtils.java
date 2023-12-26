@@ -41,7 +41,7 @@ public class GenUtils {
         column.setTableId(table.getTableId());
         column.setCreateBy(table.getCreateBy());
         // 设置java字段名
-        column.setJavaField(StringUtils.toCamelCase(columnName));
+        column.setJavaField(StringUtils.toCamelCase(columnName.toLowerCase()));
         // 设置默认类型
         column.setJavaType(GenConstants.TYPE_STRING);
         column.setQueryType(GenConstants.QUERY_EQ);
