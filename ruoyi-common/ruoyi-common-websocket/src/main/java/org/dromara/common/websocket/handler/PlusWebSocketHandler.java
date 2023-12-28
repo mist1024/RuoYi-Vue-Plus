@@ -1,5 +1,6 @@
 package org.dromara.common.websocket.handler;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
@@ -26,6 +27,9 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
+        if (ObjectUtil.isNull(loginUser)) {
+            return;
+        }
         WebSocketSessionHolder.addSession(loginUser.getUserId(), session);
         log.info("[connect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
@@ -40,6 +44,9 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
+        if (ObjectUtil.isNull(loginUser)) {
+            return;
+        }
         List<Long> userIds = List.of(loginUser.getUserId());
         WebSocketMessageDto webSocketMessageDto = new WebSocketMessageDto();
         webSocketMessageDto.setSessionKeys(userIds);
@@ -85,6 +92,9 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
+        if (ObjectUtil.isNull(loginUser)) {
+            return;
+        }
         WebSocketSessionHolder.removeSession(loginUser.getUserId());
         log.info("[disconnect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
