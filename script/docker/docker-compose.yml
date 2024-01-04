@@ -26,7 +26,7 @@ services:
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
     privileged: true
-    network_mode: "host"
+
 
   nginx-web:
     image: nginx:1.22.1
@@ -47,7 +47,6 @@ services:
       # 日志目录
       - /docker/nginx/log:/var/log/nginx
     privileged: true
-    network_mode: "host"
 
   redis:
     image: redis:6.2.7
@@ -64,7 +63,6 @@ services:
       - /docker/redis/data/:/redis/data/:rw
     command: "redis-server /redis/config/redis.conf"
     privileged: true
-    network_mode: "host"
 
   minio:
     image: minio/minio:RELEASE.2023-03-24T21-41-23Z
@@ -97,7 +95,6 @@ services:
       - /docker/minio/config:/root/.minio/
     command: server --address ':9000' --console-address ':9001' /data  # 指定容器中的目录 /data
     privileged: true
-    network_mode: "host"
 
   ruoyi-server1:
     image: ruoyi/ruoyi-server:4.8.1
@@ -112,7 +109,6 @@ services:
       # skywalking 探针
 #      - /docker/skywalking/agent/:/ruoyi/skywalking/agent
     privileged: true
-    network_mode: "host"
 
   ruoyi-server2:
     image: "ruoyi/ruoyi-server:4.8.1"
@@ -127,7 +123,6 @@ services:
       # skywalking 探针
 #      - /docker/skywalking/agent/:/ruoyi/skywalking/agent
     privileged: true
-    network_mode: "host"
 
   ruoyi-monitor-admin:
     image: ruoyi/ruoyi-monitor-admin:4.8.1
@@ -139,7 +134,6 @@ services:
       # 配置文件
       - /docker/monitor/logs/:/ruoyi/monitor/logs
     privileged: true
-    network_mode: "host"
 
   ruoyi-xxl-job-admin:
     image: ruoyi/ruoyi-xxl-job-admin:4.8.1
@@ -151,4 +145,3 @@ services:
       # 配置文件
       - /docker/xxljob/logs/:/ruoyi/xxljob/logs
     privileged: true
-    network_mode: "host"
