@@ -74,6 +74,9 @@ public class OssClient {
 
             createBucket();
         } catch (Exception e) {
+            if (e instanceof OssException) {
+                throw e;
+            }
             throw new OssException("配置错误! 请检查系统配置:[" + e.getMessage() + "]");
         }
     }
@@ -166,6 +169,21 @@ public class OssClient {
 
     public UploadResult uploadSuffix(File file, String suffix) {
         return upload(file, getPath(properties.getPrefix(), suffix));
+    }
+
+    /**
+     * 获取文件元数据
+     *
+     * @param path 完整文件路径
+     */
+    public HeadObjectResponse getObjectMetadata(String path) {
+        path = path.replace(getUrl() + "/", "");
+        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+            .bucket(properties.getBucketName())
+            .key(path)
+            .build();
+
+        return client.headObject(headObjectRequest);
     }
 
     public InputStream getObjectContent(String path) {
