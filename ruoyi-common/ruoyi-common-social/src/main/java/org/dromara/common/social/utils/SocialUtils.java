@@ -65,6 +65,7 @@ public class SocialUtils  {
             case "wechat_mp" -> new AuthWeChatMpRequest(builder.build(), STATE_CACHE);
             case "aliyun" -> new AuthAliyunRequest(builder.build(), STATE_CACHE);
             case "maxkey" -> new AuthMaxKeyRequest(builder.build(), STATE_CACHE);
+            case "topiam" -> new AuthTopIamRequest(builder.build(), STATE_CACHE);
             default -> throw new AuthException("未获取到有效的Auth配置");
         };
     }
