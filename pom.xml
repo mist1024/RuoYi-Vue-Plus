@@ -44,7 +44,7 @@
         <ip2region.version>2.7.0</ip2region.version>
 
         <!-- OSS 配置 -->
-        <aws-java-sdk-s3.version>1.12.600</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>2.22.9</aws-java-sdk-s3.version>
         <!-- SMS 配置 -->
         <sms4j.version>2.2.0</sms4j.version>
         <!-- 限制框架中的fastjson版本 -->
@@ -236,10 +236,13 @@
             </dependency>
 
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
                 <version>${aws-java-sdk-s3.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
+
             <!--短信sms4j-->
             <dependency>
                 <groupId>org.dromara.sms4j</groupId>

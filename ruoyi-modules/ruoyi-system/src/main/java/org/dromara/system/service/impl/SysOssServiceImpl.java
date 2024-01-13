@@ -1,8 +1,8 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -114,18 +114,15 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     }
 
     @Override
-    public void download(Long ossId, HttpServletResponse response) throws IOException {
+    public void download(Long ossId, HttpServletResponse response) {
         SysOssVo sysOss = SpringUtils.getAopProxy(this).getById(ossId);
         if (ObjectUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-        OssClient storage = OssFactory.instance(sysOss.getService());
-        try(InputStream inputStream = storage.getObjectContent(sysOss.getUrl())) {
-            int available = inputStream.available();
-            IoUtil.copy(inputStream, response.getOutputStream(), available);
-            response.setContentLength(available);
+        try {
+            HttpUtil.download(this.matchingUrl(sysOss).getUrl(), response.getOutputStream(), true);
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
