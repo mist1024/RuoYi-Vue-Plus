@@ -2,6 +2,7 @@ package org.dromara.common.oss.core;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import io.netty.handler.ssl.SslProvider;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.oss.constant.OssConstant;
@@ -12,7 +13,9 @@ import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.client.config.SdkAdvancedAsyncClientOption;
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.*;
 import software.amazon.awssdk.services.s3.model.*;
@@ -27,6 +30,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
+import java.util.concurrent.Executors;
 
 /**
  * S3-v2 存储协议 所有兼容S3协议的云厂商均支持
@@ -40,7 +44,7 @@ public class OssClient {
 
     private final OssProperties properties;
 
-    private final S3Client client;
+    private final S3AsyncClient client;
 
     private final S3Presigner presigner;
 
@@ -51,23 +55,31 @@ public class OssClient {
             StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey()));
 
-            S3Configuration.Builder config = S3Configuration.builder()
-                .chunkedEncodingEnabled(false);
-            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
-                // minio 使用https限制使用域名访问 需要此配置 站点填域名
-                config.pathStyleAccessEnabled(true);
-            }
-            S3ClientBuilder client = S3Client.builder()
+            S3AsyncClientBuilder client = S3AsyncClient.builder()
+                .httpClient(
+                    NettyNioAsyncHttpClient.builder()
+                        .sslProvider(SslProvider.OPENSSL)
+                        .build()
+                )
+                .asyncConfiguration(
+                    b -> b.advancedOption(SdkAdvancedAsyncClientOption
+                            .FUTURE_COMPLETION_EXECUTOR,
+                        Executors.newFixedThreadPool(10)
+                    )
+                )
                 .credentialsProvider(credentialsProvider)
                 .endpointOverride(URI.create(getEndpoint()))
-                .region(Region.of(properties.getRegion()))
-                .serviceConfiguration(config.build());
+                .region(Region.of(properties.getRegion()));
 
             S3Presigner.Builder presigner = S3Presigner.builder()
                 .credentialsProvider(credentialsProvider)
                 .endpointOverride(URI.create(getPresignerEndpoint()))
-                .region(Region.of(properties.getRegion()))
-                .serviceConfiguration(config.build());
+                .region(Region.of(properties.getRegion()));
+
+            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
+                // minio 使用https限制使用域名访问 需要此配置 站点填域名
+                client.forcePathStyle(true);
+            }
 
             this.client = client.build();
             this.presigner = presigner.build();
@@ -87,7 +99,8 @@ public class OssClient {
             try {
                 client.headBucket(HeadBucketRequest.builder()
                     .bucket(bucketName)
-                    .build());
+                    .build())
+                    .get();
                 return;
             } catch (Exception e) {
                 // 桶不存在，捕获异常。
@@ -103,8 +116,8 @@ public class OssClient {
                 .bucket(bucketName)
                 .policy(getPolicy(bucketName, accessPolicy.getPolicyType()))
                 .build();
-            client.createBucket(createBucketRequest);
-            client.putBucketPolicy(putBucketPolicyRequest);
+            client.createBucket(createBucketRequest).get();
+            client.putBucketPolicy(putBucketPolicyRequest).get();
         } catch (Exception e) {
             throw new OssException("创建Bucket失败, 请核对配置信息:[" + e.getMessage() + "]");
         }
@@ -125,7 +138,11 @@ public class OssClient {
                 .contentType(contentType)
                 .acl(getAccessPolicy().getObjectCannedACL()) // 设置上传对象的 Acl
                 .build();
-            client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, inputStream.available()));
+            client.putObject(putObjectRequest, AsyncRequestBody.fromInputStream(
+                inputStream,
+                (long) inputStream.available(),
+                Executors.newFixedThreadPool(1)
+            )).get();
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -139,7 +156,7 @@ public class OssClient {
                 .key(path)
                 .acl(getAccessPolicy().getObjectCannedACL())// 设置上传对象的 Acl
                 .build();
-            client.putObject(putObjectRequest, RequestBody.fromFile(file));
+            client.putObject(putObjectRequest, AsyncRequestBody.fromFile(file)).get();
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -153,7 +170,7 @@ public class OssClient {
                 .bucket(properties.getBucketName())
                 .key(path)
                 .build();
-            client.deleteObject(deleteObjectRequest);
+            client.deleteObject(deleteObjectRequest).get();
         } catch (Exception e) {
             throw new OssException("删除文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
@@ -182,18 +199,7 @@ public class OssClient {
             .bucket(properties.getBucketName())
             .key(path)
             .build();
-
-        return client.headObject(headObjectRequest);
-    }
-
-    public InputStream getObjectContent(String path) {
-        path = path.replace(getUrl() + "/", "");
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-            .bucket(properties.getBucketName())
-            .key(path)
-            .build();
-        return client.getObject(getObjectRequest);
+        return client.headObject(headObjectRequest).join();
     }
 
     public String getEndpoint() {
@@ -245,7 +251,6 @@ public class OssClient {
         }
         return path + suffix;
     }
-
 
     public String getConfigKey() {
         return configKey;
