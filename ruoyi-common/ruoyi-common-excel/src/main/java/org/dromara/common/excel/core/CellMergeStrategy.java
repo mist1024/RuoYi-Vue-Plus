@@ -45,10 +45,12 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements Workbook
     protected void merge(Sheet sheet, Cell cell, Head head, Integer relativeRowIndex) {
         //单元格写入了,遍历合并区域,如果该Cell在区域内,但非首行,则清空
         final int rowIndex = cell.getRowIndex();
-        for (CellRangeAddress cellAddresses : cellList) {
-            final int firstRow = cellAddresses.getFirstRow();
-            if (cellAddresses.isInRange(cell) && rowIndex != firstRow){
-                cell.setBlank();
+        if (CollUtil.isNotEmpty(cellList)){
+            for (CellRangeAddress cellAddresses : cellList) {
+                final int firstRow = cellAddresses.getFirstRow();
+                if (cellAddresses.isInRange(cell) && rowIndex != firstRow){
+                    cell.setBlank();
+                }
             }
         }
     }
@@ -56,8 +58,10 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements Workbook
     @Override
     public void afterWorkbookDispose(final WorkbookWriteHandlerContext context) {
         //当前表格写完后，统一写入
-        for (CellRangeAddress item : cellList) {
-            context.getWriteContext().writeSheetHolder().getSheet().addMergedRegion(item);
+        if (CollUtil.isNotEmpty(cellList)){
+            for (CellRangeAddress item : cellList) {
+                context.getWriteContext().writeSheetHolder().getSheet().addMergedRegion(item);
+            }
         }
     }
 
