@@ -92,16 +92,14 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                         // 空值跳过不合并
                         continue;
                     }
-                    //附加基于注解的合并条件
-                    boolean isMerge = isMerge(list, i, field);
 
                     if (!cellValue.equals(val)) {
-                        if ((i - repeatCell.getCurrent() > 1) && isMerge) {
+                        if ((i - repeatCell.getCurrent() > 1) && isMerge(list, i, field)) {
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex - 1, colNum, colNum));
                         }
                         map.put(field, new RepeatCell(val, i));
                     } else if (i == list.size() - 1) {
-                        if (i > repeatCell.getCurrent() && isMerge) {
+                        if (i > repeatCell.getCurrent() && isMerge(list, i, field)) {
                             cellList.add(new CellRangeAddress(repeatCell.getCurrent() + rowIndex, i + rowIndex, colNum, colNum));
                         }
                     }
