@@ -70,7 +70,7 @@ public class EncryptorAutoConfiguration {
                 }
             }
         }catch (Exception e) {
-            log.error("初始化数据安全缓存是出错:{}", e.getMessage());
+            log.error("初始化数据安全缓存时出错:{}", e.getMessage());
         }
         return fieldCache;
     }
