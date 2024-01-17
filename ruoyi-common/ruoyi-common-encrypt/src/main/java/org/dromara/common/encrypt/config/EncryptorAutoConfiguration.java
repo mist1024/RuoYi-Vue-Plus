@@ -3,7 +3,6 @@ package org.dromara.common.encrypt.config;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.dromara.common.encrypt.annotation.EncryptField;
@@ -11,11 +10,13 @@ import org.dromara.common.encrypt.core.EncryptorManager;
 import org.dromara.common.encrypt.interceptor.MybatisDecryptInterceptor;
 import org.dromara.common.encrypt.interceptor.MybatisEncryptInterceptor;
 import org.dromara.common.encrypt.properties.EncryptorProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.type.ClassMetadata;
@@ -40,9 +41,9 @@ import static org.springframework.util.StringUtils.tokenizeToStringArray;
 @Slf4j
 public class EncryptorAutoConfiguration {
 
-    @Resource
+    @Autowired
     private EncryptorProperties properties;
-    @Resource
+    @Autowired
     private MybatisPlusProperties mybatisPlusProperties;
 
     @Bean
@@ -58,9 +59,9 @@ public class EncryptorAutoConfiguration {
             String[] packagePatternArray = tokenizeToStringArray(typeAliasesPackage,
                 ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
             for (String packagePattern : packagePatternArray) {
-                org.springframework.core.io.Resource[] resources = new PathMatchingResourcePatternResolver().getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+                Resource[] resources = new PathMatchingResourcePatternResolver().getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
                     + ClassUtils.convertClassNameToResourcePath(packagePattern) + "/**/*.class");
-                for (org.springframework.core.io.Resource resource : resources) {
+                for (Resource resource : resources) {
                     ClassMetadata classMetadata = new CachingMetadataReaderFactory().getMetadataReader(resource).getClassMetadata();
                     Class<?> clazz = Resources.classForName(classMetadata.getClassName());
                     Set<Field> encryptFieldSet = getEncryptFieldSetFromClazz(clazz);
