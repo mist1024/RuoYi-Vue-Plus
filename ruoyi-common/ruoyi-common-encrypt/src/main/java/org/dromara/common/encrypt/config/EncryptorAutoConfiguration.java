@@ -63,9 +63,9 @@ public class EncryptorAutoConfiguration {
                 for (org.springframework.core.io.Resource resource : resources) {
                     ClassMetadata classMetadata = new CachingMetadataReaderFactory().getMetadataReader(resource).getClassMetadata();
                     Class<?> clazz = Resources.classForName(classMetadata.getClassName());
-                    Set<Field> safeFieldSetFromClazz = getSafeFieldSetFromClazz(clazz);
-                    if(CollectionUtil.isNotEmpty(safeFieldSetFromClazz)) {
-                        fieldCache.put(clazz, safeFieldSetFromClazz);
+                    Set<Field> encryptFieldSet = getEncryptFieldSetFromClazz(clazz);
+                    if(CollectionUtil.isNotEmpty(encryptFieldSet)) {
+                        fieldCache.put(clazz, encryptFieldSet);
                     }
                 }
             }
@@ -76,8 +76,12 @@ public class EncryptorAutoConfiguration {
     }
 
     // 获得一个类的加密字段集合
-    private Set<Field> getSafeFieldSetFromClazz(Class<?> clazz) {
+    private Set<Field> getEncryptFieldSetFromClazz(Class<?> clazz) {
         Set<Field> fieldSet = new HashSet<>();
+        // 判断clazz如果是接口,内部类,匿名类就直接返回
+        if (clazz.isInterface() || clazz.isMemberClass() || clazz.isAnonymousClass()) {
+            return fieldSet;
+        }
         while (clazz != null) {
             Field[] fields = clazz.getDeclaredFields();
             fieldSet.addAll(Arrays.asList(fields));
