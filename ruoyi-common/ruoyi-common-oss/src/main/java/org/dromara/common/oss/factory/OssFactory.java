@@ -39,7 +39,7 @@ public class OssFactory {
     /**
      * 根据类型获取实例
      */
-    public static synchronized OssClient instance(String configKey) {
+    public static OssClient instance(String configKey) {
         String json = CacheUtils.get(CacheNames.SYS_OSS_CONFIG, configKey);
         if (json == null) {
             throw new OssException("系统异常, '" + configKey + "'配置信息不存在!");
@@ -47,19 +47,18 @@ public class OssFactory {
         OssProperties properties = JsonUtils.parseObject(json, OssProperties.class);
         // 使用租户标识避免多个租户相同key实例覆盖
         String key = properties.getTenantId() + ":" + configKey;
-        OssClient client = CLIENT_CACHE.get(key);
-        if (client == null) {
-            CLIENT_CACHE.put(key, new OssClient(configKey, properties));
-            log.info("创建OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(key);
-        }
-        // 配置不相同则重新构建
-        if (!client.checkPropertiesSame(properties)) {
-            CLIENT_CACHE.put(key, new OssClient(configKey, properties));
-            log.info("重载OSS实例 key => {}", configKey);
-            return CLIENT_CACHE.get(key);
-        }
-        return client;
+        return CLIENT_CACHE.compute(key, (k, client) -> {
+            if (client == null) {
+                log.info("创建OSS实例 key => {}", configKey);
+                return new OssClient(configKey, properties);
+            }
+            if (!client.checkPropertiesSame(properties)) {
+                // 配置不相同则重新构建
+                log.info("重载OSS实例 key => {}", configKey);
+                return new OssClient(configKey, properties);
+            }
+            return client;
+        });
     }
 
 }
