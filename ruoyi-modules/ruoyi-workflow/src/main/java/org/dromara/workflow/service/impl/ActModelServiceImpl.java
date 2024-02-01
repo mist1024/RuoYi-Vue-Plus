@@ -7,34 +7,24 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.core.utils.StreamUtils;
-import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.SysRole;
-import org.dromara.system.domain.SysUser;
 import org.dromara.system.mapper.SysRoleMapper;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.ModelBo;
-import org.dromara.workflow.domain.vo.GroupRepresentation;
-import org.dromara.workflow.domain.vo.ResultListDataRepresentation;
-import org.dromara.workflow.domain.vo.UserRepresentation;
+import org.dromara.workflow.domain.vo.ModelVo;
 import org.dromara.workflow.service.IActModelService;
-import org.dromara.workflow.utils.WorkflowUtils;
+import org.dromara.workflow.utils.ModelUtils;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.editor.constants.ModelDataJsonConstants;
-import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -43,20 +33,17 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ValidationError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static org.dromara.workflow.common.constant.FlowConstant.NAMESPACE;
-import static org.flowable.editor.constants.ModelDataJsonConstants.*;
 
 /**
  * 模型管理 服务层实现
@@ -95,16 +82,6 @@ public class ActModelServiceImpl implements IActModelService {
         query.orderByCreateTime().desc();
         // 分页查询
         List<Model> modelList = query.listPage(modelBo.getPageNum(), modelBo.getPageSize());
-        if (CollUtil.isNotEmpty(modelList)) {
-            modelList.parallelStream().forEach(e -> {
-                boolean isNull = JSONUtil.isNull(JSONUtil.parseObj(e.getMetaInfo()).get(ModelDataJsonConstants.MODEL_DESCRIPTION));
-                if (!isNull) {
-                    e.setMetaInfo((String) JSONUtil.parseObj(e.getMetaInfo()).get(ModelDataJsonConstants.MODEL_DESCRIPTION));
-                } else {
-                    e.setMetaInfo(StrUtil.EMPTY);
-                }
-            });
-        }
         // 总记录数
         long total = query.count();
         return new TableDataInfo<>(modelList, total);
@@ -124,38 +101,22 @@ public class ActModelServiceImpl implements IActModelService {
             String key = modelBo.getKey();
             String name = modelBo.getName();
             String description = modelBo.getDescription();
+            String categoryCode = modelBo.getCategoryCode();
+            String xml = modelBo.getXml();
             Model checkModel = repositoryService.createModelQuery().modelKey(key).modelTenantId(TenantHelper.getTenantId()).singleResult();
             if (ObjectUtil.isNotNull(checkModel)) {
                 throw new ServiceException("模型key已存在！");
             }
-            // 1. 初始空的模型
+            //初始空的模型
             Model model = repositoryService.newModel();
             model.setKey(key);
             model.setName(name);
-            model.setCategory(modelBo.getCategoryCode());
             model.setVersion(version);
-            model.setTenantId(TenantHelper.getTenantId());
-            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
-            // 封装模型json对象
-            ObjectNode objectNode = JsonUtils.getObjectMapper().createObjectNode();
-            objectNode.put(MODEL_NAME, name);
-            objectNode.put(MODEL_REVISION, version);
-            objectNode.put(MODEL_DESCRIPTION, description);
-            model.setMetaInfo(objectNode.toString());
-            // 保存初始化的模型基本信息数据
+            model.setCategory(categoryCode);
+            model.setMetaInfo(description);
+            //保存初始化的模型基本信息数据
             repositoryService.saveModel(model);
-            // 封装模型对象基础数据json串
-            ObjectNode editorNode = objectMapper.createObjectNode();
-            ObjectNode stencilSetNode = objectMapper.createObjectNode();
-            stencilSetNode.put("namespace", NAMESPACE);
-            editorNode.replace("stencilset", stencilSetNode);
-            // 标识key
-            ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("process_id", key);
-            propertiesNode.put("name", name);
-            propertiesNode.put("description", description);
-            editorNode.replace("properties", propertiesNode);
-            repositoryService.addModelEditorSource(model.getId(), editorNode.toString().getBytes(StandardCharsets.UTF_8));
+            repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,93 +127,97 @@ public class ActModelServiceImpl implements IActModelService {
     /**
      * 查询模型
      *
-     * @param modelId 模型id
+     * @param id 模型id
      * @return 模型数据
      */
     @Override
-    public ObjectNode getModelInfo(String modelId) {
-        ObjectNode modelNode = null;
-        Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(TenantHelper.getTenantId()).singleResult();
-        ObjectMapper objectMapper = JsonUtils.getObjectMapper();
+    public ModelVo getInfo(String id) {
+        ModelVo modelVo = new ModelVo();
+        Model model = repositoryService.getModel(id);
         if (model != null) {
             try {
-                if (StringUtils.isNotEmpty(model.getMetaInfo())) {
-                    modelNode = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
-                } else {
-                    modelNode = objectMapper.createObjectNode();
-                    modelNode.put(MODEL_NAME, model.getName());
-                }
-                modelNode.put(MODEL_ID, model.getId());
-                modelNode.put("key", model.getKey());
-                Integer version = model.getVersion();
-                if (version > 0) {
-                    byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
-                    BpmnModel bpmnModel = WorkflowUtils.xmlToBpmnModel(modelEditorSource);
-                    BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
-                    ObjectNode jsonNodes = bpmnJsonConverter.convertToJson(bpmnModel);
-                    modelNode.set("model", jsonNodes);
-                } else {
-                    ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(
-                        new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
-                    modelNode.set("model", editorJsonNode);
-                }
-
+                byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
+                modelVo.setXml(StrUtil.utf8Str(modelEditorSource));
+                modelVo.setId(model.getId());
+                modelVo.setKey(model.getKey());
+                modelVo.setName(model.getName());
+                modelVo.setCategoryCode(model.getCategory());
+                modelVo.setDescription(model.getMetaInfo());
+                return modelVo;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new ServiceException(e.getMessage());
             }
         }
-        return modelNode;
+        return modelVo;
     }
 
     /**
-     * 编辑模型
+     * 修改模型信息
      *
-     * @param modelId 模型id
-     * @param values  模型数据
+     * @param modelBo 模型数据
+     * @return 结果
+     */
+    @Override
+    public boolean update(ModelBo modelBo) {
+        try {
+            Model model = repositoryService.getModel(modelBo.getId());
+            List<Model> list = repositoryService.createModelQuery().modelTenantId(TenantHelper.getTenantId()).modelKey(modelBo.getKey()).list();
+            list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
+                throw new ServiceException("模型KEY已存在！");
+            });
+            model.setKey(modelBo.getKey());
+            model.setName(modelBo.getName());
+            model.setCategory(modelBo.getCategoryCode());
+            model.setMetaInfo(modelBo.getDescription());
+            repositoryService.saveModel(model);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+        return true;
+    }
+
+    /**
+     * 编辑模型XML
+     *
+     * @param modelBo 模型数据
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean editModel(String modelId, MultiValueMap<String, String> values) {
+    public boolean editModelXml(ModelBo modelBo) {
         try {
-            Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(TenantHelper.getTenantId()).singleResult();
-            ObjectMapper objectMapper = JsonUtils.getObjectMapper();
-            ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
-
-            modelJson.put(MODEL_NAME, values.getFirst("name"));
-            modelJson.put(MODEL_DESCRIPTION, values.getFirst("description"));
-            modelJson.put(MODEL_REVISION, model.getVersion() + 1);
-            model.setMetaInfo(modelJson.toString());
-            model.setName(values.getFirst("name"));
-            // 每次保存把版本更新+1
-            model.setVersion(model.getVersion() + 1);
-            // 获取唯一标识key
-            String key = values.getFirst("key");
+            String xml = modelBo.getXml();
+            String svg = modelBo.getSvg();
+            String modelId = modelBo.getId();
+            String key = modelBo.getKey();
+            String name = modelBo.getName();
+            BpmnModel bpmnModel = ModelUtils.xmlToBpmnModel(xml);
+            ModelUtils.checkBpmnModel(bpmnModel);
+            Model model = repositoryService.getModel(modelId);
+            List<Model> list = repositoryService.createModelQuery().modelTenantId(TenantHelper.getTenantId()).modelKey(key).list();
+            list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
+                throw new ServiceException("模型KEY已存在！");
+            });
             // 校验key命名规范
             if (!Validator.isMatchRegex(FlowConstant.MODEL_KEY_PATTERN, key)) {
-                throw new ServiceException("模型标识key只能字符或者下划线开头！");
+                throw new ServiceException("模型标识KEY只能字符或者下划线开头！");
             }
-            List<Model> list = repositoryService.createModelQuery().modelKey(key).modelTenantId(TenantHelper.getTenantId()).list();
-            list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
-                throw new ServiceException("模型标识key已存在！");
-            });
             model.setKey(key);
+            model.setName(name);
+            model.setVersion(model.getVersion() + 1);
             repositoryService.saveModel(model);
-            JsonNode jsonNode = objectMapper.readTree(values.getFirst("json_xml"));
-            // 校验流程标识
-            String processId = jsonNode.get("properties").get("process_id").textValue();
-            if (StringUtils.isBlank(processId)) {
-                throw new ServiceException("流程标识不能为空！");
-            }
-            if (!Validator.isMatchRegex(FlowConstant.MODEL_KEY_PATTERN, processId)) {
-                throw new ServiceException("流程标识只能字符或者下划线开头！");
-            }
+            repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));
+            // 转换图片
+            InputStream svgStream = new ByteArrayInputStream(StrUtil.utf8Bytes(svg));
+            TranscoderInput input = new TranscoderInput(svgStream);
 
-            byte[] xmlBytes = WorkflowUtils.bpmnJsonToXmlBytes(Objects.requireNonNull(JsonUtils.toJsonString(jsonNode)).getBytes(StandardCharsets.UTF_8));
-            if (ArrayUtil.isEmpty(xmlBytes)) {
-                throw new ServiceException("模型不能为空！");
-            }
-            repositoryService.addModelEditorSource(model.getId(), xmlBytes);
+            PNGTranscoder transcoder = new PNGTranscoder();
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            TranscoderOutput output = new TranscoderOutput(outStream);
+
+            transcoder.transcode(input, output);
+            final byte[] result = outStream.toByteArray();
+            repositoryService.addModelEditorSourceExtra(model.getId(), result);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -276,14 +241,14 @@ public class ActModelServiceImpl implements IActModelService {
                 throw new ServiceException("模型数据为空，请先设计流程定义模型，再进行部署！");
             }
             if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString()))) {
-                byte[] bytes = WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes);
+                byte[] bytes = ModelUtils.bpmnJsonToXmlBytes(xmlBytes);
                 if (ArrayUtil.isEmpty(bytes)) {
                     throw new ServiceException("模型不能为空，请至少设计一条主线流程！");
                 }
             }
-            BpmnModel bpmnModel = WorkflowUtils.xmlToBpmnModel(xmlBytes);
+            BpmnModel bpmnModel = ModelUtils.xmlToBpmnModel(xmlBytes);
             // 校验模型
-            WorkflowUtils.checkBpmnModel(bpmnModel);
+            ModelUtils.checkBpmnModel(bpmnModel);
             List<ValidationError> validationErrors = repositoryService.validateProcess(bpmnModel);
             if (CollUtil.isNotEmpty(validationErrors)) {
                 String errorMsg = validationErrors.stream().map(ValidationError::getProblem).distinct().collect(Collectors.joining(","));
@@ -337,7 +302,7 @@ public class ActModelServiceImpl implements IActModelService {
             Model model = repositoryService.getModel(modelId);
             byte[] xmlBytes = repositoryService.getModelEditorSource(modelId);
             if (ObjectUtil.isNotNull(model)) {
-                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(WorkflowUtils.bpmnJsonToXmlBytes(xmlBytes))) {
+                if (JSONUtil.isTypeJSON(IOUtils.toString(xmlBytes, StandardCharsets.UTF_8.toString())) && ArrayUtil.isEmpty(ModelUtils.bpmnJsonToXmlBytes(xmlBytes))) {
                     zipName = "模型不能为空，请至少设计一条主线流程！";
                     zos.putNextEntry(new ZipEntry(zipName + ".txt"));
                     zos.write(zipName.getBytes(StandardCharsets.UTF_8));
@@ -370,50 +335,5 @@ public class ActModelServiceImpl implements IActModelService {
                 }
             }
         }
-    }
-
-    /**
-     * 查询用户
-     *
-     * @param filter 参数
-     */
-    @Override
-    public ResultListDataRepresentation getUsers(String filter) {
-
-        LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery();
-        wrapper.like(StringUtils.isNotBlank(filter), SysUser::getNickName, filter);
-        List<SysUser> sysUsers = sysUserMapper.selectList(wrapper);
-        List<UserRepresentation> userRepresentations = new ArrayList<>();
-        for (SysUser sysUser : sysUsers) {
-            UserRepresentation userRepresentation = new UserRepresentation();
-            userRepresentation.setFullName(sysUser.getNickName());
-            userRepresentation.setLastName(sysUser.getNickName());
-            userRepresentation.setTenantId(sysUser.getTenantId());
-            userRepresentation.setEmail(sysUser.getEmail());
-            userRepresentation.setId(sysUser.getUserId().toString());
-            userRepresentations.add(userRepresentation);
-        }
-        return new ResultListDataRepresentation(userRepresentations);
-    }
-
-    /**
-     * 查询用户组
-     *
-     * @param filter 参数
-     */
-    @Override
-    public ResultListDataRepresentation getGroups(String filter) {
-
-        LambdaQueryWrapper<SysRole> wrapper = Wrappers.lambdaQuery();
-        wrapper.like(StringUtils.isNotBlank(filter), SysRole::getRoleName, filter);
-        List<SysRole> sysRoles = sysRoleMapper.selectList(wrapper);
-        List<GroupRepresentation> result = StreamUtils.toList(sysRoles, sysRole -> {
-            GroupRepresentation groupRepresentation = new GroupRepresentation();
-            groupRepresentation.setId(sysRole.getRoleId().toString());
-            groupRepresentation.setName(sysRole.getRoleName());
-            groupRepresentation.setType(sysRole.getRoleKey());
-            return groupRepresentation;
-        });
-        return new ResultListDataRepresentation(result);
     }
 }

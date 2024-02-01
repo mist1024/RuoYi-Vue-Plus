@@ -1,12 +1,11 @@
 package org.dromara.workflow.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.bo.ModelBo;
-import org.dromara.workflow.domain.vo.ResultListDataRepresentation;
+import org.dromara.workflow.domain.vo.ModelVo;
 import org.flowable.engine.repository.Model;
-import org.springframework.util.MultiValueMap;
+
 
 /**
  * 模型管理 服务层
@@ -36,16 +35,23 @@ public interface IActModelService {
      * @param modelId 模型id
      * @return 模型数据
      */
-    ObjectNode getModelInfo(String modelId);
+    ModelVo getInfo(String modelId);
 
     /**
-     * 编辑模型
+     * 修改模型信息
      *
-     * @param modelId 模型id
-     * @param values  模型数据
+     * @param modelBo 模型数据
      * @return 结果
      */
-    boolean editModel(String modelId, MultiValueMap<String, String> values);
+    boolean update(ModelBo modelBo);
+
+    /**
+     * 编辑模型XML
+     *
+     * @param modelBo 模型数据
+     * @return 结果
+     */
+    boolean editModelXml(ModelBo modelBo);
 
     /**
      * 模型部署
@@ -62,20 +68,4 @@ public interface IActModelService {
      * @param response 相应
      */
     void exportZip(String modelId, HttpServletResponse response);
-
-    /**
-     * 查询用户
-     *
-     * @param filter 参数
-     * @return 结果
-     */
-    ResultListDataRepresentation getUsers(String filter);
-
-    /**
-     * 查询用户组
-     *
-     * @param filter 参数
-     * @return 结果
-     */
-    ResultListDataRepresentation getGroups(String filter);
 }

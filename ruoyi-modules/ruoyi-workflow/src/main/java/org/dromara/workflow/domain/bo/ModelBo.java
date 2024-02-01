@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.validate.AddGroup;
+import org.dromara.common.core.validate.EditGroup;
 import org.dromara.workflow.common.PageEntity;
 import org.dromara.workflow.common.constant.FlowConstant;
 
@@ -24,6 +25,12 @@ public class ModelBo extends PageEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 模型id
+     */
+    @NotBlank(message = "模型ID不能为空", groups = {EditGroup.class})
+    private String id;
+
+    /**
      * 模型名称
      */
     @NotBlank(message = "模型名称不能为空", groups = {AddGroup.class})
@@ -41,6 +48,18 @@ public class ModelBo extends PageEntity implements Serializable {
      */
     @NotBlank(message = "模型分类不能为空", groups = {AddGroup.class})
     private String categoryCode;
+
+    /**
+     * 模型XML
+     */
+    @NotBlank(message = "模型XML不能为空", groups = {AddGroup.class})
+    private String xml;
+
+    /**
+     * 模型SVG图片
+     */
+    @NotBlank(message = "模型SVG不能为空", groups = {EditGroup.class})
+    private String svg;
 
     /**
      * 备注
