@@ -114,6 +114,7 @@ public class ActModelServiceImpl implements IActModelService {
             model.setVersion(version);
             model.setCategory(categoryCode);
             model.setMetaInfo(description);
+            model.setTenantId(TenantHelper.getTenantId());
             //保存初始化的模型基本信息数据
             repositoryService.saveModel(model);
             repositoryService.addModelEditorSource(model.getId(), StrUtil.utf8Bytes(xml));
@@ -165,8 +166,6 @@ public class ActModelServiceImpl implements IActModelService {
             list.stream().filter(e -> !e.getId().equals(model.getId())).findFirst().ifPresent(e -> {
                 throw new ServiceException("模型KEY已存在！");
             });
-            model.setKey(modelBo.getKey());
-            model.setName(modelBo.getName());
             model.setCategory(modelBo.getCategoryCode());
             model.setMetaInfo(modelBo.getDescription());
             repositoryService.saveModel(model);

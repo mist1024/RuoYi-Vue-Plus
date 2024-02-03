@@ -78,7 +78,7 @@ public class ActModelController extends BaseController {
      */
     @Log(title = "模型管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/update")
     public R<Void> update(@RequestBody ModelBo modelBo) {
         return toAjax(actModelService.update(modelBo));
     }
