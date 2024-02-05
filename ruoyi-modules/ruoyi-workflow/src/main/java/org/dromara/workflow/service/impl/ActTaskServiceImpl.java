@@ -492,7 +492,13 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public boolean addMultiInstanceExecution(AddMultiBo addMultiBo) {
-        Task task = taskService.createTaskQuery().taskId(addMultiBo.getTaskId()).taskTenantId(TenantHelper.getTenantId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        TaskQuery taskQuery = taskService.createTaskQuery();
+        taskQuery.taskId(addMultiBo.getTaskId());
+        taskQuery.taskTenantId(TenantHelper.getTenantId());
+        if (!LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin()) {
+            taskQuery.taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId()));
+        }
+        Task task = taskQuery.singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }
@@ -535,7 +541,13 @@ public class ActTaskServiceImpl implements IActTaskService {
      */
     @Override
     public boolean deleteMultiInstanceExecution(DeleteMultiBo deleteMultiBo) {
-        Task task = taskService.createTaskQuery().taskId(deleteMultiBo.getTaskId()).taskTenantId(TenantHelper.getTenantId()).taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId())).singleResult();
+        TaskQuery taskQuery = taskService.createTaskQuery();
+        taskQuery.taskId(deleteMultiBo.getTaskId());
+        taskQuery.taskTenantId(TenantHelper.getTenantId());
+        if (!LoginHelper.isSuperAdmin() && !LoginHelper.isTenantAdmin()) {
+            taskQuery.taskCandidateOrAssigned(String.valueOf(LoginHelper.getUserId()));
+        }
+        Task task = taskQuery.singleResult();
         if (ObjectUtil.isEmpty(task)) {
             throw new ServiceException(FlowConstant.MESSAGE_CURRENT_TASK_IS_NULL);
         }

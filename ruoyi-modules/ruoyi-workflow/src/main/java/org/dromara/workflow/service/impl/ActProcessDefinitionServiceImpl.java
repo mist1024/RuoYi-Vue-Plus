@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
@@ -295,17 +294,25 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             InputStream inputStream = file.getInputStream();
             Deployment deployment;
             if (FlowConstant.ZIP.equals(suffix)) {
-                // zip
                 deployment = repositoryService.createDeployment()
                     .tenantId(TenantHelper.getTenantId())
                     .addZipInputStream(new ZipInputStream(inputStream)).name(processName).key(processKey).category(categoryCode).deploy();
-            } else if (Arrays.asList(ResourceNameUtil.BPMN_RESOURCE_SUFFIXES).contains(filename)) {
-                // xml 或 bpmn
-                deployment = repositoryService.createDeployment()
-                    .tenantId(TenantHelper.getTenantId())
-                    .addInputStream(filename, inputStream).name(processName).key(processKey).category(categoryCode).deploy();
             } else {
-                throw new ServiceException("文件类型上传错误！");
+                String[] list = ResourceNameUtil.BPMN_RESOURCE_SUFFIXES;
+                boolean flag = false;
+                for (String str : list) {
+                    if (filename.contains(str)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) {
+                    deployment = repositoryService.createDeployment()
+                        .tenantId(TenantHelper.getTenantId())
+                        .addInputStream(filename, inputStream).name(processName).key(processKey).category(categoryCode).deploy();
+                } else {
+                    throw new ServiceException("文件类型上传错误！");
+                }
             }
             // 更新分类
             ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();

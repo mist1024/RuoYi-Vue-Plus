@@ -1,5 +1,6 @@
 package org.dromara.workflow.flowable.cmd;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -51,10 +52,14 @@ public class DeleteSequenceMultiInstanceCmd implements Command<Void> {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
         ExecutionEntity entity = executionEntityManager.findById(executionId);
         // 设置流程变量
-        List<Long> userIds = (List<Long>) entity.getVariable(assigneeList);
+        List<Long> userIds = new ArrayList<>();
+        List<Object> variable = (List<Object>) entity.getVariable(assigneeList);
+        for (Object o : variable) {
+            userIds.add(Long.valueOf(o.toString()));
+        }
         List<Long> userIdList = new ArrayList<>();
         userIds.forEach(e -> {
-            Long userId = assignees.stream().filter(id -> id.equals(e)).findFirst().orElse(null);
+            Long userId = assignees.stream().filter(id -> ObjectUtil.equals(id, e)).findFirst().orElse(null);
             if (userId == null) {
                 userIdList.add(e);
             }

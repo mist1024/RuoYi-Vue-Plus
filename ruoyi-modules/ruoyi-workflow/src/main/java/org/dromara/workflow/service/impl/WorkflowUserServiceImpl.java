@@ -99,13 +99,16 @@ public class WorkflowUserServiceImpl implements IWorkflowUserService {
         if (multiInstance == null) {
             return Collections.emptyList();
         }
-        List<Long> assigneeList = null;
+        List<Long> assigneeList = new ArrayList<>();
         if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
-            assigneeList = (List<Long>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+            List<Object> variable = (List<Object>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+            for (Object o : variable) {
+                assigneeList.add(Long.valueOf(o.toString()));
+            }
         }
 
         if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
-            List<Long> userIds = StreamUtils.filter(assigneeList, e -> !e.toString().equals(task.getAssignee()));
+            List<Long> userIds = StreamUtils.filter(assigneeList, e -> !String.valueOf(e).equals(task.getAssignee()));
             List<SysUserVo> sysUsers = null;
             if (CollectionUtil.isNotEmpty(userIds)) {
                 sysUsers = sysUserMapper.selectVoBatchIds(userIds);
