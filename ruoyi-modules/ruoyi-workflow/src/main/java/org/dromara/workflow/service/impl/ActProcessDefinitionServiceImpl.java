@@ -6,8 +6,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -22,7 +20,6 @@ import org.dromara.workflow.domain.bo.ProcessDefinitionBo;
 import org.dromara.workflow.domain.vo.ProcessDefinitionVo;
 import org.dromara.workflow.service.IActProcessDefinitionService;
 import org.dromara.workflow.service.IWfCategoryService;
-import org.flowable.editor.constants.ModelDataJsonConstants;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
@@ -257,11 +254,6 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 modelData.setKey(pd.getKey());
                 modelData.setName(pd.getName());
                 modelData.setTenantId(pd.getTenantId());
-                ObjectNode modelObjectNode = new ObjectMapper().createObjectNode();
-                modelObjectNode.put(ModelDataJsonConstants.MODEL_NAME, pd.getName());
-                modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, modelData.getVersion());
-                modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, pd.getDescription());
-                modelData.setMetaInfo(modelObjectNode.toString());
                 repositoryService.saveModel(modelData);
                 repositoryService.addModelEditorSource(modelData.getId(), IoUtil.readBytes(inputStream));
             }

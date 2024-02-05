@@ -26,6 +26,7 @@ import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
 import org.dromara.workflow.flowable.strategy.FlowTaskEventHandler;
 import org.dromara.workflow.service.IActTaskService;
 import org.dromara.workflow.utils.WorkflowUtils;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -100,7 +101,12 @@ public class ActTaskServiceImpl implements IActTaskService {
         variables.put(FLOWABLE_SKIP_EXPRESSION_ENABLED, true);
         // 流程发起人
         variables.put(INITIATOR, (String.valueOf(LoginHelper.getUserId())));
-        ProcessInstance pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
+        ProcessInstance pi;
+        try {
+            pi = runtimeService.startProcessInstanceByKeyAndTenantId(startProcessBo.getProcessKey(), startProcessBo.getBusinessKey(), variables, TenantHelper.getTenantId());
+        } catch (FlowableObjectNotFoundException e) {
+            throw new ServiceException("找不到当前【" + startProcessBo.getProcessKey() + "】流程定义！");
+        }
         // 将流程定义名称 作为 流程实例名称
         runtimeService.setProcessInstanceName(pi.getProcessInstanceId(), pi.getProcessDefinitionName());
         // 申请人执行流程
