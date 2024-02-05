@@ -90,7 +90,7 @@ public class ActModelController extends BaseController {
      */
     @Log(title = "模型管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PostMapping(value = "/editModelXml")
+    @PutMapping(value = "/editModelXml")
     public R<Void> editModel(@Validated(EditGroup.class) @RequestBody ModelBo modelBo) {
         return toAjax(actModelService.editModelXml(modelBo));
     }
