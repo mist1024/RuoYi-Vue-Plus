@@ -24,6 +24,14 @@ public interface IActProcessInstanceService {
     String getHistoryProcessImage(String processInstanceId);
 
     /**
+     * 通过流程实例id获取历史流程图运行中，历史等节点
+     *
+     * @param processInstanceId 流程实例id
+     * @return 结果
+     */
+    Map<String, Object> getHistoryProcessList(String processInstanceId);
+
+    /**
      * 分页查询正在运行的流程实例
      *
      * @param processInstanceBo 参数

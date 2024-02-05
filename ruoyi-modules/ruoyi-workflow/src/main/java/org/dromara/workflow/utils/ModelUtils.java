@@ -24,10 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.ServerException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -190,5 +187,34 @@ public class ModelUtils {
                 buildFlowElements(subFlowElements, list);
             }
         }
+    }
+
+    /**
+     * 获取全部扩展信息
+     *
+     * @param processDefinitionId 流程定义id
+     */
+    public Map<String, List<ExtensionElement>> getExtensionElements(String processDefinitionId) {
+        Map<String, List<ExtensionElement>> map = new HashMap<>();
+        List<FlowElement> flowElements = getFlowElements(processDefinitionId);
+        for (FlowElement flowElement : flowElements) {
+            if (flowElement instanceof UserTask && CollUtil.isNotEmpty(flowElement.getExtensionElements())) {
+                map.putAll(flowElement.getExtensionElements());
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 获取某个节点的扩展信息
+     *
+     * @param processDefinitionId 流程定义id
+     * @param flowElementId       节点id
+     */
+    public Map<String, List<ExtensionElement>> getExtensionElement(String processDefinitionId, String flowElementId) {
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        Process process = bpmnModel.getMainProcess();
+        FlowElement flowElement = process.getFlowElement(flowElementId);
+        return flowElement.getExtensionElements();
     }
 }

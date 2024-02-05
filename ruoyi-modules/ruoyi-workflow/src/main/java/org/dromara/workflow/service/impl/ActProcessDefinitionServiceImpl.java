@@ -23,6 +23,7 @@ import org.dromara.workflow.service.IWfCategoryService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
@@ -297,11 +299,13 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 deployment = repositoryService.createDeployment()
                     .tenantId(TenantHelper.getTenantId())
                     .addZipInputStream(new ZipInputStream(inputStream)).name(processName).key(processKey).category(categoryCode).deploy();
-            } else {
+            } else if (Arrays.asList(ResourceNameUtil.BPMN_RESOURCE_SUFFIXES).contains(filename)) {
                 // xml 或 bpmn
                 deployment = repositoryService.createDeployment()
                     .tenantId(TenantHelper.getTenantId())
                     .addInputStream(filename, inputStream).name(processName).key(processKey).category(categoryCode).deploy();
+            } else {
+                throw new ServiceException("文件类型上传错误！");
             }
             // 更新分类
             ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();

@@ -8,11 +8,6 @@ package org.dromara.workflow.common.constant;
  */
 public interface FlowConstant {
 
-    /**
-     * 命名空间
-     */
-    String NAMESPACE = "http://b3mn.org/stencilset/bpmn2.0#";
-
     String MESSAGE_CURRENT_TASK_IS_NULL = "当前任务不存在或你不是任务办理人！";
 
     String MESSAGE_SUSPENDED = "当前任务已挂起不可审批！";
@@ -21,6 +16,27 @@ public interface FlowConstant {
      * 连线
      */
     String SEQUENCE_FLOW = "sequenceFlow";
+
+    /**
+     * 并行网关
+     */
+    String PARALLEL_GATEWAY = "parallelGateway";
+
+    /**
+     * 排它网关
+     */
+    String EXCLUSIVE_GATEWAY = "exclusiveGateway";
+
+    /**
+     * 包含网关
+     */
+    String INCLUSIVE_GATEWAY = "inclusiveGateway";
+
+    /**
+     * 结束节点
+     */
+    String END_EVENT = "endEvent";
+
 
     /**
      * 流程委派标识
@@ -62,17 +78,7 @@ public interface FlowConstant {
     /**
      * 流程发起人
      */
-    String INITIATOR = "INITIATOR";
-
-    /**
-     * 设计器中节点设置流程发起人
-     */
-    String INITIATOR_SET = "$INITIATOR";
-
-    /**
-     * 修改设计器设置的变量错误内容
-     */
-    String INITIATOR_SET_UPDATE = "${INITIATOR}";
+    String INITIATOR = "initiator";
 
     /**
      * 开启跳过表达式变量

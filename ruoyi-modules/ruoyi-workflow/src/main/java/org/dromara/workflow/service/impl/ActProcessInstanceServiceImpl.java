@@ -39,6 +39,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
@@ -50,7 +51,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -209,6 +212,96 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         CustomDefaultProcessDiagramGenerator diagramGenerator = new CustomDefaultProcessDiagramGenerator();
         InputStream inputStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedNodeList, highLightedFlows, activityFontName, labelFontName, annotationFontName, null, 1.0, true);
         return Base64.encode(IOUtils.toByteArray(inputStream));
+    }
+
+    /**
+     * 通过流程实例id获取历史流程图运行中，历史等节点
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @Override
+    public Map<String, Object> getHistoryProcessList(String processInstanceId) {
+        Map<String, Object> map = new HashMap<>();
+        List<Map<String, Object>> taskList = new ArrayList<>();
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        StringBuilder xml = new StringBuilder();
+        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(historicProcessInstance.getProcessDefinitionId());
+        // 获取节点
+        List<HistoricActivityInstance> highLightedFlowList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
+        for (HistoricActivityInstance tempActivity : highLightedFlowList) {
+            Map<String, Object> task = new HashMap<>();
+            if (!FlowConstant.SEQUENCE_FLOW.equals(tempActivity.getActivityType()) &&
+                !FlowConstant.PARALLEL_GATEWAY.equals(tempActivity.getActivityType()) &&
+                !FlowConstant.EXCLUSIVE_GATEWAY.equals(tempActivity.getActivityType()) &&
+                !FlowConstant.INCLUSIVE_GATEWAY.equals(tempActivity.getActivityType())
+            ) {
+                task.put("key", tempActivity.getActivityId());
+                task.put("completed", tempActivity.getEndTime() != null);
+                task.put("activityType", tempActivity.getActivityType());
+                taskList.add(task);
+            }
+        }
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance != null) {
+            taskList = taskList.stream().filter(e -> !e.get("activityType").equals(FlowConstant.END_EVENT)).collect(Collectors.toList());
+        }
+        //查询出运行中节点
+        List<Map<String, Object>> runtimeNodeList = taskList.stream().filter(e -> !(Boolean) e.get("completed")).collect(Collectors.toList());
+        if (CollUtil.isNotEmpty(runtimeNodeList)) {
+            Iterator<Map<String, Object>> iterator = taskList.iterator();
+            while (iterator.hasNext()) {
+                Map<String, Object> next = iterator.next();
+                runtimeNodeList.stream().filter(t -> t.get("key").equals(next.get("key")) && (Boolean) next.get("completed")).findFirst().ifPresent(t -> iterator.remove());
+            }
+        }
+        map.put("taskList", taskList);
+        List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId);
+        map.put("historyList", historyTaskList);
+        InputStream inputStream;
+        try {
+            inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
+            xml.append(IOUtils.toString(inputStream, String.valueOf(StandardCharsets.UTF_8)));
+            map.put("xml", xml.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    /**
+     * 获取历史任务节点信息
+     *
+     * @param processInstanceId 流程实例id
+     */
+    private List<ActHistoryInfoVo> getHistoryTaskList(String processInstanceId) {
+        //查询任务办理记录
+        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).orderByHistoricTaskInstanceEndTime().desc().list();
+        list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
+        List<ActHistoryInfoVo> actHistoryInfoVoList = new ArrayList<>();
+        for (HistoricTaskInstance historicTaskInstance : list) {
+            ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
+            BeanUtils.copyProperties(historicTaskInstance, actHistoryInfoVo);
+            actHistoryInfoVo.setStatus(actHistoryInfoVo.getEndTime() == null ? "待处理" : "已处理");
+            if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
+                actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
+            }
+            actHistoryInfoVoList.add(actHistoryInfoVo);
+        }
+        List<ActHistoryInfoVo> historyInfoVoList = new ArrayList<>();
+        Map<String, List<ActHistoryInfoVo>> groupByKey = StreamUtils.groupByKey(actHistoryInfoVoList, ActHistoryInfoVo::getTaskDefinitionKey);
+        for (Map.Entry<String, List<ActHistoryInfoVo>> entry : groupByKey.entrySet()) {
+            ActHistoryInfoVo historyInfoVo = new ActHistoryInfoVo();
+            BeanUtils.copyProperties(entry.getValue().get(0), historyInfoVo);
+            actHistoryInfoVoList.stream().filter(e -> e.getTaskDefinitionKey().equals(entry.getKey()) && e.getEndTime() == null).findFirst()
+                .ifPresent(e -> {
+                    historyInfoVo.setStatus("待处理");
+                    historyInfoVo.setStartTime(e.getStartTime());
+                    historyInfoVo.setEndTime(null);
+                    historyInfoVo.setRunDuration(null);
+                });
+            historyInfoVoList.add(historyInfoVo);
+        }
+        return historyInfoVoList;
     }
 
     /**

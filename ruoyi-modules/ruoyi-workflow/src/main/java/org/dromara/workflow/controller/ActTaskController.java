@@ -108,6 +108,7 @@ public class ActTaskController extends BaseController {
      * @param taskId 任务id
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/claim/{taskId}")
     public R<Void> claimTask(@NotBlank(message = "任务id不能为空") @PathVariable String taskId) {
         try {
@@ -125,6 +126,7 @@ public class ActTaskController extends BaseController {
      * @param taskId 任务id
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/returnTask/{taskId}")
     public R<Void> returnTask(@NotBlank(message = "任务id不能为空") @PathVariable String taskId) {
         try {
@@ -142,6 +144,7 @@ public class ActTaskController extends BaseController {
      * @param delegateBo 参数
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/delegateTask")
     public R<Void> delegateTask(@Validated({AddGroup.class}) @RequestBody DelegateBo delegateBo) {
         return toAjax(actTaskService.delegateTask(delegateBo));
@@ -153,6 +156,7 @@ public class ActTaskController extends BaseController {
      * @param terminationBo 参数
      */
     @Log(title = "任务管理", businessType = BusinessType.DELETE)
+    @RepeatSubmit()
     @PostMapping("/terminationTask")
     public R<Void> terminationTask(@RequestBody TerminationBo terminationBo) {
         return toAjax(actTaskService.terminationTask(terminationBo));
@@ -164,6 +168,7 @@ public class ActTaskController extends BaseController {
      * @param transmitBo 参数
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/transferTask")
     public R<Void> transferTask(@Validated({AddGroup.class}) @RequestBody TransmitBo transmitBo) {
         return toAjax(actTaskService.transferTask(transmitBo));
@@ -175,6 +180,7 @@ public class ActTaskController extends BaseController {
      * @param addMultiBo 参数
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/addMultiInstanceExecution")
     public R<Void> addMultiInstanceExecution(@Validated({AddGroup.class}) @RequestBody AddMultiBo addMultiBo) {
         return toAjax(actTaskService.addMultiInstanceExecution(addMultiBo));
@@ -186,6 +192,7 @@ public class ActTaskController extends BaseController {
      * @param deleteMultiBo 参数
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/deleteMultiInstanceExecution")
     public R<Void> deleteMultiInstanceExecution(@Validated({AddGroup.class}) @RequestBody DeleteMultiBo deleteMultiBo) {
         return toAjax(actTaskService.deleteMultiInstanceExecution(deleteMultiBo));
@@ -197,6 +204,7 @@ public class ActTaskController extends BaseController {
      * @param backProcessBo 参数
      */
     @Log(title = "任务管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/backProcess")
     public R<String> backProcess(@RequestBody BackProcessBo backProcessBo) {
         return R.ok(actTaskService.backProcess(backProcessBo));
@@ -220,6 +228,7 @@ public class ActTaskController extends BaseController {
      * @param userId  办理人id
      */
     @Log(title = "任务管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/updateAssignee/{taskIds}/{userId}")
     public R<Void> updateAssignee(@PathVariable String[] taskIds, @PathVariable String userId) {
         return toAjax(actTaskService.updateAssignee(taskIds, userId));

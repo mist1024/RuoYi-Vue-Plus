@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -64,6 +65,16 @@ public class ActProcessInstanceController extends BaseController {
     }
 
     /**
+     * 通过流程实例id获取历史流程图运行中，历史等节点
+     *
+     * @param processInstanceId 流程实例id
+     */
+    @GetMapping("/getHistoryProcessList/{processInstanceId}")
+    public R<Map<String, Object>> getHistoryProcessList(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
+        return R.ok("操作成功", actProcessInstanceService.getHistoryProcessList(processInstanceId));
+    }
+
+    /**
      * 获取审批记录
      *
      * @param processInstanceId 流程实例id
@@ -79,6 +90,7 @@ public class ActProcessInstanceController extends BaseController {
      * @param processInvalidBo 参数
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @RepeatSubmit()
     @PostMapping("/deleteRuntimeProcessInst")
     public R<Void> deleteRuntimeProcessInst(@Validated(AddGroup.class) @RequestBody ProcessInvalidBo processInvalidBo) {
         return toAjax(actProcessInstanceService.deleteRuntimeProcessInst(processInvalidBo));
@@ -90,6 +102,7 @@ public class ActProcessInstanceController extends BaseController {
      * @param processInstanceIds 流程实例id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @RepeatSubmit()
     @DeleteMapping("/deleteRuntimeProcessAndHisInst/{processInstanceIds}")
     public R<Void> deleteRuntimeProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
         return toAjax(actProcessInstanceService.deleteRuntimeProcessAndHisInst(Arrays.asList(processInstanceIds)));
@@ -101,6 +114,7 @@ public class ActProcessInstanceController extends BaseController {
      * @param processInstanceIds 流程实例id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.DELETE)
+    @RepeatSubmit()
     @DeleteMapping("/deleteFinishProcessAndHisInst/{processInstanceIds}")
     public R<Void> deleteFinishProcessAndHisInst(@NotNull(message = "流程实例id不能为空") @PathVariable String[] processInstanceIds) {
         return toAjax(actProcessInstanceService.deleteFinishProcessAndHisInst(Arrays.asList(processInstanceIds)));
@@ -112,6 +126,7 @@ public class ActProcessInstanceController extends BaseController {
      * @param processInstanceId 流程实例id
      */
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/cancelProcessApply/{processInstanceId}")
     public R<Void> cancelProcessApply(@NotBlank(message = "流程实例id不能为空") @PathVariable String processInstanceId) {
         return toAjax(actProcessInstanceService.cancelProcessApply(processInstanceId));
@@ -133,6 +148,7 @@ public class ActProcessInstanceController extends BaseController {
      * @param taskUrgingBo 任务催办
      */
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping("/taskUrging")
     public R<Void> taskUrging(@RequestBody TaskUrgingBo taskUrgingBo) {
         return toAjax(actProcessInstanceService.taskUrging(taskUrgingBo));

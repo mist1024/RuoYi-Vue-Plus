@@ -82,7 +82,7 @@ public class GlobalFlowableListener implements FlowableEventListener {
                 if (task != null) {
                     List<Comment> taskComments = taskService.getTaskComments(task.getId());
                     if (CollUtil.isEmpty(taskComments)) {
-                        taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), "自动审批！");
+                        taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.PASS.getStatus(), "超时自动审批！");
                     }
                 }
             }
