@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@FlowListenerAnnotation(processDefinitionKey = "leave1", taskDefId = "sid-31C52262-04C3-43D8-A3FB-8434017A6572")
+@FlowListenerAnnotation(processDefinitionKey = "leave1", taskDefId = "Activity_14633hx")
 public class TestCustomTaskHandler implements FlowTaskEventHandler {
 
     @Override
