@@ -162,10 +162,11 @@ public class OssClient {
      * @param filePath  本地文件路径
      * @param key       在 Amazon S3 中的对象键
      * @param md5Digest 本地文件的 MD5 哈希值（可选）
+     * @param deleteAfterUpload 是否自动删除临时文件
      * @return UploadResult 包含上传后的文件信息
      * @throws OssException 如果上传失败，抛出自定义异常
      */
-    public UploadResult upload(Path filePath, String key, String md5Digest) {
+    public UploadResult upload(Path filePath, String key, String md5Digest, Boolean deleteAfterUpload) {
         try {
             // 构建上传请求对象
             FileUpload fileUpload = transferManager.uploadFile(
@@ -187,8 +188,9 @@ public class OssClient {
             // 捕获异常并抛出自定义异常
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         } finally {
-            // 无论上传是否成功，最终都会删除临时文件
-            FileUtils.del(filePath);
+            if (deleteAfterUpload){
+                FileUtils.del(filePath);
+            }
         }
     }
 
@@ -322,11 +324,12 @@ public class OssClient {
      *
      * @param file   要上传的文件
      * @param suffix 对象键的后缀
+     * @param deleteAfterUpload 是否自动删除临时文件
      * @return UploadResult 包含上传后的文件信息
      * @throws OssException 如果上传失败，抛出自定义异常
      */
-    public UploadResult uploadSuffix(File file, String suffix) {
-        return upload(file.toPath(), getPath(properties.getPrefix(), suffix), null);
+    public UploadResult uploadSuffix(File file, String suffix, Boolean deleteAfterUpload) {
+        return upload(file.toPath(), getPath(properties.getPrefix(), suffix), null, deleteAfterUpload);
     }
 
     /**
