@@ -29,6 +29,11 @@ public class CompleteTaskBo implements Serializable {
     private String taskId;
 
     /**
+     * 附件id
+     */
+    private String fileId;
+
+    /**
      * 消息类型
      */
     private List<String> messageType;
