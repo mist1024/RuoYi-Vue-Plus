@@ -3,10 +3,12 @@ package org.dromara.workflow.domain.vo;
 import lombok.Data;
 import org.dromara.common.translation.annotation.Translation;
 import org.dromara.common.translation.constant.TransConstant;
+import org.flowable.engine.task.Attachment;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 流程审批记录视图
@@ -79,4 +81,9 @@ public class ActHistoryInfoVo implements Serializable {
      * 审批信息
      */
     private String comment;
+
+    /**
+     * 审批附件
+     */
+    private List<Attachment> attachmentList;
 }

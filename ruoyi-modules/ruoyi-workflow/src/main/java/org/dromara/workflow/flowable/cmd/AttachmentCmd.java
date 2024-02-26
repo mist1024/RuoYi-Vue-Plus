@@ -49,7 +49,7 @@ public class AttachmentCmd implements Command<Boolean> {
                         AttachmentEntity attachmentEntity = attachmentEntityManager.create();
                         attachmentEntity.setRevision(1);
                         attachmentEntity.setUserId(LoginHelper.getUserId().toString());
-                        attachmentEntity.setName(sysOssVo.getFileName());
+                        attachmentEntity.setName(sysOssVo.getOriginalName());
                         attachmentEntity.setDescription(sysOssVo.getOriginalName());
                         attachmentEntity.setType(sysOssVo.getFileSuffix());
                         attachmentEntity.setTaskId(taskId);

@@ -42,6 +42,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -318,6 +319,8 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         list = StreamUtils.sorted(list, Comparator.comparing(HistoricTaskInstance::getEndTime, Comparator.nullsFirst(Date::compareTo)).reversed());
         List<ActHistoryInfoVo> actHistoryInfoVoList = new ArrayList<>();
         List<Comment> processInstanceComments = taskService.getProcessInstanceComments(processInstanceId);
+        //附件
+        List<Attachment> attachmentList = taskService.getProcessInstanceAttachments(processInstanceId);
         for (HistoricTaskInstance historicTaskInstance : list) {
             ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
             BeanUtils.copyProperties(historicTaskInstance, actHistoryInfoVo);
@@ -341,6 +344,13 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 actHistoryInfoVo.setAssignee(StringUtils.isNotBlank(historicTaskInstance.getAssignee()) ? Long.valueOf(historicTaskInstance.getAssignee()) : null);
             } catch (NumberFormatException ignored) {
                 log.warn("当前任务【{}】,办理人转换人员ID【{}】异常！", historicTaskInstance.getName(), historicTaskInstance.getAssignee());
+            }
+            //附件
+            if (CollUtil.isNotEmpty(attachmentList)) {
+                List<Attachment> attachments = attachmentList.stream().filter(e -> e.getTaskId().equals(historicTaskInstance.getId())).collect(Collectors.toList());
+                if (CollUtil.isNotEmpty(attachments)) {
+                    actHistoryInfoVo.setAttachmentList(attachments);
+                }
             }
             actHistoryInfoVoList.add(actHistoryInfoVo);
         }
