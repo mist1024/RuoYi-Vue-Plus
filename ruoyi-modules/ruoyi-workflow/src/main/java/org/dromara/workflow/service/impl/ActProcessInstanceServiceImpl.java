@@ -112,6 +112,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         if (StringUtils.isNotBlank(processInstanceBo.getCategoryCode())) {
             query.processDefinitionCategory(processInstanceBo.getCategoryCode());
         }
+        query.orderByStartTime().desc();
         List<ProcessInstance> processInstances = query.listPage(processInstanceBo.getPageNum(), processInstanceBo.getPageSize());
         for (ProcessInstance processInstance : processInstances) {
             ProcessInstanceVo processInstanceVo = BeanUtil.toBean(processInstance, ProcessInstanceVo.class);

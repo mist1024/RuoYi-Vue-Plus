@@ -76,6 +76,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         if (StringUtils.isNotEmpty(processDefinitionBo.getName())) {
             query.processDefinitionNameLike("%" + processDefinitionBo.getName() + "%");
         }
+        query.orderByDeploymentId().desc();
         // 分页查询
         List<ProcessDefinitionVo> processDefinitionVoList = new ArrayList<>();
         List<ProcessDefinition> definitionList = query.latestVersion().listPage(processDefinitionBo.getPageNum(), processDefinitionBo.getPageSize());

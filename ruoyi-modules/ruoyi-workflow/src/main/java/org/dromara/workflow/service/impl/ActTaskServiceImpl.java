@@ -278,6 +278,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
             query.processDefinitionKey(taskBo.getProcessDefinitionKey());
         }
+        query.orderByTaskCreateTime().desc();
         List<Task> taskList = query.listPage(taskBo.getPageNum(), taskBo.getPageSize());
         List<ProcessInstance> processInstanceList = null;
         if (CollUtil.isNotEmpty(taskList)) {

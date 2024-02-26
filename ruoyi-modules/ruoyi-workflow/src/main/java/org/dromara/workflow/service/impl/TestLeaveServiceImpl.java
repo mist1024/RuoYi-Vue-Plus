@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.domain.TestLeave;
@@ -75,6 +76,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         lqw.eq(StringUtils.isNotBlank(bo.getLeaveType()), TestLeave::getLeaveType, bo.getLeaveType());
         lqw.ge(bo.getStartLeaveDays() != null,TestLeave::getLeaveDays, bo.getStartLeaveDays());
         lqw.le(bo.getEndLeaveDays() != null,TestLeave::getLeaveDays, bo.getEndLeaveDays());
+        lqw.orderByDesc(BaseEntity::getCreateTime);
         return lqw;
     }
 
