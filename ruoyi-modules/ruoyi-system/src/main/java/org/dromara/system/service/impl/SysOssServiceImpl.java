@@ -196,10 +196,22 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public SysOssVo upload(File file) {
+        return this.upload(file, true);
+    }
+
+    /**
+     * 上传文件到对象存储服务，并保存文件信息到数据库
+     *
+     * @param file 要上传的文件对象
+     * @param deleteAfterUpload 是否自动删除临时文件
+     * @return 上传成功后的 SysOssVo 对象，包含文件信息
+     */
+    @Override
+    public SysOssVo upload(File file, Boolean deleteAfterUpload) {
         String originalfileName = file.getName();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient storage = OssFactory.instance();
-        UploadResult uploadResult = storage.uploadSuffix(file, suffix);
+        UploadResult uploadResult = storage.uploadSuffix(file, suffix, deleteAfterUpload);
         // 保存文件信息
         return buildResultEntity(originalfileName, suffix, storage.getConfigKey(), uploadResult);
     }

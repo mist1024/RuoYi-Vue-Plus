@@ -61,6 +61,15 @@ public interface ISysOssService {
     SysOssVo upload(File file);
 
     /**
+     * 上传文件到对象存储服务，并保存文件信息到数据库
+     *
+     * @param file 要上传的文件对象
+     * @param deleteAfterUpload 是否自动删除临时文件
+     * @return 上传成功后的 SysOssVo 对象，包含文件信息
+     */
+    SysOssVo upload(File file, Boolean deleteAfterUpload);
+
+    /**
      * 文件下载方法，支持一次性下载完整文件
      *
      * @param ossId    OSS对象ID
