@@ -470,10 +470,10 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                 taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.INVALID.getStatus(), deleteReason);
             }
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceBusinessKey(processInvalidBo.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
-            if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
-                BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
-            }
+                .processInstanceId(processInvalidBo.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+//            if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
+//                BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
+//            }
             runtimeService.updateBusinessStatus(processInvalidBo.getProcessInstanceId(), BusinessStatusEnum.INVALID.getStatus());
             runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstanceId(), deleteReason);
             FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(historicProcessInstance.getProcessDefinitionKey());
