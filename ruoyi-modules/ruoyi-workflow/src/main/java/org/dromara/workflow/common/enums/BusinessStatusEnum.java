@@ -89,26 +89,5 @@ public enum BusinessStatusEnum {
             throw new ServiceException("流程状态为空！");
         }
     }
-
-    /**
-     * 校验流程申请
-     *
-     * @param status 状态
-     */
-    public static void checkStatus(String status) {
-        if (FINISH.getStatus().equals(status)) {
-            throw new ServiceException("该单据已完成申请！");
-        } else if (INVALID.getStatus().equals(status)) {
-            throw new ServiceException("该单据已作废！");
-        } else if (CANCEL.getStatus().equals(status)) {
-            throw new ServiceException("该单据已撤销！");
-        } else if (BACK.getStatus().equals(status)) {
-            throw new ServiceException("该单据已退回！");
-        } else if (TERMINATION.getStatus().equals(status)) {
-            throw new ServiceException("该单据已终止！");
-        } else if (StringUtils.isBlank(status)) {
-            throw new ServiceException("流程状态为空！");
-        }
-    }
 }
 
