@@ -611,7 +611,6 @@ public class ActTaskServiceImpl implements IActTaskService {
             ExecutionChildByExecutionIdCmd childByExecutionIdCmd = new ExecutionChildByExecutionIdCmd(task.getExecutionId());
             List<ExecutionEntity> executionEntities = managementService.executeCommand(childByExecutionIdCmd);
             //校验单据
-            BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
             if (BusinessStatusEnum.BACK.getStatus().equals(processInstance.getBusinessStatus())) {
                 throw new ServiceException("该单据已退回！");
             }
