@@ -471,9 +471,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInvalidBo.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
-//            if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
-//                BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
-//            }
+            if (ObjectUtil.isNotEmpty(historicProcessInstance) && BusinessStatusEnum.FINISH.getStatus().equals(historicProcessInstance.getBusinessStatus())) {
+                throw new ServiceException("该单据已完成申请！");
+            }
             runtimeService.updateBusinessStatus(processInvalidBo.getProcessInstanceId(), BusinessStatusEnum.INVALID.getStatus());
             runtimeService.deleteProcessInstance(processInvalidBo.getProcessInstanceId(), deleteReason);
             FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(historicProcessInstance.getProcessDefinitionKey());
@@ -587,7 +587,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (processInstance.isSuspended()) {
                 throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
             }
-            BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
+            if (BusinessStatusEnum.CANCEL.getStatus().equals(processInstance.getBusinessStatus())) {
+                throw new ServiceException("该单据已撤销！");
+            }
             List<Task> taskList = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(processInstanceId).list();
             for (Task task : taskList) {
                 taskService.setAssignee(task.getId(), String.valueOf(LoginHelper.getUserId()));

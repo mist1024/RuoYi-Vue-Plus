@@ -434,8 +434,8 @@ public class ActTaskServiceImpl implements IActTaskService {
             throw new ServiceException(FlowConstant.MESSAGE_SUSPENDED);
         }
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey(task.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
-        if (ObjectUtil.isNotEmpty(historicProcessInstance)) {
-            BusinessStatusEnum.checkStatus(historicProcessInstance.getBusinessStatus());
+        if (ObjectUtil.isNotEmpty(historicProcessInstance) && BusinessStatusEnum.TERMINATION.getStatus().equals(historicProcessInstance.getBusinessStatus())) {
+            throw new ServiceException("该单据已终止！");
         }
         try {
             if (StringUtils.isBlank(terminationBo.getComment())) {
@@ -612,6 +612,9 @@ public class ActTaskServiceImpl implements IActTaskService {
             List<ExecutionEntity> executionEntities = managementService.executeCommand(childByExecutionIdCmd);
             //校验单据
             BusinessStatusEnum.checkStatus(processInstance.getBusinessStatus());
+            if (BusinessStatusEnum.BACK.getStatus().equals(processInstance.getBusinessStatus())) {
+                throw new ServiceException("该单据已退回！");
+            }
             //判断是否有多个任务
             List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstanceId).taskTenantId(TenantHelper.getTenantId()).list();
             //申请人节点
