@@ -2,15 +2,11 @@ package org.dromara.workflow.utils;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
-import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
@@ -28,10 +24,8 @@ import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IWorkflowUserService;
 import org.dromara.workflow.service.impl.WorkflowUserServiceImpl;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
@@ -41,14 +35,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.rmi.ServerException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.dromara.workflow.common.constant.FlowConstant.*;
 
@@ -93,6 +80,40 @@ public class WorkflowUtils {
             PROCESS_ENGINE.getManagementService().executeCommand(updateHiTaskInstCmd);
         }
         return task;
+    }
+
+    /**
+     * 抄送任务
+     *
+     * @param parentTaskList 父级任务
+     * @param userIds        人员id
+     */
+    public static void createCopyTask(List<Task> parentTaskList, List<Long> userIds) {
+        List<Task> list = new ArrayList<>();
+        for (Task parentTask : parentTaskList) {
+            for (Long userId : userIds) {
+                TaskEntity newTask = (TaskEntity) PROCESS_ENGINE.getTaskService().newTask();
+                newTask.setParentTaskId(parentTask.getId());
+                newTask.setAssignee(userId.toString());
+                newTask.setName("【抄送】-" + parentTask.getName());
+                newTask.setProcessDefinitionId(parentTask.getProcessDefinitionId());
+                newTask.setProcessInstanceId(parentTask.getProcessInstanceId());
+                newTask.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
+                list.add(newTask);
+            }
+        }
+        PROCESS_ENGINE.getTaskService().bulkSaveTasks(list);
+        /*if (CollectionUtil.isNotEmpty(list) && CollectionUtil.isNotEmpty(parentTaskList)) {
+            String processInstanceId = parentTaskList.get(0).getProcessInstanceId();
+            String processDefinitionId = parentTaskList.get(0).getProcessDefinitionId();
+            List<String> taskIds = list.stream().map(Task::getId).collect(Collectors.toList());
+            ActHiTaskinst actHiTaskinst = new ActHiTaskinst();
+            actHiTaskinst.setProcDefId(processDefinitionId);
+            actHiTaskinst.setProcInstId(processInstanceId);
+            LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(ActHiTaskinst::getId, Collections.singletonList(taskIds));
+            actHiTaskinstMapper.update(actHiTaskinst, updateWrapper);
+        }*/
     }
 
     /**
@@ -188,8 +209,7 @@ public class WorkflowUtils {
      */
     public static String getBusinessStatusByTaskId(String taskId) {
         HistoricTaskInstance historicTaskInstance = PROCESS_ENGINE.getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).taskTenantId(TenantHelper.getTenantId()).singleResult();
-        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery()
-            .processInstanceId(historicTaskInstance.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(historicTaskInstance.getProcessInstanceId()).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 
@@ -199,8 +219,7 @@ public class WorkflowUtils {
      * @param processInstanceId 流程实例id
      */
     public static String getBusinessStatus(String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery()
-            .processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
+        HistoricProcessInstance historicProcessInstance = PROCESS_ENGINE.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceTenantId(TenantHelper.getTenantId()).singleResult();
         return historicProcessInstance.getBusinessStatus();
     }
 

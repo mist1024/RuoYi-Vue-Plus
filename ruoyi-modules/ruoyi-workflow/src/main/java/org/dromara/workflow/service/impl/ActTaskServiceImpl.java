@@ -20,6 +20,7 @@ import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.TaskVo;
+import org.dromara.workflow.domain.vo.WfCopy;
 import org.dromara.workflow.flowable.strategy.FlowEventStrategy;
 import org.dromara.workflow.flowable.cmd.*;
 import org.dromara.workflow.flowable.strategy.FlowProcessEventHandler;
@@ -190,6 +191,14 @@ public class ActTaskServiceImpl implements IActTaskService {
                 }
             } else {
                 List<Task> list = taskService.createTaskQuery().taskTenantId(TenantHelper.getTenantId()).processInstanceId(task.getProcessInstanceId()).list();
+                if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(completeTaskBo.getWfCopyList())) {
+                    TaskEntity newTask = WorkflowUtils.createNewTask(task);
+                    taskService.addComment(newTask.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(),
+                        LoginHelper.getLoginUser().getNickname() + "【抄送】给" + String.join(",", StreamUtils.toList(completeTaskBo.getWfCopyList(), WfCopy::getUserName)));
+                    taskService.complete(newTask.getId());
+                    List<Task> taskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+                    WorkflowUtils.createCopyTask(taskList, StreamUtils.toList(completeTaskBo.getWfCopyList(), WfCopy::getUserId));
+                }
                 sendMessage(list, processInstance.getName(), completeTaskBo.getMessageType(), null);
             }
             return true;
