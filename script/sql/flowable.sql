@@ -1,6 +1,6 @@
 insert into sys_menu values('11616', '工作流'  , '0',    '6', 'workflow',          '',                                 '', '1', '0', 'M', '0', '0', '',                       'tree-table', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values('11617', '模型管理', '11616', '2', 'model',             'workflow/model/index',             '', '1', '1', 'C', '0', '0', 'workflow:model:list',    'tree-table', 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values('11618', '我的待办', '11616', '5', 'task',              '',                                 '', '1', '0', 'M', '0', '0', '',                       'tree-table', 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values('11618', '我的任务', '0', '7', 'task',              '',                                 '', '1', '0', 'M', '0', '0', '',                       'tree-table', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values('11619', '待办任务', '11618', '2', 'taskWaiting',       'workflow/task/index',              '', '1', '1', 'C', '0', '0', '',                       'tree-table', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values('11620', '流程定义', '11616', '3', 'processDefinition', 'workflow/processDefinition/index', '', '1', '1', 'C', '0', '0', '',                       'tree-table', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values('11621', '流程实例', '11630', '1', 'processInstance',   'workflow/processInstance/index',   '', '1', '1', 'C', '0', '0', '',                       'tree-table', 103, 1, sysdate(), NULL, NULL, '');
