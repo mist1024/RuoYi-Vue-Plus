@@ -2,6 +2,7 @@ package org.dromara.workflow.mapper;
 
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +26,13 @@ public interface ActTaskMapper extends BaseMapperPlus<TaskVo, TaskVo> {
      * @return 结果
      */
     Page<TaskVo> getTaskWaitByPage(@Param("page") Page<TaskVo> page, @Param(Constants.WRAPPER) Wrapper<TaskVo> queryWrapper);
+
+    /**
+     * 查询当前用户的抄送
+     *
+     * @param page         分页
+     * @param queryWrapper 条件
+     * @return 结果
+     */
+    Page<TaskVo> getTaskCopyByPage(@Param("page") Page<TaskVo> page, @Param(Constants.WRAPPER) QueryWrapper<TaskVo> queryWrapper);
 }

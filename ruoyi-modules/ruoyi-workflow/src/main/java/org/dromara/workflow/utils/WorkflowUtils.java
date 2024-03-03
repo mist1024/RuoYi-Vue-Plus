@@ -120,7 +120,7 @@ public class WorkflowUtils {
             actHiTaskinst.setScopeType(TaskStatusEnum.COPY.getStatus());
             actHiTaskinst.setTenantId(TenantHelper.getTenantId());
             LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.in(ActHiTaskinst::getId, Collections.singletonList(taskIds));
+            updateWrapper.in(ActHiTaskinst::getId, taskIds);
             ACT_HI_TASKINST_MAPPER.update(actHiTaskinst, updateWrapper);
             for (Task task : list) {
                 PROCESS_ENGINE.getTaskService().addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(), StrUtil.EMPTY);

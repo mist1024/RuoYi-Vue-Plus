@@ -93,6 +93,16 @@ public class ActTaskController extends BaseController {
     }
 
     /**
+     * 查询当前用户的抄送
+     *
+     * @param taskBo 参数
+     */
+    @GetMapping("/getTaskCopyByPage")
+    public TableDataInfo<TaskVo> getTaskCopyByPage(TaskBo taskBo) {
+        return actTaskService.getTaskCopyByPage(taskBo);
+    }
+
+    /**
      * 查询当前租户所有已办任务
      *
      * @param taskBo 参数

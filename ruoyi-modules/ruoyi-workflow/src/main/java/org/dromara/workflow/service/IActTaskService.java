@@ -55,6 +55,14 @@ public interface IActTaskService {
     TableDataInfo<TaskVo> getTaskFinishByPage(TaskBo taskBo);
 
     /**
+     * 查询当前用户的抄送
+     *
+     * @param taskBo 参数
+     * @return 结果
+     */
+    TableDataInfo<TaskVo> getTaskCopyByPage(TaskBo taskBo);
+
+    /**
      * 查询当前租户所有已办任务
      *
      * @param taskBo 参数

@@ -352,6 +352,38 @@ public class ActTaskServiceImpl implements IActTaskService {
     }
 
     /**
+     * 查询当前用户的抄送
+     *
+     * @param taskBo 参数
+     */
+    @Override
+    public TableDataInfo<TaskVo> getTaskCopyByPage(TaskBo taskBo) {
+        PageQuery pageQuery = new PageQuery();
+        pageQuery.setPageNum(taskBo.getPageNum());
+        pageQuery.setPageSize(taskBo.getPageSize());
+        QueryWrapper<TaskVo> queryWrapper = new QueryWrapper<>();
+        String userId = String.valueOf(LoginHelper.getUserId());
+        if (StringUtils.isNotBlank(taskBo.getName())) {
+            queryWrapper.like("t.name_", taskBo.getName());
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionName())) {
+            queryWrapper.like("t.processDefinitionName", taskBo.getProcessDefinitionName());
+        }
+        if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
+            queryWrapper.eq("t.processDefinitionKey", taskBo.getProcessDefinitionKey());
+        }
+        queryWrapper.eq("t.assignee_", userId);
+        Page<TaskVo> page = actTaskMapper.getTaskCopyByPage(pageQuery.build(), queryWrapper);
+
+        List<TaskVo> taskList = page.getRecords();
+        for (TaskVo task : taskList) {
+            task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
+            task.setMultiInstance(WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey()) != null);
+        }
+        return new TableDataInfo<>(taskList, page.getTotal());
+    }
+
+    /**
      * 查询当前租户所有已办任务
      *
      * @param taskBo 参数
