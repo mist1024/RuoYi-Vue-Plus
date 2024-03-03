@@ -3,6 +3,8 @@ package org.dromara.workflow.utils;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -16,11 +18,14 @@ import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.common.enums.BusinessStatusEnum;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
+import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
+import org.dromara.workflow.domain.ActHiTaskinst;
 import org.dromara.workflow.domain.vo.MultiInstanceVo;
 import org.dromara.workflow.domain.vo.ParticipantVo;
 import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
+import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IWorkflowUserService;
 import org.dromara.workflow.service.impl.WorkflowUserServiceImpl;
@@ -52,6 +57,7 @@ public class WorkflowUtils {
     private static final ProcessEngine PROCESS_ENGINE = SpringUtils.getBean(ProcessEngine.class);
     private static final IWorkflowUserService I_WORKFLOW_USER_SERVICE = SpringUtils.getBean(WorkflowUserServiceImpl.class);
     private static final IActHiProcinstService I_ACT_HI_PROCINST_SERVICE = SpringUtils.getBean(IActHiProcinstService.class);
+    private static final ActHiTaskinstMapper ACT_HI_TASKINST_MAPPER = SpringUtils.getBean(ActHiTaskinstMapper.class);
 
     /**
      * 创建一个新任务
@@ -99,21 +105,27 @@ public class WorkflowUtils {
                 newTask.setProcessDefinitionId(parentTask.getProcessDefinitionId());
                 newTask.setProcessInstanceId(parentTask.getProcessInstanceId());
                 newTask.setTaskDefinitionKey(parentTask.getTaskDefinitionKey());
+                newTask.setTenantId(TenantHelper.getTenantId());
                 list.add(newTask);
             }
         }
         PROCESS_ENGINE.getTaskService().bulkSaveTasks(list);
-        /*if (CollectionUtil.isNotEmpty(list) && CollectionUtil.isNotEmpty(parentTaskList)) {
+        if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(parentTaskList)) {
             String processInstanceId = parentTaskList.get(0).getProcessInstanceId();
             String processDefinitionId = parentTaskList.get(0).getProcessDefinitionId();
-            List<String> taskIds = list.stream().map(Task::getId).collect(Collectors.toList());
+            List<String> taskIds = StreamUtils.toList(list, Task::getId);
             ActHiTaskinst actHiTaskinst = new ActHiTaskinst();
             actHiTaskinst.setProcDefId(processDefinitionId);
             actHiTaskinst.setProcInstId(processInstanceId);
+            actHiTaskinst.setScopeType(TaskStatusEnum.COPY.getStatus());
+            actHiTaskinst.setTenantId(TenantHelper.getTenantId());
             LambdaUpdateWrapper<ActHiTaskinst> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(ActHiTaskinst::getId, Collections.singletonList(taskIds));
-            actHiTaskinstMapper.update(actHiTaskinst, updateWrapper);
-        }*/
+            updateWrapper.in(ActHiTaskinst::getId, Collections.singletonList(taskIds));
+            ACT_HI_TASKINST_MAPPER.update(actHiTaskinst, updateWrapper);
+            for (Task task : list) {
+                PROCESS_ENGINE.getTaskService().addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.COPY.getStatus(), StrUtil.EMPTY);
+            }
+        }
     }
 
     /**

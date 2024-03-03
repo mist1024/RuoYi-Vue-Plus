@@ -331,11 +331,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             }
             if (CollUtil.isNotEmpty(processInstanceComments)) {
                 processInstanceComments.stream().filter(e -> e.getTaskId().equals(historicTaskInstance.getId())).findFirst().ifPresent(e -> {
-                    if (StringUtils.isNotBlank(e.getFullMessage())) {
-                        actHistoryInfoVo.setComment(e.getFullMessage());
-                        actHistoryInfoVo.setStatus(e.getType());
-                        actHistoryInfoVo.setStatusName(TaskStatusEnum.findByStatus(e.getType()));
-                    }
+                    actHistoryInfoVo.setComment(e.getFullMessage());
+                    actHistoryInfoVo.setStatus(e.getType());
+                    actHistoryInfoVo.setStatusName(TaskStatusEnum.findByStatus(e.getType()));
                 });
             }
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
