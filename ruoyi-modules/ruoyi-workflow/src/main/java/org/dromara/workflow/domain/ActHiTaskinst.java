@@ -23,169 +23,169 @@ public class ActHiTaskinst {
     /**
      *
      */
-    @TableId(value = "id_")
+    @TableId(value = "ID_")
     private String id;
 
     /**
      * 版本
      */
-    @TableField(value = "rev_")
+    @TableField(value = "REV_")
     private Long rev;
 
     /**
      * 流程定义id
      */
-    @TableField(value = "proc_def_id_")
+    @TableField(value = "PROC_DEF_ID_")
     private String procDefId;
 
     /**
      *
      */
-    @TableField(value = "task_def_id_")
+    @TableField(value = "TASK_DEF_ID_")
     private String taskDefId;
 
     /**
      * 任务节点id
      */
-    @TableField(value = "task_def_key_")
+    @TableField(value = "TASK_DEF_KEY_")
     private String taskDefKey;
 
     /**
      * 流程实例id
      */
-    @TableField(value = "proc_inst_id_")
+    @TableField(value = "PROC_INST_ID_")
     private String procInstId;
 
     /**
      * 流程执行id
      */
-    @TableField(value = "execution_id")
+    @TableField(value = "EXECUTION_ID")
     private String executionId;
 
     /**
      *
      */
-    @TableField(value = "scope_id_")
+    @TableField(value = "SCOPE_ID_")
     private String scopeId;
 
     /**
      *
      */
-    @TableField(value = "sub_scope_id_")
+    @TableField(value = "SUB_SCOPE_ID_")
     private String subScopeId;
 
     /**
      * 先用当前字段标识抄送类型
      */
-    @TableField(value = "scope_type_")
+    @TableField(value = "SCOPE_TYPE_")
     private String scopeType;
 
     /**
      *
      */
-    @TableField(value = "scope_definition_id_")
+    @TableField(value = "SCOPE_DEFINITION_ID_")
     private String scopeDefinitionId;
 
     /**
      *
      */
-    @TableField(value = "propagated_stage_inst_id_")
+    @TableField(value = "PROPAGATED_STAGE_INST_ID_")
     private String propagatedStageInstId;
 
     /**
      * 任务名称
      */
-    @TableField(value = "name_")
+    @TableField(value = "NAME_")
     private String name;
 
     /**
      * 父级id
      */
-    @TableField(value = "parent_task_id_")
+    @TableField(value = "PARENT_TASK_ID_")
     private String parentTaskId;
 
     /**
      * 描述
      */
-    @TableField(value = "description_")
+    @TableField(value = "DESCRIPTION_")
     private String description;
 
     /**
      * 办理人
      */
-    @TableField(value = "owner_")
+    @TableField(value = "OWNER_")
     private String owner;
 
     /**
      * 办理人
      */
-    @TableField(value = "assignee_")
+    @TableField(value = "ASSIGNEE_")
     private String assignee;
 
     /**
      * 开始事件
      */
-    @TableField(value = "start_time_")
+    @TableField(value = "START_TIME_")
     private Date startTime;
 
     /**
      * 认领时间
      */
-    @TableField(value = "claim_time_")
+    @TableField(value = "CLAIM_TIME_")
     private Date claimTime;
 
     /**
      * 结束时间
      */
-    @TableField(value = "end_time_")
+    @TableField(value = "END_TIME_")
     private Date endTime;
 
     /**
      * 持续时间
      */
-    @TableField(value = "duration_")
+    @TableField(value = "DURATION_")
     private Long duration;
 
     /**
      * 删除原因
      */
-    @TableField(value = "delete_reason_")
+    @TableField(value = "DELETE_REASON_")
     private String deleteReason;
 
     /**
      * 优先级
      */
-    @TableField(value = "priority_")
+    @TableField(value = "PRIORITY_")
     private Long priority;
 
     /**
      * 到期时间
      */
-    @TableField(value = "due_date_")
+    @TableField(value = "DUE_DATE_")
     private Date dueDate;
 
     /**
      *
      */
-    @TableField(value = "form_key_")
+    @TableField(value = "FORM_KEY_")
     private String formKey;
 
     /**
      * 分类
      */
-    @TableField(value = "category_")
+    @TableField(value = "CATEGORY_")
     private String category;
 
     /**
      * 最后修改时间
      */
-    @TableField(value = "last_updated_time_")
+    @TableField(value = "LAST_UPDATED_TIME_")
     private Date lastUpdatedTime;
 
     /**
      * 租户id
      */
-    @TableField(value = "tenant_id_")
+    @TableField(value = "TENANT_ID_")
     private String tenantId;
 
 
