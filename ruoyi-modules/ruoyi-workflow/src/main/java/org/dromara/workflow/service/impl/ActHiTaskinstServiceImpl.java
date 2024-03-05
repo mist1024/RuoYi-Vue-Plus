@@ -2,7 +2,6 @@ package org.dromara.workflow.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.dromara.workflow.mapper.ActHiTaskinstMapper;
 import org.dromara.workflow.service.IActHiTaskinstService;
 
 
@@ -15,8 +14,5 @@ import org.dromara.workflow.service.IActHiTaskinstService;
 @RequiredArgsConstructor
 @Service
 public class ActHiTaskinstServiceImpl implements IActHiTaskinstService {
-
-    private final ActHiTaskinstMapper baseMapper;
-
 
 }
