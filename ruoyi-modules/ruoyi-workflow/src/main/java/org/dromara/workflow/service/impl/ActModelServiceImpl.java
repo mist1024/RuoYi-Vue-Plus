@@ -17,8 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.mapper.SysRoleMapper;
-import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.bo.ModelBo;
 import org.dromara.workflow.domain.vo.ModelVo;
@@ -55,8 +53,6 @@ import java.util.zip.ZipOutputStream;
 public class ActModelServiceImpl implements IActModelService {
 
     private final RepositoryService repositoryService;
-    private final SysUserMapper sysUserMapper;
-    private final SysRoleMapper sysRoleMapper;
 
     /**
      * 分页查询模型
