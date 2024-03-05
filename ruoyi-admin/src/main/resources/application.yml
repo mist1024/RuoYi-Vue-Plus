@@ -47,6 +47,7 @@ logging:
     org.dromara: @logging.level@
     org.springframework: warn
     tech.powerjob.worker.background: warn
+    org.mybatis.spring.mapper: error
   config: classpath:logback-plus.xml
 
 # 用户配置
@@ -63,7 +64,6 @@ spring:
     name: ${ruoyi.name}
   threads:
     # 开启虚拟线程 仅jdk21可用
-    # 开启后还需更改 UndertowConfig 虚拟线程配置
     virtual:
       enabled: false
   # 资源信息
@@ -143,8 +143,7 @@ tenant:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
-  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
-  # 例如 com.**.**.mapper
+  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
   mapperPackage: org.dromara.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
@@ -231,6 +230,7 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 # 全局线程池相关配置
+# 如使用JDK21请直接使用虚拟线程 不要开启此配置
 thread-pool:
   # 是否开启线程池
   enabled: false
