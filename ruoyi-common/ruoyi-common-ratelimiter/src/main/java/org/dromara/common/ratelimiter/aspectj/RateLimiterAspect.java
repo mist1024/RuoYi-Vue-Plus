@@ -80,7 +80,7 @@ public class RateLimiterAspect {
 
     private String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
         String key = rateLimiter.key();
-        if (StringUtils.isNotBlank(key)) {
+        if (StringUtils.isBlank(key)) {
             MethodSignature signature = (MethodSignature) point.getSignature();
             Method targetMethod = signature.getMethod();
             Object[] args = point.getArgs();
