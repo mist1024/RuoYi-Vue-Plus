@@ -31,11 +31,11 @@
     <select id="getTaskWaitByPage" resultMap="TaskWaitingVoResult">
         select *
         from (SELECT RES.*,
-                     AHP.business_status_,
-                     ARP.name_ as processDefinitionName,
-                     ARP.key_  as processDefinitionKey,
-                     LINK.user_id_,
-                     LINK.group_id_
+                     AHP.BUSINESS_STATUS_,
+                     ARP.NAME_ as processDefinitionName,
+                     ARP.KEY_  as processDefinitionKey,
+                     LINK.USER_ID_,
+                     LINK.GROUP_ID_
               FROM ACT_RU_TASK RES
                        INNER JOIN ACT_HI_PROCINST AHP ON RES.PROC_INST_ID_ = AHP.PROC_INST_ID_
                        INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = RES.PROC_DEF_ID_
@@ -47,9 +47,9 @@
     <select id="getTaskCopyByPage" resultMap="TaskWaitingVoResult">
         select *
         from (SELECT AHT.*,
-                     AHP.business_status_,
-                     ARP.name_ as processDefinitionName,
-                     ARP.key_  as processDefinitionKey
+                     AHP.BUSINESS_STATUS_,
+                     ARP.NAME_ as processDefinitionName,
+                     ARP.KEY_  as processDefinitionKey
               FROM ACT_HI_TASKINST AHT
                        INNER JOIN ACT_HI_PROCINST AHP ON AHT.PROC_INST_ID_ = AHP.PROC_INST_ID_
                        INNER JOIN ACT_RE_PROCDEF ARP ON ARP.ID_ = AHT.PROC_DEF_ID_
