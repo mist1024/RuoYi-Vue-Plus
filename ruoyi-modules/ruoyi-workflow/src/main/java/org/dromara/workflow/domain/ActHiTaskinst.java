@@ -3,6 +3,7 @@ package org.dromara.workflow.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import java.io.Serial;
@@ -15,7 +16,7 @@ import java.io.Serial;
  */
 @Data
 @TableName("act_hi_taskinst")
-public class ActHiTaskinst {
+public class ActHiTaskinst implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
