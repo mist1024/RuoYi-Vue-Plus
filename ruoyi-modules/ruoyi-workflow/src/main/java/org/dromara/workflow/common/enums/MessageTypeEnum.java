@@ -31,10 +31,14 @@ public enum MessageTypeEnum {
 
     private final String desc;
 
-    private final static Map<String, MessageTypeEnum> MESSAGE_TYPE_ENUM_MAP = new ConcurrentHashMap<>(MessageTypeEnum.values().length);
+    private final static Map<String, MessageTypeEnum> MESSAGE_TYPE_ENUM_MAP;
 
     static {
-        for (MessageTypeEnum messageType : MessageTypeEnum.values()) {
+        MessageTypeEnum[] messageTypeEnums = MessageTypeEnum.values();
+
+        MESSAGE_TYPE_ENUM_MAP = new ConcurrentHashMap<>(messageTypeEnums.length);
+
+        for (MessageTypeEnum messageType : messageTypeEnums) {
             MESSAGE_TYPE_ENUM_MAP.put(messageType.code, messageType);
         }
     }
