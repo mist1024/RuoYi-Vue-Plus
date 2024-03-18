@@ -63,8 +63,8 @@
 #end
 #end
       <el-form-item>
-	    <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+	    <el-button type="primary" icon="el-icon-search" size="default" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="default" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -74,7 +74,7 @@
           type="primary"
           plain
           icon="el-icon-plus"
-          size="mini"
+          size="default"
           @click="handleAdd"
           v-hasPermi="['${moduleName}:${businessName}:add']"
         >新增</el-button>
@@ -84,7 +84,7 @@
           type="info"
           plain
           icon="el-icon-sort"
-          size="mini"
+          size="default"
           @click="toggleExpandAll"
         >展开/折叠</el-button>
       </el-col>
@@ -110,7 +110,7 @@
 #if($column.pk)
 #elseif($column.list && $column.htmlType == "datetime")
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
@@ -122,7 +122,7 @@
       </el-table-column>
 #elseif($column.list && $column.dictType && "" != $column.dictType)
       <el-table-column label="${comment}" align="center" prop="${javaField}">
-        <template slot-scope="scope">
+        <template v-slot="scope">
 #if($column.htmlType == "checkbox")
           <dict-tag :options="dict.type.${column.dictType}" :value="scope.row.${javaField} ? scope.row.${javaField}.split(',') : []"/>
 #else
@@ -139,23 +139,23 @@
 #end
 #end
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-button
-            size="mini"
+            size="default"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['${moduleName}:${businessName}:edit']"
           >修改</el-button>
           <el-button
-            size="mini"
+            size="default"
             type="text"
             icon="el-icon-plus"
             @click="handleAdd(scope.row)"
             v-hasPermi="['${moduleName}:${businessName}:add']"
           >新增</el-button>
           <el-button
-            size="mini"
+            size="default"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"

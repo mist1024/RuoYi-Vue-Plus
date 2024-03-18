@@ -122,19 +122,19 @@
       <el-table-column label="${comment}" align="center" prop="${javaField}" v-if="${column.list}"/>
 #elseif($column.list && $column.htmlType == "datetime")
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
-        <template #default="scope">
+        <template v-slot="scope">
           <span>{{ parseTime(scope.row.${javaField}, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
 #elseif($column.list && $column.htmlType == "imageUpload")
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="100">
-          <template #default="scope">
+          <template v-slot="scope">
               <image-preview :src="scope.row.${javaField}" :width="50" :height="50"/>
           </template>
       </el-table-column>
 #elseif($column.list && $column.dictType && "" != $column.dictType)
       <el-table-column label="${comment}" align="center" prop="${javaField}">
-        <template #default="scope">
+        <template v-slot="scope">
 #if($column.htmlType == "checkbox")
           <dict-tag :options="${column.dictType}" :value="scope.row.${javaField} ? scope.row.${javaField}.split(',') : []"/>
 #else
@@ -147,7 +147,7 @@
 #end
 #end
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-          <template #default="scope">
+          <template v-slot="scope">
               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['${moduleName}:${businessName}:edit']">修改</el-button>
               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['${moduleName}:${businessName}:remove']">删除</el-button>
           </template>
@@ -289,13 +289,13 @@
 #if($column.pk || $javaField == ${subTableFkclassName})
 #elseif($column.list && $column.htmlType == "input")
           <el-table-column label="$comment" prop="${javaField}" width="150">
-            <template #default="scope">
+            <template v-slot="scope">
               <el-input v-model="scope.row.$javaField" placeholder="请输入$comment" />
             </template>
           </el-table-column>
 #elseif($column.list && $column.htmlType == "datetime")
           <el-table-column label="$comment" prop="${javaField}" width="240">
-            <template #default="scope">
+            <template v-slot="scope">
               <el-date-picker clearable
                 v-model="scope.row.$javaField"
                 type="date"
@@ -306,7 +306,7 @@
           </el-table-column>
 #elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" != $column.dictType)
           <el-table-column label="$comment" prop="${javaField}" width="150">
-            <template #default="scope">
+            <template v-slot="scope">
               <el-select v-model="scope.row.$javaField" placeholder="请选择$comment">
                 <el-option
                   v-for="dict in $column.dictType"
@@ -319,7 +319,7 @@
           </el-table-column>
 #elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" == $column.dictType)
           <el-table-column label="$comment" prop="${javaField}" width="150">
-            <template #default="scope">
+            <template v-slot="scope">
               <el-select v-model="scope.row.$javaField" placeholder="请选择$comment">
                 <el-option label="请选择字典生成" value="" />
               </el-select>
