@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.utils.DateUtils;
+import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.oss.constant.OssConstant;
@@ -12,6 +13,7 @@ import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.enumd.PolicyType;
 import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
+import org.dromara.common.oss.properties.S3CrtProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -55,6 +57,11 @@ public class OssClient {
     private final OssProperties properties;
 
     /**
+     * s3 Crt 配置属性
+     */
+    private final S3CrtProperties S3_CRT;
+
+    /**
      * Amazon S3 异步客户端
      */
     private final S3AsyncClient client;
@@ -78,6 +85,7 @@ public class OssClient {
     public OssClient(String configKey, OssProperties ossProperties) {
         this.configKey = configKey;
         this.properties = ossProperties;
+        this.S3_CRT = SpringUtils.getBean(S3CrtProperties.class);
         try {
             // 创建 AWS 认证信息
             StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
@@ -88,16 +96,16 @@ public class OssClient {
                 .credentialsProvider(credentialsProvider)
                 .endpointOverride(URI.create(getEndpoint()))
                 .region(of())
-                .targetThroughputInGbps(20.0)
-                .minimumPartSizeInBytes(10 * 1025 * 1024L)
-                .checksumValidationEnabled(false)
+                .targetThroughputInGbps(S3_CRT.getTargetThroughputInGbps())
+                .minimumPartSizeInBytes(S3_CRT.getUploadPartSize())
+                .checksumValidationEnabled(S3_CRT.getChecksumValidationEnabled())
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
             this.transferManager = S3TransferManager.builder().s3Client(this.client).build();
 
             // 检查是否连接到 MinIO，MinIO 使用 HTTPS 限制使用域名访问，需要启用路径样式访问
-            S3Configuration config = S3Configuration.builder().chunkedEncodingEnabled(false)
+            S3Configuration config = S3Configuration.builder().chunkedEncodingEnabled(S3_CRT.getChunkedEncodingEnabled())
                 // minio 使用https限制使用域名访问 需要此配置 站点填域名
                 .pathStyleAccessEnabled(!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)).build();
 
@@ -340,8 +348,9 @@ public class OssClient {
         Path tempFilePath = fileDownload(path);
         // 创建输入流
         InputStream inputStream = Files.newInputStream(tempFilePath);
-        // 删除临时文件
-        FileUtils.del(tempFilePath);
+        if (S3_CRT.getDelTempFilePath()) {
+            FileUtils.del(tempFilePath);
+        }
         // 返回对象内容的输入流
         return inputStream;
     }
