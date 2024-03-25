@@ -267,12 +267,14 @@ lock4j:
 
 --- # Actuator 监控端点的配置项
 management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  endpoint:
-    health:
-      show-details: ALWAYS
-    logfile:
-      external-file: ./logs/sys-console.log
+  server:
+    port: -1
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
+#  endpoint:
+#    health:
+#      show-details: ALWAYS
+#    logfile:
+#      external-file: ./logs/sys-console.log
