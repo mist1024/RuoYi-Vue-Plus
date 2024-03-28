@@ -37,4 +37,8 @@ public interface OssConstant {
      */
     String IS_HTTPS = "Y";
 
+    /**
+     * 分片上传信息 cacheKey
+     */
+    String PART_UPLOAD_INFO_CACHE_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "sys_oss:part_upload_info:";
 }
