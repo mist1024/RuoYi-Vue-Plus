@@ -302,7 +302,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
                 oss.setUrl(partUploadInfo.getUrl());
                 baseMapper.insert(oss);
             }
-            return MapstructUtils.convert(partUploadInfo, SysOssPartUploadVo.class);
+            SysOssPartUploadVo sysOssPartUploadVo = MapstructUtils.convert(partUploadInfo, SysOssPartUploadVo.class);
+            sysOssPartUploadVo.setMergeCompleted(partUploadInfo.isNeedMerge());
+            return sysOssPartUploadVo;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }

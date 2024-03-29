@@ -2,6 +2,7 @@ package org.dromara.common.oss.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.io.Serializable;
  *
  * @author SunnyDeer0911
  */
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class PartInfo implements Serializable {
