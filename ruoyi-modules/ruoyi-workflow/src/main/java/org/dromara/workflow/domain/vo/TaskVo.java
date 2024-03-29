@@ -156,6 +156,10 @@ public class TaskVo implements Serializable {
      */
     private String businessKey;
 
+	/**
+	 * 节点表单路由
+	 */
+	private String formKey;
     /**
      * 表单配置
      */
