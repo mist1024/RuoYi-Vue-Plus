@@ -11,6 +11,8 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.bo.SysOssBo;
+import org.dromara.system.domain.bo.SysOssPartUploadBo;
+import org.dromara.system.domain.vo.SysOssPartUploadVo;
 import org.dromara.system.domain.vo.SysOssUploadVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysOssService;
@@ -105,4 +107,20 @@ public class SysOssController extends BaseController {
         return toAjax(ossService.deleteWithValidByIds(List.of(ossIds), true));
     }
 
+    /**
+     * 上传OSS对象分片文件
+     *
+     * @param file 分片文件
+     * @param bo   OSS分片上传业务对象
+     * @return R 上传结果
+     */
+    @SaCheckPermission("system:oss:upload")
+    @Log(title = "OSS对象存储-分片上传", businessType = BusinessType.INSERT)
+    @PostMapping(value = "/part/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public R<SysOssPartUploadVo> partUpload(@RequestPart("file") MultipartFile file, @Validated SysOssPartUploadBo bo) {
+        if (ObjectUtil.isNull(file)) {
+            return R.fail("上传文件不能为空");
+        }
+        return R.ok(ossService.partUpload(file, bo));
+    }
 }
