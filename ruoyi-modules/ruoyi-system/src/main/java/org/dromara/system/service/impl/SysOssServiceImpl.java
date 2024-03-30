@@ -18,12 +18,11 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.oss.constant.OssConstant;
 import org.dromara.common.oss.core.OssClient;
 import org.dromara.common.oss.entity.*;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
-import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.oss.utils.PartUploadCacheHelper;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.bo.SysOssPartUploadBo;
@@ -243,71 +242,112 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
 
     @Override
     public SysOssPartUploadVo partUpload(MultipartFile file, SysOssPartUploadBo bo) {
-        OssClient storage;
-        PartUploadInfo partUploadInfo;
-        String uploadId = bo.getUploadId();
-        // 如果上传ID为空，则说明是创建任务此时
-        if (StringUtils.isBlank(uploadId)) {
-            storage = OssFactory.instance();
-            String originalFileName = bo.getFileName();
-            // 如果文件名为空，则使用从上传的文件中获取
-            if (StringUtils.isBlank(originalFileName)) {
-                originalFileName = file.getOriginalFilename();
-            }
-            String suffix = StringUtils.substring(originalFileName, originalFileName.lastIndexOf("."), originalFileName.length());
-            CreatePartUploadResult partUpload = storage.createPartUploadSuffix(suffix);
-            uploadId = partUpload.getUploadId();
-
-            partUploadInfo = new PartUploadInfo();
-            partUploadInfo.setUploadId(uploadId);
-            partUploadInfo.setFileName(partUpload.getFilename());
-            partUploadInfo.setOriginalName(originalFileName);
-            partUploadInfo.setFileSuffix(suffix);
-            partUploadInfo.setUrl(partUpload.getUrl());
-            partUploadInfo.setFileSize(bo.getFileSize());
-            partUploadInfo.setService(storage.getConfigKey());
-            partUploadInfo.setPartSize(bo.getPartSize());
-            partUploadInfo.setTotalParts(bo.getTotalParts());
-            partUploadInfo.setPartInfoList(new ArrayList<>());
-            partUploadInfo.setNeedMerge(bo.getNeedMerge());
-        } else {
-            // uploadId不为空，且文件不为空，则进行文件上传
-            partUploadInfo = RedisUtils.getCacheObject(OssConstant.PART_UPLOAD_INFO_CACHE_KEY + uploadId);
-            partUploadInfo.setNeedMerge(bo.getNeedMerge());
-            storage = OssFactory.instance(partUploadInfo.getService());
-        }
-        return partUpload(storage, file, partUploadInfo, bo.getPartNumber());
-    }
-
-    private SysOssPartUploadVo partUpload(OssClient storage, MultipartFile file, PartUploadInfo partUploadInfo, Integer partNumber) {
         try {
-            String uploadId = partUploadInfo.getUploadId();
-            PartUploadResult partUploadResult = storage.partUpload(file.getInputStream(), partUploadInfo.getFileName(), partUploadInfo.getUploadId(), partNumber, file.getSize());
-            // 将完成上传的分片信息放入集合中
-            partUploadInfo.getPartInfoList().add(new PartInfo(partUploadResult.getPartNumber(), partUploadResult.getETag()));
-            // 分片上传信息放入redis
-            RedisUtils.setCacheObject(OssConstant.PART_UPLOAD_INFO_CACHE_KEY + partUploadInfo.getUploadId(), partUploadInfo);
-            // 检查是否需要合并 - 已经完成所有上传时操作
-            if (partUploadInfo.isNeedMerge()) {
-                // 如果已经完成最后一片的上传，则进行合并
-                UploadResult uploadResult = storage.completePartUpload(uploadId, partUploadInfo.getFileName(), partUploadInfo.getPartInfoList());
-                // 不报错即合并成功，删除redis中的分片上传信息
-                RedisUtils.deleteObject(OssConstant.PART_UPLOAD_INFO_CACHE_KEY + uploadId);
-                // 数据落库
-                SysOss oss = new SysOss();
-                oss.setFileSuffix(partUploadInfo.getFileSuffix());
-                oss.setOriginalName(partUploadInfo.getOriginalName());
-                oss.setService(storage.getConfigKey());
-                oss.setFileName(partUploadInfo.getFileName());
-                oss.setUrl(partUploadInfo.getUrl());
-                baseMapper.insert(oss);
+            String uploadId = bo.getUploadId();
+
+            // 如果 uploadId 为空，则说明是新建上传分片
+            if (StringUtils.isBlank(uploadId)) {
+                return createPartUpload(file, bo);
             }
-            SysOssPartUploadVo sysOssPartUploadVo = MapstructUtils.convert(partUploadInfo, SysOssPartUploadVo.class);
-            sysOssPartUploadVo.setMergeCompleted(partUploadInfo.isNeedMerge());
-            return sysOssPartUploadVo;
+
+            // uploadId不为空，从缓存中获取分片上传信息
+            PartUploadInfo partUploadInfo = PartUploadCacheHelper.getCache(uploadId);
+            if (ObjectUtil.isNull(partUploadInfo)) {
+                throw new ServiceException("未找到分片上传信息！");
+            }
+            // TODO 是否需要合并分片
+            partUploadInfo.setNeedMerge(bo.getNeedMerge());
+            OssClient storage = OssFactory.instance(partUploadInfo.getService());
+            // 上传分片并返回结果
+            return partUpload(storage, partUploadInfo, file, bo.getPartNumber());
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    /**
+     * 创建并上传分片
+     *
+     * @param file 需要进行上传的分片文件
+     * @param bo   OSS分片上传业务对象
+     * @return 分片上传对象信息VO
+     */
+    private SysOssPartUploadVo createPartUpload(MultipartFile file, SysOssPartUploadBo bo) throws IOException {
+        // 文件大小
+        Long fileSize = bo.getFileSize();
+        // 获取第一片文件的大小作为分片大小
+        long partSize = file.getSize();
+        // 计算总片数
+        long totalParts = fileSize / partSize;
+        // 当除以分数有余数时每分片总数+1
+        if (fileSize % partSize > 0) {
+            totalParts += 1;
+        }
+        // 获取文件名，如果文件名为空，则使用从上传的文件中获取
+        String originalFileName = bo.getFileName();
+        if (StringUtils.isBlank(originalFileName)) {
+            originalFileName = file.getOriginalFilename();
+        }
+        String suffix = StringUtils.substring(originalFileName, originalFileName.lastIndexOf("."), originalFileName.length());
+        OssClient storage = OssFactory.instance();
+        CreatePartUploadResult partUpload = storage.createPartUploadSuffix(suffix);
+        // 构建分片上传信息对象
+        PartUploadInfo partUploadInfo = new PartUploadInfo();
+        partUploadInfo.setUploadId(partUpload.getUploadId());
+        partUploadInfo.setFileName(partUpload.getFilename());
+        partUploadInfo.setOriginalName(originalFileName);
+        partUploadInfo.setFileSuffix(suffix);
+        partUploadInfo.setUrl(partUpload.getUrl());
+        partUploadInfo.setFileSize(fileSize);
+        partUploadInfo.setService(storage.getConfigKey());
+        partUploadInfo.setPartSize(partSize);
+        partUploadInfo.setTotalParts(totalParts);
+        partUploadInfo.setPartInfoList(new ArrayList<>());
+        // TODO 是否需要合并分片
+        partUploadInfo.setNeedMerge(bo.getNeedMerge());
+        // 上传分片并返回结果
+        return partUpload(storage, partUploadInfo, file, bo.getPartNumber());
+    }
+
+    /**
+     * 上传分片
+     *
+     * @param storage        OSS客户端
+     * @param partUploadInfo 分片上传信息对象
+     * @param file           需要进行上传的分片文件
+     * @param partNumber     分片序号
+     * @return 分片上传对象信息VO
+     */
+    private SysOssPartUploadVo partUpload(OssClient storage, PartUploadInfo partUploadInfo, MultipartFile file, Integer partNumber) throws IOException {
+        String uploadId = partUploadInfo.getUploadId();
+        // 上传分片
+        PartUploadResult partUploadResult = storage.partUpload(file.getInputStream(), partUploadInfo.getFileName(), uploadId, partNumber, file.getSize());
+        // 将完成上传的分片信息放入集合中
+        partUploadInfo.getPartInfoList().add(new PartInfo(partUploadResult.getPartNumber(), partUploadResult.getETag()));
+        // 分片上传信息放入缓存
+        PartUploadCacheHelper.putCache(partUploadInfo);
+        // 检查是否需要合并 - 已经完成所有上传时操作
+        if (partUploadInfo.isNeedMerge()) {
+            // 如果已经完成最后一片的上传，则进行合并
+            UploadResult uploadResult = storage.completePartUpload(uploadId, partUploadInfo.getFileName(), partUploadInfo.getPartInfoList());
+            // 不报错即合并成功，删除缓存中的分片上传信息
+            PartUploadCacheHelper.removeCache(uploadId);
+            // 数据落库
+            SysOss oss = new SysOss();
+            oss.setFileSuffix(partUploadInfo.getFileSuffix());
+            oss.setOriginalName(partUploadInfo.getOriginalName());
+            oss.setService(storage.getConfigKey());
+            oss.setFileName(partUploadInfo.getFileName());
+            oss.setUrl(partUploadInfo.getUrl());
+            baseMapper.insert(oss);
+        }
+        // 构建分片上传对象信息VO
+        SysOssPartUploadVo sysOssPartUploadVo = new SysOssPartUploadVo();
+        sysOssPartUploadVo.setUploadId(uploadId);
+        sysOssPartUploadVo.setUrl(partUploadInfo.getUrl());
+        sysOssPartUploadVo.setPartInfoList(partUploadInfo.getPartInfoList());
+        sysOssPartUploadVo.setMergeCompleted(partUploadInfo.isNeedMerge());
+        return sysOssPartUploadVo;
     }
 
     /**

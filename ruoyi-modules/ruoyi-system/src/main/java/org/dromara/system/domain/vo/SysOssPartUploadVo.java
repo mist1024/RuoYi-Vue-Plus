@@ -1,9 +1,7 @@
 package org.dromara.system.domain.vo;
 
-import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import org.dromara.common.oss.entity.PartInfo;
-import org.dromara.common.oss.entity.PartUploadInfo;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,7 +13,6 @@ import java.util.List;
  * @author SunnyDeer0911
  */
 @Data
-@AutoMapper(target = PartUploadInfo.class)
 public class SysOssPartUploadVo implements Serializable {
 
     @Serial

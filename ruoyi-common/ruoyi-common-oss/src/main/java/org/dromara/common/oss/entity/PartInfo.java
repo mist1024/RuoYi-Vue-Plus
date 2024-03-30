@@ -20,7 +20,13 @@ public class PartInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 分片序号
+     */
     private Integer partNumber;
 
+    /**
+     * 已上传分片的实体标记（用来校验文件）
+     */
     private String eTag;
 }

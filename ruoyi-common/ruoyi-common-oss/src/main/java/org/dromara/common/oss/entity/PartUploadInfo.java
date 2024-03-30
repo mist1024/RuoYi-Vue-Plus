@@ -1,6 +1,9 @@
 package org.dromara.common.oss.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -8,17 +11,21 @@ import java.util.List;
 
 /**
  * 分片上传信息对象
+ * TODO 用于创建分片上传任务时，数据落库之前，存放分片上传信息数据到Redis
  *
  * @author SunnyDeer0911
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
+@Builder
 public class PartUploadInfo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 文件上传ID（分片上传扩展字段，文件分片上传S3 OSS返回的唯一标识）
+     * 文件上传ID（创建分片上传任务时，S3 OSS返回的唯一标识）
      */
     private String uploadId;
 
@@ -28,7 +35,7 @@ public class PartUploadInfo implements Serializable {
     private String fileName;
 
     /**
-     * 原名
+     * 原文件名
      */
     private String originalName;
 
