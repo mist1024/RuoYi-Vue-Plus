@@ -116,6 +116,7 @@ create unique index uni_category_code
 
 INSERT INTO wf_category values (1, 'OA', 'OA', 0, 0, '000000', 103, 1, now(), 1, now());
 
+DROP TABLE if EXISTS wf_task_back_node;
 create table wf_task_back_node
 (
     id            bigint not null
@@ -166,6 +167,7 @@ comment on column wf_task_back_node.update_time is '修改时间';
 alter table wf_task_back_node
     owner to postgres;
 
+DROP TABLE if EXISTS wf_definition_config;
 create table wf_definition_config
 (
     id            bigint not null
@@ -209,6 +211,7 @@ alter table wf_definition_config
 create unique index uni_definition_id
     on wf_definition_config (definition_id);
 
+DROP TABLE if EXISTS wf_form_manage;
 create table wf_form_manage
 (
     id            bigint not null
@@ -252,6 +255,7 @@ comment on column wf_form_manage.update_time is '修改时间';
 
 insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, create_dept, create_by, create_time, update_by, update_time) VALUES (1, '请假申请', 'static', '/demo/leaveEdit/index', NULL, '000000', 103, 1, now(), 1, now());
 
+DROP TABLE if EXISTS wf_node_config;
 create table wf_node_config
 (
     id            bigint not null
