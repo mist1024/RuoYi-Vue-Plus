@@ -70,7 +70,7 @@ public class PartUploadInfo implements Serializable {
     private Long totalParts;
 
     /**
-     * 合并完成
+     * 是否需要合并
      */
     private boolean needMerge;
 
