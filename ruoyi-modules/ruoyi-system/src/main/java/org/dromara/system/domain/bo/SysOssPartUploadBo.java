@@ -1,6 +1,7 @@
 package org.dromara.system.domain.bo;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -26,9 +27,8 @@ public class SysOssPartUploadBo implements Serializable {
 
     /**
      * 文件名
-     * TODO 非必填，如果为空则从上传的文件中获取
      */
-//    @NotBlank(message = "文件名不能为空")
+    @NotBlank(message = "文件名不能为空")
     private String fileName;
 
     /**
@@ -43,6 +43,18 @@ public class SysOssPartUploadBo implements Serializable {
     @NotNull(message = "分片序号不能为空")
     @Min(value = 1, message = "分片序号不能小于1")
     private Integer partNumber;
+
+    /**
+     * 分片大小
+     */
+//    @NotNull(message = "分片大小不能为空")
+    private Long partSize;
+
+    /**
+     * 分片数量
+     */
+//    @NotNull(message = "分片数量不能为空")
+    private Long totalParts;
 
     /**
      * 是否需要合并

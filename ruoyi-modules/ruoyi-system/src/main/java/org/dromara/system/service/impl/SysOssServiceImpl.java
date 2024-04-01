@@ -275,19 +275,13 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     private SysOssPartUploadVo createPartUpload(MultipartFile file, SysOssPartUploadBo bo) throws IOException {
         // 文件大小
         Long fileSize = bo.getFileSize();
-        // 获取第一片文件的大小作为分片大小
-        long partSize = file.getSize();
-        // 计算总片数
-        long totalParts = fileSize / partSize;
-        // 当除以分数有余数时每分片总数+1
-        if (fileSize % partSize > 0) {
-            totalParts += 1;
-        }
-        // 获取文件名，如果文件名为空，则使用从上传的文件中获取
+        // 分片大小
+        Long partSize = bo.getPartSize();
+        // 分片数量
+        Long totalParts = bo.getTotalParts();
+        // 文件名
         String originalFileName = bo.getFileName();
-        if (StringUtils.isBlank(originalFileName)) {
-            originalFileName = file.getOriginalFilename();
-        }
+        // 从文件名中获取文件后缀
         String suffix = StringUtils.substring(originalFileName, originalFileName.lastIndexOf("."), originalFileName.length());
         OssClient storage = OssFactory.instance();
         CreatePartUploadResult partUpload = storage.createPartUploadSuffix(suffix);
@@ -319,7 +313,14 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @return 分片上传对象信息VO
      */
     private SysOssPartUploadVo partUpload(OssClient storage, PartUploadInfo partUploadInfo, MultipartFile file, Integer partNumber) throws IOException {
+        // 文件上传ID
         String uploadId = partUploadInfo.getUploadId();
+        // 构建分片上传对象信息VO
+        SysOssPartUploadVo sysOssPartUploadVo = new SysOssPartUploadVo();
+        sysOssPartUploadVo.setUploadId(uploadId);
+        sysOssPartUploadVo.setUrl(partUploadInfo.getUrl());
+        sysOssPartUploadVo.setPartInfoList(partUploadInfo.getPartInfoList());
+        sysOssPartUploadVo.setMergeCompleted(partUploadInfo.isNeedMerge());
         // 上传分片
         PartUploadResult partUploadResult = storage.partUpload(file.getInputStream(), partUploadInfo.getFileName(), uploadId, partNumber, file.getSize());
         // 将完成上传的分片信息放入集合中
@@ -340,13 +341,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             oss.setFileName(partUploadInfo.getFileName());
             oss.setUrl(partUploadInfo.getUrl());
             baseMapper.insert(oss);
+            // 回填对象存储ID
+            sysOssPartUploadVo.setOssId(oss.getOssId());
         }
-        // 构建分片上传对象信息VO
-        SysOssPartUploadVo sysOssPartUploadVo = new SysOssPartUploadVo();
-        sysOssPartUploadVo.setUploadId(uploadId);
-        sysOssPartUploadVo.setUrl(partUploadInfo.getUrl());
-        sysOssPartUploadVo.setPartInfoList(partUploadInfo.getPartInfoList());
-        sysOssPartUploadVo.setMergeCompleted(partUploadInfo.isNeedMerge());
         return sysOssPartUploadVo;
     }
 

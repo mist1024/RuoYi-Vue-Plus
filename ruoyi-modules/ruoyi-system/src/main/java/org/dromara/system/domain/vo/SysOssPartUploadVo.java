@@ -38,4 +38,10 @@ public class SysOssPartUploadVo implements Serializable {
      */
     private Boolean mergeCompleted;
 
+    /**
+     * 分片上传ID - 仅在文件成功合并，数据落库时才会生成
+     * @see this#mergeCompleted 分片文件合并状态
+     */
+    private Long ossId;
+
 }
