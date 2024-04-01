@@ -78,7 +78,7 @@ public class PartUploadCacheHelper {
         if (cache==null) {
             return;
         }
-        // 如果未合并，啧调用OssClient终止分片上传任务的方法，让OSS删除已上传的分片
+        // 如果未合并，则调用OssClient终止分片上传任务的方法，让OSS删除已上传的分片
         if (!cache.isNeedMerge() && CollUtil.isNotEmpty(cache.getPartInfoList())) {
             OssClient instance = OssFactory.instance(cache.getService());
             // 终止分片上传任务
