@@ -71,7 +71,7 @@ public class PartUploadCacheHelper {
 
     /**
      * 移除分片上传信息对象缓存
-     * @param uploadId 文件分片上传ID
+     * @param cacheKey 缓存key
      */
     private static void removeCacheByKey(String cacheKey){
         PartUploadInfo cache = RedisUtils.getCacheObject(cacheKey);
