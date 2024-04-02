@@ -94,6 +94,7 @@ create table wf_definition_config
 )
     comment '流程定义配置';
 
+DROP TABLE if EXISTS wf_form_manage;
 create table wf_form_manage
 (
     id          bigint       not null comment '主键'
@@ -113,7 +114,8 @@ create table wf_form_manage
 
 insert into wf_form_manage(id, form_name, form_type, router, remark, tenant_id, create_dept, create_by, create_time, update_by, update_time) VALUES (1, '请假申请', 'static', '/demo/leaveEdit/index', NULL, '000000', 103, 1, sysdate(), 1, sysdate());
 
-create table wf_node_config
+DROP TABLE if EXISTS wf_form_manage;
+create table wf_form_manage
 (
     id            bigint       not null comment '主键'
         primary key,
