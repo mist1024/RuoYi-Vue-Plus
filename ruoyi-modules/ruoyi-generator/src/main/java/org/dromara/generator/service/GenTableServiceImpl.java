@@ -104,7 +104,7 @@ public class GenTableServiceImpl implements IGenTableService {
             .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 "create_time", params.get("beginTime"), params.get("endTime"));
-        return wrapper;
+        return wrapper.orderByDesc("table_id");
     }
 
     @DS("#genTable.dataName")
