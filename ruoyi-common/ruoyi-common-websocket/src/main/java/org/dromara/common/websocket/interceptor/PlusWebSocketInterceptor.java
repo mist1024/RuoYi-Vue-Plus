@@ -1,8 +1,8 @@
 package org.dromara.common.websocket.interceptor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.satoken.utils.LoginHelper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -11,6 +11,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import java.util.Map;
 
 import static org.dromara.common.websocket.constant.WebSocketConstants.LOGIN_USER_KEY;
+import static org.dromara.common.websocket.constant.WebSocketConstants.TOKEN_ID_KEY;
 
 /**
  * WebSocket握手请求的拦截器
@@ -32,7 +33,9 @@ public class PlusWebSocketInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         LoginUser loginUser = LoginHelper.getLoginUser();
+        String tokenId = LoginHelper.getTokenId();
         attributes.put(LOGIN_USER_KEY, loginUser);
+        attributes.put(TOKEN_ID_KEY, tokenId);
         return true;
     }
 

@@ -12,6 +12,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.utils.WebSocketUtils;
@@ -324,7 +325,7 @@ public class WorkflowUtils {
                     switch (messageTypeEnum) {
                         case SYSTEM_MESSAGE:
                             WebSocketMessageDto dto = new WebSocketMessageDto();
-                            dto.setSessionKeys(new ArrayList<>(userIds));
+                            dto.setSessionKeys(LoginHelper.getTokenUserIds(userIds));
                             dto.setMessage(message);
                             WebSocketUtils.publishMessage(dto);
                             break;

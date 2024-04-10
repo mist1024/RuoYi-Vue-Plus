@@ -16,27 +16,31 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WebSocketSessionHolder {
 
-    private static final Map<Long, WebSocketSession> USER_SESSION_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, WebSocketSession> USER_SESSION_MAP = new ConcurrentHashMap<>();
 
-    public static void addSession(Long sessionKey, WebSocketSession session) {
+    /**
+     * @param sessionKey session主键 一般为用户tokenId
+     * @param session 会话
+     */
+    public static void addSession(String sessionKey, WebSocketSession session) {
         USER_SESSION_MAP.put(sessionKey, session);
     }
 
-    public static void removeSession(Long sessionKey) {
+    public static void removeSession(String sessionKey) {
         if (USER_SESSION_MAP.containsKey(sessionKey)) {
             USER_SESSION_MAP.remove(sessionKey);
         }
     }
 
-    public static WebSocketSession getSessions(Long sessionKey) {
+    public static WebSocketSession getSessions(String sessionKey) {
         return USER_SESSION_MAP.get(sessionKey);
     }
 
-    public static Set<Long> getSessionsAll() {
+    public static Set<String> getSessionsAll() {
         return USER_SESSION_MAP.keySet();
     }
 
-    public static Boolean existSession(Long sessionKey) {
+    public static Boolean existSession(String sessionKey) {
         return USER_SESSION_MAP.containsKey(sessionKey);
     }
 }

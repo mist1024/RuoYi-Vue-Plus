@@ -6,10 +6,12 @@ package org.dromara.common.websocket.constant;
  * @author zendwang
  */
 public interface WebSocketConstants {
+
     /**
      * websocketSession中的参数的key
      */
     String LOGIN_USER_KEY = "loginUser";
+    String TOKEN_ID_KEY = "tokenId";
 
     /**
      * 订阅的频道

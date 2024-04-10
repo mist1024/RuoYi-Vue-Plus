@@ -95,11 +95,11 @@ public class AuthController {
         // 登录
         LoginVo loginVo = IAuthStrategy.login(body, client, grantType);
 
-        Long userId = LoginHelper.getUserId();
+        String tokenId = LoginHelper.getTokenId();
         scheduledExecutorService.schedule(() -> {
             WebSocketMessageDto dto = new WebSocketMessageDto();
             dto.setMessage("欢迎登录RuoYi-Vue-Plus后台管理系统");
-            dto.setSessionKeys(List.of(userId));
+            dto.setSessionKeys(List.of(tokenId));
             WebSocketUtils.publishMessage(dto);
         }, 3, TimeUnit.SECONDS);
         return R.ok(loginVo);
@@ -198,7 +198,7 @@ public class AuthController {
         }
         // 根据域名进行筛选
         List<TenantListVo> list = StreamUtils.filter(voList, vo ->
-                StringUtils.equals(vo.getDomain(), host));
+            StringUtils.equals(vo.getDomain(), host));
         // 返回对象
         LoginTenantVo vo = new LoginTenantVo();
         vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
