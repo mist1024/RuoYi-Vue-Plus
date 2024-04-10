@@ -41,6 +41,7 @@ public class LoginHelper {
     public static final String DEPT_KEY = "deptId";
     public static final String DEPT_NAME_KEY = "deptName";
     public static final String CLIENT_KEY = "clientid";
+    public static final String SYS_USER = "sys_user:";
 
     /**
      * 登录系统 基于 设备类型
@@ -85,21 +86,21 @@ public class LoginHelper {
      * 获取当前用户的 token 集合
      */
     public static List<String> getTokenIds() {
-        return StpUtil.getTokenValueListByLoginId(getUserId());
+        return StpUtil.getTokenValueListByLoginId(SYS_USER + getUserId());
     }
 
     /**
      * 获取当前用户 指定设备类型端的 token 集合
      */
     public static List<String> getTokenIds(DeviceType device) {
-        return StpUtil.getTokenValueListByLoginId(getUserId(), device.getDevice());
+        return StpUtil.getTokenValueListByLoginId(SYS_USER + getUserId(), device.getDevice());
     }
 
     /**
      * 获取指定账号 userId 的 token 集合
      */
     public static List<String> getTokenIds(Long userId) {
-        return StpUtil.getTokenValueListByLoginId(userId);
+        return StpUtil.getTokenValueListByLoginId(SYS_USER + userId);
     }
 
     /**
@@ -108,7 +109,7 @@ public class LoginHelper {
     public static List<String> getTokenUserIds(Set<Long> userIds) {
         if (CollUtil.isNotEmpty(userIds)) {
             return userIds.stream()
-                .flatMap(userId -> StpUtil.getTokenValueListByLoginId(userId).stream())
+                .flatMap(userId -> StpUtil.getTokenValueListByLoginId(SYS_USER + userId).stream())
                 .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
@@ -119,7 +120,7 @@ public class LoginHelper {
      * 获取指定账号 userId 指定设备类型端的 token 集合
      */
     public static List<String> getTokenIds(Long userId, DeviceType device) {
-        return StpUtil.getTokenValueListByLoginId(userId, device.getDevice());
+        return StpUtil.getTokenValueListByLoginId(SYS_USER + userId, device.getDevice());
     }
 
     /**
