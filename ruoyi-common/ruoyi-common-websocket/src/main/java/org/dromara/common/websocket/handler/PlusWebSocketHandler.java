@@ -2,6 +2,7 @@ package org.dromara.common.websocket.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.common.satoken.utils.TokenUtils;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.dromara.common.websocket.utils.WebSocketUtils;
@@ -11,6 +12,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import java.util.List;
 
 import static org.dromara.common.websocket.constant.WebSocketConstants.LOGIN_USER_KEY;
+import static org.dromara.common.websocket.constant.WebSocketConstants.TOKEN_ID_KEY;
 
 /**
  * WebSocketHandler 实现类
@@ -26,7 +28,8 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
-        WebSocketSessionHolder.addSession(loginUser.getUserId(), session);
+        String tokenId = (String) session.getAttributes().get(TOKEN_ID_KEY);
+        WebSocketSessionHolder.addSession(tokenId, session);
         log.info("[connect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
 
@@ -40,9 +43,9 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
-        List<Long> userIds = List.of(loginUser.getUserId());
+        List<String> tokenIds = TokenUtils.getTokenIds(loginUser.getUserId());
         WebSocketMessageDto webSocketMessageDto = new WebSocketMessageDto();
-        webSocketMessageDto.setSessionKeys(userIds);
+        webSocketMessageDto.setSessionKeys(tokenIds);
         webSocketMessageDto.setMessage(message.getPayload());
         WebSocketUtils.publishMessage(webSocketMessageDto);
     }
@@ -85,7 +88,8 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
-        WebSocketSessionHolder.removeSession(loginUser.getUserId());
+        String tokenId = (String) session.getAttributes().get(TOKEN_ID_KEY);
+        WebSocketSessionHolder.removeSession(tokenId);
         log.info("[disconnect] sessionId: {},userId:{},userType:{}", session.getId(), loginUser.getUserId(), loginUser.getUserType());
     }
 

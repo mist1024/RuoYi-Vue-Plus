@@ -18,9 +18,9 @@ public class WebSocketMessageDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 需要推送到的session key 列表
+     * 需要推送到的session key 列表  一般为用户tokenId
      */
-    private List<Long> sessionKeys;
+    private List<String> sessionKeys;
 
     /**
      * 需要发送的消息

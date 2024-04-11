@@ -31,10 +31,10 @@ public class WebSocketUtils {
     /**
      * 发送消息
      *
-     * @param sessionKey session主键 一般为用户id
+     * @param sessionKey session主键 一般为用户tokenId
      * @param message    消息文本
      */
-    public static void sendMessage(Long sessionKey, String message) {
+    public static void sendMessage(String sessionKey, String message) {
         WebSocketSession session = WebSocketSessionHolder.getSessions(sessionKey);
         sendMessage(session, message);
     }
@@ -54,9 +54,9 @@ public class WebSocketUtils {
      * @param webSocketMessage 消息对象
      */
     public static void publishMessage(WebSocketMessageDto webSocketMessage) {
-        List<Long> unsentSessionKeys = new ArrayList<>();
+        List<String> unsentSessionKeys = new ArrayList<>();
         // 当前服务内session,直接发送消息
-        for (Long sessionKey : webSocketMessage.getSessionKeys()) {
+        for (String sessionKey : webSocketMessage.getSessionKeys()) {
             if (WebSocketSessionHolder.existSession(sessionKey)) {
                 WebSocketUtils.sendMessage(sessionKey, webSocketMessage.getMessage());
                 continue;
