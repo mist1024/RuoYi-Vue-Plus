@@ -3,6 +3,7 @@ package org.dromara.common.websocket.interceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.satoken.utils.TokenUtils;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -33,7 +34,7 @@ public class PlusWebSocketInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         LoginUser loginUser = LoginHelper.getLoginUser();
-        String tokenId = LoginHelper.getTokenId();
+        String tokenId = TokenUtils.getTokenId();
         attributes.put(LOGIN_USER_KEY, loginUser);
         attributes.put(TOKEN_ID_KEY, tokenId);
         return true;

@@ -12,7 +12,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mail.utils.MailUtils;
-import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.satoken.utils.TokenUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.utils.WebSocketUtils;
@@ -24,10 +24,13 @@ import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.domain.ActHiTaskinst;
-import org.dromara.workflow.domain.vo.*;
+import org.dromara.workflow.domain.vo.MultiInstanceVo;
+import org.dromara.workflow.domain.vo.ParticipantVo;
+import org.dromara.workflow.domain.vo.ProcessInstanceVo;
 import org.dromara.workflow.flowable.cmd.UpdateHiTaskInstCmd;
 import org.dromara.workflow.mapper.ActHiTaskinstMapper;
-import org.dromara.workflow.service.*;
+import org.dromara.workflow.service.IActHiProcinstService;
+import org.dromara.workflow.service.IWorkflowUserService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -42,7 +45,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 import java.util.*;
 
-import static org.dromara.workflow.common.constant.FlowConstant.*;
+import static org.dromara.workflow.common.constant.FlowConstant.PROCESS_INSTANCE_VO;
 
 /**
  * 工作流工具
@@ -325,7 +328,7 @@ public class WorkflowUtils {
                     switch (messageTypeEnum) {
                         case SYSTEM_MESSAGE:
                             WebSocketMessageDto dto = new WebSocketMessageDto();
-                            dto.setSessionKeys(LoginHelper.getTokenUserIds(userIds));
+                            dto.setSessionKeys(TokenUtils.getTokenUserIds(userIds));
                             dto.setMessage(message);
                             WebSocketUtils.publishMessage(dto);
                             break;

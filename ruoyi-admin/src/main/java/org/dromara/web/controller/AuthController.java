@@ -18,7 +18,7 @@ import org.dromara.common.core.domain.model.SocialLoginBody;
 import org.dromara.common.core.utils.*;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.satoken.utils.TokenUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
@@ -95,7 +95,7 @@ public class AuthController {
         // 登录
         LoginVo loginVo = IAuthStrategy.login(body, client, grantType);
 
-        String tokenId = LoginHelper.getTokenId();
+        String tokenId = TokenUtils.getTokenId();
         scheduledExecutorService.schedule(() -> {
             WebSocketMessageDto dto = new WebSocketMessageDto();
             dto.setMessage("欢迎登录RuoYi-Vue-Plus后台管理系统");

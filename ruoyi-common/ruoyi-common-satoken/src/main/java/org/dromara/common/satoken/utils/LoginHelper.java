@@ -3,7 +3,6 @@ package org.dromara.common.satoken.utils;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AccessLevel;
@@ -11,13 +10,9 @@ import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.core.enums.UserType;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 登录鉴权助手
@@ -41,7 +36,6 @@ public class LoginHelper {
     public static final String DEPT_KEY = "deptId";
     public static final String DEPT_NAME_KEY = "deptName";
     public static final String CLIENT_KEY = "clientid";
-    public static final String SYS_USER = "sys_user:";
 
     /**
      * 登录系统 基于 设备类型
@@ -73,54 +67,6 @@ public class LoginHelper {
             return null;
         }
         return (LoginUser) session.get(LOGIN_USER_KEY);
-    }
-
-    /**
-     * 获取当前登录用户的token
-     */
-    public static String getTokenId() {
-        return StpUtil.getTokenInfo().getTokenValue() ;
-    }
-
-    /**
-     * 获取当前用户的 token 集合
-     */
-    public static List<String> getTokenIds() {
-        return StpUtil.getTokenValueListByLoginId(SYS_USER + getUserId());
-    }
-
-    /**
-     * 获取当前用户 指定设备类型端的 token 集合
-     */
-    public static List<String> getTokenIds(DeviceType device) {
-        return StpUtil.getTokenValueListByLoginId(SYS_USER + getUserId(), device.getDevice());
-    }
-
-    /**
-     * 获取指定账号 userId 的 token 集合
-     */
-    public static List<String> getTokenIds(Long userId) {
-        return StpUtil.getTokenValueListByLoginId(SYS_USER + userId);
-    }
-
-    /**
-     * 获取指定账号 userIds 的 token 集合
-     */
-    public static List<String> getTokenUserIds(Set<Long> userIds) {
-        if (CollUtil.isNotEmpty(userIds)) {
-            return userIds.stream()
-                .flatMap(userId -> StpUtil.getTokenValueListByLoginId(SYS_USER + userId).stream())
-                .collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    /**
-     * 获取指定账号 userId 指定设备类型端的 token 集合
-     */
-    public static List<String> getTokenIds(Long userId, DeviceType device) {
-        return StpUtil.getTokenValueListByLoginId(SYS_USER + userId, device.getDevice());
     }
 
     /**

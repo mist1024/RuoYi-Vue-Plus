@@ -2,7 +2,7 @@ package org.dromara.common.websocket.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.satoken.utils.TokenUtils;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.dromara.common.websocket.utils.WebSocketUtils;
@@ -43,7 +43,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
-        List<String> tokenIds = LoginHelper.getTokenIds(loginUser.getUserId());
+        List<String> tokenIds = TokenUtils.getTokenIds(loginUser.getUserId());
         WebSocketMessageDto webSocketMessageDto = new WebSocketMessageDto();
         webSocketMessageDto.setSessionKeys(tokenIds);
         webSocketMessageDto.setMessage(message.getPayload());
