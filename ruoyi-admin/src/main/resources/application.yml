@@ -126,7 +126,7 @@ security:
     # EasyRetry Job 分派 @see com.aizuda.easy.retry.client.job.core.client.JobEndPoint
     - /job/dispatch/v1
     - /job/stop/v1
-    - /resource/short/link
+    - /resource/short/link/*
 
 # 多租户配置
 tenant:

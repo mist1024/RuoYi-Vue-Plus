@@ -8,10 +8,7 @@ import org.dromara.common.shortlink.enums.ValidityType;
 import org.dromara.common.shortlink.properties.ShortLinkProperties;
 import org.dromara.common.shortlink.utils.ShortLinkUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.MalformedURLException;
@@ -31,12 +28,12 @@ public class SysShortLinkController {
     /**
      * 根据短链接获取长链接并重定向
      *
-     * @param shortUrl 短链接
+     * @param shortLinkIdentifier 短链接标识符
      * @return 重定向视图
      */
-    @GetMapping("/link")
-    public RedirectView getLongLink(@NotBlank(message = "参数不能为空") String shortUrl) {
-        String longLink = ShortLinkUtils.getLongLink(shortUrl, shortLinkProperties.getErrorAddress());
+    @GetMapping("/link/{shortLinkIdentifier}")
+    public RedirectView getLongLink(@PathVariable("shortLinkIdentifier") String shortLinkIdentifier) {
+        String longLink = ShortLinkUtils.getLongLink(shortLinkIdentifier, shortLinkProperties.getErrorAddress());
         return new RedirectView(longLink);
     }
 
@@ -52,11 +49,9 @@ public class SysShortLinkController {
         if (Boolean.FALSE.equals(shortLinkProperties.getEnabled())) {
             shorturl = ShortLinkUtils.generateShortUrl(shortLinkProperties.getAddress(), longUrl, ValidityType.THREE_DAYS);
         } else {
-            String requestUrl = request.getRequestURL().toString();
+            String requestUrl = request.getRequestURL().toString().replace("shorturl", "link/");
             String host = new URL(requestUrl).getHost();
-            String address = requestUrl
-                .replace(host, host + shortLinkProperties.getApi())
-                .replace("shorturl", "link?shortUrl=");
+            String address = requestUrl.replace(host, host + shortLinkProperties.getApi());
             shorturl = ShortLinkUtils.generateShortUrl(address, longUrl, ValidityType.THREE_DAYS);
         }
         return R.ok(shorturl);

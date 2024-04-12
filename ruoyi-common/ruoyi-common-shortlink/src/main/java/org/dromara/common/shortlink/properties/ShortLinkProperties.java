@@ -30,6 +30,6 @@ public class ShortLinkProperties {
     /**
      * 错误页面的主机名或域名
      */
-    private String errorAddress="/error";
+    private String errorAddress = "/error";
 
 }

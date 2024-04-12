@@ -78,22 +78,22 @@ public class ShortLinkUtils {
     /**
      * 根据短链接获取对应的完整长链接，如果找不到长链接则返回错误链接
      *
-     * @param shortUrl 短链接标识符
+     * @param shortLinkIdentifier 短链接标识符
      * @return 对应的完整长链接，如果未找到则返回错误链接
      */
-    public static String getLongLink(String shortUrl) {
-        return getLongLink(shortUrl, SHORT_LINK_PROPERTIES.getErrorAddress());
+    public static String getLongLink(String shortLinkIdentifier) {
+        return getLongLink(shortLinkIdentifier, SHORT_LINK_PROPERTIES.getErrorAddress());
     }
 
     /**
      * 根据短链接获取对应的完整长链接，如果找不到长链接则返回指定的错误链接
      *
-     * @param shortUrl 短链接标识符
+     * @param shortLinkIdentifier 短链接标识符
      * @param errUrl   错误链接
      * @return 对应的完整长链接，如果未找到则返回错误链接
      */
-    public static String getLongLink(String shortUrl, String errUrl) {
-        String longLink = RedisUtils.getCacheObject(GlobalConstants.SHORT_LINK_KEY + shortUrl);
+    public static String getLongLink(String shortLinkIdentifier, String errUrl) {
+        String longLink = RedisUtils.getCacheObject(GlobalConstants.SHORT_LINK_KEY + shortLinkIdentifier);
         return StringUtils.isNotEmpty(longLink) ? longLink : errUrl;
     }
 
