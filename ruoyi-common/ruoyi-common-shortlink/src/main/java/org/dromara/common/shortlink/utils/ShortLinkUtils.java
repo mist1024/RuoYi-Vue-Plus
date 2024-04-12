@@ -32,20 +32,20 @@ public class ShortLinkUtils {
      * @return 带有默认主机名（或域名）的完整短链接
      */
     public static String generateShortUrl(String longUrl, ValidityType validityType) {
-        return generateShortUrl(SHORT_LINK_PROPERTIES.getHost(), longUrl, validityType);
+        return generateShortUrl(SHORT_LINK_PROPERTIES.getAddress(), longUrl, validityType);
     }
 
     /**
      * 根据指定主机名（或域名）生成完整短链接
      *
-     * @param host 主机名（或域名）
+     * @param address 主机名（或域名）
      * @param longUrl 完整的长链接
      * @param validityType 有效期类型枚举
      * @return 带有指定主机名（或域名）的完整短链接
      */
-    public static String generateShortUrl(String host, String longUrl, ValidityType validityType) {
+    public static String generateShortUrl(String address, String longUrl, ValidityType validityType) {
         String url = generateShortLinkIdentifier(longUrl, validityType);
-        return host + url;
+        return address + url;
     }
 
     /**
@@ -82,7 +82,7 @@ public class ShortLinkUtils {
      * @return 对应的完整长链接，如果未找到则返回错误链接
      */
     public static String getLongLink(String shortUrl) {
-        return getLongLink(shortUrl, SHORT_LINK_PROPERTIES.getErroHost());
+        return getLongLink(shortUrl, SHORT_LINK_PROPERTIES.getErrorAddress());
     }
 
     /**

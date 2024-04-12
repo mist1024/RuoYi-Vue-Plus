@@ -13,13 +13,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ShortLinkProperties {
 
     /**
+     * 客户端使用租户域名生成链接
+     */
+    private Boolean enabled = false;
+
+    /**
      * 短链接主机名或域名
      */
-    private String host;
+    private String address;
 
     /**
      * 错误页面的主机名或域名
      */
-    private String erroHost;
+    private String errorAddress="/error";
 
 }

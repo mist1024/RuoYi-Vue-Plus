@@ -194,8 +194,10 @@ sms:
       signature: 您的短信签名
       sdk-app-id: 您的sdkAppId
 
-short:
-  host: http://localhost/dev-api/resource/short/link?shortUrl=
+shortlink:
+  enabled: false
+  address: http://localhost/dev-api/resource/short/link?shortUrl=
+  errorAddress:  http://localhost/error
 
 --- # 三方授权
 justauth:
