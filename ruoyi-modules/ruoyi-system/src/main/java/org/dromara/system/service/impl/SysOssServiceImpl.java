@@ -22,6 +22,8 @@ import org.dromara.common.oss.core.OssClient;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
+import org.dromara.common.shortlink.enums.ValidityType;
+import org.dromara.common.shortlink.utils.ShortLinkUtils;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssVo;
@@ -238,16 +240,17 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     }
 
     /**
-     * 桶类型为 private 的URL 修改为临时URL时长为120s
+     * 桶类型为 private 的URL 修改为临时URL时长为180s
      *
      * @param oss OSS对象
      * @return oss 匹配Url的OSS对象
      */
     private SysOssVo matchingUrl(SysOssVo oss) {
         OssClient storage = OssFactory.instance(oss.getService());
-        // 仅修改桶类型为 private 的URL，临时URL时长为120s
+        // 仅修改桶类型为 private 的URL，临时URL时长为180s
         if (AccessPolicyType.PRIVATE == storage.getAccessPolicy()) {
-            oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 120));
+            String privateUrl = storage.getPrivateUrl(oss.getFileName(), 180);
+            oss.setUrl(ShortLinkUtils.generateShortUrl(privateUrl, ValidityType.THREE_MINUTES));
         }
         return oss;
     }
