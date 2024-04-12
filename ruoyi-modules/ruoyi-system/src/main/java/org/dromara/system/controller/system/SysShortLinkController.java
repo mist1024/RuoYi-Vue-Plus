@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * 短链接 控制层
  */
@@ -44,13 +47,16 @@ public class SysShortLinkController {
      * @return 完整的短链接
      */
     @PostMapping("/shorturl")
-    public R<String> generateShortUrl(HttpServletRequest request, @NotBlank(message = "参数不能为空") String longUrl) {
+    public R<String> generateShortUrl(HttpServletRequest request, @NotBlank(message = "参数不能为空") String longUrl) throws MalformedURLException {
         String shorturl;
         if (Boolean.FALSE.equals(shortLinkProperties.getEnabled())) {
             shorturl = ShortLinkUtils.generateShortUrl(shortLinkProperties.getAddress(), longUrl, ValidityType.THREE_DAYS);
         } else {
-            StringBuffer requestURL = request.getRequestURL();
-            String address = requestURL.substring(0, requestURL.indexOf("shorturl")) + "link?shortUrl=";
+            String requestUrl = request.getRequestURL().toString();
+            String host = new URL(requestUrl).getHost();
+            String address = requestUrl
+                .replace(host, host + shortLinkProperties.getApi())
+                .replace("shorturl", "link?shortUrl=");
             shorturl = ShortLinkUtils.generateShortUrl(address, longUrl, ValidityType.THREE_DAYS);
         }
         return R.ok(shorturl);

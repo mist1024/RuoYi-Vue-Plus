@@ -195,7 +195,8 @@ sms:
       sdk-app-id: 您的sdkAppId
 
 shortlink:
-  enabled: false
+  enabled: true
+  api: /dev-api
   address: http://localhost/dev-api/resource/short/link?shortUrl=
   errorAddress:  http://localhost/error
 

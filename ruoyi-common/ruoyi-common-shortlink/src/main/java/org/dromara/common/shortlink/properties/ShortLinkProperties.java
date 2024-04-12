@@ -18,6 +18,11 @@ public class ShortLinkProperties {
     private Boolean enabled = false;
 
     /**
+     * 访问前缀 （开启时启用，可不填写，能访问到后端即可）
+     */
+    private String api;
+
+    /**
      * 短链接主机名或域名
      */
     private String address;
