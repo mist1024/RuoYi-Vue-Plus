@@ -13,7 +13,7 @@ import lombok.Data;
 public class PartUploadResult {
 
     /**
-     * 新上传部件的部件号
+     * 分片编号（从1开始递增）
      */
     private Integer partNumber;
 

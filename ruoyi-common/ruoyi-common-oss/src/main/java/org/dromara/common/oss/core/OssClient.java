@@ -282,7 +282,7 @@ public class OssClient {
     /**
      * 生成预签名的私有对象获取 URL
      *
-     * @param objectKey 对象键（Object Key）
+     * @param objectKey 在 Amazon S3 中的对象键
      * @param second    签名持续时间（秒）
      * @return 预签名 URL 字符串
      */
@@ -302,7 +302,7 @@ public class OssClient {
     /**
      * 生成预签名的私有上传 URL
      *
-     * @param key       对象键（Object Key）
+     * @param key       在 Amazon S3 中的对象键
      * @param md5Digest 内容的 MD5 摘要，如果有的话
      * @param second    签名持续时间（秒）
      * @return 上传结果对象
@@ -323,8 +323,8 @@ public class OssClient {
     /**
      * 创建分片上传任务
      *
-     * @param key 对象的键（Object Key）
-     * @return 包含上传 ID 的 UploadResult 对象
+     * @param key 在 Amazon S3 中的对象键
+     * @return 包含上传后的文件信息
      */
     public UploadResult initiateMultipartUpload(String key) {
         try {
@@ -343,13 +343,14 @@ public class OssClient {
     /**
      * 生成预签名的分片上传 URL
      *
-     * @param key        对象键（Object Key）
+     * @param key        在 Amazon S3 中的对象键
      * @param uploadId   分片上传任务的 Upload ID
-     * @param partNumber 分片编号
+     * @param partNumber 分片编号（从1开始递增）
+     * @param md5Digest  内容的 MD5 摘要，如果有的话
      * @param second     签名持续时间（秒）
      * @return 预签名 URL 字符串
      */
-    public String uploadPartFutures(String key, String uploadId, Integer partNumber, Integer second) {
+    public String uploadPartFutures(String key, String uploadId, Integer partNumber, String md5Digest, Integer second) {
         URL url = presigner.presignUploadPart(
             x -> x.signatureDuration(Duration.ofSeconds(second))
                 .uploadPartRequest(
@@ -357,6 +358,7 @@ public class OssClient {
                         .key(key)
                         .uploadId(uploadId)
                         .partNumber(partNumber)
+                        .contentMD5(StringUtils.isNotEmpty(md5Digest) ? md5Digest : null)
                         .build()
                 ).build()
         ).url();
@@ -366,7 +368,7 @@ public class OssClient {
     /**
      * 获取指定对象分片上传的分片列表
      *
-     * @param key              对象的键（Object Key）
+     * @param key              在 Amazon S3 中的对象键
      * @param uploadId         分片上传任务的 Upload ID
      * @param maxParts         最大返回的分片数（默认为1000）
      * @param partNumberMarker 分片编号的标记，用于分页查询（默认为0，表示从第一个分片开始查询）
@@ -396,10 +398,10 @@ public class OssClient {
     /**
      * 完成分片上传任务
      *
-     * @param key               对象的键（Object Key）
+     * @param key               在 Amazon S3 中的对象键
      * @param uploadId          分片上传任务的 Upload ID
      * @param partUploadResults 已完成的分片列表
-     * @return 包含上传结果信息的 UploadResult 对象
+     * @return 包含上传后的文件信息
      */
     public UploadResult completeMultipartUpload(String key, String uploadId, List<PartUploadResult> partUploadResults) {
         if (CollUtil.isEmpty(partUploadResults)) {
