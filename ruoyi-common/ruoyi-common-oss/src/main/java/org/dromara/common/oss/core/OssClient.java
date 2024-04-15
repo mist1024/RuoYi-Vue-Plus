@@ -1,5 +1,6 @@
 package org.dromara.common.oss.core;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import org.dromara.common.core.constant.Constants;
@@ -326,12 +327,17 @@ public class OssClient {
      * @return 包含上传 ID 的 UploadResult 对象
      */
     public UploadResult initiateMultipartUpload(String key) {
-        String uploadId = client.createMultipartUpload(
-            x -> x.bucket(properties.getBucketName())
-                .key(key)
-                .build()
-        ).join().uploadId();
-        return UploadResult.builder().url(getUrl() + StringUtils.SLASH + key).filename(key).uploadId(uploadId).build();
+        try {
+            String uploadId = client.createMultipartUpload(
+                x -> x.bucket(properties.getBucketName())
+                    .key(key)
+                    .build()
+            ).join().uploadId();
+            return UploadResult.builder().url(getUrl() + StringUtils.SLASH + key).filename(key).uploadId(uploadId).build();
+        } catch (Exception e) {
+            // 捕获异常并抛出自定义异常
+            throw new OssException("创建分片上传任务失败，请检查配置信息:[" + e.getMessage() + "]");
+        }
     }
 
     /**
@@ -367,19 +373,24 @@ public class OssClient {
      * @return 包含分片上传结果信息的 PartUploadResult 对象列表
      */
     public List<PartUploadResult> listParts(String key, String uploadId, Integer maxParts, Integer partNumberMarker) {
-        List<Part> parts = client.listParts(
-            x -> x.bucket(properties.getBucketName())
-                .key(key)
-                .uploadId(uploadId)
-                .maxParts(maxParts != null ? maxParts : 1000)
-                .partNumberMarker(partNumberMarker != null ? partNumberMarker : 0)
-                .build()).join().parts();
-        return parts.stream()
-            .map(x -> PartUploadResult.builder()
-                .partNumber(x.partNumber())
-                .eTag(x.eTag())
-                .build())
-            .collect(Collectors.toList());
+        try {
+            List<Part> parts = client.listParts(
+                x -> x.bucket(properties.getBucketName())
+                    .key(key)
+                    .uploadId(uploadId)
+                    .maxParts(maxParts != null ? maxParts : 1000)
+                    .partNumberMarker(partNumberMarker != null ? partNumberMarker : 0)
+                    .build()).join().parts();
+            return parts.stream()
+                .map(x -> PartUploadResult.builder()
+                    .partNumber(x.partNumber())
+                    .eTag(x.eTag())
+                    .build())
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            // 捕获异常并抛出自定义异常
+            throw new OssException("获取分片列表失败，请检查配置信息:[" + e.getMessage() + "]");
+        }
     }
 
     /**
@@ -391,6 +402,9 @@ public class OssClient {
      * @return 包含上传结果信息的 UploadResult 对象
      */
     public UploadResult completeMultipartUpload(String key, String uploadId, List<PartUploadResult> partUploadResults) {
+        if (CollUtil.isEmpty(partUploadResults)) {
+            throw new OssException("分片列表不能为空");
+        }
         List<CompletedPart> completedParts = partUploadResults.stream()
             .map(x -> CompletedPart.builder()
                 .partNumber(x.getPartNumber())
