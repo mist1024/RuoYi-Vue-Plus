@@ -400,7 +400,7 @@ public class OssClient {
      *
      * @param key               在 Amazon S3 中的对象键
      * @param uploadId          分片上传任务的 Upload ID
-     * @param partUploadResults 已完成的分片列表
+     * @param partUploadResults 已完成的分片列表（必须是唯一且按照递增顺序排列，严格检查是否漏传）
      * @return 包含上传后的文件信息
      */
     public UploadResult completeMultipartUpload(String key, String uploadId, List<PartUploadResult> partUploadResults) {
