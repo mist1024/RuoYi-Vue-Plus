@@ -108,10 +108,11 @@ public class SysUserOnlineController extends BaseController {
     }
 
     /**
-     * 删除当前在线设备
+     * 强退当前在线设备
      *
      * @param tokenId token值
      */
+    @Log(title = "在线设备", businessType = BusinessType.FORCE)
     @DeleteMapping("/remove/{tokenId}")
     public R<Void> remove(@PathVariable("tokenId") String tokenId) {
         try {
