@@ -2,6 +2,7 @@ package org.dromara.common.translation.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.dromara.common.translation.core.TranslationInterface;
 import org.dromara.common.translation.core.handler.TranslationHandler;
 
 import java.lang.annotation.*;
@@ -27,9 +28,11 @@ public @interface Translation {
     String type();
 
     /**
-     * 映射字段 (如果不为空则取此字段的值)
+     * 映射字段 (如果不为空则取此字段的值,支持多值映射)
+     * <p>
+     * 多值映射模式下 {@link TranslationInterface#translation(Object key, String other)} 方法的第一个参数 key 类型为 {@link cn.hutool.core.lang.Dict}
      */
-    String mapper() default "";
+    String[] mapper() default "";
 
     /**
      * 其他条件 例如: 字典type(sys_user_sex)
