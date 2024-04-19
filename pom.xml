@@ -49,6 +49,7 @@
         <sms4j.version>2.2.0</sms4j.version>
         <!-- 限制框架中的fastjson版本 -->
         <fastjson.version>1.2.83</fastjson.version>
+        <p6spy.version>3.0.4.2</p6spy.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -226,7 +227,6 @@
             <dependency>
                 <groupId>p6spy</groupId>
                 <artifactId>p6spy</artifactId>
-                <version>${p6spy.version}</version>
             </dependency>
 
             <dependency>
@@ -337,6 +337,12 @@
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-demo</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.herodotus.engine</groupId>
+                <artifactId>data-sdk-p6spy</artifactId>
+                <version>${p6spy.version}</version>
             </dependency>
 
         </dependencies>

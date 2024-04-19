@@ -379,6 +379,7 @@ public class GenTableServiceImpl implements IGenTableService {
             StringWriter sw = new StringWriter();
             Template tpl = Velocity.getTemplate(template, Constants.UTF8);
             tpl.merge(context, sw);
+            log.info("生成的文件======{}",sw.toString());
             try {
                 // 添加到zip
                 zip.putNextEntry(new ZipEntry(VelocityUtils.getFileName(template, table)));

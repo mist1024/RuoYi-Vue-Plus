@@ -45,14 +45,24 @@
                     <groupId>org.mybatis</groupId>
                     <artifactId>mybatis-spring</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>mybatis</artifactId>
+                    <groupId>org.mybatis</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <!-- sql性能分析插件 -->
+<!--        <dependency>-->
+<!--            <groupId>p6spy</groupId>-->
+<!--            <artifactId>p6spy</artifactId>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>p6spy</groupId>
-            <artifactId>p6spy</artifactId>
+            <groupId>cn.herodotus.engine</groupId>
+            <artifactId>data-sdk-p6spy</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>
