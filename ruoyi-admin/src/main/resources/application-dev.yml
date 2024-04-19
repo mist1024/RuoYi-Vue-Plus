@@ -194,6 +194,16 @@ sms:
       signature: 您的短信签名
       sdk-app-id: 您的sdkAppId
 
+--- # 短链接
+shortlink:
+  # 是否启用租户域名生成
+  enabled: false
+  # 访问前缀
+  api: /dev-api
+  # 域名或主机名
+  address: http://localhost/dev-api/resource/short/link/
+  # 错误页面
+  errorAddress:  /error
 
 --- # 三方授权
 justauth:

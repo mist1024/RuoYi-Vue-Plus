@@ -96,6 +96,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 短链接 -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-shortlink</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- satoken -->
             <dependency>
                 <groupId>org.dromara</groupId>
