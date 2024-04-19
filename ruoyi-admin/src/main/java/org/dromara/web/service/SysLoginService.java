@@ -25,13 +25,9 @@ import org.dromara.common.tenant.exception.TenantException;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysSocialBo;
-import org.dromara.system.domain.vo.SysSocialVo;
-import org.dromara.system.domain.vo.SysTenantVo;
-import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.domain.vo.*;
 import org.dromara.system.mapper.SysUserMapper;
-import org.dromara.system.service.ISysPermissionService;
-import org.dromara.system.service.ISysSocialService;
-import org.dromara.system.service.ISysTenantService;
+import org.dromara.system.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +55,8 @@ public class SysLoginService {
     private final ISysTenantService tenantService;
     private final ISysPermissionService permissionService;
     private final ISysSocialService sysSocialService;
+    private final ISysRoleService roleService;
+    private final ISysDeptService deptService;
     private final SysUserMapper userMapper;
 
 
@@ -146,9 +144,15 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
-        loginUser.setDeptName(ObjectUtil.isNull(user.getDept()) ? "" : user.getDept().getDeptName());
-        List<RoleDTO> roles = BeanUtil.copyToList(user.getRoles(), RoleDTO.class);
-        loginUser.setRoles(roles);
+        TenantHelper.dynamic(user.getTenantId(), () -> {
+            SysDeptVo dept = null;
+            if (ObjectUtil.isNotNull(user.getDeptId())) {
+                dept = deptService.selectDeptById(user.getDeptId());
+            }
+            loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
+            List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
+            loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+        });
         return loginUser;
     }
 

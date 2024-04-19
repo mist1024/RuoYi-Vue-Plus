@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginUser;
-import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
@@ -72,9 +71,8 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:export")
     @PostMapping("/export")
     public void export(SysUserBo user, HttpServletResponse response) {
-        List<SysUserVo> list = userService.selectUserList(user);
-        List<SysUserExportVo> listVo = MapstructUtils.convert(list, SysUserExportVo.class);
-        ExcelUtil.exportExcel(listVo, "用户数据", SysUserExportVo.class, response);
+        List<SysUserExportVo> list = userService.selectUserExportList(user);
+        ExcelUtil.exportExcel(list, "用户数据", SysUserExportVo.class, response);
     }
 
     /**
@@ -142,7 +140,7 @@ public class SysUserController extends BaseController {
         if (ObjectUtil.isNotNull(userId)) {
             SysUserVo sysUser = userService.selectUserById(userId);
             userInfoVo.setUser(sysUser);
-            userInfoVo.setRoleIds(StreamUtils.toList(sysUser.getRoles(), SysRoleVo::getRoleId));
+            userInfoVo.setRoleIds(roleService.selectRoleListByUserId(userId));
             userInfoVo.setPostIds(postService.selectPostListByUserId(userId));
         }
         return R.ok(userInfoVo);
@@ -208,6 +206,19 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * 根据用户ID串批量获取用户基础信息
+     *
+     * @param userIds 用户ID串
+     * @param deptId  部门ID
+     */
+    @SaCheckPermission("system:user:query")
+    @GetMapping("/optionselect")
+    public R<List<SysUserVo>> optionselect(@RequestParam(required = false) Long[] userIds,
+                                           @RequestParam(required = false) Long deptId) {
+        return R.ok(userService.selectUserByIds(userIds == null ? null : List.of(userIds), deptId));
+    }
+
+    /**
      * 重置密码
      */
     @ApiEncrypt
@@ -241,8 +252,9 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:query")
     @GetMapping("/authRole/{userId}")
     public R<SysUserInfoVo> authRole(@PathVariable Long userId) {
+        userService.checkUserDataScope(userId);
         SysUserVo user = userService.selectUserById(userId);
-        List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
+        List<SysRoleVo> roles = roleService.selectRolesAuthByUserId(userId);
         SysUserInfoVo userInfoVo = new SysUserInfoVo();
         userInfoVo.setUser(user);
         userInfoVo.setRoles(LoginHelper.isSuperAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isSuperAdmin()));

@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.exception.ServiceException;
@@ -27,7 +28,6 @@ import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysRoleMapper;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.service.ISysDeptService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -83,6 +83,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         lqw.eq(ObjectUtil.isNotNull(bo.getParentId()), SysDept::getParentId, bo.getParentId());
         lqw.like(StringUtils.isNotBlank(bo.getDeptName()), SysDept::getDeptName, bo.getDeptName());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysDept::getStatus, bo.getStatus());
+        lqw.orderByAsc(SysDept::getAncestors);
         lqw.orderByAsc(SysDept::getParentId);
         lqw.orderByAsc(SysDept::getOrderNum);
         lqw.orderByAsc(SysDept::getDeptId);
@@ -136,6 +137,14 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
             .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
         dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
         return dept;
+    }
+
+    @Override
+    public List<SysDeptVo> selectDeptByIds(List<Long> deptIds) {
+        return baseMapper.selectDeptList(new LambdaQueryWrapper<SysDept>()
+            .select(SysDept::getDeptId, SysDept::getDeptName, SysDept::getLeader)
+            .eq(SysDept::getStatus, UserConstants.DEPT_NORMAL)
+            .in(CollUtil.isNotEmpty(deptIds), SysDept::getDeptId, deptIds));
     }
 
     /**
@@ -221,8 +230,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
         if (LoginHelper.isSuperAdmin()) {
             return;
         }
-        SysDeptVo dept = baseMapper.selectDeptById(deptId);
-        if (ObjectUtil.isNull(dept)) {
+        if (baseMapper.countDeptById(deptId) == 0) {
             throw new ServiceException("没有权限访问部门数据！");
         }
     }
