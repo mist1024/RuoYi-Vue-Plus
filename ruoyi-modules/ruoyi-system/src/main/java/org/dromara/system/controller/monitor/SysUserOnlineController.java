@@ -92,7 +92,7 @@ public class SysUserOnlineController extends BaseController {
     /**
      * 获取当前用户登录在线设备
      */
-    @GetMapping("/getInfo")
+    @GetMapping()
     public TableDataInfo<SysUserOnline> getInfo() {
         // 获取指定账号 id 的 token 集合
         List<String> tokenIds = StpUtil.getTokenValueListByLoginId(StpUtil.getLoginIdAsString());
@@ -113,7 +113,7 @@ public class SysUserOnlineController extends BaseController {
      * @param tokenId token值
      */
     @Log(title = "在线设备", businessType = BusinessType.FORCE)
-    @DeleteMapping("/remove/{tokenId}")
+    @PostMapping("/{tokenId}")
     public R<Void> remove(@PathVariable("tokenId") String tokenId) {
         try {
             // 获取指定账号 id 的 token 集合
