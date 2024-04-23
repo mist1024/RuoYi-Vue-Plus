@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 岗位信息 服务层处理
@@ -61,24 +62,40 @@ public class SysPostServiceImpl implements ISysPostService {
             .like(StringUtils.isNotBlank(post.getPostCategory()), SysPost::getPostCategory, post.getPostCategory())
             .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName())
             .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+            .eq(ObjectUtil.isNotNull(post.getDeptId()), SysPost::getDeptId, post.getDeptId())
             .orderByAsc(SysPost::getPostSort)
         );
     }
 
+    /**
+     * 根据查询条件构建查询包装器
+     *
+     * @param bo 查询条件对象
+     * @return 构建好的查询包装器
+     */
     private QueryWrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
         QueryWrapper<SysPost> wrapper = Wrappers.query();
         wrapper.like(StringUtils.isNotBlank(bo.getPostCode()), "post_code", bo.getPostCode())
             .like(StringUtils.isNotBlank(bo.getPostName()), "post_name", bo.getPostName())
             .like(StringUtils.isNotBlank(bo.getPostCategory()), "post_category", bo.getPostCategory())
-            .eq(StringUtils.isNotBlank(bo.getStatus()), "status", bo.getStatus())
-            .and(ObjectUtil.isNotNull(bo.getDeptId()), w -> {
-                List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
-                    .select(SysDept::getDeptId)
-                    .apply(DataBaseHelper.findInSet(bo.getDeptId(), "ancestors")));
-                List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
-                ids.add(bo.getDeptId());
-                w.in("dept_id", ids);
-            }).orderByAsc("post_sort");
+            .eq(StringUtils.isNotBlank(bo.getStatus()), "status", bo.getStatus());
+        if (ObjectUtil.isNotNull(bo.getDeptId())) {
+            //优先单部门搜索
+            wrapper.eq("dept_id", bo.getDeptId());
+        } else if (ObjectUtil.isNotNull(bo.getBelongDeptId())) {
+            //部门树搜索
+            wrapper.and(x -> {
+                List<Long> deptIds = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
+                        .select(SysDept::getDeptId)
+                        .apply(DataBaseHelper.findInSet(bo.getBelongDeptId(), "ancestors")))
+                    .stream()
+                    .map(SysDept::getDeptId)
+                    .collect(Collectors.toList());
+                deptIds.add(bo.getDeptId());
+                x.in("dept_id", deptIds);
+            });
+        }
+        wrapper.orderByAsc("post_sort");
         return wrapper;
     }
 

@@ -26,10 +26,15 @@ public class SysPostBo extends BaseEntity {
     private Long postId;
 
     /**
-     * 部门id
+     * 部门id（单部门）
      */
     @NotNull(message = "部门id不能为空")
     private Long deptId;
+
+    /**
+     * 归属部门id（部门树）
+     */
+    private Long belongDeptId;
 
     /**
      * 岗位编码
