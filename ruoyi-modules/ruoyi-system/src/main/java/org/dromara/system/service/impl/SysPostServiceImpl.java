@@ -14,10 +14,13 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatis.helper.DataBaseHelper;
+import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.vo.SysPostVo;
+import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysPostMapper;
 import org.dromara.system.mapper.SysUserPostMapper;
 import org.dromara.system.service.ISysPostService;
@@ -36,12 +39,12 @@ import java.util.List;
 public class SysPostServiceImpl implements ISysPostService {
 
     private final SysPostMapper baseMapper;
+    private final SysDeptMapper deptMapper;
     private final SysUserPostMapper userPostMapper;
 
     @Override
     public TableDataInfo<SysPostVo> selectPagePostList(SysPostBo post, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysPost> lqw = buildQueryWrapper(post);
-        Page<SysPostVo> page = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<SysPostVo> page = baseMapper.selectPagePostList(pageQuery.build(), buildQueryWrapper(post));
         return TableDataInfo.build(page);
     }
 
@@ -53,17 +56,30 @@ public class SysPostServiceImpl implements ISysPostService {
      */
     @Override
     public List<SysPostVo> selectPostList(SysPostBo post) {
-        LambdaQueryWrapper<SysPost> lqw = buildQueryWrapper(post);
-        return baseMapper.selectVoList(lqw);
+        return baseMapper.selectVoList(new LambdaQueryWrapper<SysPost>()
+            .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
+            .like(StringUtils.isNotBlank(post.getPostCategory()), SysPost::getPostCategory, post.getPostCategory())
+            .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName())
+            .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
+            .orderByAsc(SysPost::getPostSort)
+        );
     }
 
-    private LambdaQueryWrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
-        LambdaQueryWrapper<SysPost> lqw = Wrappers.lambdaQuery();
-        lqw.like(StringUtils.isNotBlank(bo.getPostCode()), SysPost::getPostCode, bo.getPostCode());
-        lqw.like(StringUtils.isNotBlank(bo.getPostName()), SysPost::getPostName, bo.getPostName());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysPost::getStatus, bo.getStatus());
-        lqw.orderByAsc(SysPost::getPostSort);
-        return lqw;
+    private QueryWrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
+        QueryWrapper<SysPost> wrapper = Wrappers.query();
+        wrapper.like(StringUtils.isNotBlank(bo.getPostCode()), "post_code", bo.getPostCode())
+            .like(StringUtils.isNotBlank(bo.getPostName()), "post_name", bo.getPostName())
+            .like(StringUtils.isNotBlank(bo.getPostCategory()), "post_category", bo.getPostCategory())
+            .eq(StringUtils.isNotBlank(bo.getStatus()), "status", bo.getStatus())
+            .and(ObjectUtil.isNotNull(bo.getDeptId()), w -> {
+                List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
+                    .select(SysDept::getDeptId)
+                    .apply(DataBaseHelper.findInSet(bo.getDeptId(), "ancestors")));
+                List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
+                ids.add(bo.getDeptId());
+                w.in("dept_id", ids);
+            }).orderByAsc("post_sort");
+        return wrapper;
     }
 
     /**
