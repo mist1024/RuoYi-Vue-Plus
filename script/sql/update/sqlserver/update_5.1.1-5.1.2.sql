@@ -8,3 +8,13 @@ INSERT sys_menu VALUES (1622, N'配置编辑', 118, 6, N'#', N'', N'', 1, 0, N'F
 GO
 INSERT sys_menu VALUES (1623, N'配置删除', 118, 6, N'#', N'', N'', 1, 0, N'F', N'0', N'0', N'system:ossConfig:remove', N'#', 103, 1, getdate(), NULL, NULL, N'');
 GO
+
+ALTER TABLE sys_dept ADD dept_category VARCHAR(100) DEFAULT NULL;
+EXEC sp_addextendedproperty 'MS_Description', '部门类别编码', 'SCHEMA', 'dbo', 'TABLE', 'sys_dept', 'COLUMN', 'dept_category';
+GO
+ALTER TABLE sys_post ADD dept_id BIGINT NOT NULL;
+ALTER TABLE sys_post ADD post_category VARCHAR(100) DEFAULT NULL;
+EXEC sp_addextendedproperty 'MS_Description', '部门id', 'SCHEMA', 'dbo', 'TABLE', 'sys_post', 'COLUMN', 'dept_id';
+EXEC sp_addextendedproperty 'MS_Description', '岗位类别编码', 'SCHEMA', 'dbo', 'TABLE', 'sys_post', 'COLUMN', 'post_category';
+GO
+UPDATE sys_post SET dept_id = 100;
