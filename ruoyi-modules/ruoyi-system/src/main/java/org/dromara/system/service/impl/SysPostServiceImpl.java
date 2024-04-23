@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
@@ -57,14 +56,7 @@ public class SysPostServiceImpl implements ISysPostService {
      */
     @Override
     public List<SysPostVo> selectPostList(SysPostBo post) {
-        return baseMapper.selectVoList(new LambdaQueryWrapper<SysPost>()
-            .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
-            .like(StringUtils.isNotBlank(post.getPostCategory()), SysPost::getPostCategory, post.getPostCategory())
-            .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName())
-            .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
-            .eq(ObjectUtil.isNotNull(post.getDeptId()), SysPost::getDeptId, post.getDeptId())
-            .orderByAsc(SysPost::getPostSort)
-        );
+        return baseMapper.selectVoList(buildQueryWrapper(post));
     }
 
     /**
@@ -73,15 +65,16 @@ public class SysPostServiceImpl implements ISysPostService {
      * @param bo 查询条件对象
      * @return 构建好的查询包装器
      */
-    private QueryWrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
-        QueryWrapper<SysPost> wrapper = Wrappers.query();
-        wrapper.like(StringUtils.isNotBlank(bo.getPostCode()), "post_code", bo.getPostCode())
-            .like(StringUtils.isNotBlank(bo.getPostName()), "post_name", bo.getPostName())
-            .like(StringUtils.isNotBlank(bo.getPostCategory()), "post_category", bo.getPostCategory())
-            .eq(StringUtils.isNotBlank(bo.getStatus()), "status", bo.getStatus());
+    private LambdaQueryWrapper<SysPost> buildQueryWrapper(SysPostBo bo) {
+        LambdaQueryWrapper<SysPost> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtils.isNotBlank(bo.getPostCode()), SysPost::getPostCode, bo.getPostCode())
+            .like(StringUtils.isNotBlank(bo.getPostCategory()), SysPost::getPostCategory, bo.getPostCategory())
+            .like(StringUtils.isNotBlank(bo.getPostName()), SysPost::getPostName, bo.getPostName())
+            .eq(StringUtils.isNotBlank(bo.getStatus()), SysPost::getStatus, bo.getStatus())
+            .orderByAsc(SysPost::getPostSort);
         if (ObjectUtil.isNotNull(bo.getDeptId())) {
             //优先单部门搜索
-            wrapper.eq("dept_id", bo.getDeptId());
+            wrapper.eq(SysPost::getDeptId, bo.getDeptId());
         } else if (ObjectUtil.isNotNull(bo.getBelongDeptId())) {
             //部门树搜索
             wrapper.and(x -> {
@@ -91,11 +84,10 @@ public class SysPostServiceImpl implements ISysPostService {
                     .stream()
                     .map(SysDept::getDeptId)
                     .collect(Collectors.toList());
-                deptIds.add(bo.getDeptId());
-                x.in("dept_id", deptIds);
+                deptIds.add(bo.getBelongDeptId());
+                x.in(SysPost::getDeptId, deptIds);
             });
         }
-        wrapper.orderByAsc("post_sort");
         return wrapper;
     }
 
