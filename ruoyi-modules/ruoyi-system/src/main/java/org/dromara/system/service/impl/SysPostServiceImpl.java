@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -119,9 +118,8 @@ public class SysPostServiceImpl implements ISysPostService {
      * @return 选中岗位ID列表
      */
     @Override
-    public List<Long> selectPostListByUserId(Long userId) {
-        List<SysPostVo> list = baseMapper.selectPostsByUserId(userId);
-        return StreamUtils.toList(list, SysPostVo::getPostId);
+    public List<SysPostVo> selectPostListByUserId(Long userId) {
+        return baseMapper.selectPostsByUserId(userId);
     }
 
     /**
