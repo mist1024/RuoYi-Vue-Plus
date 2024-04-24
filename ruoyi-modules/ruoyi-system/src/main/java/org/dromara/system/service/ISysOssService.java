@@ -85,7 +85,7 @@ public interface ISysOssService {
      * @param originalName 文件原名
      * @return 分片上传对象信息
      */
-    MultipartVo initiateMultipart(String originalName);
+    MultipartVo initiateMultipart(String originalName, String md5Digest);
 
     /**
      * 上传文件的分段（分片上传）

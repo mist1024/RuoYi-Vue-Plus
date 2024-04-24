@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.OssService;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -23,6 +24,7 @@ import org.dromara.common.oss.entity.PartUploadResult;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
+import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
@@ -39,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -248,11 +251,20 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @return 分片上传对象信息
      */
     @Override
-    public MultipartVo initiateMultipart(String originalName) {
-        String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
-        OssClient storage = OssFactory.instance();
-        UploadResult uploadResult = storage.initiateMultipart(suffix);
-        return MapstructUtils.convert(uploadResult, MultipartVo.class);
+    public MultipartVo initiateMultipart(String originalName, String md5Digest) {
+        String osskey = GlobalConstants.OSS_CONTINUATION + md5Digest;
+        MultipartVo multipartVo;
+        long timeout = RedisUtils.getTimeToLive(osskey);
+        if ((timeout < 0 ? timeout : timeout / 1000) > 60 * 60 * 2) {
+            multipartVo = RedisUtils.getCacheObject(osskey);
+        } else {
+            String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
+            OssClient storage = OssFactory.instance();
+            UploadResult uploadResult = storage.initiateMultipart(suffix);
+            multipartVo = MapstructUtils.convert(uploadResult, MultipartVo.class);
+            RedisUtils.setCacheObject(osskey, multipartVo, Duration.ofMillis(10800));
+        }
+        return multipartVo;
     }
 
     /**
@@ -264,7 +276,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Override
     public MultipartVo uploadPart(MultipartBo multipartBo) {
         OssClient storage = OssFactory.instance();
-        String privateUrl = storage.uploadPartFutures(multipartBo.getFilename(), multipartBo.getUploadId(), multipartBo.getPartNumber(), multipartBo.getMd5Digest(), 10800);
+        String privateUrl = storage.uploadPartFutures(multipartBo.getFilename(), multipartBo.getUploadId(), multipartBo.getPartNumber(), multipartBo.getMd5Digest(), 60 * 60 * 72);
         MultipartVo multipartVo = MapstructUtils.convert(multipartBo, MultipartVo.class);
         multipartVo.setPrivateUrl(privateUrl);
         return multipartVo;

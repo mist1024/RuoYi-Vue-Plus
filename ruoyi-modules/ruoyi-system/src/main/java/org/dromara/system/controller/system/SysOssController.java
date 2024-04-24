@@ -4,15 +4,12 @@ package org.dromara.system.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
-import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -112,17 +109,14 @@ public class SysOssController extends BaseController {
         return toAjax(ossService.deleteWithValidByIds(List.of(ossIds), true));
     }
 
-    /**
-     * 初始化分片上传任务
-     *
-     * @param originalName 文件原名
-     */
-    @RepeatSubmit
     @SaCheckPermission("system:oss:multipart")
-    @PostMapping(value = "/multipart/initiate")
-    public R<MultipartVo> initiateMultipart(@Size(min = 2, max = 255, message = "文件原名长度必须在2到255之间")
-                                            @NotBlank(message = "文件原名不能为空") String originalName) {
-        return R.ok(ossService.initiateMultipart(originalName));
+    @PostMapping(value = "/multipart")
+    public R<MultipartVo> multipart(@RequestBody MultipartBo multipartBo) {
+        String ossStatus = multipartBo.getOssStatus();
+
+
+
+        return R.ok(ossService.initiateMultipart(multipartBo.getOriginalName(), multipartBo.getMd5Digest()));
     }
 
     /**
