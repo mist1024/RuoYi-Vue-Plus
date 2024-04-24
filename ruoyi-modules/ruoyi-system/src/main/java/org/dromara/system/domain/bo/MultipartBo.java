@@ -22,6 +22,12 @@ public class MultipartBo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 分片类型
+     */
+    @NotBlank(message = "分片类型不能为空", groups = {QueryGroup.class, AddGroup.class, EditGroup.class})
+    private String ossStatus;
+
+    /**
      * 文件名
      */
     @NotBlank(message = "文件名不能为空", groups = {QueryGroup.class, AddGroup.class, EditGroup.class})
