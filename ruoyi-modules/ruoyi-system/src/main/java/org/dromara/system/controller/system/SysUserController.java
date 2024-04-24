@@ -24,6 +24,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysDeptBo;
+import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.bo.SysRoleBo;
 import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.vo.*;
@@ -137,9 +138,13 @@ public class SysUserController extends BaseController {
             SysUserVo sysUser = userService.selectUserById(userId);
             userInfoVo.setUser(sysUser);
             userInfoVo.setRoleIds(roleService.selectRoleListByUserId(userId));
-            List<SysPostVo> sysPostVos = postService.selectPostListByUserId(userId);
-            userInfoVo.setPosts(sysPostVos);
-            userInfoVo.setPostIds(StreamUtils.toList(sysPostVos, SysPostVo::getPostId));
+            Long deptId = sysUser.getDeptId();
+            if (ObjectUtil.isNotNull(deptId)) {
+                SysPostBo postBo = new SysPostBo();
+                postBo.setDeptId(deptId);
+                userInfoVo.setPosts(postService.selectPostList(postBo));
+                userInfoVo.setPostIds(postService.selectPostListByUserId(userId));
+            }
         }
         return R.ok(userInfoVo);
     }
