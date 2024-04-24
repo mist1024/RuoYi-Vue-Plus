@@ -333,7 +333,7 @@ public class OssClient {
                     .key(key)
                     .build()
             ).join().uploadId();
-            return UploadResult.builder().url(getUrl() + StringUtils.SLASH + key).filename(key).uploadId(uploadId).build();
+            return UploadResult.builder().filename(key).uploadId(uploadId).build();
         } catch (Exception e) {
             // 捕获异常并抛出自定义异常
             throw new OssException("创建分片上传任务失败，请检查配置信息:[" + e.getMessage() + "]");
@@ -477,6 +477,16 @@ public class OssClient {
      */
     public UploadResult uploadSuffix(String suffix, String md5Digest, Integer second) {
         return putPrivateUrl(getPath(properties.getPrefix(), suffix), md5Digest, second);
+    }
+
+    /**
+     * 创建分片上传任务
+     *
+     * @param suffix 对象键的后缀
+     * @return 包含上传后的文件信息
+     */
+    public UploadResult initiateMultipart(String suffix){
+        return initiateMultipartUpload(getPath(properties.getPrefix(), suffix));
     }
 
     /**

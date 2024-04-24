@@ -19,11 +19,14 @@ import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.oss.core.OssClient;
+import org.dromara.common.oss.entity.PartUploadResult;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.system.domain.SysOss;
+import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
+import org.dromara.system.domain.vo.MultipartVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.mapper.SysOssMapper;
 import org.dromara.system.service.ISysOssService;
@@ -40,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 文件上传 服务层实现
@@ -238,6 +242,74 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     }
 
     /**
+     * 初始化分片上传任务
+     *
+     * @param originalName 文件原名
+     * @return 分片上传对象信息
+     */
+    @Override
+    public MultipartVo initiateMultipart(String originalName) {
+        String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
+        OssClient storage = OssFactory.instance();
+        UploadResult uploadResult = storage.initiateMultipart(suffix);
+        return MapstructUtils.convert(uploadResult, MultipartVo.class);
+    }
+
+    /**
+     * 上传文件的分段（分片上传）
+     *
+     * @param multipartBo MultipartBo 分段上传的参数对象
+     * @return MultipartVo 分片上传成功后的对象信息
+     */
+    @Override
+    public MultipartVo uploadPart(MultipartBo multipartBo) {
+        OssClient storage = OssFactory.instance();
+        String privateUrl = storage.uploadPartFutures(multipartBo.getFilename(), multipartBo.getUploadId(), multipartBo.getPartNumber(), multipartBo.getMd5Digest(), 10800);
+        MultipartVo multipartVo = MapstructUtils.convert(multipartBo, MultipartVo.class);
+        multipartVo.setPrivateUrl(privateUrl);
+        return multipartVo;
+    }
+
+    /**
+     * 获取上传分段进度
+     *
+     * @param multipartBo 分片上传对象信息
+     * @return 分片上传对象信息
+     */
+    @Override
+    public MultipartVo uploadPartList(MultipartBo multipartBo) {
+        OssClient storage = OssFactory.instance();
+        List<PartUploadResult> listParts = storage.listParts(multipartBo.getFilename(), multipartBo.getUploadId(), multipartBo.getMaxParts(), multipartBo.getPartNumberMarker());
+        MultipartVo multipartVo = MapstructUtils.convert(multipartBo, MultipartVo.class);
+        multipartVo.setPartUploadList(listParts.stream()
+            .map(x -> new MultipartVo.PartUploadResult(x.getPartNumber(), x.getETag()))
+            .collect(Collectors.toList()));
+        return multipartVo;
+    }
+
+    /**
+     * 合并分段
+     *
+     * @param multipartBo 分片上传对象信息
+     * @return OSS对象存储视图对象
+     */
+    @Override
+    public SysOssVo completeMultipartUpload(MultipartBo multipartBo) {
+        String originalName = multipartBo.getOriginalName();
+        String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
+        List<PartUploadResult> listParts = multipartBo.getPartUploadList().stream()
+            .map(x -> PartUploadResult.builder()
+                .partNumber(x.getPartNumber())
+                .eTag(x.getETag())
+                .build())
+            .collect(Collectors.toList());
+        OssClient storage = OssFactory.instance();
+        UploadResult uploadResult = storage.completeMultipartUpload(multipartBo.getFilename(), multipartBo.getUploadId(), listParts);
+        // 保存文件信息
+        return buildResultEntity(originalName, suffix, storage.getConfigKey(), uploadResult);
+    }
+
+    /**
      * 桶类型为 private 的URL 修改为临时URL时长为120s
      *
      * @param oss OSS对象
@@ -251,4 +323,5 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         return oss;
     }
+
 }
