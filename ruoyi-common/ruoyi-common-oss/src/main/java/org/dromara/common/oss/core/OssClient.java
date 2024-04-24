@@ -7,6 +7,9 @@ import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.oss.constant.OssConstant;
+import org.dromara.common.oss.entity.CreatePartUploadResult;
+import org.dromara.common.oss.entity.PartInfo;
+import org.dromara.common.oss.entity.PartUploadResult;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.enumd.PolicyType;
@@ -19,8 +22,7 @@ import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
-import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.*;
@@ -35,6 +37,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
@@ -231,6 +236,212 @@ public class OssClient {
         } catch (Exception e) {
             throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
+    }
+
+    /**
+     * 创建分片任务
+     *
+     * @param key 在 Amazon S3 中的对象键
+     * @return CreatePartUploadResult 创建上传分片任务返回体，包含上传后的文件信息
+     * @throws OssException 如果创建失败，抛出自定义异常
+     */
+    public CreatePartUploadResult createPartUpload(String key) {
+        try {
+            // 创建分片上传
+            CompletableFuture<CreateMultipartUploadResponse> createPartUploadFuture = client.createMultipartUpload(builder -> builder.bucket(properties.getBucketName())
+                .key(key)
+                .acl(getAccessPolicy().getObjectCannedACL())
+                .build());
+            // 等待创建分片上传任务完成
+            CreateMultipartUploadResponse createPartUploadResult = createPartUploadFuture.join();
+            // 获取分片上传任务 uploadId
+            String uploadId = createPartUploadResult.uploadId();
+            return CreatePartUploadResult.builder().uploadId(uploadId).url(getUrl() + StringUtils.SLASH + key).filename(key).build();
+        } catch (Exception e) {
+            throw new OssException("创建分片上传任务失败，请检查配置信息:[" + e.getMessage() + "]");
+        }
+    }
+
+    /**
+     * 创建分片任务
+     *
+     * @param suffix 对象键的后缀
+     * @return CreatePartUploadResult 创建上传分片任务返回体，包含上传后的文件信息
+     * @throws OssException 如果创建失败，抛出自定义异常
+     */
+    public CreatePartUploadResult createPartUploadSuffix(String suffix) {
+        return createPartUpload(getPath(properties.getPrefix(), suffix));
+    }
+
+    /**
+     * 分片文件上传
+     *
+     * @param data       文件字节数组
+     * @param key        在 Amazon S3 中的对象键
+     * @param uploadId   oss分片上传id
+     * @param partNumber 分片序号
+     * @return PartUploadResult 分片上传结果，包含上传后的分片文件信息
+     * @throws OssException 如果上传失败，抛出自定义异常
+     */
+    public PartUploadResult partUpload(byte[] data, String key, String uploadId, Integer partNumber) {
+        try {
+            // 创建异步请求体
+            AsyncRequestBody requestBody = AsyncRequestBody.fromBytes(data);
+            // 使用 s3client 进行分片上传
+            CompletableFuture<UploadPartResponse> partUploadFuture = client.uploadPart(builder -> builder.bucket(properties.getBucketName())
+                .key(key)
+                .uploadId(uploadId)
+                .partNumber(partNumber)
+                .build(), requestBody);
+
+            // 等待文件上传操作完成
+            UploadPartResponse partUploadResult = partUploadFuture.join();
+            String eTag = partUploadResult.eTag();
+
+            // 提取上传结果中的 ETag，并构建一个自定义的 PartUploadResult 对象
+            return PartUploadResult.builder().uploadId(uploadId).partNumber(partNumber).partSize((long) data.length).eTag(eTag).build();
+        } catch (Exception e) {
+            throw new OssException("上传分片文件失败，请检查配置信息:[" + e.getMessage() + "]");
+        }
+    }
+
+    /**
+     * 分片文件上传
+     *
+     * @param inputStream 要上传的输入流
+     * @param key         在 Amazon S3 中的对象键
+     * @param uploadId    oss分片上传id
+     * @param partNumber  分片序号
+     * @param partSize    分片大小
+     * @return PartUploadResult 分片上传结果，包含上传后的分片文件信息
+     * @throws OssException 如果上传失败，抛出自定义异常
+     */
+    public PartUploadResult partUpload(InputStream inputStream, String key, String uploadId, Integer partNumber, Long partSize) {
+        if (!(inputStream instanceof ByteArrayInputStream)) {
+            inputStream = new ByteArrayInputStream(IoUtil.readBytes(inputStream));
+        }
+        try {
+            // 创建异步请求体（length如果为空会报错）
+            BlockingInputStreamAsyncRequestBody requestBody = AsyncRequestBody.forBlockingInputStream(partSize);
+            // 使用 s3client 进行分片上传
+            CompletableFuture<UploadPartResponse> partUploadFuture = client.uploadPart(builder -> builder.bucket(properties.getBucketName())
+                .key(key)
+                .uploadId(uploadId)
+                .partNumber(partNumber)
+                .build(), requestBody);
+
+            // 将输入流写入请求体
+            requestBody.writeInputStream(inputStream);
+
+            // 等待文件上传操作完成
+            UploadPartResponse partUploadResult = partUploadFuture.join();
+            String eTag = partUploadResult.eTag();
+
+            // 提取上传结果中的 ETag，并构建一个自定义的 PartUploadResult 对象
+            return PartUploadResult.builder().uploadId(uploadId).partNumber(partNumber).partSize(partSize).eTag(eTag).build();
+        } catch (Exception e) {
+            throw new OssException("上传分片文件失败，请检查配置信息:[" + e.getMessage() + "]");
+        }
+    }
+
+    /**
+     * 终止分片上传任务
+     *
+     * @param uploadId 分片上传任务ID
+     * @param key      文件在 Amazon S3 中的对象键
+     * @return boolean 终止分片上传任务结果
+     * @throws OssException 如果终止分片上传失败，抛出自定义异常
+     */
+    public boolean abortPartUpload(String uploadId, String key) {
+        try {
+            // 使用 s3client 请求终止分片上传任务
+            CompletableFuture<AbortMultipartUploadResponse> abortPartUploadFuture = client.abortMultipartUpload(builder -> builder.bucket(properties.getBucketName())
+                .uploadId(uploadId)
+                .key(key)
+                .build());
+            // 等待终止分片上传任务请求响应
+            AbortMultipartUploadResponse abortPartUploadResult = abortPartUploadFuture.join();
+            // 没有异常即成功
+            return true;
+        } catch (Exception e) {
+//            throw new OssException("终止分片上传任务失败，请检查配置信息:[" + e.getMessage() + "]");
+            return false;
+        }
+    }
+
+    /**
+     * 列出已经上传的分片
+     *
+     * @param uploadId 分片上传任务ID
+     * @param key      文件在 Amazon S3 中的对象键
+     * @return List<Part> 已经上传的分片信息
+     */
+    public List<Part> listParts(String uploadId, String key) {
+        // 使用 s3client 请求获取已经上传的分片信息
+        CompletableFuture<ListPartsResponse> listPartsFuture = client.listParts(builder -> builder.bucket(properties.getBucketName())
+            .uploadId(uploadId)
+            .key(key)
+            .build());
+        // 等待获取已经上传的分片信息请求响应
+        ListPartsResponse listPartsResult = listPartsFuture.join();
+        return listPartsResult.parts();
+    }
+
+    /**
+     * 完成分片上传 - 合并分片
+     *
+     * @param uploadId       分片上传任务ID
+     * @param key            文件在 Amazon S3 中的对象键
+     * @param completedParts 已经上传的分片信息
+     * @return UploadResult 包含上传后的文件信息
+     */
+    public UploadResult completePartUpload(String uploadId, String key, Collection<CompletedPart> completedParts) {
+        // 使用 s3client 请求完成分片上传任务
+        CompletableFuture<CompleteMultipartUploadResponse> completePartUploadFuture = client.completeMultipartUpload(builder -> builder.bucket(properties.getBucketName())
+            .uploadId(uploadId)
+            .key(key)
+            .multipartUpload(CompletedMultipartUpload.builder().parts(completedParts).build())
+            .build());
+        // 等待完成分片上传任务请求响应
+        CompleteMultipartUploadResponse completePartUploadResult = completePartUploadFuture.join();
+        // 提取上传结果中的 ETag，并构建一个自定义的 UploadResult 对象
+        return UploadResult.builder().url(getUrl() + "/" + key).filename(key).eTag(completePartUploadResult.eTag()).build();
+    }
+
+    /**
+     * 完成分片上传 - 合并分片
+     *
+     * @param uploadId     分片上传任务ID
+     * @param key          文件在 Amazon S3 中的对象键
+     * @param partInfoList 已经上传的分片信息
+     * @return UploadResult 包含上传后的文件信息
+     */
+    public UploadResult completePartUpload(String uploadId, String key, List<PartInfo> partInfoList) {
+        List<CompletedPart> completedParts = partInfoList.stream()
+            .map(partInfo -> CompletedPart.builder()
+                .partNumber(partInfo.getPartNumber())
+                .eTag(partInfo.getETag())
+                .build())
+            .toList();
+        return completePartUpload(uploadId, key, completedParts);
+    }
+
+    /**
+     * 完成分片上传 - 合并分片（根据已上传的分片结果合并）
+     *
+     * @param uploadId 分片上传任务ID
+     * @param key      文件在 Amazon S3 中的对象键
+     * @return UploadResult 包含上传后的文件信息
+     */
+    public UploadResult completePartUpload(String uploadId, String key) {
+        // 获取已上传的文件分片列表
+        List<Part> parts = listParts(uploadId, key);
+        // 构建 CompletedPart 列表
+        List<CompletedPart> completedParts = parts.stream()
+            .map(part -> CompletedPart.builder().partNumber(part.partNumber()).eTag(part.eTag()).build())
+            .toList();
+        // 合并分片并返回结果
+        return completePartUpload(uploadId, key, completedParts);
     }
 
     /**
