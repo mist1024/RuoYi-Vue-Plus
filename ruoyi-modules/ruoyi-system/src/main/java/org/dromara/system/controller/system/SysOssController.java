@@ -12,6 +12,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -116,6 +117,7 @@ public class SysOssController extends BaseController {
      *
      * @param originalName 文件原名
      */
+    @RepeatSubmit
     @SaCheckPermission("system:oss:multipart")
     @PostMapping(value = "/multipart/initiate")
     public R<MultipartVo> initiateMultipart(@Size(min = 2, max = 255, message = "文件原名长度必须在2到255之间")

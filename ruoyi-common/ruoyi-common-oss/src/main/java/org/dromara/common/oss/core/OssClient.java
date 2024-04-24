@@ -426,7 +426,7 @@ public class OssClient {
             return UploadResult.builder().url(getUrl() + StringUtils.SLASH + key).filename(key).eTag(eTag).build();
         } catch (Exception e) {
             // 捕获异常并抛出自定义异常
-            throw new OssException("上传文件失败，请检查配置信息:[" + e.getMessage() + "]");
+            throw new OssException("合并文件失败，请检查配置信息:[" + e.getMessage() + "]");
         }
     }
 
