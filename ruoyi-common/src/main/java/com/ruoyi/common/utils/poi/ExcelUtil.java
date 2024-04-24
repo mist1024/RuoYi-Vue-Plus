@@ -362,7 +362,7 @@ public class ExcelUtil {
                     }
                 }
             } else {
-                if (itemArray[1].equals(propertyValue)) {
+                if (propertyValue.contains(itemArray[1])) {
                     return itemArray[0];
                 }
             }
