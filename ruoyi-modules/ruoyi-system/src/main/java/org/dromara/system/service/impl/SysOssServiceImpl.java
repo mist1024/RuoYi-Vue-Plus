@@ -264,6 +264,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             UploadResult uploadResult = storage.initiateMultipart(suffix);
             multipartVo.setFilename(uploadResult.getFilename());
             multipartVo.setUploadId(uploadResult.getUploadId());
+            multipartVo.setOriginalName(originalName);
             multipartVo.setSuffix(suffix);
             RedisUtils.setCacheObject(osskey, multipartVo, Duration.ofMillis(60 * 60 * 72));
             RedisUtils.setCacheObject(GlobalConstants.OSS_MULTIPART + multipartVo.getUploadId(), multipartVo, Duration.ofMillis(60 * 60 * 72));
