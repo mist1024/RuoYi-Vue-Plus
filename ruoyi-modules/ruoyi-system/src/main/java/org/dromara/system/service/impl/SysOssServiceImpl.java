@@ -257,8 +257,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         MultipartVo multipartVo = new MultipartVo();
 
         // 检查是否存在缓存，如果存在且超时时间在2小时内，则从缓存中获取上传信息
-        long timeout = RedisUtils.getTimeToLive(osskey);
-        if ((timeout < 0 ? timeout : timeout / 1000) > 60 * 60 * 2) {
+        if (RedisUtils.getTimeToLive(osskey) > 60 * 60 * 2 * 1000) {
             multipartVo = RedisUtils.getCacheObject(osskey);
 
             // 获取上传分段进度
