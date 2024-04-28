@@ -119,10 +119,8 @@ public class SysOssController extends BaseController {
         String ossStatus = multipartBo.getOssStatus();
         return switch (ossStatus) {
             case "initiate" -> {
-                String originalName = multipartBo.getOriginalName();
-                String md5Digest = multipartBo.getMd5Digest();
-                if (StringUtils.isNotEmpty(originalName) && StringUtils.isNotEmpty(md5Digest)) {
-                    yield R.ok(ossService.initiateMultipart(originalName, md5Digest));
+                if (StringUtils.isNotEmpty(multipartBo.getOriginalName()) && StringUtils.isNotEmpty(multipartBo.getMd5Digest())) {
+                    yield R.ok(ossService.initiateMultipart(multipartBo));
                 } else {
                     yield R.fail("Original name and MD5 digest cannot be empty");
                 }
@@ -131,7 +129,7 @@ public class SysOssController extends BaseController {
                 ValidatorUtils.validate(multipartBo, AddGroup.class);
                 yield R.ok(ossService.uploadPart(multipartBo));
             }
-            case "list" -> {
+            case "query" -> {
                 ValidatorUtils.validate(multipartBo, QueryGroup.class);
                 yield R.ok(ossService.uploadPartList(multipartBo));
             }

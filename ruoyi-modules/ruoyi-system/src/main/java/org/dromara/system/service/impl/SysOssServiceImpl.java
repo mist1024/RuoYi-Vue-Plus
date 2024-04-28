@@ -247,20 +247,28 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     /**
      * 初始化分片上传任务
      *
-     * @param originalName 文件原名
+     * @param multipartBo 初始化分片的参数对象
      * @return 分片上传对象信息
      */
     @Override
-    public MultipartVo initiateMultipart(String originalName, String md5Digest) {
-        String osskey = GlobalConstants.OSS_CONTINUATION + md5Digest;
+    public MultipartVo initiateMultipart(MultipartBo multipartBo) {
+        OssClient storage = OssFactory.instance();
+        String osskey = GlobalConstants.OSS_CONTINUATION + multipartBo.getMd5Digest();
         MultipartVo multipartVo = new MultipartVo();
+
         // 检查是否存在缓存，如果存在且超时时间在2小时内，则从缓存中获取上传信息
         long timeout = RedisUtils.getTimeToLive(osskey);
         if ((timeout < 0 ? timeout : timeout / 1000) > 60 * 60 * 2) {
             multipartVo = RedisUtils.getCacheObject(osskey);
+
+            // 获取上传分段进度
+            List<PartUploadResult> listParts = storage.listParts(multipartVo.getFilename(), multipartVo.getUploadId(), null, null);
+            multipartVo.setPartUploadList(listParts.stream()
+                .map(x -> new MultipartVo.PartUploadResult(x.getPartNumber(), x.getETag()))
+                .collect(Collectors.toList()));
         } else {
+            String originalName = multipartBo.getOriginalName();
             String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
-            OssClient storage = OssFactory.instance();
             UploadResult uploadResult = storage.initiateMultipart(suffix);
             multipartVo.setFilename(uploadResult.getFilename());
             multipartVo.setUploadId(uploadResult.getUploadId());
@@ -275,8 +283,8 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     /**
      * 上传文件的分段（分片上传）
      *
-     * @param multipartBo MultipartBo 分段上传的参数对象
-     * @return MultipartVo 分片上传成功后的对象信息
+     * @param multipartBo 分段上传的参数对象
+     * @return 分片上传成功后的对象信息
      */
     @Override
     public MultipartVo uploadPart(MultipartBo multipartBo) {

@@ -82,16 +82,16 @@ public interface ISysOssService {
     /**
      * 初始化分片上传任务
      *
-     * @param originalName 文件原名
+     * @param multipartBo 初始化分片的参数对象
      * @return 分片上传对象信息
      */
-    MultipartVo initiateMultipart(String originalName, String md5Digest);
+    MultipartVo initiateMultipart(MultipartBo multipartBo);
 
     /**
      * 上传文件的分段（分片上传）
      *
-     * @param multipartBo SysOssMultipartBo 分段上传的参数对象
-     * @return SysOssMultipartVo 分片上传成功后的对象信息
+     * @param multipartBo 分段上传的参数对象
+     * @return 分片上传成功后的对象信息
      */
     MultipartVo uploadPart(MultipartBo multipartBo);
 
