@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
@@ -17,7 +19,6 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
-import org.dromara.system.domain.vo.MultipartVo;
 import org.dromara.system.domain.vo.SysOssUploadVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysOssService;
@@ -109,42 +110,37 @@ public class SysOssController extends BaseController {
         return toAjax(ossService.deleteWithValidByIds(List.of(ossIds), true));
     }
 
+    /**
+     * 分片上传
+     */
     @SaCheckPermission("system:oss:multipart")
     @PostMapping(value = "/multipart")
-    public R<MultipartVo> multipart(@RequestBody MultipartBo multipartBo) {
+    public R<?> multipart(@RequestBody MultipartBo multipartBo) {
         String ossStatus = multipartBo.getOssStatus();
-
-
-
-        return R.ok(ossService.initiateMultipart(multipartBo.getOriginalName(), multipartBo.getMd5Digest()));
-    }
-
-    /**
-     * 上传分段
-     */
-    @SaCheckPermission("system:oss:multipart")
-    @PostMapping(value = "/multipart/upload")
-    public R<MultipartVo> uploadPart(@Validated(AddGroup.class) @RequestBody MultipartBo multipartBo) {
-        return R.ok(ossService.uploadPart(multipartBo));
-    }
-
-    /**
-     * 查询上传分段进度
-     */
-    @SaCheckPermission("system:oss:multipart")
-    @PostMapping(value = "/multipart/list")
-    public R<MultipartVo> uploadPartList(@Validated(QueryGroup.class) @RequestBody MultipartBo multipartBo) {
-        return R.ok(ossService.uploadPartList(multipartBo));
-    }
-
-    /**
-     * 合并分段文件
-     */
-    @SaCheckPermission("system:oss:multipart")
-    @Log(title = "OSS对象存储-分片", businessType = BusinessType.INSERT)
-    @PostMapping(value = "/multipart/complete")
-    public R<SysOssVo> completeMultipartUpload(@Validated(EditGroup.class) @RequestBody MultipartBo multipartBo) {
-        return R.ok(ossService.completeMultipartUpload(multipartBo));
+        return switch (ossStatus) {
+            case "initiate" -> {
+                String originalName = multipartBo.getOriginalName();
+                String md5Digest = multipartBo.getMd5Digest();
+                if (StringUtils.isNotEmpty(originalName) && StringUtils.isNotEmpty(md5Digest)) {
+                    yield R.ok(ossService.initiateMultipart(originalName, md5Digest));
+                } else {
+                    yield R.fail("Original name and MD5 digest cannot be empty");
+                }
+            }
+            case "upload" -> {
+                ValidatorUtils.validate(multipartBo, AddGroup.class);
+                yield R.ok(ossService.uploadPart(multipartBo));
+            }
+            case "list" -> {
+                ValidatorUtils.validate(multipartBo, QueryGroup.class);
+                yield R.ok(ossService.uploadPartList(multipartBo));
+            }
+            case "complete" -> {
+                ValidatorUtils.validate(multipartBo, EditGroup.class);
+                yield R.ok(ossService.completeMultipartUpload(multipartBo));
+            }
+            default -> R.fail("Invalid OSS status");
+        };
     }
 
 }
