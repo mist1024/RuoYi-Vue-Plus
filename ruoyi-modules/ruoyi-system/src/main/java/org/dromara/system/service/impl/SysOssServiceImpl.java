@@ -253,7 +253,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Override
     public MultipartVo initiateMultipart(String originalName, String md5Digest) {
         String osskey = GlobalConstants.OSS_CONTINUATION + md5Digest;
-        MultipartVo multipartVo;
+        MultipartVo multipartVo = new MultipartVo();
         // 检查是否存在缓存，如果存在且超时时间在2小时内，则从缓存中获取上传信息
         long timeout = RedisUtils.getTimeToLive(osskey);
         if ((timeout < 0 ? timeout : timeout / 1000) > 60 * 60 * 2) {
@@ -262,7 +262,8 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
             OssClient storage = OssFactory.instance();
             UploadResult uploadResult = storage.initiateMultipart(suffix);
-            multipartVo = MapstructUtils.convert(uploadResult, MultipartVo.class);
+            multipartVo.setFilename(uploadResult.getFilename());
+            multipartVo.setUploadId(uploadResult.getUploadId());
             multipartVo.setSuffix(suffix);
             RedisUtils.setCacheObject(osskey, multipartVo, Duration.ofMillis(60 * 60 * 72));
             RedisUtils.setCacheObject(GlobalConstants.OSS_MULTIPART + multipartVo.getUploadId(), multipartVo, Duration.ofMillis(60 * 60 * 72));
