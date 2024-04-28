@@ -281,6 +281,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         String uploadId = multipartBo.getUploadId();
         Integer partNumber = multipartBo.getPartNumber();
         MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
+        if (ObjectUtil.isNull(multipartVo)) {
+            throw new ServiceException("该分片任务不存在!");
+        }
         OssClient storage = OssFactory.instance();
         String privateUrl = storage.uploadPartFutures(multipartVo.getFilename(), uploadId, partNumber, multipartBo.getMd5Digest(), 60 * 60 * 72);
         multipartVo.setPrivateUrl(privateUrl);
@@ -298,6 +301,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     public MultipartVo uploadPartList(MultipartBo multipartBo) {
         String uploadId = multipartBo.getUploadId();
         MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
+        if (ObjectUtil.isNull(multipartVo)) {
+            throw new ServiceException("该分片任务不存在!");
+        }
         OssClient storage = OssFactory.instance();
         List<PartUploadResult> listParts = storage.listParts(multipartVo.getFilename(), uploadId, multipartBo.getMaxParts(), multipartBo.getPartNumberMarker());
         multipartVo.setPartUploadList(listParts.stream()
@@ -315,7 +321,11 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Override
     public SysOssVo completeMultipartUpload(MultipartBo multipartBo) {
         String uploadId = multipartBo.getUploadId();
-        MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
+        String uploadIdKey = GlobalConstants.OSS_MULTIPART + uploadId;
+        MultipartVo multipartVo = RedisUtils.getCacheObject(uploadIdKey);
+        if (ObjectUtil.isNull(multipartVo)) {
+            throw new ServiceException("该分片任务不存在!");
+        }
         List<PartUploadResult> listParts = multipartBo.getPartUploadList().stream()
             .map(x -> PartUploadResult.builder()
                 .partNumber(x.getPartNumber())
@@ -325,7 +335,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         OssClient storage = OssFactory.instance();
         UploadResult uploadResult = storage.completeMultipartUpload(multipartVo.getFilename(), uploadId, listParts);
         // 保存文件信息
-        return buildResultEntity(multipartVo.getOriginalName(), multipartVo.getSuffix(), storage.getConfigKey(), uploadResult);
+        SysOssVo sysOssVo = buildResultEntity(multipartVo.getOriginalName(), multipartVo.getSuffix(), storage.getConfigKey(), uploadResult);
+        RedisUtils.deleteObject(uploadIdKey);
+        return sysOssVo;
     }
 
     /**
