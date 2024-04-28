@@ -254,6 +254,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     public MultipartVo initiateMultipart(String originalName, String md5Digest) {
         String osskey = GlobalConstants.OSS_CONTINUATION + md5Digest;
         MultipartVo multipartVo;
+        // 检查是否存在缓存，如果存在且超时时间在2小时内，则从缓存中获取上传信息
         long timeout = RedisUtils.getTimeToLive(osskey);
         if ((timeout < 0 ? timeout : timeout / 1000) > 60 * 60 * 2) {
             multipartVo = RedisUtils.getCacheObject(osskey);
@@ -262,7 +263,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
             OssClient storage = OssFactory.instance();
             UploadResult uploadResult = storage.initiateMultipart(suffix);
             multipartVo = MapstructUtils.convert(uploadResult, MultipartVo.class);
-            RedisUtils.setCacheObject(osskey, multipartVo, Duration.ofMillis(10800));
+            multipartVo.setSuffix(suffix);
+            RedisUtils.setCacheObject(osskey, multipartVo, Duration.ofMillis(60 * 60 * 72));
+            RedisUtils.setCacheObject(GlobalConstants.OSS_MULTIPART + multipartVo.getUploadId(), multipartVo, Duration.ofMillis(60 * 60 * 72));
         }
         return multipartVo;
     }
@@ -275,10 +278,13 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public MultipartVo uploadPart(MultipartBo multipartBo) {
+        String uploadId = multipartBo.getUploadId();
+        Integer partNumber = multipartBo.getPartNumber();
+        MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
         OssClient storage = OssFactory.instance();
-        String privateUrl = storage.uploadPartFutures(multipartBo.getFilename(), multipartBo.getUploadId(), multipartBo.getPartNumber(), multipartBo.getMd5Digest(), 60 * 60 * 72);
-        MultipartVo multipartVo = MapstructUtils.convert(multipartBo, MultipartVo.class);
+        String privateUrl = storage.uploadPartFutures(multipartVo.getFilename(), uploadId, partNumber, multipartBo.getMd5Digest(), 60 * 60 * 72);
         multipartVo.setPrivateUrl(privateUrl);
+        multipartVo.setPartNumber(partNumber);
         return multipartVo;
     }
 
@@ -290,9 +296,10 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public MultipartVo uploadPartList(MultipartBo multipartBo) {
+        String uploadId = multipartBo.getUploadId();
+        MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
         OssClient storage = OssFactory.instance();
-        List<PartUploadResult> listParts = storage.listParts(multipartBo.getFilename(), multipartBo.getUploadId(), multipartBo.getMaxParts(), multipartBo.getPartNumberMarker());
-        MultipartVo multipartVo = MapstructUtils.convert(multipartBo, MultipartVo.class);
+        List<PartUploadResult> listParts = storage.listParts(multipartVo.getFilename(), uploadId, multipartBo.getMaxParts(), multipartBo.getPartNumberMarker());
         multipartVo.setPartUploadList(listParts.stream()
             .map(x -> new MultipartVo.PartUploadResult(x.getPartNumber(), x.getETag()))
             .collect(Collectors.toList()));
@@ -307,8 +314,8 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      */
     @Override
     public SysOssVo completeMultipartUpload(MultipartBo multipartBo) {
-        String originalName = multipartBo.getOriginalName();
-        String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
+        String uploadId = multipartBo.getUploadId();
+        MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
         List<PartUploadResult> listParts = multipartBo.getPartUploadList().stream()
             .map(x -> PartUploadResult.builder()
                 .partNumber(x.getPartNumber())
@@ -316,9 +323,9 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
                 .build())
             .collect(Collectors.toList());
         OssClient storage = OssFactory.instance();
-        UploadResult uploadResult = storage.completeMultipartUpload(multipartBo.getFilename(), multipartBo.getUploadId(), listParts);
+        UploadResult uploadResult = storage.completeMultipartUpload(multipartVo.getFilename(), uploadId, listParts);
         // 保存文件信息
-        return buildResultEntity(originalName, suffix, storage.getConfigKey(), uploadResult);
+        return buildResultEntity(multipartVo.getOriginalName(), multipartVo.getSuffix(), storage.getConfigKey(), uploadResult);
     }
 
     /**

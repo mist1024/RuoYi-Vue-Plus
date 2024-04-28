@@ -22,16 +22,15 @@ public class MultipartBo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 分片类型
+     * 分片类型（必传）
      */
-    @NotBlank(message = "分片类型不能为空", groups = {QueryGroup.class, AddGroup.class, EditGroup.class})
     private String ossStatus;
 
     /**
-     * 文件名
+     * 文件原名（分片初始化的时候使用）
      */
-    @NotBlank(message = "文件名不能为空", groups = {QueryGroup.class, AddGroup.class, EditGroup.class})
-    private String filename;
+    @Size(min = 2, max = 255, message = "文件原名长度必须在2到255之间")
+    private String originalName;
 
     /**
      * 用于分片上传任务的 Upload ID
@@ -48,7 +47,7 @@ public class MultipartBo implements Serializable {
     private Integer partNumber;
 
     /**
-     * 内容的 MD5 摘要
+     * 内容的 MD5 摘要（初始化的时候，需要第一片的md5值用来判断断点续传）
      */
     @Size(max = 255, message = "内容的 MD5 摘要，如果有的话不能超过255", groups = AddGroup.class)
     private String md5Digest;
@@ -65,13 +64,6 @@ public class MultipartBo implements Serializable {
      */
     @NotNull(message = "分片编号的标记不能为空", groups = QueryGroup.class)
     private Integer partNumberMarker;
-
-    /**
-     * 原名
-     */
-    @NotBlank(message = "原名不能为空", groups = EditGroup.class)
-    @Size(min = 2, max = 255, message = "文件原名长度必须在2到255之间", groups = EditGroup.class)
-    private String originalName;
 
     /**
      * 已上传列表（最大长度一万）

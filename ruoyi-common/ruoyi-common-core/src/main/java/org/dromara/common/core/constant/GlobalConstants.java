@@ -42,4 +42,9 @@ public interface GlobalConstants {
      */
     String OSS_CONTINUATION = GLOBAL_REDIS_KEY + "oss_continuation:";
 
+    /**
+     * OSS分片上传
+     */
+    String OSS_MULTIPART = GLOBAL_REDIS_KEY + "oss_multipart:";
+
 }

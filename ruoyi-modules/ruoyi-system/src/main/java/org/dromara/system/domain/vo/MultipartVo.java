@@ -25,10 +25,20 @@ public class MultipartVo implements Serializable {
     private String filename;
 
     /**
+     * 文件原名（分片初始化的时候使用）
+     */
+    private String originalName;
+
+    /**
      * 用于分片上传任务的 Upload ID
      * 在初始化分片上传时获取，并在后续的分片上传和完成上传过程中使用
      */
     private String uploadId;
+
+    /**
+     * 文件后缀
+     */
+    private String suffix;
 
     /**
      * 分片编号（从1开始递增）
