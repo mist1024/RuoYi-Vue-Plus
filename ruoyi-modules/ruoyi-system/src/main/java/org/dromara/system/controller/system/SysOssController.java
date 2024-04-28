@@ -116,8 +116,7 @@ public class SysOssController extends BaseController {
     @SaCheckPermission("system:oss:multipart")
     @PostMapping(value = "/multipart")
     public R<?> multipart(@RequestBody MultipartBo multipartBo) {
-        String ossStatus = multipartBo.getOssStatus();
-        return switch (ossStatus) {
+        return switch (multipartBo.getOssStatus()) {
             case "initiate" -> {
                 if (StringUtils.isNotEmpty(multipartBo.getOriginalName()) && StringUtils.isNotEmpty(multipartBo.getMd5Digest())) {
                     yield R.ok(ossService.initiateMultipart(multipartBo));
