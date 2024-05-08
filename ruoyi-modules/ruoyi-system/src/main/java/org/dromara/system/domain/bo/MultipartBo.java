@@ -7,6 +7,7 @@ import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
+import org.hibernate.validator.constraints.Range;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -43,7 +44,7 @@ public class MultipartBo implements Serializable {
      * 分片编号（从1开始递增）
      */
     @NotNull(message = "分片编号不能为空", groups = AddGroup.class)
-    @Size(min = 1, max = 10000, message = "分片编号必须介于1和10,000之间", groups = AddGroup.class)
+    @Range(min = 1, max = 10000, message = "分片编号必须介于1和10,000之间", groups = AddGroup.class)
     private Integer partNumber;
 
     /**
@@ -83,7 +84,7 @@ public class MultipartBo implements Serializable {
          * 分片编号（从1开始递增）
          */
         @NotNull(message = "分片编号不能为空", groups = EditGroup.class)
-        @Size(min = 1, max = 10000, message = "分片编号必须介于1和10,000之间", groups = EditGroup.class)
+        @Range(min = 1, max = 10000, message = "分片编号必须介于1和10,000之间", groups = EditGroup.class)
         private Integer partNumber;
 
         /**
