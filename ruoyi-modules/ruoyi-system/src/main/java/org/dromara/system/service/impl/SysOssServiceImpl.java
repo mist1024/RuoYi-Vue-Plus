@@ -25,6 +25,7 @@ import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
@@ -253,7 +254,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     @Override
     public MultipartVo initiateMultipart(MultipartBo multipartBo) {
         OssClient storage = OssFactory.instance();
-        String osskey = GlobalConstants.OSS_CONTINUATION + multipartBo.getMd5Digest();
+        String osskey = GlobalConstants.OSS_CONTINUATION + LoginHelper.getUserId() + multipartBo.getMd5Digest();
         MultipartVo multipartVo = new MultipartVo();
 
         // 检查是否存在缓存，如果存在且超时时间在2小时内，则从缓存中获取上传信息
@@ -346,6 +347,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         // 保存文件信息
         SysOssVo sysOssVo = buildResultEntity(multipartVo.getOriginalName(), multipartVo.getSuffix(), storage.getConfigKey(), uploadResult);
         RedisUtils.deleteObject(uploadIdKey);
+        RedisUtils.deleteObject(GlobalConstants.OSS_CONTINUATION + LoginHelper.getUserId() + multipartBo.getMd5Digest());
         return sysOssVo;
     }
 

@@ -51,9 +51,11 @@ public class MultipartBo implements Serializable {
     private Integer partNumber;
 
     /**
-     * 内容的 MD5 摘要（初始化的时候，需要第一片的md5值用来判断断点续传）
-     *
+     * 内容的 MD5 摘要
+     * （initiate初始化、合并complete的时候，需要第一片的md5值用来判断断点续传）
+     * upload状态时，非必需（如果有值会校验）
      */
+    @NotBlank(message = "第一片的md5值不能为空", groups = EditGroup.class)
     @Size(max = 255, message = "内容的 MD5 摘要，如果有的话不能超过255", groups = AddGroup.class)
     private String md5Digest;
 
@@ -62,12 +64,14 @@ public class MultipartBo implements Serializable {
      * 最多分片一万，一次性返回会造成前端性能问题，需要前端多次校验
      */
     @NotNull(message = "最大返回的分片数不能为空", groups = QueryGroup.class)
+    @Range(max = 1000, message = "最大返回的分片数不能超过1000", groups = EditGroup.class)
     private Integer maxParts;
 
     /**
      * 分片编号的标记，用于分页查询（默认为0，表示从第一个分片开始查询）
      */
     @NotNull(message = "分片编号的标记不能为空", groups = QueryGroup.class)
+    @Range(min = 0, max = 10000, message = "分片编号的标记长度必须在0到10000之间", groups = EditGroup.class)
     private Integer partNumberMarker;
 
     /**
