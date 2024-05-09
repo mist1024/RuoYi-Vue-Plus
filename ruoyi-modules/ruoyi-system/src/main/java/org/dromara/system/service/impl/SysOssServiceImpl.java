@@ -347,7 +347,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         // 保存文件信息
         SysOssVo sysOssVo = buildResultEntity(multipartVo.getOriginalName(), multipartVo.getSuffix(), storage.getConfigKey(), uploadResult);
         RedisUtils.deleteObject(uploadIdKey);
-        RedisUtils.deleteObject(GlobalConstants.OSS_CONTINUATION + LoginHelper.getUserId() + multipartBo.getMd5Digest());
+        RedisUtils.deleteObject(GlobalConstants.OSS_CONTINUATION + LoginHelper.getUserId() + multipartVo.getMd5Digest());
         return sysOssVo;
     }
 
