@@ -124,6 +124,6 @@ public class WfCategoryServiceImpl implements IWfCategoryService {
      */
     @Override
     public WfCategory queryByCategoryCode(String categoryCode) {
-        return baseMapper.selectOne(new LambdaQueryWrapper<WfCategory>().eq(WfCategory::getCategoryCode, categoryCode));
+        return baseMapper.selectOne(new LambdaQueryWrapper<WfCategory>().eq(WfCategory::getCategoryCode, categoryCode), false);
     }
 }

@@ -150,7 +150,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         long ossConfigId = ObjectUtil.isNull(sysOssConfig.getOssConfigId()) ? -1L : sysOssConfig.getOssConfigId();
         SysOssConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysOssConfig>()
             .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
-            .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()));
+            .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()), false);
         if (ObjectUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
             return false;
         }

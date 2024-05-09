@@ -569,7 +569,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     public String selectUserNameById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserName).eq(SysUser::getUserId, userId));
+            .select(SysUser::getUserName).eq(SysUser::getUserId, userId), false);
         return ObjectUtil.isNull(sysUser) ? null : sysUser.getUserName();
     }
 
@@ -583,7 +583,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Cacheable(cacheNames = CacheNames.SYS_NICKNAME, key = "#userId")
     public String selectNicknameById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getNickName).eq(SysUser::getUserId, userId));
+            .select(SysUser::getNickName).eq(SysUser::getUserId, userId),false);
         return ObjectUtil.isNull(sysUser) ? null : sysUser.getNickName();
     }
 
@@ -614,7 +614,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     public String selectPhonenumberById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getPhonenumber).eq(SysUser::getUserId, userId));
+            .select(SysUser::getPhonenumber).eq(SysUser::getUserId, userId),false);
         return ObjectUtil.isNull(sysUser) ? null : sysUser.getPhonenumber();
     }
 
@@ -627,7 +627,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Override
     public String selectEmailById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getEmail).eq(SysUser::getUserId, userId));
+            .select(SysUser::getEmail).eq(SysUser::getUserId, userId),false);
         return ObjectUtil.isNull(sysUser) ? null : sysUser.getEmail();
     }
 
