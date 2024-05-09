@@ -56,7 +56,7 @@ public class MultipartBo implements Serializable {
      * upload状态时，非必需（如果有值会校验）
      */
     @NotBlank(message = "第一片的md5值不能为空", groups = EditGroup.class)
-    @Size(max = 255, message = "内容的 MD5 摘要，如果有的话不能超过255", groups = AddGroup.class)
+    @Size(max = 255, message = "内容的 MD5 摘要，如果有的话不能超过255", groups = {AddGroup.class, EditGroup.class})
     private String md5Digest;
 
     /**
