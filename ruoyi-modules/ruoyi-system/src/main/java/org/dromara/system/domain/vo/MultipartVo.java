@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * 分片上传
+ *
  * @author AprilWind
  */
 @Data
@@ -54,6 +56,7 @@ public class MultipartVo implements Serializable {
     /**
      * 已上传列表（最大长度一千）
      * 必须是唯一且按照递增顺序排列，严格检查是否漏传
+     * ‘initiate’初始化状态时如果返回值，说明是断点续传，如果前端分片大于一千，需要请求‘query’获取
      */
     private List<PartUploadResult> partUploadList;
 

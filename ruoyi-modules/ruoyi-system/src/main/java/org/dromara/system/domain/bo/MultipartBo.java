@@ -1,5 +1,6 @@
 package org.dromara.system.domain.bo;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,6 +15,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * 分片上传
+ *
  * @author AprilWind
  */
 @Data
@@ -49,6 +52,7 @@ public class MultipartBo implements Serializable {
 
     /**
      * 内容的 MD5 摘要（初始化的时候，需要第一片的md5值用来判断断点续传）
+     *
      */
     @Size(max = 255, message = "内容的 MD5 摘要，如果有的话不能超过255", groups = AddGroup.class)
     private String md5Digest;
@@ -70,6 +74,7 @@ public class MultipartBo implements Serializable {
      * 已上传列表（最大长度一万）
      * 必须是唯一且按照递增顺序排列，严格检查是否漏传
      */
+    @Valid
     @NotNull(message = "已上传列表不能为空")
     @Size(min = 2, max = 10000, message = "已上传列表长度必须在2到10000之间", groups = EditGroup.class)
     private List<PartUploadResult> partUploadList;
