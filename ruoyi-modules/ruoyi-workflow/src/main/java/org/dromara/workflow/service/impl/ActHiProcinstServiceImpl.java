@@ -45,7 +45,7 @@ public class ActHiProcinstServiceImpl implements IActHiProcinstService {
     public ActHiProcinst selectByBusinessKey(String businessKey) {
         return baseMapper.selectOne(new LambdaQueryWrapper<ActHiProcinst>()
             .eq(ActHiProcinst::getBusinessKey, businessKey)
-            .eq(TenantHelper.isEnable(), ActHiProcinst::getTenantId, TenantHelper.getTenantId()));
+            .eq(TenantHelper.isEnable(), ActHiProcinst::getTenantId, TenantHelper.getTenantId()), false);
 
     }
 }

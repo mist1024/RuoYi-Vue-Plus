@@ -71,7 +71,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @Override
     public String selectConfigByKey(String configKey) {
         SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
-            .eq(SysConfig::getConfigKey, configKey));
+            .eq(SysConfig::getConfigKey, configKey), false);
         if (ObjectUtil.isNotNull(retConfig)) {
             return retConfig.getConfigValue();
         }
@@ -80,6 +80,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
 
     /**
      * 获取注册开关
+     *
      * @param tenantId 租户id
      * @return true开启，false关闭
      */
@@ -87,7 +88,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     public boolean selectRegisterEnabled(String tenantId) {
         SysConfig retConfig = TenantHelper.dynamic(tenantId, () -> {
             return baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
-                .eq(SysConfig::getConfigKey, "sys.account.registerUser"));
+                .eq(SysConfig::getConfigKey, "sys.account.registerUser"), false);
         });
         if (ObjectUtil.isNull(retConfig)) {
             return false;
@@ -197,7 +198,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     @Override
     public boolean checkConfigKeyUnique(SysConfigBo config) {
         long configId = ObjectUtil.isNull(config.getConfigId()) ? -1L : config.getConfigId();
-        SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()));
+        SysConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getConfigKey, config.getConfigKey()), false);
         if (ObjectUtil.isNotNull(info) && info.getConfigId() != configId) {
             return false;
         }

@@ -73,7 +73,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         return baseMapper.selectOne(new LambdaQueryWrapper<SysDictData>()
                 .select(SysDictData::getDictLabel)
                 .eq(SysDictData::getDictType, dictType)
-                .eq(SysDictData::getDictValue, dictValue))
+                .eq(SysDictData::getDictValue, dictValue), false)
             .getDictLabel();
     }
 
@@ -146,7 +146,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     public boolean checkDictDataUnique(SysDictDataBo dict) {
         Long dictCode = ObjectUtil.isNull(dict.getDictCode()) ? -1L : dict.getDictCode();
         SysDictData entity = baseMapper.selectOne(new LambdaQueryWrapper<SysDictData>()
-            .eq(SysDictData::getDictType, dict.getDictType()).eq(SysDictData::getDictValue, dict.getDictValue()));
+            .eq(SysDictData::getDictType, dict.getDictType()).eq(SysDictData::getDictValue, dict.getDictValue()), false);
         if (ObjectUtil.isNotNull(entity) && !dictCode.equals(entity.getDictCode())) {
             return false;
         }

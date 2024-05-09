@@ -81,7 +81,7 @@ public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
         LambdaQueryWrapper<WfTaskBackNode> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WfTaskBackNode::getInstanceId, processInstanceId);
         queryWrapper.eq(WfTaskBackNode::getNodeId, nodeId);
-        return wfTaskBackNodeMapper.selectOne(queryWrapper);
+        return wfTaskBackNodeMapper.selectOne(queryWrapper, false);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class WfTaskBackNodeServiceImpl implements IWfTaskBackNodeService {
             LambdaQueryWrapper<WfTaskBackNode> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(WfTaskBackNode::getInstanceId, processInstanceId);
             queryWrapper.eq(WfTaskBackNode::getNodeId, targetActivityId);
-            WfTaskBackNode actTaskNode = wfTaskBackNodeMapper.selectOne(queryWrapper);
+            WfTaskBackNode actTaskNode = wfTaskBackNodeMapper.selectOne(queryWrapper, false);
             if (ObjectUtil.isNotNull(actTaskNode)) {
                 Integer orderNo = actTaskNode.getOrderNo();
                 List<WfTaskBackNode> taskNodeList = getListByInstanceId(processInstanceId);
