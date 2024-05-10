@@ -5,6 +5,7 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
+import com.baomidou.lock.exception.LockFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -129,6 +130,16 @@ public class GlobalExceptionHandler {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生系统异常.", requestURI, e);
         return R.fail(e.getMessage());
+    }
+
+    /**
+     * 分布式锁Lock4j异常
+     */
+    @ExceptionHandler(LockFailureException.class)
+    public R<Void> handleBaseException(LockFailureException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("获取锁失败了'{}',发生Lock4j异常." + requestURI, e.getMessage());
+        return R.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
     }
 
     /**
