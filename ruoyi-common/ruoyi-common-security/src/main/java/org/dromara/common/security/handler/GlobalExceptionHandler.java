@@ -5,7 +5,6 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
-import com.baomidou.lock.exception.LockFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
