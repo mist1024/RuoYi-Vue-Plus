@@ -3,14 +3,12 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -38,7 +36,6 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.*;
-import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +43,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -62,9 +62,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private final RepositoryService repositoryService;
     private final ProcessMigrationService processMigrationService;
     private final IWfCategoryService wfCategoryService;
-    private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final IWfDefinitionConfigService wfDefinitionConfigService;
     private final WfDefinitionConfigMapper wfDefinitionConfigMapper;
-    private final IWfNodeConfigService iWfNodeConfigService;
+    private final IWfNodeConfigService wfNodeConfigService;
 
     /**
      * 分页查询
@@ -95,7 +95,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         }
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> ids = StreamUtils.toList(definitionList, ProcessDefinition::getId);
-            List<WfDefinitionConfigVo> wfDefinitionConfigVos = iWfDefinitionConfigService.queryList(ids);
+            List<WfDefinitionConfigVo> wfDefinitionConfigVos = wfDefinitionConfigService.queryList(ids);
             for (ProcessDefinition processDefinition : definitionList) {
                 ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
                 if (CollUtil.isNotEmpty(deploymentList)) {
@@ -135,7 +135,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         }
         if (CollUtil.isNotEmpty(definitionList)) {
             List<String> ids = StreamUtils.toList(definitionList, ProcessDefinition::getId);
-            List<WfDefinitionConfigVo> wfDefinitionConfigVos = iWfDefinitionConfigService.queryList(ids);
+            List<WfDefinitionConfigVo> wfDefinitionConfigVos = wfDefinitionConfigService.queryList(ids);
             for (ProcessDefinition processDefinition : definitionList) {
                 ProcessDefinitionVo processDefinitionVo = BeanUtil.toBean(processDefinition, ProcessDefinitionVo.class);
                 if (CollUtil.isNotEmpty(deploymentList)) {
@@ -150,7 +150,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 processDefinitionVoList.add(processDefinitionVo);
             }
         }
-        return CollectionUtil.reverse(processDefinitionVoList);
+        return CollUtil.reverse(processDefinitionVoList);
     }
 
     /**
@@ -162,7 +162,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     @Override
     public String definitionImage(String processDefinitionId) {
         InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
-        return Base64.encode(IOUtils.toByteArray(inputStream));
+        return Base64.encode(IoUtil.readBytes(inputStream));
     }
 
     /**
@@ -174,13 +174,8 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public String definitionXml(String processDefinitionId) {
         StringBuilder xml = new StringBuilder();
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
-        InputStream inputStream;
-        try {
-            inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
-            xml.append(IOUtils.toString(inputStream, StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
+        xml.append(IoUtil.read(inputStream, StandardCharsets.UTF_8));
         return xml.toString();
     }
 
@@ -195,7 +190,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     public boolean deleteDeployment(List<String> deploymentIds, List<String> processDefinitionIds) {
         try {
             List<HistoricProcessInstance> historicProcessInstances = QueryUtils.hisInstanceQuery().deploymentIdIn(deploymentIds).list();
-            if (CollectionUtil.isNotEmpty(historicProcessInstances)) {
+            if (CollUtil.isNotEmpty(historicProcessInstances)) {
                 Set<String> defIds = StreamUtils.toSet(historicProcessInstances, HistoricProcessInstance::getProcessDefinitionId);
                 List<ProcessDefinition> processDefinitions = QueryUtils.definitionQuery().processDefinitionIds(defIds).list();
                 if (CollUtil.isNotEmpty(processDefinitions)) {
@@ -208,9 +203,9 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
                 repositoryService.deleteDeployment(deploymentId);
             }
             //删除流程定义配置
-            iWfDefinitionConfigService.deleteByDefIds(processDefinitionIds);
+            wfDefinitionConfigService.deleteByDefIds(processDefinitionIds);
             //删除节点配置
-            iWfNodeConfigService.deleteByDefIds(processDefinitionIds);
+            wfNodeConfigService.deleteByDefIds(processDefinitionIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -387,12 +382,12 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
         if (CollUtil.isEmpty(wfDefinitionConfigs)) {
             ProcessDefinition processDefinition = QueryUtils.definitionQuery().processDefinitionKey("leave1").latestVersion().singleResult();
             if (processDefinition != null) {
-                WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
-                wfFormDefinition.setDefinitionId(processDefinition.getId());
-                wfFormDefinition.setProcessKey(processDefinition.getKey());
-                wfFormDefinition.setTableName("test_leave");
-                wfFormDefinition.setVersion(processDefinition.getVersion());
-                iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                WfDefinitionConfigBo wfDefinitionConfigBo = new WfDefinitionConfigBo();
+                wfDefinitionConfigBo.setDefinitionId(processDefinition.getId());
+                wfDefinitionConfigBo.setProcessKey(processDefinition.getKey());
+                wfDefinitionConfigBo.setTableName("test_leave");
+                wfDefinitionConfigBo.setVersion(processDefinition.getVersion());
+                wfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
             }
         }
 
@@ -407,16 +402,16 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
     private void setWfConfig(ProcessDefinition oldProcessDefinition, ProcessDefinition definition) {
         //更新流程定义表单
         if (oldProcessDefinition != null) {
-            WfDefinitionConfigVo definitionVo = iWfDefinitionConfigService.getByDefId(oldProcessDefinition.getId());
+            WfDefinitionConfigVo definitionVo = wfDefinitionConfigService.getByDefId(oldProcessDefinition.getId());
             if (definitionVo != null) {
-                iWfDefinitionConfigService.deleteByDefIds(Collections.singletonList(oldProcessDefinition.getId()));
-                WfDefinitionConfigBo wfFormDefinition = new WfDefinitionConfigBo();
-                wfFormDefinition.setDefinitionId(definition.getId());
-                wfFormDefinition.setProcessKey(definition.getKey());
-                wfFormDefinition.setTableName(definitionVo.getTableName());
-                wfFormDefinition.setVersion(definition.getVersion());
-                wfFormDefinition.setRemark(definitionVo.getRemark());
-                iWfDefinitionConfigService.saveOrUpdate(wfFormDefinition);
+                wfDefinitionConfigService.deleteByDefIds(Collections.singletonList(oldProcessDefinition.getId()));
+                WfDefinitionConfigBo wfDefinitionConfigBo = new WfDefinitionConfigBo();
+                wfDefinitionConfigBo.setDefinitionId(definition.getId());
+                wfDefinitionConfigBo.setProcessKey(definition.getKey());
+                wfDefinitionConfigBo.setTableName(definitionVo.getTableName());
+                wfDefinitionConfigBo.setVersion(definition.getVersion());
+                wfDefinitionConfigBo.setRemark(definitionVo.getRemark());
+                wfDefinitionConfigService.saveOrUpdate(wfDefinitionConfigBo);
             }
         }
         //更新流程节点配置表单
@@ -437,7 +432,7 @@ public class ActProcessDefinitionServiceImpl implements IActProcessDefinitionSer
             }
         }
         if (CollUtil.isNotEmpty(wfNodeConfigList)) {
-            iWfNodeConfigService.saveOrUpdate(wfNodeConfigList);
+            wfNodeConfigService.saveOrUpdate(wfNodeConfigList);
         }
     }
 }

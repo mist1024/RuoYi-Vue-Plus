@@ -42,7 +42,7 @@ public class ActTaskController extends BaseController {
 
     private final TaskService taskService;
 
-    private final IWfTaskBackNodeService iWfTaskBackNodeService;
+    private final IWfTaskBackNodeService wfTaskBackNodeService;
 
 
     /**
@@ -269,6 +269,27 @@ public class ActTaskController extends BaseController {
      */
     @GetMapping("/getTaskNodeList/{processInstanceId}")
     public R<List<WfTaskBackNode>> getNodeList(@PathVariable String processInstanceId) {
-        return R.ok(CollUtil.reverse(iWfTaskBackNodeService.getListByInstanceId(processInstanceId)));
+        return R.ok(CollUtil.reverse(wfTaskBackNodeService.getListByInstanceId(processInstanceId)));
     }
+
+    /**
+     * 查询工作流任务用户选择加签人员
+     *
+     * @param taskId 任务id
+     */
+    @GetMapping("/getTaskUserIdsByAddMultiInstance/{taskId}")
+    public R<String> getTaskUserIdsByAddMultiInstance(@PathVariable String taskId) {
+        return R.ok(actTaskService.getTaskUserIdsByAddMultiInstance(taskId));
+    }
+
+    /**
+     * 查询工作流选择减签人员
+     *
+     * @param taskId 任务id
+     */
+    @GetMapping("/getListByDeleteMultiInstance/{taskId}")
+    public R<List<TaskVo>> getListByDeleteMultiInstance(@PathVariable String taskId) {
+        return R.ok(actTaskService.getListByDeleteMultiInstance(taskId));
+    }
+
 }

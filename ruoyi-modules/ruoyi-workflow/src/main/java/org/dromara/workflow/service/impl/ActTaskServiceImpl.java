@@ -2,14 +2,15 @@ package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
+import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -76,10 +77,11 @@ public class ActTaskServiceImpl implements IActTaskService {
     private final ManagementService managementService;
     private final FlowEventStrategy flowEventStrategy;
     private final ActTaskMapper actTaskMapper;
-    private final IWfTaskBackNodeService iWfTaskBackNodeService;
+    private final IWfTaskBackNodeService wfTaskBackNodeService;
     private final ActHiTaskinstMapper actHiTaskinstMapper;
-    private final IWfNodeConfigService iWfNodeConfigService;
-    private final IWfDefinitionConfigService iWfDefinitionConfigService;
+    private final IWfNodeConfigService wfNodeConfigService;
+    private final IWfDefinitionConfigService wfDefinitionConfigService;
+    private final UserService userService;
 
     /**
      * 启动任务
@@ -108,7 +110,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             map.put("taskId", taskResult.get(0).getId());
             return map;
         }
-        WfDefinitionConfigVo wfDefinitionConfigVo = iWfDefinitionConfigService.getByTableNameLastVersion(startProcessBo.getTableName());
+        WfDefinitionConfigVo wfDefinitionConfigVo = wfDefinitionConfigService.getByTableNameLastVersion(startProcessBo.getTableName());
         if (wfDefinitionConfigVo == null) {
             throw new ServiceException("请到流程定义绑定业务表名与流程KEY！");
         }
@@ -207,7 +209,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 taskService.complete(completeTaskBo.getTaskId());
             }
             //记录执行过的流程任务节点
-            iWfTaskBackNodeService.recordExecuteNode(task);
+            wfTaskBackNodeService.recordExecuteNode(task);
             ProcessInstance pi = QueryUtils.instanceQuery(task.getProcessInstanceId()).singleResult();
             if (pi == null) {
                 UpdateBusinessStatusCmd updateBusinessStatusCmd = new UpdateBusinessStatusCmd(task.getProcessInstanceId(), BusinessStatusEnum.FINISH.getStatus());
@@ -282,7 +284,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> taskList = page.getRecords();
         if (CollUtil.isNotEmpty(taskList)) {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
                 task.setParticipantVo(WorkflowUtils.getCurrentTaskParticipant(task.getId()));
@@ -336,7 +338,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> list = new ArrayList<>();
         if (CollUtil.isNotEmpty(taskList)) {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, Task::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (Task task : taskList) {
                 TaskVo taskVo = BeanUtil.toBean(task, TaskVo.class);
                 if (CollUtil.isNotEmpty(processInstanceList)) {
@@ -384,7 +386,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> taskList = page.getRecords();
         if (CollUtil.isNotEmpty(taskList)) {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
@@ -420,7 +422,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> taskList = page.getRecords();
         if (CollUtil.isNotEmpty(taskList)) {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
@@ -448,7 +450,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         List<TaskVo> taskList = page.getRecords();
         if (CollUtil.isNotEmpty(taskList)) {
             List<String> processDefinitionIds = StreamUtils.toList(taskList, TaskVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (TaskVo task : taskList) {
                 task.setBusinessStatusName(BusinessStatusEnum.findByStatus(task.getBusinessStatus()));
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
@@ -517,9 +519,9 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
             taskService.addComment(task.getId(), task.getProcessInstanceId(), TaskStatusEnum.TERMINATION.getStatus(), terminationBo.getComment());
             List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
-            if (CollectionUtil.isNotEmpty(list)) {
+            if (CollUtil.isNotEmpty(list)) {
                 List<Task> subTasks = StreamUtils.filter(list, e -> StringUtils.isNotBlank(e.getParentTaskId()));
-                if (CollectionUtil.isNotEmpty(subTasks)) {
+                if (CollUtil.isNotEmpty(subTasks)) {
                     subTasks.forEach(e -> taskService.deleteTask(e.getId()));
                 }
                 runtimeService.updateBusinessStatus(task.getProcessInstanceId(), BusinessStatusEnum.TERMINATION.getStatus());
@@ -723,7 +725,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 managementService.executeCommand(deleteExecutionCmd);
             }
 
-            WfTaskBackNode wfTaskBackNode = iWfTaskBackNodeService.getListByInstanceIdAndNodeId(task.getProcessInstanceId(), backProcessBo.getTargetActivityId());
+            WfTaskBackNode wfTaskBackNode = wfTaskBackNodeService.getListByInstanceIdAndNodeId(task.getProcessInstanceId(), backProcessBo.getTargetActivityId());
             if (ObjectUtil.isNotNull(wfTaskBackNode) && wfTaskBackNode.getOrderNo() == 0) {
                 runtimeService.updateBusinessStatus(processInstanceId, BusinessStatusEnum.BACK.getStatus());
                 FlowProcessEventHandler processHandler = flowEventStrategy.getProcessHandler(processInstance.getProcessDefinitionKey());
@@ -732,7 +734,7 @@ public class ActTaskServiceImpl implements IActTaskService {
                 }
             }
             //删除驳回后的流程节点
-            iWfTaskBackNodeService.deleteBackTaskNode(processInstanceId, backProcessBo.getTargetActivityId());
+            wfTaskBackNodeService.deleteBackTaskNode(processInstanceId, backProcessBo.getTargetActivityId());
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
@@ -768,7 +770,7 @@ public class ActTaskServiceImpl implements IActTaskService {
     public List<VariableVo> getInstanceVariable(String taskId) {
         List<VariableVo> variableVoList = new ArrayList<>();
         Map<String, VariableInstance> variableInstances = taskService.getVariableInstances(taskId);
-        if (CollectionUtil.isNotEmpty(variableInstances)) {
+        if (CollUtil.isNotEmpty(variableInstances)) {
             for (Map.Entry<String, VariableInstance> entry : variableInstances.entrySet()) {
                 VariableVo variableVo = new VariableVo();
                 variableVo.setKey(entry.getKey());
@@ -777,5 +779,94 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
         }
         return variableVoList;
+    }
+
+    /**
+     * 查询工作流任务用户选择加签人员
+     *
+     * @param taskId 任务id
+     * @return
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getTaskUserIdsByAddMultiInstance(String taskId) {
+        Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ServiceException("任务不存在");
+        }
+        MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+        if (multiInstance == null) {
+            return "";
+        }
+        List<Long> userIds;
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            userIds = (List<Long>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+        } else {
+            List<Task> list = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
+            userIds = StreamUtils.toList(list, e -> Long.valueOf(e.getAssignee()));
+        }
+        return StringUtils.join(userIds, StringUtils.SEPARATOR);
+    }
+
+    /**
+     * 查询工作流选择减签人员
+     *
+     * @param taskId 任务id 任务id
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<TaskVo> getListByDeleteMultiInstance(String taskId) {
+        Task task = QueryUtils.taskQuery().taskId(taskId).singleResult();
+        List<Task> taskList = QueryUtils.taskQuery(task.getProcessInstanceId()).list();
+        MultiInstanceVo multiInstance = WorkflowUtils.isMultiInstance(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+        List<TaskVo> taskListVo = new ArrayList<>();
+        if (multiInstance == null) {
+            return List.of();
+        }
+        List<Long> assigneeList = new ArrayList<>();
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            List<Object> variable = (List<Object>) runtimeService.getVariable(task.getExecutionId(), multiInstance.getAssigneeList());
+            for (Object o : variable) {
+                assigneeList.add(Long.valueOf(o.toString()));
+            }
+        }
+
+        if (multiInstance.getType() instanceof SequentialMultiInstanceBehavior) {
+            List<Long> userIds = StreamUtils.filter(assigneeList, e -> !String.valueOf(e).equals(task.getAssignee()));
+            List<UserDTO> userList = userService.selectListByIds(userIds);
+            for (Long userId : userIds) {
+                TaskVo taskVo = new TaskVo();
+                taskVo.setId("串行会签");
+                taskVo.setExecutionId("串行会签");
+                taskVo.setProcessInstanceId(task.getProcessInstanceId());
+                taskVo.setName(task.getName());
+                taskVo.setAssignee(userId);
+                if (CollUtil.isNotEmpty(userList)) {
+                    userList.stream().filter(u -> u.getUserId().toString().equals(userId.toString())).findFirst().ifPresent(u -> taskVo.setAssigneeName(u.getNickName()));
+                }
+                taskListVo.add(taskVo);
+            }
+            return taskListVo;
+        } else if (multiInstance.getType() instanceof ParallelMultiInstanceBehavior) {
+            List<Task> tasks = StreamUtils.filter(taskList, e -> StringUtils.isBlank(e.getParentTaskId()) && !e.getExecutionId().equals(task.getExecutionId()) && e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
+            if (CollUtil.isNotEmpty(tasks)) {
+                List<Long> userIds = StreamUtils.toList(tasks, e -> Long.valueOf(e.getAssignee()));
+                List<UserDTO> userList = userService.selectListByIds(userIds);
+                for (Task t : tasks) {
+                    TaskVo taskVo = new TaskVo();
+                    taskVo.setId(t.getId());
+                    taskVo.setExecutionId(t.getExecutionId());
+                    taskVo.setProcessInstanceId(t.getProcessInstanceId());
+                    taskVo.setName(t.getName());
+                    taskVo.setAssignee(Long.valueOf(t.getAssignee()));
+                    if (CollUtil.isNotEmpty(userList)) {
+                        userList.stream().filter(u -> u.getUserId().toString().equals(t.getAssignee())).findFirst().ifPresent(e -> taskVo.setAssigneeName(e.getNickName()));
+                    }
+                    taskListVo.add(taskVo);
+                }
+                return taskListVo;
+            }
+        }
+        return List.of();
     }
 }

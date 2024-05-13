@@ -16,12 +16,15 @@ import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.Part;
 import software.amazon.awssdk.services.s3.model.S3Exception;
@@ -30,10 +33,7 @@ import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.*;
 import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -89,6 +89,9 @@ public class OssClient {
             StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey()));
 
+            //MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
+            boolean isStyle = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+
             //创建AWS基于 CRT 的 S3 客户端
             this.client = S3AsyncClient.crtBuilder()
                 .credentialsProvider(credentialsProvider)
@@ -97,15 +100,15 @@ public class OssClient {
                 .targetThroughputInGbps(20.0)
                 .minimumPartSizeInBytes(10 * 1025 * 1024L)
                 .checksumValidationEnabled(false)
+                .forcePathStyle(isStyle)
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
             this.transferManager = S3TransferManager.builder().s3Client(this.client).build();
 
-            // 检查是否连接到 MinIO，MinIO 使用 HTTPS 限制使用域名访问，需要启用路径样式访问
+            // 创建 S3 配置对象
             S3Configuration config = S3Configuration.builder().chunkedEncodingEnabled(false)
-                // minio 使用https限制使用域名访问 需要此配置 站点填域名
-                .pathStyleAccessEnabled(!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)).build();
+                .pathStyleAccessEnabled(isStyle).build();
 
             // 创建 预签名 URL 的生成器 实例，用于生成 S3 预签名 URL
             this.presigner = S3Presigner.builder()
@@ -261,6 +264,37 @@ public class OssClient {
         // 等待文件下载操作完成
         downloadFile.completionFuture().join();
         return tempFilePath;
+    }
+
+    /**
+     * 下载文件从 Amazon S3 到 输出流
+     *
+     * @param key 文件在 Amazon S3 中的对象键
+     * @param out 输出流
+     * @return 输出流中写入的字节数（长度）
+     * @throws OssException 如果下载失败，抛出自定义异常
+     */
+    public long download(String key, OutputStream out) {
+        try {
+            // 构建下载请求
+            DownloadRequest<ResponseInputStream<GetObjectResponse>> downloadRequest = DownloadRequest.builder()
+                // 文件对象
+                .getObjectRequest(y -> y.bucket(properties.getBucketName())
+                    .key(key)
+                    .build())
+                .addTransferListener(LoggingTransferListener.create())
+                // 使用订阅转换器
+                .responseTransformer(AsyncResponseTransformer.toBlockingInputStream())
+                .build();
+            // 使用 S3TransferManager 下载文件
+            Download<ResponseInputStream<GetObjectResponse>> responseFuture = transferManager.download(downloadRequest);
+            // 输出到流中
+            try (ResponseInputStream<GetObjectResponse> responseStream = responseFuture.completionFuture().join().result()) { // auto-closeable stream
+                return responseStream.transferTo(out); // 阻塞调用线程 blocks the calling thread
+            }
+        } catch (Exception e) {
+            throw new OssException("文件下载失败，错误信息:[" + e.getMessage() + "]");
+        }
     }
 
     /**

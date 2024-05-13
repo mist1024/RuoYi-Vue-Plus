@@ -3,11 +3,12 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -52,7 +53,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -76,8 +76,8 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     private final IActHiProcinstService actHiProcinstService;
     private final ManagementService managementService;
     private final FlowEventStrategy flowEventStrategy;
-    private final IWfTaskBackNodeService iWfTaskBackNodeService;
-    private final IWfNodeConfigService iWfNodeConfigService;
+    private final IWfTaskBackNodeService wfTaskBackNodeService;
+    private final IWfNodeConfigService wfNodeConfigService;
 
     @Value("${flowable.activity-font-name}")
     private String activityFontName;
@@ -122,7 +122,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
@@ -169,7 +169,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
@@ -236,7 +236,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
         CustomDefaultProcessDiagramGenerator diagramGenerator = new CustomDefaultProcessDiagramGenerator();
         InputStream inputStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedNodeList, highLightedFlows, activityFontName, labelFontName, annotationFontName, null, 1.0, true);
-        return Base64.encode(IOUtils.toByteArray(inputStream));
+        return Base64.encode(IoUtil.readBytes(inputStream));
     }
 
     /**
@@ -282,14 +282,9 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         map.put("taskList", taskList);
         List<ActHistoryInfoVo> historyTaskList = getHistoryTaskList(processInstanceId);
         map.put("historyList", historyTaskList);
-        InputStream inputStream;
-        try {
-            inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
-            xml.append(IOUtils.toString(inputStream, String.valueOf(StandardCharsets.UTF_8)));
-            map.put("xml", xml.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName());
+        xml.append(IoUtil.read(inputStream, StandardCharsets.UTF_8));
+        map.put("xml", xml.toString());
         return map;
     }
 
@@ -306,7 +301,6 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         for (HistoricTaskInstance historicTaskInstance : list) {
             ActHistoryInfoVo actHistoryInfoVo = new ActHistoryInfoVo();
             BeanUtils.copyProperties(historicTaskInstance, actHistoryInfoVo);
-            actHistoryInfoVo.setAssignee(StringUtils.isNotBlank(historicTaskInstance.getAssignee()) ? Long.valueOf(historicTaskInstance.getAssignee()) : null);
             actHistoryInfoVo.setStatus(actHistoryInfoVo.getEndTime() == null ? "待处理" : "已处理");
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
                 actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
@@ -324,6 +318,12 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
                     historyInfoVo.setStartTime(e.getStartTime());
                     historyInfoVo.setEndTime(null);
                     historyInfoVo.setRunDuration(null);
+                    if (ObjectUtil.isEmpty(e.getAssignee())) {
+                        ParticipantVo participantVo = WorkflowUtils.getCurrentTaskParticipant(e.getId());
+                        if (ObjectUtil.isNotEmpty(participantVo) && CollUtil.isNotEmpty(participantVo.getCandidate())) {
+                            historyInfoVo.setAssignee(StreamUtils.join(participantVo.getCandidate(), Convert::toStr));
+                        }
+                    }
                 });
             historyInfoVoList.add(historyInfoVo);
         }
@@ -362,16 +362,18 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicTaskInstance.getDurationInMillis())) {
                 actHistoryInfoVo.setRunDuration(getDuration(historicTaskInstance.getDurationInMillis()));
             }
-            try {
-                actHistoryInfoVo.setAssignee(StringUtils.isNotBlank(historicTaskInstance.getAssignee()) ? Long.valueOf(historicTaskInstance.getAssignee()) : null);
-            } catch (NumberFormatException ignored) {
-                log.warn("当前任务【{}】,办理人转换人员ID【{}】异常！", historicTaskInstance.getName(), historicTaskInstance.getAssignee());
-            }
             //附件
             if (CollUtil.isNotEmpty(attachmentList)) {
                 List<Attachment> attachments = attachmentList.stream().filter(e -> e.getTaskId().equals(historicTaskInstance.getId())).collect(Collectors.toList());
                 if (CollUtil.isNotEmpty(attachments)) {
                     actHistoryInfoVo.setAttachmentList(attachments);
+                }
+            }
+            //设置人员id
+            if (ObjectUtil.isEmpty(historicTaskInstance.getAssignee())) {
+                ParticipantVo participantVo = WorkflowUtils.getCurrentTaskParticipant(historicTaskInstance.getId());
+                if (ObjectUtil.isNotEmpty(participantVo) && CollUtil.isNotEmpty(participantVo.getCandidate())) {
+                    actHistoryInfoVo.setAssignee(StreamUtils.join(participantVo.getCandidate(), Convert::toStr));
                 }
             }
             actHistoryInfoVoList.add(actHistoryInfoVo);
@@ -389,10 +391,6 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         Map<String, List<ActHistoryInfoVo>> groupByKey = StreamUtils.groupByKey(actHistoryInfoVoList, ActHistoryInfoVo::getTaskDefinitionKey);
         for (Map.Entry<String, List<ActHistoryInfoVo>> entry : groupByKey.entrySet()) {
             ActHistoryInfoVo actHistoryInfoVo = BeanUtil.toBean(entry.getValue().get(0), ActHistoryInfoVo.class);
-            String nickName = entry.getValue().stream().filter(e -> StringUtils.isNotBlank(e.getNickName()) && e.getEndTime() == null).map(ActHistoryInfoVo::getNickName).toList().stream().distinct().collect(Collectors.joining(StringUtils.SEPARATOR));
-            if (StringUtils.isNotBlank(nickName)) {
-                actHistoryInfoVo.setNickName(nickName);
-            }
             actHistoryInfoVoList.stream().filter(e -> e.getTaskDefinitionKey().equals(entry.getKey()) && e.getEndTime() != null).findFirst()
                 .ifPresent(e -> {
                     actHistoryInfoVo.setStatus("已处理");
@@ -525,7 +523,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
-            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
+            wfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -560,7 +558,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             if (ObjectUtil.isNotEmpty(historicProcessInstanceList)) {
                 historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
             }
-            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
+            wfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -578,7 +576,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
     public boolean deleteFinishAndHisInstance(List<String> processInstanceIds) {
         try {
             historyService.bulkDeleteHistoricProcessInstances(processInstanceIds);
-            iWfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
+            wfTaskBackNodeService.deleteByInstanceIds(processInstanceIds);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -679,7 +677,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
         }
         if (CollUtil.isNotEmpty(list)) {
             List<String> processDefinitionIds = StreamUtils.toList(list, ProcessInstanceVo::getProcessDefinitionId);
-            List<WfNodeConfigVo> wfNodeConfigVoList = iWfNodeConfigService.selectByDefIds(processDefinitionIds);
+            List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
                     wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
