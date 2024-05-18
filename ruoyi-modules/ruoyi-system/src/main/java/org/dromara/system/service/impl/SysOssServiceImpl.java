@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.dto.OssDTO;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.OssService;
@@ -20,11 +21,16 @@ import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.oss.core.OssClient;
+import org.dromara.common.oss.entity.PartUploadResult;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enumd.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
+import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysOss;
+import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
+import org.dromara.system.domain.vo.MultipartVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.mapper.SysOssMapper;
 import org.dromara.system.service.ISysOssService;
@@ -36,10 +42,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 文件上传 服务层实现
@@ -251,6 +260,114 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
     }
 
     /**
+     * 初始化分片上传任务
+     *
+     * @param multipartBo 初始化分片的参数对象
+     * @return 分片上传对象信息
+     */
+    @Override
+    public MultipartVo initiateMultipart(MultipartBo multipartBo) {
+        OssClient storage = OssFactory.instance();
+        String md5Digest = multipartBo.getMd5Digest();
+        String osskey = GlobalConstants.OSS_CONTINUATION + LoginHelper.getUserId() + md5Digest;
+        MultipartVo multipartVo = new MultipartVo();
+
+        // 检查是否存在缓存，如果存在且超时时间在2小时内，则从缓存中获取上传信息
+        if (RedisUtils.getTimeToLive(osskey) > 60 * 60 * 2 * 1000) {
+            multipartVo = RedisUtils.getCacheObject(osskey);
+
+            // 获取上传分段进度
+            List<PartUploadResult> listParts = storage.listParts(multipartVo.getFilename(), multipartVo.getUploadId(), null, null);
+            multipartVo.setPartUploadList(listParts.stream()
+                .map(x -> new MultipartVo.PartUploadResult(x.getPartNumber(), x.getETag()))
+                .collect(Collectors.toList()));
+        } else {
+            String originalName = multipartBo.getOriginalName();
+            String suffix = StringUtils.substring(originalName, originalName.lastIndexOf("."), originalName.length());
+            UploadResult uploadResult = storage.initiateMultipart(suffix);
+            multipartVo.setFilename(uploadResult.getFilename());
+            multipartVo.setUploadId(uploadResult.getUploadId());
+            multipartVo.setMd5Digest(md5Digest);
+            multipartVo.setOriginalName(originalName);
+            multipartVo.setSuffix(suffix);
+            RedisUtils.setCacheObject(osskey, multipartVo, Duration.ofMillis(60 * 60 * 72));
+            RedisUtils.setCacheObject(GlobalConstants.OSS_MULTIPART + multipartVo.getUploadId(), multipartVo, Duration.ofMillis(60 * 60 * 72));
+        }
+        return multipartVo;
+    }
+
+    /**
+     * 上传文件的分段（分片上传）
+     *
+     * @param multipartBo 分段上传的参数对象
+     * @return 分片上传成功后的对象信息
+     */
+    @Override
+    public MultipartVo uploadPart(MultipartBo multipartBo) {
+        String uploadId = multipartBo.getUploadId();
+        Integer partNumber = multipartBo.getPartNumber();
+        MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
+        if (ObjectUtil.isNull(multipartVo)) {
+            throw new ServiceException("该分片任务不存在!");
+        }
+        OssClient storage = OssFactory.instance();
+        String privateUrl = storage.uploadPartFutures(multipartVo.getFilename(), uploadId, partNumber, multipartBo.getMd5Digest(), 60 * 60 * 72);
+        multipartVo.setPrivateUrl(privateUrl);
+        multipartVo.setPartNumber(partNumber);
+        return multipartVo;
+    }
+
+    /**
+     * 获取上传分段进度
+     *
+     * @param multipartBo 分片上传对象信息
+     * @return 分片上传对象信息
+     */
+    @Override
+    public MultipartVo uploadPartList(MultipartBo multipartBo) {
+        String uploadId = multipartBo.getUploadId();
+        MultipartVo multipartVo = RedisUtils.getCacheObject(GlobalConstants.OSS_MULTIPART + uploadId);
+        if (ObjectUtil.isNull(multipartVo)) {
+            throw new ServiceException("该分片任务不存在!");
+        }
+        OssClient storage = OssFactory.instance();
+        List<PartUploadResult> listParts = storage.listParts(multipartVo.getFilename(), uploadId, multipartBo.getMaxParts(), multipartBo.getPartNumberMarker());
+        multipartVo.setPartUploadList(listParts.stream()
+            .map(x -> new MultipartVo.PartUploadResult(x.getPartNumber(), x.getETag()))
+            .collect(Collectors.toList()));
+        return multipartVo;
+    }
+
+    /**
+     * 合并分段
+     *
+     * @param multipartBo 分片上传对象信息
+     * @return OSS对象存储视图对象
+     */
+    @Override
+    public SysOssVo completeMultipartUpload(MultipartBo multipartBo) {
+        String uploadId = multipartBo.getUploadId();
+        String uploadIdKey = GlobalConstants.OSS_MULTIPART + uploadId;
+        MultipartVo multipartVo = RedisUtils.getCacheObject(uploadIdKey);
+        if (ObjectUtil.isNull(multipartVo)) {
+            throw new ServiceException("该分片任务不存在!");
+        }
+        List<PartUploadResult> listParts = multipartBo.getPartUploadList().stream()
+            .map(x -> PartUploadResult.builder()
+                .partNumber(x.getPartNumber())
+                .eTag(x.getETag())
+                .build())
+            .collect(Collectors.toList());
+        OssClient storage = OssFactory.instance();
+        UploadResult uploadResult = storage.completeMultipartUpload(multipartVo.getFilename(), uploadId, listParts);
+        // 保存文件信息
+        SysOssVo sysOssVo = buildResultEntity(multipartVo.getOriginalName(), multipartVo.getSuffix(), storage.getConfigKey(), uploadResult);
+        RedisUtils.deleteObject(uploadIdKey);
+        RedisUtils.deleteObject(GlobalConstants.OSS_CONTINUATION + LoginHelper.getUserId() + multipartVo.getMd5Digest());
+        return sysOssVo;
+    }
+
+    /**
      * 桶类型为 private 的URL 修改为临时URL时长为120s
      *
      * @param oss OSS对象
@@ -264,4 +381,5 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         }
         return oss;
     }
+
 }

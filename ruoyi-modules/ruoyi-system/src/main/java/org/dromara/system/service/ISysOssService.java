@@ -1,10 +1,12 @@
 package org.dromara.system.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
+import org.dromara.system.domain.vo.MultipartVo;
 import org.dromara.system.domain.vo.SysOssVo;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -76,5 +78,37 @@ public interface ISysOssService {
      * @return 结果
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 初始化分片上传任务
+     *
+     * @param multipartBo 初始化分片的参数对象
+     * @return 分片上传对象信息
+     */
+    MultipartVo initiateMultipart(MultipartBo multipartBo);
+
+    /**
+     * 上传文件的分段（分片上传）
+     *
+     * @param multipartBo 分段上传的参数对象
+     * @return 分片上传成功后的对象信息
+     */
+    MultipartVo uploadPart(MultipartBo multipartBo);
+
+    /**
+     * 获取上传分段进度
+     *
+     * @param multipartBo 分片上传对象信息
+     * @return 分片上传对象信息
+     */
+    MultipartVo uploadPartList(MultipartBo multipartBo);
+
+    /**
+     * 合并分段
+     *
+     * @param multipartBo 分片上传对象信息
+     * @return OSS对象存储视图对象
+     */
+    SysOssVo completeMultipartUpload(MultipartBo multipartBo);
 
 }

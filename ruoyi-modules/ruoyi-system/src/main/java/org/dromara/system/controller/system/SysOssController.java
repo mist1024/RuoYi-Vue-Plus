@@ -3,20 +3,25 @@ package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.ObjectUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.ValidatorUtils;
+import org.dromara.common.core.validate.AddGroup;
+import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
-import org.dromara.common.web.core.BaseController;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.web.core.BaseController;
+import org.dromara.system.domain.bo.MultipartBo;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.vo.SysOssUploadVo;
 import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysOssService;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -103,6 +108,36 @@ public class SysOssController extends BaseController {
     public R<Void> remove(@NotEmpty(message = "主键不能为空")
                           @PathVariable Long[] ossIds) {
         return toAjax(ossService.deleteWithValidByIds(List.of(ossIds), true));
+    }
+
+    /**
+     * 分片上传
+     */
+    @SaCheckPermission("system:oss:multipart")
+    @PostMapping(value = "/multipart")
+    public R<?> multipart(@RequestBody MultipartBo multipartBo) {
+        return switch (multipartBo.getOssStatus()) {
+            case "initiate" -> {
+                if (StringUtils.isNotEmpty(multipartBo.getOriginalName()) && StringUtils.isNotEmpty(multipartBo.getMd5Digest())) {
+                    yield R.ok(ossService.initiateMultipart(multipartBo));
+                } else {
+                    yield R.fail("Original name and MD5 digest cannot be empty");
+                }
+            }
+            case "upload" -> {
+                ValidatorUtils.validate(multipartBo, AddGroup.class);
+                yield R.ok(ossService.uploadPart(multipartBo));
+            }
+            case "query" -> {
+                ValidatorUtils.validate(multipartBo, QueryGroup.class);
+                yield R.ok(ossService.uploadPartList(multipartBo));
+            }
+            case "complete" -> {
+                ValidatorUtils.validate(multipartBo, EditGroup.class);
+                yield R.ok(ossService.completeMultipartUpload(multipartBo));
+            }
+            default -> R.fail("Invalid OSS status");
+        };
     }
 
 }
