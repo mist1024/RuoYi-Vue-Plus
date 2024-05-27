@@ -24,6 +24,7 @@ import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
+import org.dromara.common.websocket.enums.MsgType;
 import org.dromara.common.websocket.utils.WebSocketUtils;
 import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysClientVo;
@@ -100,6 +101,7 @@ public class AuthController {
             WebSocketMessageDto dto = new WebSocketMessageDto();
             dto.setMessage("欢迎登录RuoYi-Vue-Plus后台管理系统");
             dto.setSessionKeys(List.of(userId));
+            dto.setMsgType(MsgType.MSG);
             WebSocketUtils.publishMessage(dto);
         }, 3, TimeUnit.SECONDS);
         return R.ok(loginVo);
