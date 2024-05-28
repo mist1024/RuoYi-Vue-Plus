@@ -4,6 +4,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -352,7 +353,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
             rm.setMenuId(menuId);
             list.add(rm);
         }
-        if (list.size() > 0) {
+        if (CollectionUtil.isNotEmpty(list)) {
             rows = roleMenuMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
@@ -373,7 +374,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
             rd.setDeptId(deptId);
             list.add(rd);
         }
-        if (list.size() > 0) {
+        if (CollectionUtil.isNotEmpty(list)) {
             rows = roleDeptMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
