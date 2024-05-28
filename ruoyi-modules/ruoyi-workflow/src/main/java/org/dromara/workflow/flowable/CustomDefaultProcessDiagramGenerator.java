@@ -13,10 +13,12 @@
 
 package org.dromara.workflow.flowable;
 
+import cn.hutool.core.collection.CollectionUtil;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.image.ProcessDiagramGenerator;
+import org.springframework.util.CollectionUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -69,9 +71,8 @@ public class CustomDefaultProcessDiagramGenerator implements ProcessDiagramGener
                     }
                 } else {
                     List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
-                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                    if (CollectionUtil.isNotEmpty(eventTypeElements)) {
                         processDiagramCanvas.drawEventRegistryStartEvent(graphicInfo, scaleFactor);
-
                     } else {
                         processDiagramCanvas.drawNoneStartEvent(graphicInfo);
                     }
@@ -350,7 +351,7 @@ public class CustomDefaultProcessDiagramGenerator implements ProcessDiagramGener
 
                 } else {
                     List<ExtensionElement> eventTypeElements = boundaryEvent.getExtensionElements().get("eventType");
-                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                    if (CollectionUtil.isNotEmpty(eventTypeElements)) {
                         processDiagramCanvas.drawCatchingEventRegistryEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
                     }
                 }
@@ -634,7 +635,7 @@ public class CustomDefaultProcessDiagramGenerator implements ProcessDiagramGener
             }
         }
 
-        if (allGraphicInfos.size() > 0) {
+        if (CollectionUtil.isNotEmpty(allGraphicInfos)) {
 
             boolean needsTranslationX = false;
             boolean needsTranslationY = false;
@@ -752,7 +753,7 @@ public class CustomDefaultProcessDiagramGenerator implements ProcessDiagramGener
             FlowElement sourceElement = bpmnModel.getFlowElement(sourceRef);
             FlowElement targetElement = bpmnModel.getFlowElement(targetRef);
             List<GraphicInfo> graphicInfoList = bpmnModel.getFlowLocationGraphicInfo(sequenceFlow.getId());
-            if (graphicInfoList != null && graphicInfoList.size() > 0) {
+            if (CollectionUtil.isNotEmpty(graphicInfoList)) {
                 graphicInfoList = connectionPerfectionizer(processDiagramCanvas, bpmnModel, sourceElement, targetElement, graphicInfoList);
                 int[] xPoints = new int[graphicInfoList.size()];
                 int[] yPoints = new int[graphicInfoList.size()];

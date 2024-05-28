@@ -21,6 +21,5 @@ public enum EncodeType {
     /**
      * 16进制编码
      */
-    HEX;
-
+    HEX
 }

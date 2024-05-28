@@ -2,7 +2,6 @@ package org.dromara.common.satoken.core.dao;
 
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.util.SaFoxUtil;
-import cn.hutool.core.lang.Console;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -99,8 +98,7 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public Object getObject(String key) {
-        Object o = CAFFEINE.get(key, k -> RedisUtils.getCacheObject(key));
-        return o;
+        return CAFFEINE.get(key, k -> RedisUtils.getCacheObject(key));
     }
 
     /**

@@ -2,6 +2,7 @@ package org.dromara.common.oss.core;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import lombok.Getter;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -46,7 +47,11 @@ public class OssClient {
 
     /**
      * 服务商
+     * -- GETTER --
+     *  服务商
+
      */
+    @Getter
     private final String configKey;
 
     /**
@@ -483,13 +488,6 @@ public class OssClient {
      */
     public String removeBaseUrl(String path) {
         return path.replace(getUrl() + StringUtils.SLASH, "");
-    }
-
-    /**
-     * 服务商
-     */
-    public String getConfigKey() {
-        return configKey;
     }
 
     /**

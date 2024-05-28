@@ -105,7 +105,7 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         if (msg == null) {
             msg = "";
         }
-        return "[" + msg.toString() + "]";
+        return "[" + msg + "]";
     }
 
     @Override
