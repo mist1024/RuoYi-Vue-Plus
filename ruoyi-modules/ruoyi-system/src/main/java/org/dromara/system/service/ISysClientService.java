@@ -1,6 +1,5 @@
 package org.dromara.system.service;
 
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.bo.SysClientBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
