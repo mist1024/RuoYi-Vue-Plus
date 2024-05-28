@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 参数配置 服务层实现
@@ -147,7 +148,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
     public String updateConfig(SysConfigBo bo) {
         int row = 0;
         SysConfig config = MapstructUtils.convert(bo, SysConfig.class);
-        if (config.getConfigId() != null) {
+        if (Objects.nonNull(config) && Objects.nonNull(config.getConfigId())) {
             SysConfig temp = baseMapper.selectById(config.getConfigId());
             if (!StringUtils.equals(temp.getConfigKey(), config.getConfigKey())) {
                 CacheUtils.evict(CacheNames.SYS_CONFIG, temp.getConfigKey());
