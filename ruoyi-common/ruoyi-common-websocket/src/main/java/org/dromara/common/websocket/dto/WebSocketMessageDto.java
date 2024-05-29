@@ -1,6 +1,7 @@
 package org.dromara.common.websocket.dto;
 
 import lombok.Data;
+import org.dromara.common.websocket.enums.MsgType;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,6 +22,11 @@ public class WebSocketMessageDto implements Serializable {
      * 需要推送到的session key 列表
      */
     private List<Long> sessionKeys;
+
+    /**
+     * 消息类型
+     */
+    private MsgType msgType;
 
     /**
      * 需要发送的消息

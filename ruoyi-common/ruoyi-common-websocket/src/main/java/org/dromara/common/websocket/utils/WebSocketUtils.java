@@ -1,11 +1,14 @@
 package org.dromara.common.websocket.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
+import org.dromara.common.websocket.enums.MsgType;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
@@ -14,6 +17,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -34,9 +38,10 @@ public class WebSocketUtils {
      * @param sessionKey 要发送消息的用户id
      * @param message    要发送的消息内容
      */
-    public static void sendMessage(Long sessionKey, String message) {
+    public static void sendMessage(Long sessionKey, MsgType msgType, String message) {
         WebSocketSession session = WebSocketSessionHolder.getSessions(sessionKey);
-        sendMessage(session, message);
+        sendMessage(session, ObjUtil.isNotEmpty(msgType) ?
+            JsonUtils.toJsonString(Collections.singletonMap(msgType.getMsgType(), message)) : message);
     }
 
     /**
@@ -58,7 +63,7 @@ public class WebSocketUtils {
         // 当前服务内session,直接发送消息
         for (Long sessionKey : webSocketMessage.getSessionKeys()) {
             if (WebSocketSessionHolder.existSession(sessionKey)) {
-                WebSocketUtils.sendMessage(sessionKey, webSocketMessage.getMessage());
+                WebSocketUtils.sendMessage(sessionKey, webSocketMessage.getMsgType(), webSocketMessage.getMessage());
                 continue;
             }
             unsentSessionKeys.add(sessionKey);
@@ -67,10 +72,11 @@ public class WebSocketUtils {
         if (CollUtil.isNotEmpty(unsentSessionKeys)) {
             WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
             broadcastMessage.setMessage(webSocketMessage.getMessage());
+            broadcastMessage.setMsgType(webSocketMessage.getMsgType());
             broadcastMessage.setSessionKeys(unsentSessionKeys);
             RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
-                log.info(" WebSocket发送主题订阅消息topic:{} session keys:{} message:{}",
-                    WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.getMessage());
+                log.info(" WebSocket发送主题订阅消息topic:{} session keys:{} msgType={} message:{}",
+                    WEB_SOCKET_TOPIC, unsentSessionKeys, webSocketMessage.getMsgType(), webSocketMessage.getMessage());
             });
         }
     }
@@ -80,12 +86,11 @@ public class WebSocketUtils {
      *
      * @param message 要发布的消息内容
      */
-    public static void publishAll(String message) {
+    public static void publishAll(MsgType msgType, String message) {
         WebSocketMessageDto broadcastMessage = new WebSocketMessageDto();
+        broadcastMessage.setMsgType(msgType);
         broadcastMessage.setMessage(message);
-        RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> {
-            log.info("WebSocket发送主题订阅消息topic:{} message:{}", WEB_SOCKET_TOPIC, message);
-        });
+        RedisUtils.publish(WEB_SOCKET_TOPIC, broadcastMessage, consumer -> log.info("WebSocket发送主题订阅消息topic:{} message:{}", WEB_SOCKET_TOPIC, message));
     }
 
     /**
