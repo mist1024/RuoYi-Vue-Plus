@@ -137,6 +137,11 @@ public class LoginHelper {
     }
 
     /**
+     * 获取用户昵称
+     */
+    public static String getNickname() {return getLoginUser().getNickname();}
+
+    /**
      * 获取用户类型
      */
     public static UserType getUserType() {
