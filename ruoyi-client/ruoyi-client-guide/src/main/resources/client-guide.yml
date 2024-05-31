@@ -1,0 +1,5 @@
+client:
+  # 高德地图API
+  guide:
+    key: 920a2a10bcfa85f561f2018b2474776f
+    clientKey: 920a2a10bcfa85f561f2018b2474776f

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ruoyi-vue-plus</artifactId>
+        <groupId>org.dromara</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>ruoyi-client-bom</module>
+        <module>ruoyi-client-demo</module>
+        <module>ruoyi-client-guide</module>
+    </modules>
+
+    <artifactId>ruoyi-client</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        ruoyi-client 客户端模块
+    </description>
+
+</project>

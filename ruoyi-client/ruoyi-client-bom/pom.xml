@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.dromara</groupId>
+    <artifactId>ruoyi-client-bom</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
+    <description>
+        ruoyi-client-bom client 依赖项
+    </description>
+
+    <properties>
+        <revision>5.1.2</revision>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- demo第三方请求服务 -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-client-demo</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- 高德地图API -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-client-guide</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+</project>
