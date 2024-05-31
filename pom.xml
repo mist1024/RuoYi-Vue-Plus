@@ -340,6 +340,13 @@
                 <version>${fastjson.version}</version>
             </dependency>
 
+            <!--    forest http请求工具        -->
+            <dependency>
+                <groupId>com.dtflys.forest</groupId>
+                <artifactId>forest-spring-boot3-starter</artifactId>
+                <version>${forest.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-system</artifactId>
