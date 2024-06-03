@@ -1,0 +1,16 @@
+forest:
+  # 全局变量
+  variables:
+    # demo第三方请求服务
+    thdahhrfs:
+      # 请求地址
+      ip: http://zlzjapi.sanshi.yunsee.cn:8090
+
+client:
+  # demo第三方请求服务
+  thdahhrfs:
+    appid: 84fd3bb528549d07
+    appSecret: Wpe/t9fkrpDux6cv5dx8h1JW4THCpLBop0USj+wSBUbj+oPJA+UhQPCu0nPxMTZUXDU3e9jk60WnkMIQDuUbSeBOVftnpqONu35afozxOpyg50BRR9phyajD0mcI/mFlfuh0GMGkMQG54qg4UDc1c7h2iCtTkfvGQUGR1jsrSCn1YOLiEqKBOkFDdw7eEMFYkIoXf1R3FScwxmAUdBK2LFAv67yhjEJyajLFur+oQVQ232oGXZbCfzP6Nw6JtymdNFMravd5q5E7bDfuGJWlObYQtiUyOpq9HH4Yn9YhRHgMppE6uVaYON/sGEiv375Nm6cA4qiXeiUiFBCyjkTaYw==
+    # SM2公私钥 非对称算法的公私钥
+    publicKey: 049927d887e38ebd30d4418b5e5785f75014efaec36cc2dce9ce49bfad42d81c2d0b0b5bc360cc56d0f9d17d178d6cb091d8449adc3b57ab196f6d7ec61ffabcea
+    privateKey: fc4a50a91c25a85bfc8c6ab4c60005c986007afb9ccf9503afc880c4001f1803

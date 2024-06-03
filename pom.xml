@@ -59,6 +59,9 @@
         <maven-compiler-plugin.verison>3.11.0</maven-compiler-plugin.verison>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <flatten-maven-plugin.version>1.3.0</flatten-maven-plugin.version>
+
+        <!--    forest版本 http请求工具    -->
+        <forest.version>1.5.36</forest.version>
     </properties>
 
     <profiles>
@@ -339,6 +342,13 @@
                 <version>${fastjson.version}</version>
             </dependency>
 
+            <!--    forest http请求工具        -->
+            <dependency>
+                <groupId>com.dtflys.forest</groupId>
+                <artifactId>forest-spring-boot3-starter</artifactId>
+                <version>${forest.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-system</artifactId>
@@ -378,6 +388,7 @@
         <module>ruoyi-common</module>
         <module>ruoyi-extend</module>
         <module>ruoyi-modules</module>
+        <module>ruoyi-client</module>
     </modules>
     <packaging>pom</packaging>
 

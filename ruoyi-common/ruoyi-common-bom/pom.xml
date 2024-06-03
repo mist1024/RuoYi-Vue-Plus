@@ -40,6 +40,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- forest -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-forest</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 幂等 -->
             <dependency>
                 <groupId>org.dromara</groupId>
