@@ -285,3 +285,24 @@ flowable:
     enabled: false
   app:
     enabled: false
+
+--- # 规则引擎
+liteflow:
+  # 组件降级
+  fallback-cmp-enable: true
+  # 执行过程中的日志
+  print-execution-log: true
+  # 5000条规则以上的时候，开启可将加载性能能提高4倍
+  fast-load: false
+  # 默认线程池的worker数目
+  parallel-max-workers: 16
+  # 默认线程池的队列长度
+  parallel-queue-limit: 512
+  # 指定自定义的线程池全类名的方式指定异步循环线程池
+  #  parallel-loop-executor-class:
+  rule-source-ext-data-map:
+    applicationName: @profiles.active@
+    #以下是轮询机制的配置
+    pollingEnabled: true
+    pollingStartSeconds: 600
+    pollingIntervalSeconds: 600
