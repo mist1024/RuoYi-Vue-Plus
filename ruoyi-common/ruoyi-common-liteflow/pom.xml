@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.dromara</groupId>
+        <artifactId>ruoyi-common</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ruoyi-common-liteflow</artifactId>
+
+    <description>
+        ruoyi-common-liteflow 规则引擎
+    </description>
+
+    <dependencies>
+
+        <!-- RuoYi Common Core-->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>liteflow-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>liteflow-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>liteflow-rule-sql</artifactId>
+        </dependency>
+
+        <!-- Lua脚本引擎 -->
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>liteflow-script-lua</artifactId>
+        </dependency>
+
+        <!-- Java脚本引擎 -->
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>liteflow-script-java</artifactId>
+        </dependency>
+
+        <!-- Groovy脚本引擎 -->
+<!--        <dependency>-->
+<!--            <groupId>com.yomahub</groupId>-->
+<!--            <artifactId>liteflow-script-groovy</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- Javascript脚本引擎 -->
+<!--        <dependency>-->
+<!--            <groupId>com.yomahub</groupId>-->
+<!--            <artifactId>liteflow-script-graaljs</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- QLExpress脚本引擎 -->
+<!--        <dependency>-->
+<!--            <groupId>com.yomahub</groupId>-->
+<!--            <artifactId>liteflow-script-qlexpress</artifactId>-->
+<!--        </dependency>-->
+
+<!--        python解析执行依赖Jython环境，不安装部署启动会报错（IDEA里不会报错） -->
+        <!-- Python脚本引擎 -->
+<!--        <dependency>-->
+<!--            <groupId>com.yomahub</groupId>-->
+<!--            <artifactId>liteflow-script-python</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- Aviator脚本引擎 -->
+<!--        <dependency>-->
+<!--            <groupId>com.yomahub</groupId>-->
+<!--            <artifactId>liteflow-script-aviator</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- Kotlin脚本引擎 -->
+<!--        <dependency>-->
+<!--            <groupId>com.yomahub</groupId>-->
+<!--            <artifactId>liteflow-script-kotlin</artifactId>-->
+<!--        </dependency>-->
+
+    </dependencies>
+</project>
