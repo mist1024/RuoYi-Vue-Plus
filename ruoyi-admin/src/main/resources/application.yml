@@ -300,40 +300,8 @@ liteflow:
   parallel-queue-limit: 512
   # 指定自定义的线程池全类名的方式指定异步循环线程池
   #  parallel-loop-executor-class:
-  # 启动时不解析规则，但是第一次执行相关规则时，只解析对应的规则
-  parse-mode: PARSE_ONE_ON_FIRST_EXEC
   rule-source-ext-data-map:
     applicationName: @profiles.active@
-    # 编排规则表
-    chainTableName: liteflow_chain
-    # 应用名称存储字段名
-    chainApplicationNameField: application_name
-    # 规则名称存储的字段名
-    chainNameField: chain_name
-    # EL表达式的字段(只存EL)
-    elDataField: el_str
-    # 决策路由EL字段
-    routeField: route
-    # namespace字段
-    namespaceField: name_space
-    # 是否生效 1为生效，0为不生效
-    chainEnableField: chain_status
-    # 脚本存储表的表名
-    scriptTableName: liteflow_script
-    # 应用名称存储字段名
-    scriptApplicationNameField: application_name
-    # 脚本组件的Id的字段名
-    scriptIdField: script_id
-    # 脚本组件名称的字段名
-    scriptNameField: script_name
-    # 脚本数据的字段名
-    scriptDataField: script_data
-    # 脚本类型的字段名
-    scriptTypeField: script_type
-    # 脚本语言类型（groovy | qlexpress | js | python | lua | aviator | java | kotlin）
-    scriptLanguageField: script_language
-    # 是否生效 1为生效，0为不生效
-    scriptEnableField: script_status
     #以下是轮询机制的配置
     pollingEnabled: true
     pollingStartSeconds: 600

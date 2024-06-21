@@ -1,9 +1,11 @@
 package org.dromara.common.liteflow.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.factory.YmlPropertySourceFactory;
 import org.dromara.common.liteflow.handler.LiteFlowExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * LiteFlow 配置
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Bean;
  */
 @Slf4j
 @AutoConfiguration
+@PropertySource(value = "classpath:common-liteflow.yml", factory = YmlPropertySourceFactory.class)
 public class LiteFlowConfig {
 
     /**
