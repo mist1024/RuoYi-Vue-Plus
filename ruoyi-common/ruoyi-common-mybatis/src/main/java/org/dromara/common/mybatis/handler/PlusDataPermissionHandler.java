@@ -217,27 +217,18 @@ public class PlusDataPermissionHandler {
      */
     private void findAnnotation(Class<?> clazz) {
         DataPermission dataPermission;
-        // 获取方法注解
         for (Method method : clazz.getMethods()) {
-            // 过滤掉默认方法和可变参数方法
             if (method.isDefault() || method.isVarArgs()) {
                 continue;
             }
-            // 获取方法的全限定名，作为映射语句的 ID
             String mappedStatementId = clazz.getName() + "." + method.getName();
-            // 检查方法是否带有 DataPermission 注解
             if (AnnotationUtil.hasAnnotation(method, DataPermission.class)) {
-                // 获取方法上的 DataPermission 注解
                 dataPermission = AnnotationUtil.getAnnotation(method, DataPermission.class);
-                // 将方法映射语句 ID 和 DataPermission 注解存储到缓存中
                 dataPermissionCacheMap.put(mappedStatementId, dataPermission);
             }
         }
-        // 获取类注解
         if (AnnotationUtil.hasAnnotation(clazz, DataPermission.class)) {
-            // 获取类上的 DataPermission 注解
             dataPermission = AnnotationUtil.getAnnotation(clazz, DataPermission.class);
-            // 将类名和 DataPermission 注解存储到缓存中
             dataPermissionCacheMap.put(clazz.getName(), dataPermission);
         }
     }
