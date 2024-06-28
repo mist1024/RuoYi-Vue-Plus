@@ -2,17 +2,15 @@ package org.dromara.system.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.dromara.common.core.constant.UserConstants;
-import org.dromara.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.tenant.core.TenantEntity;
 
 /**
  * 字典数据表 sys_dict_data
  *
  * @author Lion Li
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_dict_data")
@@ -63,9 +61,5 @@ public class SysDictData extends TenantEntity {
      * 备注
      */
     private String remark;
-
-    public boolean getDefault() {
-        return UserConstants.YES.equals(this.isDefault);
-    }
 
 }

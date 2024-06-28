@@ -1,8 +1,8 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.system.domain.SysLogininfor;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.dromara.system.domain.SysLogininfor;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -13,7 +13,6 @@ import java.util.Map;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @AutoMapper(target = SysLogininfor.class, reverseConvertGenerate = false)
 public class SysLogininforBo {
@@ -82,6 +81,5 @@ public class SysLogininforBo {
      * 请求参数
      */
     private Map<String, Object> params = new HashMap<>();
-
 
 }

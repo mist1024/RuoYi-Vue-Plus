@@ -1,10 +1,10 @@
 package org.dromara.system.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import java.io.Serial;
-
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 
 /**
@@ -16,9 +16,6 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_tenant_package")
 public class SysTenantPackage extends BaseEntity {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     /**
      * 租户套餐id

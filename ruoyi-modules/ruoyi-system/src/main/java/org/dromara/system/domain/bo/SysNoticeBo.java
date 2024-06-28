@@ -14,7 +14,6 @@ import org.dromara.system.domain.SysNotice;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysNotice.class, reverseConvertGenerate = false)

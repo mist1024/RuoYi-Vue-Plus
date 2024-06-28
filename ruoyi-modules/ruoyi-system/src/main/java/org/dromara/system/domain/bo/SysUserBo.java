@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.xss.Xss;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.system.domain.SysUser;
@@ -17,7 +16,6 @@ import org.dromara.system.domain.SysUser;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -107,13 +105,5 @@ public class SysUserBo extends BaseEntity {
      * 排除不查询的用户(工作流用)
      */
     private String excludeUserIds;
-
-    public SysUserBo(Long userId) {
-        this.userId = userId;
-    }
-
-    public boolean isSuperAdmin() {
-        return UserConstants.SUPER_ADMIN_ID.equals(this.userId);
-    }
 
 }

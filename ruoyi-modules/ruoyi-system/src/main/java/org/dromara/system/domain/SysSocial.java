@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.tenant.core.TenantEntity;
 
-import java.io.Serial;
-
 /**
  * 社会化关系对象 sys_social
  *
@@ -17,9 +15,6 @@ import java.io.Serial;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_social")
 public class SysSocial extends TenantEntity {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键
@@ -131,6 +126,5 @@ public class SysSocial extends TenantEntity {
      * Twitter平台用户的附带属性，部分平台可能没有
      */
     private String oauthTokenSecret;
-
 
 }

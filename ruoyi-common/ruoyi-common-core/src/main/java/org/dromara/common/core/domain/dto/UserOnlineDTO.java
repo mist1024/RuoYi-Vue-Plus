@@ -11,7 +11,6 @@ import java.io.Serializable;
  *
  * @author ruoyi
  */
-
 @Data
 @NoArgsConstructor
 public class UserOnlineDTO implements Serializable {

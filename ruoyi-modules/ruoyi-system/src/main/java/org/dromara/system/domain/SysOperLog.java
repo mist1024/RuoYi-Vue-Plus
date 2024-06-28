@@ -13,7 +13,6 @@ import java.util.Date;
  *
  * @author Lion Li
  */
-
 @Data
 @TableName("sys_oper_log")
 public class SysOperLog implements Serializable {
