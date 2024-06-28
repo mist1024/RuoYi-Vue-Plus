@@ -15,7 +15,6 @@ import org.dromara.system.domain.SysDictType;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysDictType.class, reverseConvertGenerate = false)
@@ -45,6 +44,5 @@ public class SysDictTypeBo extends BaseEntity {
      * 备注
      */
     private String remark;
-
 
 }

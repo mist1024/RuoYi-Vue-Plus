@@ -13,7 +13,6 @@ import org.dromara.system.domain.SysConfig;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysConfig.class, reverseConvertGenerate = false)
@@ -54,6 +53,5 @@ public class SysConfigBo extends BaseEntity {
      * 备注
      */
     private String remark;
-
 
 }

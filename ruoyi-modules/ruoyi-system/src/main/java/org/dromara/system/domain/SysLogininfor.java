@@ -13,7 +13,6 @@ import java.util.Date;
  *
  * @author Lion Li
  */
-
 @Data
 @TableName("sys_logininfor")
 public class SysLogininfor implements Serializable {

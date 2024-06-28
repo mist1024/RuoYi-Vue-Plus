@@ -1,11 +1,10 @@
 package org.dromara.system.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import org.dromara.common.core.constant.UserConstants;
-import org.dromara.common.tenant.core.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.dromara.common.tenant.core.TenantEntity;
 
 import java.util.Date;
 
@@ -14,7 +13,6 @@ import java.util.Date;
  *
  * @author Lion Li
  */
-
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -102,14 +100,5 @@ public class SysUser extends TenantEntity {
      * 备注
      */
     private String remark;
-
-
-    public SysUser(Long userId) {
-        this.userId = userId;
-    }
-
-    public boolean isSuperAdmin() {
-        return UserConstants.SUPER_ADMIN_ID.equals(this.userId);
-    }
 
 }

@@ -11,7 +11,6 @@ import java.io.Serializable;
  *
  * @author Lion Li
  */
-
 @Data
 public class LoginBody implements Serializable {
 

@@ -137,6 +137,4 @@ public class SysSocialBo extends TenantEntity {
      */
     private String oauthTokenSecret;
 
-
-
 }

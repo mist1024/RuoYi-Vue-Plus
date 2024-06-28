@@ -14,7 +14,6 @@ import org.dromara.system.domain.SysPost;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysPost.class, reverseConvertGenerate = false)

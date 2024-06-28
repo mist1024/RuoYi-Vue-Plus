@@ -7,7 +7,9 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户密码修改bo
+ * 用户密码修改
+ *
+ * @author Lion Li
  */
 @Data
 public class SysUserPasswordBo implements Serializable {
@@ -26,4 +28,5 @@ public class SysUserPasswordBo implements Serializable {
      */
     @NotBlank(message = "新密码不能为空")
     private String newPassword;
+
 }

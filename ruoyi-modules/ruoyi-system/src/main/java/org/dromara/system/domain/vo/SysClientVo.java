@@ -1,12 +1,12 @@
 package org.dromara.system.domain.vo;
 
-import org.dromara.system.domain.SysClient;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
-import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.dromara.common.excel.annotation.ExcelDictFormat;
+import org.dromara.common.excel.convert.ExcelDictConvert;
+import org.dromara.system.domain.SysClient;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -85,6 +85,5 @@ public class SysClientVo implements Serializable {
     @ExcelProperty(value = "状态", converter = ExcelDictConvert.class)
     @ExcelDictFormat(readConverterExp = "0=正常,1=停用")
     private String status;
-
 
 }

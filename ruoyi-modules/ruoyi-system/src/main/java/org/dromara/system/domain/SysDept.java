@@ -14,7 +14,6 @@ import java.io.Serial;
  *
  * @author Lion Li
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_dept")

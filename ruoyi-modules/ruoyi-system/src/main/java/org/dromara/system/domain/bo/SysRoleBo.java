@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.system.domain.SysRole;
 
@@ -16,7 +15,6 @@ import org.dromara.system.domain.SysRole;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -85,10 +83,6 @@ public class SysRoleBo extends BaseEntity {
 
     public SysRoleBo(Long roleId) {
         this.roleId = roleId;
-    }
-
-    public boolean isSuperAdmin() {
-        return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
 
 }

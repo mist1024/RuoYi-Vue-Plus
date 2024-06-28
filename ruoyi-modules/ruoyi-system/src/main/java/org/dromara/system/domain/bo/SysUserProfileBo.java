@@ -17,7 +17,6 @@ import org.dromara.common.sensitive.core.SensitiveStrategy;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

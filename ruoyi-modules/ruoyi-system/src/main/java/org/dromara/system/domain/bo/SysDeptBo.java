@@ -15,7 +15,6 @@ import org.dromara.system.domain.SysDept;
  *
  * @author Michelle.Chung
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysDept.class, reverseConvertGenerate = false)
