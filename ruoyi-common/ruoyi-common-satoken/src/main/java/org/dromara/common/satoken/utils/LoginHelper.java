@@ -170,7 +170,7 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isTenantAdmin(Set<String> rolePermission) {
-        return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
+        return ObjectUtil.isNotEmpty(rolePermission) && rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
 
     /**
