@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 public class StreamUtils {
 
     /**
-     * 将collection过滤
+     * 将collection-list过滤
      *
      * @param collection 需要转化的集合
      * @param function   过滤方法
@@ -32,6 +33,61 @@ public class StreamUtils {
         }
         // 注意此处不要使用 .toList() 新语法 因为返回的是不可变List 会导致序列化问题
         return collection.stream().filter(function).collect(Collectors.toList());
+    }
+
+    /**
+     * 将collection-set过滤
+     *
+     * @param collection 需要转化的集合
+     * @param function   过滤方法
+     * @return 过滤后的Set
+     */
+    public static <E> Set<E> filterSet(Collection<E> collection, Predicate<E> function) {
+        if (CollUtil.isEmpty(collection)) {
+            return CollUtil.newHashSet() ;
+        }
+        return collection.stream().filter(function).collect(Collectors.toSet());
+    }
+
+    /**
+     * 找到流中满足条件的第一个元素
+     *
+     * @param collection 需要查询的集合
+     * @param function   过滤方法
+     * @return 找到符合条件的第一个元素，没有则返回null
+     */
+    public static <E> E findFirst(Collection<E> collection, Predicate<E> function) {
+        if (CollUtil.isEmpty(collection)) {
+            return null;
+        }
+        return collection.stream().filter(function).findFirst().orElse(null);
+    }
+
+    /**
+     * 找到流中第一个满足条件的元素之后执行操作
+     * @param collection 需要查询的集合
+     * @param function   过滤方法
+     * @param action   执行的动作
+     */
+    public static <E> void findFirstIfPresent(Collection<E> collection, Predicate<E> function, Consumer<E> action) {
+        if (CollUtil.isEmpty(collection)) {
+            return;
+        }
+        collection.stream().filter(function).findFirst().ifPresent(action);
+    }
+
+    /**
+     * 找到流中任意一个满足条件的元素
+     *
+     * @param collection 需要查询的集合
+     * @param function   过滤方法
+     * @return 找到符合条件的任意一个元素，没有则返回null
+     */
+    public static <E> Optional<E> findAny(Collection<E> collection, Predicate<E> function) {
+        if (CollUtil.isEmpty(collection)) {
+            return Optional.empty();
+        }
+        return collection.stream().filter(function).findAny();
     }
 
     /**
