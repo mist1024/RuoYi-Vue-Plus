@@ -67,9 +67,7 @@ public class WfNodeConfigServiceImpl implements IWfNodeConfigService {
             List<Long> formIds = StreamUtils.toList(wfNodeConfigVos, WfNodeConfigVo::getFormId);
             List<WfFormManageVo> wfFormManageVos = wfFormManageService.queryByIds(formIds);
             for (WfNodeConfigVo wfNodeConfigVo : wfNodeConfigVos) {
-                StreamUtils.findFirstIfPresent(wfFormManageVos,
-                    e -> ObjectUtil.equals(e.getId(), wfNodeConfigVo.getFormId()),
-                    wfNodeConfigVo::setWfFormManageVo);
+                wfFormManageVos.stream().filter(e -> ObjectUtil.equals(e.getId(), wfNodeConfigVo.getFormId())).findFirst().ifPresent(wfNodeConfigVo::setWfFormManageVo);
             }
         }
         return wfNodeConfigVos;

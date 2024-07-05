@@ -6,7 +6,6 @@ import cn.hutool.core.util.ReflectUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
-import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.EncryptField;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -20,6 +19,7 @@ import org.springframework.util.ClassUtils;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 加密管理类
@@ -146,8 +146,9 @@ public class EncryptorManager {
             fieldSet.addAll(Arrays.asList(fields));
             clazz = clazz.getSuperclass();
         }
-        fieldSet = StreamUtils.filterSet(fieldSet, field ->
-            field.isAnnotationPresent(EncryptField.class) && field.getType() == String.class);
+        fieldSet = fieldSet.stream().filter(field ->
+                field.isAnnotationPresent(EncryptField.class) && field.getType() == String.class)
+            .collect(Collectors.toSet());
         for (Field field : fieldSet) {
             field.setAccessible(true);
         }

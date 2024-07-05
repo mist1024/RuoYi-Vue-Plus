@@ -154,7 +154,9 @@ public class OpenApiHandler extends OpenAPIService {
         buildTagsFromClass(handlerMethod.getBeanType(), tags, tagsStr, locale);
 
         if (!CollectionUtils.isEmpty(tagsStr))
-            tagsStr = StreamUtils.toSet(tagsStr, str -> propertyResolverUtils.resolve(str, locale));
+            tagsStr = tagsStr.stream()
+                .map(str -> propertyResolverUtils.resolve(str, locale))
+                .collect(Collectors.toSet());
 
         if (springdocTags.containsKey(handlerMethod)) {
             io.swagger.v3.oas.models.tags.Tag tag = springdocTags.get(handlerMethod);

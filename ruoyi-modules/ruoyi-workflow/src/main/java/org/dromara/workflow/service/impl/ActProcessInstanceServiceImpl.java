@@ -648,9 +648,7 @@ public class ActProcessInstanceServiceImpl implements IActProcessInstanceService
             List<WfNodeConfigVo> wfNodeConfigVoList = wfNodeConfigService.selectByDefIds(processDefinitionIds);
             for (ProcessInstanceVo processInstanceVo : list) {
                 if (CollUtil.isNotEmpty(wfNodeConfigVoList)) {
-                    StreamUtils.findFirstIfPresent(wfNodeConfigVoList,
-                        e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask()),
-                        processInstanceVo::setWfNodeConfigVo);
+                    wfNodeConfigVoList.stream().filter(e -> e.getDefinitionId().equals(processInstanceVo.getProcessDefinitionId()) && FlowConstant.TRUE.equals(e.getApplyUserTask())).findFirst().ifPresent(processInstanceVo::setWfNodeConfigVo);
                 }
             }
         }
