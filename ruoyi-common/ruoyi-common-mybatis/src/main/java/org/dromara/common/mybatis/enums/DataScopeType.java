@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
 
 /**
@@ -56,7 +57,12 @@ public enum DataScopeType {
      * 使用 SpEL 表达式：`#{#userName} = #{#user.userId}`
      * 如果不满足条件，则使用默认 SQL 表达式：`1 = 0`
      */
-    SELF("5", " #{#userName} = #{#user.userId} ", " 1 = 0 ");
+    SELF("5", " #{#userName} = #{#user.userId} ", " 1 = 0 "),
+
+    /**
+     * 弹性数据权限（通过自定义SQL实现）
+     */
+    CUSTOM_SQL("6", " {" + DataColumn.CUSTOM_SQL + "} ", " 1 = 0 ");
 
     private final String code;
 

@@ -3,6 +3,7 @@ package org.dromara.common.mybatis.handler;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -37,10 +38,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -147,13 +145,23 @@ public class PlusDataPermissionHandler {
             if (type == DataScopeType.ALL) {
                 return "";
             }
+
+            String sqlTemplate = type.getSqlTemplate();
+            if (type == DataScopeType.CUSTOM_SQL) {
+                //自定义SQL逻辑
+                DataColumn customColum = Arrays.stream(dataColumns).filter(c -> Arrays.asList(c.key()).contains(DataColumn.CUSTOM_SQL)).findFirst().orElseThrow(() -> new ServiceException("角色数据范围异常key配置异常 => " + role.getDataScope()));
+                Map<String, String> map = new HashMap<>();
+                map.put(DataColumn.CUSTOM_SQL, customColum.value()[0]);
+                sqlTemplate = StrUtil.format(sqlTemplate, map);
+            }
+
             boolean isSuccess = false;
             for (DataColumn dataColumn : dataPermission.value()) {
                 if (dataColumn.key().length != dataColumn.value().length) {
                     throw new ServiceException("角色数据范围异常 => key与value长度不匹配");
                 }
                 // 不包含 key 变量 则不处理
-                if (!StringUtils.containsAny(type.getSqlTemplate(),
+                if (!StringUtils.containsAny(sqlTemplate,
                     Arrays.stream(dataColumn.key()).map(key -> "#" + key).toArray(String[]::new)
                 )) {
                     continue;
@@ -170,7 +178,7 @@ public class PlusDataPermissionHandler {
                 }
 
                 // 解析sql模板并填充
-                String sql = parser.parseExpression(type.getSqlTemplate(), parserContext).getValue(context, String.class);
+                String sql = parser.parseExpression(sqlTemplate, parserContext).getValue(context, String.class);
                 conditions.add(joinStr + sql);
                 isSuccess = true;
             }

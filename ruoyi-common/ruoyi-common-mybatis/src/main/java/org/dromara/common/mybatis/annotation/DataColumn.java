@@ -15,6 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface DataColumn {
+    String CUSTOM_SQL = "CustomSql";
 
     /**
      * 数据权限模板的占位符关键字，默认为 "deptName"
