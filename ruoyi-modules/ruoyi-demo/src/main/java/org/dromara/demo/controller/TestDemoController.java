@@ -7,6 +7,7 @@ import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
+import org.dromara.common.mybatis.annotation.DataPermissionIgnored;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -52,6 +53,7 @@ public class TestDemoController extends BaseController {
      */
     @SaCheckPermission("demo:demo:list")
     @GetMapping("/list")
+    // @DataPermissionIgnored
     public TableDataInfo<TestDemoVo> list(@Validated(QueryGroup.class) TestDemoBo bo, PageQuery pageQuery) {
         return testDemoService.queryPageList(bo, pageQuery);
     }
