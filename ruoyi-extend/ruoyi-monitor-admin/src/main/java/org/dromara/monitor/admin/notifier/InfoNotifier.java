@@ -31,26 +31,31 @@ public class InfoNotifier {
     private final NotifyProperties notifyProperties;
 
     /**
-     * 服务上线或者离线
+     * 处理服务通知事件
+     * <p>
+     * 此方法会在服务状态发生变化时触发，并且会异步地发送 WebHook 通知
+     * 适用于服务的正常状态变更，不包括异常情况
      *
-     * @param notifier 通知事件
+     * @param notifier 通知事件对象，包含服务的状态和其他相关信息
      */
     @Async
-    @EventListener(condition = "#notifier.status == 'UP' || #notifier.status == 'OFFLINE'")
+    @EventListener
     public void infoNotification(NotifierEvent notifier) {
         sendWebHook(notifier);
     }
 
     /**
-     * 服务下线或者发送异常
+     * 处理服务下线，离线或异常的通知事件
+     * <p>
+     * 当服务的状态为“OFFLINE”、“DOWN”或“UNKNOWN”时，会触发此方法
+     * 该方法会异步发送邮件通知，以便及时处理服务问题
      *
-     * @param notifier 通知事件
+     * @param notifier 通知事件对象，包含服务的状态和其他相关信息
      */
     @Async
-    @EventListener(condition = "#notifier.status == 'DOWN' || #notifier.status == 'UNKNOWN'")
+    @EventListener(condition = "#notifier.status == 'OFFLINE' || #notifier.status == 'DOWN' || #notifier.status == 'UNKNOWN'")
     public void errNotification(NotifierEvent notifier) {
         sendMail(notifier);
-        sendWebHook(notifier);
     }
 
     /**
