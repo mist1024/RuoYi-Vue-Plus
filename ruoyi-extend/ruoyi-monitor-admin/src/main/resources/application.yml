@@ -76,21 +76,21 @@ notify:
     to:
     subject: 系统通知
     template: "<html><body>
-                  <p>服务名: <b>{}</b> ({})</p>
-                  <p>状态: <b>{}</b> ({})</p>
-                  <p>服务IP: <b>{}</b></p>
-                  <p>时间: <b>{}</b></p>
-               </body></html>"
+              <p><b>服务名称:</b> {}</p >
+              <p><b>实例编号:</b> {}</p >
+              <p><b>服务状态:</b> {}({})</p >
+              <p><b>服务地址:</b> {}</p >
+              <p><b>发送时间:</b> {}</p >
+           </body></html>"
   web-hook:
-    enabled: false
-    type: 0
-    url:
-    secret:
-    keywords:
+    enabled: true
+    type: 2
+    secret: SEC4d035df24951f00445ea16022f0db2d442fdc83b34c6ebe15a427572264f6798
+    url: https://oapi.dingtalk.com/robot/send?access_token=81a122dbbfbcbe237acdd9e20e421059fc2e0d80bf83ded4099b0fef9f9800ef
     template: |
-      #### **{}通知**
-      - **服务名**: {}
-      - **实例ID**: {}
-      - **状态**: {}
-      - **服务IP**: {}
-      - **时间**: {}
+      #### **{}**
+      - **服务名称**: {}
+      - **实例编号**: {}
+      - **服务状态**: {}({})
+      - **服务地址**: {}
+      - **发送时间**: {}

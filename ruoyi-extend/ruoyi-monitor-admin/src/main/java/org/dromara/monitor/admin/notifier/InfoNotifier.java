@@ -93,11 +93,7 @@ public class InfoNotifier {
         if (webHook.getEnabled()) {
             String title = notifier.getRegistName() + notifier.getStatusName();
             String message = StringUtils.format(webHook.getTemplate(), title, notifier.getRegistName(),
-                notifier.getInstanceId(), notifier.getStatus(), notifier.getServiceUrl(), DateUtils.getTime());
-            if (StringUtils.isNotBlank(webHook.getKeywords())) {
-                //追加关键词到标题中
-                title += "——" + webHook.getKeywords();
-            }
+                notifier.getInstanceId(), notifier.getStatusName(), notifier.getStatus(), notifier.getServiceUrl(), DateUtils.getTime());
             try {
                 sendWebHookMessage(webHook, title, message);
                 log.info("WebHook消息已发送至: {}", webHook.getUrl());
