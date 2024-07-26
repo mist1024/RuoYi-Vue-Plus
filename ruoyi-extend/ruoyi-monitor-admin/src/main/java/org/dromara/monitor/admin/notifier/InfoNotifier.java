@@ -1,5 +1,6 @@
 package org.dromara.monitor.admin.notifier;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -186,10 +187,19 @@ public class InfoNotifier {
      * @param response HTTP响应
      */
     private void handleResponse(HttpResponse<String> response) {
-        if (response.statusCode() == 200) {
-            log.info("WebHook消息发送成功");
-        } else {
-            log.error("WebHook消息发送失败: {}", response.body());
+        try {
+            // 解析响应体
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.body());
+            int errcode = jsonNode.has("errcode") ? jsonNode.get("errcode").asInt() : -1;
+            String errmsg = jsonNode.has("errmsg") ? jsonNode.get("errmsg").asText() : "Unknown error";
+            if (errcode == 0) {
+                log.info("WebHook消息发送成功");
+            } else {
+                log.error("WebHook消息发送失败: errcode={}, errmsg={}", errcode, errmsg);
+            }
+        } catch (Exception e) {
+            log.error("处理WebHook响应时发生异常: {}", e.getMessage());
         }
     }
 
