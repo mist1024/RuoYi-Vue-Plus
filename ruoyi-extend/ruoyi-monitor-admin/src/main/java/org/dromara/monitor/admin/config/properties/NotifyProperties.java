@@ -63,7 +63,12 @@ public class NotifyProperties {
         /**
          * 0默认 1密码 2签名密钥
          */
-        private String type;
+        private String type = "0";
+
+        /**
+         * 签名密钥
+         */
+        private String secret;
 
         /**
          * Post地址

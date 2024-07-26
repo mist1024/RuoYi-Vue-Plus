@@ -12,10 +12,15 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,7 +94,7 @@ public class InfoNotifier {
             String message = StringUtils.format(webHook.getTemplate(), title,
                 notifier.getRegistName(), notifier.getInstanceId(), notifier.getStatus(), notifier.getServiceUrl());
             try {
-                sendWebHookMessage(webHook.getUrl(), title, message);
+                sendWebHookMessage(webHook, title, message);
                 log.info("WebHook消息已发送至: {}", webHook.getUrl());
             } catch (Exception e) {
                 log.error("WebHook消息发送失败: ", e);
@@ -97,32 +102,90 @@ public class InfoNotifier {
         }
     }
 
-    private void sendWebHookMessage(String url, String title, String markdownMessage) throws Exception {
-        // 构造消息体
+    /**
+     * 发送WebHook消息
+     *
+     * @param webHook         WebHook配置信息
+     * @param title           消息标题
+     * @param markdownMessage 消息内容
+     * @throws Exception 处理过程中可能抛出的异常
+     */
+    private void sendWebHookMessage(NotifyProperties.WebHook webHook, String title, String markdownMessage) throws Exception {
+        String jsonMessage = createJsonMessage(title, markdownMessage);
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = createHttpRequest(webHook, jsonMessage);
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        handleResponse(response);
+    }
+
+    /**
+     * 创建消息体的JSON字符串
+     *
+     * @param title           消息标题
+     * @param markdownMessage 消息内容
+     * @return JSON格式的消息体
+     * @throws Exception 处理过程中可能抛出的异常
+     */
+    private String createJsonMessage(String title, String markdownMessage) throws Exception {
         Map<String, Object> messageBody = new HashMap<>();
         messageBody.put("msgtype", "markdown");
-
         Map<String, String> markdownContent = new HashMap<>();
         markdownContent.put("title", title + "通知");
         markdownContent.put("text", markdownMessage);
         messageBody.put("markdown", markdownContent);
-
-        // 将消息体转换为JSON字符串
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonMessage = objectMapper.writeValueAsString(messageBody);
+        return objectMapper.writeValueAsString(messageBody);
+    }
 
-        // 创建HTTP客户端
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(new URI(url))
+    /**
+     * 根据WebHook配置创建HTTP请求
+     *
+     * @param webHook     WebHook配置信息
+     * @param jsonMessage JSON格式的消息体
+     * @return 创建的HTTP请求
+     * @throws Exception 处理过程中可能抛出的异常
+     */
+    private HttpRequest createHttpRequest(NotifyProperties.WebHook webHook, String jsonMessage) throws Exception {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(jsonMessage))
-            .build();
+            .POST(HttpRequest.BodyPublishers.ofString(jsonMessage));
 
-        // 发送请求
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if ("2".equals(webHook.getType())) {
+            String signedUrl = generateSignedUrl(webHook);
+            requestBuilder.uri(new URI(signedUrl));
+        } else {
+            requestBuilder.uri(new URI(webHook.getUrl()));
+        }
 
-        // 处理响应
+        return requestBuilder.build();
+    }
+
+    /**
+     * 生成带签名的URL
+     *
+     * @param webHook WebHook配置信息
+     * @return 带签名的URL
+     * @throws Exception 处理过程中可能抛出的异常
+     */
+    private String generateSignedUrl(NotifyProperties.WebHook webHook) throws Exception {
+        long timestamp = System.currentTimeMillis();
+        String secret = webHook.getSecret();
+        String stringToSign = timestamp + "\n" + secret;
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+        byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));
+        String sign = URLEncoder.encode(Base64.getEncoder().encodeToString(signData), StandardCharsets.UTF_8);
+
+        return String.format("%s&timestamp=%d&sign=%s", webHook.getUrl(), timestamp, sign);
+    }
+
+    /**
+     * 处理HTTP响应
+     *
+     * @param response HTTP响应
+     */
+    private void handleResponse(HttpResponse<String> response) {
         if (response.statusCode() == 200) {
             log.info("WebHook消息发送成功");
         } else {
