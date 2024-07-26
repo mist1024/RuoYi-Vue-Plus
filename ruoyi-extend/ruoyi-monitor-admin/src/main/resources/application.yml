@@ -79,6 +79,7 @@ notify:
                   <p>服务名: <b>{}</b> ({})</p>
                   <p>状态: <b>{}</b> ({})</p>
                   <p>服务IP: <b>{}</b></p>
+                  <p>时间: <b>{}</b></p>
                </body></html>"
   web-hook:
     enabled: false
@@ -87,8 +88,9 @@ notify:
     secret:
     keywords:
     template: |
-      ### {}通知
+      #### **{}通知**
       - **服务名**: {}
       - **实例ID**: {}
       - **状态**: {}
       - **服务IP**: {}
+      - **时间**: {}

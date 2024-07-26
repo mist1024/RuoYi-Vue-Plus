@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.monitor.admin.config.properties.NotifyProperties;
@@ -72,7 +73,7 @@ public class InfoNotifier {
         NotifyProperties.Mail mail = notifyProperties.getMail();
         if (mail.getEnabled()) {
             String message = StringUtils.format(mail.getTemplate(), notifier.getRegistName(), notifier.getInstanceId(),
-                notifier.getStatusName(), notifier.getStatus(), notifier.getServiceUrl());
+                notifier.getStatusName(), notifier.getStatus(), notifier.getServiceUrl(), DateUtils.getTime());
             try {
                 MailUtils.sendHtml(mail.getTo(), notifier.getRegistName() + notifier.getStatusName(), message);
                 log.info("邮件已发送至: {}", mail.getTo());
@@ -91,8 +92,8 @@ public class InfoNotifier {
         NotifyProperties.WebHook webHook = notifyProperties.getWebHook();
         if (webHook.getEnabled()) {
             String title = notifier.getRegistName() + notifier.getStatusName();
-            String message = StringUtils.format(webHook.getTemplate(), title,
-                notifier.getRegistName(), notifier.getInstanceId(), notifier.getStatus(), notifier.getServiceUrl());
+            String message = StringUtils.format(webHook.getTemplate(), title, notifier.getRegistName(),
+                notifier.getInstanceId(), notifier.getStatus(), notifier.getServiceUrl(), DateUtils.getTime());
             if (StringUtils.isNotBlank(webHook.getKeywords())) {
                 //追加关键词到标题中
                 title += "——" + webHook.getKeywords();
