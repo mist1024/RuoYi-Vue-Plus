@@ -71,6 +71,11 @@ public class NotifyProperties {
         private String secret;
 
         /**
+         * 关键词
+         */
+        private String keywords;
+
+        /**
          * Post地址
          */
         private String url;

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mail.utils.MailUtils;
-
 import org.dromara.monitor.admin.config.properties.NotifyProperties;
 import org.dromara.monitor.admin.event.NotifierEvent;
 import org.springframework.context.event.EventListener;
@@ -94,6 +93,10 @@ public class InfoNotifier {
             String title = notifier.getRegistName() + notifier.getStatusName();
             String message = StringUtils.format(webHook.getTemplate(), title,
                 notifier.getRegistName(), notifier.getInstanceId(), notifier.getStatus(), notifier.getServiceUrl());
+            if (StringUtils.isNotBlank(webHook.getKeywords())) {
+                //追加关键词到标题中
+                title += "——" + webHook.getKeywords();
+            }
             try {
                 sendWebHookMessage(webHook, title, message);
                 log.info("WebHook消息已发送至: {}", webHook.getUrl());

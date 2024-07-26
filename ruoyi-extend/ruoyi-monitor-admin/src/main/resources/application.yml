@@ -85,6 +85,7 @@ notify:
     type: 0
     url:
     secret:
+    keywords:
     template: |
       ### {}通知
       - **服务名**: {}
