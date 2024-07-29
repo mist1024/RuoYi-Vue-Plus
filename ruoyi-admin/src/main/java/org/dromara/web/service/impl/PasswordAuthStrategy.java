@@ -99,11 +99,11 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
-            loginService.recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLoginInfo(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         if (!code.equalsIgnoreCase(captcha)) {
-            loginService.recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
+            loginService.recordLoginInfo(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }
     }

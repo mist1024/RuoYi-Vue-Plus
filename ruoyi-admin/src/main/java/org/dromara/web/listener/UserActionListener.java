@@ -14,7 +14,7 @@ import org.dromara.common.core.utils.MessageUtils;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
-import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
@@ -64,13 +64,13 @@ public class UserActionListener implements SaTokenListener {
             }
         });
         // 记录登录日志
-        LogininforEvent logininforEvent = new LogininforEvent();
-        logininforEvent.setTenantId(tenantId);
-        logininforEvent.setUsername(username);
-        logininforEvent.setStatus(Constants.LOGIN_SUCCESS);
-        logininforEvent.setMessage(MessageUtils.message("user.login.success"));
-        logininforEvent.setRequest(ServletUtils.getRequest());
-        SpringUtils.context().publishEvent(logininforEvent);
+        LoginInfoEvent loginInfoEvent = new LoginInfoEvent();
+        loginInfoEvent.setTenantId(tenantId);
+        loginInfoEvent.setUsername(username);
+        loginInfoEvent.setStatus(Constants.LOGIN_SUCCESS);
+        loginInfoEvent.setMessage(MessageUtils.message("user.login.success"));
+        loginInfoEvent.setRequest(ServletUtils.getRequest());
+        SpringUtils.context().publishEvent(loginInfoEvent);
         // 更新登录信息
         loginService.recordLoginInfo((Long) loginModel.getExtra(LoginHelper.USER_KEY), ip);
         log.info("user doLogin, userId:{}, token:{}", loginId, tokenValue);

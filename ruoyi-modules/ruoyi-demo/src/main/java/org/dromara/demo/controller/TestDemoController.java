@@ -7,6 +7,7 @@ import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.core.validate.QueryGroup;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -144,4 +145,10 @@ public class TestDemoController extends BaseController {
                           @PathVariable Long[] ids) {
         return toAjax(testDemoService.deleteWithValidByIds(Arrays.asList(ids), true));
     }
+
+    @GetMapping(value = "/nickNameTest")
+    public R<String> nickNameTest() {
+        return R.ok(LoginHelper.getNickname());
+    }
+
 }

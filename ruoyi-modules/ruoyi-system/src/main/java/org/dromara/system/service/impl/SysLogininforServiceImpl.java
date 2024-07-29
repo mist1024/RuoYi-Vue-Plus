@@ -13,7 +13,7 @@ import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ip.AddressUtils;
-import org.dromara.common.log.event.LogininforEvent;
+import org.dromara.common.log.event.LoginInfoEvent;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -50,12 +50,12 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
     /**
      * 记录登录信息
      *
-     * @param logininforEvent 登录事件
+     * @param loginInfoEvent 登录事件
      */
     @Async
     @EventListener
-    public void recordLogininfor(LogininforEvent logininforEvent) {
-        HttpServletRequest request = logininforEvent.getRequest();
+    public void recordLogininfor(LoginInfoEvent loginInfoEvent) {
+        HttpServletRequest request = loginInfoEvent.getRequest();
         final UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
         final String ip = ServletUtils.getClientIP(request);
         // 客户端信息
@@ -69,19 +69,19 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         StringBuilder s = new StringBuilder();
         s.append(getBlock(ip));
         s.append(address);
-        s.append(getBlock(logininforEvent.getUsername()));
-        s.append(getBlock(logininforEvent.getStatus()));
-        s.append(getBlock(logininforEvent.getMessage()));
+        s.append(getBlock(loginInfoEvent.getUsername()));
+        s.append(getBlock(loginInfoEvent.getStatus()));
+        s.append(getBlock(loginInfoEvent.getMessage()));
         // 打印信息到日志
-        log.info(s.toString(), logininforEvent.getArgs());
+        log.info(s.toString(), loginInfoEvent.getArgs());
         // 获取客户端操作系统
         String os = userAgent.getOs().getName();
         // 获取客户端浏览器
         String browser = userAgent.getBrowser().getName();
         // 封装对象
         SysLogininforBo logininfor = new SysLogininforBo();
-        logininfor.setTenantId(logininforEvent.getTenantId());
-        logininfor.setUserName(logininforEvent.getUsername());
+        logininfor.setTenantId(loginInfoEvent.getTenantId());
+        logininfor.setUserName(loginInfoEvent.getUsername());
         if (ObjectUtil.isNotNull(client)) {
             logininfor.setClientKey(client.getClientKey());
             logininfor.setDeviceType(client.getDeviceType());
@@ -90,11 +90,11 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
         logininfor.setLoginLocation(address);
         logininfor.setBrowser(browser);
         logininfor.setOs(os);
-        logininfor.setMsg(logininforEvent.getMessage());
+        logininfor.setMsg(loginInfoEvent.getMessage());
         // 日志状态
-        if (StringUtils.equalsAny(logininforEvent.getStatus(), Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
+        if (StringUtils.equalsAny(loginInfoEvent.getStatus(), Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER)) {
             logininfor.setStatus(Constants.SUCCESS);
-        } else if (Constants.LOGIN_FAIL.equals(logininforEvent.getStatus())) {
+        } else if (Constants.LOGIN_FAIL.equals(loginInfoEvent.getStatus())) {
             logininfor.setStatus(Constants.FAIL);
         }
         // 插入数据
