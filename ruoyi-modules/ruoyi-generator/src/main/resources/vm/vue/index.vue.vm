@@ -101,11 +101,23 @@
           </template>
         </el-table-column>
 #elseif($column.list && $column.htmlType == "imageUpload")
+    #set($nonUrlField = "")
+    #if ($column.javaField.endsWith("Url"))
+        #set($nonUrlField = $column.javaField.substring(0, $column.javaField.length() - 3))
+        #foreach ($otherColumn in $columns)
+            #if ($otherColumn.javaField == $nonUrlField)
+                #set($nonUrlField = $nonUrlField)
+                #break
+            #end
+        #end
+    #end
+    #if(!($column.javaField.endsWith("Url") && $nonUrlField != ""))
         <el-table-column label="${comment}" align="center" prop="${javaField}" width="100">
           <template #default="scope">
             <image-preview :src="scope.row.${javaField}" :width="50" :height="50"/>
           </template>
         </el-table-column>
+    #end
 #elseif($column.list && $column.dictType && "" != $column.dictType)
         <el-table-column label="${comment}" align="center" prop="${javaField}">
           <template #default="scope">

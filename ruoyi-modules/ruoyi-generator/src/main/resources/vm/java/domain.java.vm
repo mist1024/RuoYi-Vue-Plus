@@ -40,9 +40,22 @@ public class ${ClassName} extends ${Entity} {
 
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField))
+    #set($nonUrlField = "")
+    #if ($column.javaField.endsWith("Url"))
+        #set($nonUrlField = $column.javaField.substring(0, $column.javaField.length() - 3))
+        #foreach ($otherColumn in $columns)
+            #if ($otherColumn.javaField == $nonUrlField)
+                #set($nonUrlField = $nonUrlField)
+                #break
+            #end
+        #end
+    #end
     /**
      * $column.columnComment
      */
+#if(($column.javaField.endsWith("Url") && $nonUrlField != ""))
+    @TableField("$column.columnName")
+#end
 #if($column.javaField=='delFlag')
     @TableLogic
 #end

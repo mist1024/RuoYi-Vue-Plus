@@ -10,6 +10,8 @@ import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.dbn.common.translation.annotation.Translation;
+import org.dbn.common.translation.constant.TransConstant;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -42,6 +44,16 @@ public class ${ClassName}Vo implements Serializable {
 #else
 #set($comment=$column.columnComment)
 #end
+    #set($nonUrlField = "")
+    #if ($column.javaField.endsWith("Url"))
+        #set($nonUrlField = $column.javaField.substring(0, $column.javaField.length() - 3))
+        #foreach ($otherColumn in $columns)
+            #if ($otherColumn.javaField == $nonUrlField)
+                #set($nonUrlField = $nonUrlField)
+                #break
+            #end
+        #end
+    #end
 #if(${column.dictType} && ${column.dictType} != '')
     @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "${column.dictType}")
@@ -51,6 +63,9 @@ public class ${ClassName}Vo implements Serializable {
 #else
     @ExcelProperty(value = "${comment}")
 #end
+    #if(($column.javaField.endsWith("Url") && $nonUrlField != ""))
+    @Translation(type = TransConstant.OSS_ID_TO_URL)
+    #end
     private $column.javaType $column.javaField;
 
 #end
