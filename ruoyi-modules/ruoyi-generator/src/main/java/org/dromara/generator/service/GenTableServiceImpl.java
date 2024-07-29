@@ -1,5 +1,6 @@
 package org.dromara.generator.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Dict;
@@ -48,6 +49,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -326,6 +328,9 @@ public class GenTableServiceImpl implements IGenTableService {
         for (int i = 0; i < 6; i++) {
             menuIds.add(identifierGenerator.nextId(null).longValue());
         }
+        //处理图片上传组件回现问题
+        processImageUploadColumns(table);
+
         table.setMenuIds(menuIds);
         // 设置主键列信息
         setPkColumn(table);
@@ -369,6 +374,9 @@ public class GenTableServiceImpl implements IGenTableService {
     public void generatorCode(Long tableId) {
         // 查询表信息
         GenTable table = baseMapper.selectGenTableById(tableId);
+        //处理图片上传组件回现问题
+        processImageUploadColumns(table);
+
         // 设置主键列信息
         setPkColumn(table);
 
@@ -472,6 +480,9 @@ public class GenTableServiceImpl implements IGenTableService {
         for (int i = 0; i < 6; i++) {
             menuIds.add(identifierGenerator.nextId(null).longValue());
         }
+        //处理图片上传组件回现问题
+        processImageUploadColumns(table);
+
         table.setMenuIds(menuIds);
         // 设置主键列信息
         setPkColumn(table);
@@ -573,6 +584,28 @@ public class GenTableServiceImpl implements IGenTableService {
             return System.getProperty("user.dir") + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
         }
         return genPath + File.separator + VelocityUtils.getFileName(template, table);
+    }
+    /**
+     * 传入数据库行数据，返回添加后数据字段
+     * @param table 表数据
+     */
+    private void processImageUploadColumns( GenTable table) {
+        List<GenTableColumn> columns = table.getColumns();
+        List<GenTableColumn> newColumns = columns.stream()
+            .filter(column -> GenConstants.HTML_IMAGE_UPLOAD.equals(column.getHtmlType()))
+            .map(column -> {
+                GenTableColumn convert = BeanUtil.copyProperties(column, GenTableColumn.class);
+                convert.setJavaField(column.getJavaField() + "Url");
+                convert.setIsQuery("0");
+                convert.setIsEdit("0");
+                convert.setIsInsert("0");
+                convert.setIsList("1");
+                return convert;
+            })
+            .collect(Collectors.toList());
+
+        // 将新生成的列添加到原始列列表中
+        columns.addAll(newColumns);
     }
 }
 
