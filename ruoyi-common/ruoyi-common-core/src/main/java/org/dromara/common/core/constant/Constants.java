@@ -43,6 +43,16 @@ public interface Constants {
     String FAIL = "1";
 
     /**
+     * 通用存在标志
+     */
+    String DELETED_FLAG_EXIST = "0";
+
+    /**
+     * 通用删除标志
+     */
+    String DELETED_FLAG_REMOVED  = "2";
+
+    /**
      * 登录成功
      */
     String LOGIN_SUCCESS = "Success";
