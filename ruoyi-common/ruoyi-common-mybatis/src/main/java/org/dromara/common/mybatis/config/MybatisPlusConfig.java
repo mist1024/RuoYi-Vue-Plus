@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.dromara.common.core.factory.YmlPropertySourceFactory;
 import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.mybatis.aspectj.DataPermissionIgnoredAspect;
 import org.dromara.common.mybatis.handler.InjectionMetaObjectHandler;
 import org.dromara.common.mybatis.handler.MybatisExceptionHandler;
 import org.dromara.common.mybatis.interceptor.PlusDataPermissionInterceptor;
@@ -115,5 +116,13 @@ public class MybatisPlusConfig {
      * DynamicTableNameInnerInterceptor 动态表名插件
      * https://baomidou.com/pages/2a45ff/
      */
+
+    /**
+     * 忽略数据权限
+     */
+    @Bean
+    public DataPermissionIgnoredAspect dataPermissionIgnoredAspect() {
+        return new DataPermissionIgnoredAspect();
+    }
 
 }
