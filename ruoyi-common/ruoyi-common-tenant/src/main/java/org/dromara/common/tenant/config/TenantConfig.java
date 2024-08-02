@@ -71,7 +71,6 @@ public class TenantConfig {
     /**
      * 多租户缓存管理器
      */
-    @Primary
     @Bean
     public CacheManager tenantCacheManager() {
         return new TenantSpringCacheManager();
