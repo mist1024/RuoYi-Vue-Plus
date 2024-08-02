@@ -32,7 +32,7 @@ public class CaffeineCacheDecorator implements Cache {
     }
 
     public String getUniqueKey(Object key) {
-        return cache.getName() + ":" + key;
+        return getName() + ":" + key;
     }
 
     @Override
