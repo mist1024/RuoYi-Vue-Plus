@@ -48,10 +48,12 @@ public class WorkDaysUtils {
                 startYear++;
                 daysArray = daysInYear(startYear);
                 endIndex = 0;
+                // 更新年份
+                calendar.set(Calendar.YEAR, startYear);
             }
         }
         // 设置截止日期
-        calendar.set(Calendar.DAY_OF_YEAR, endIndex + 1); // +1 因为 Calendar.DAY_OF_YEAR 从 1 开始
+        calendar.set(Calendar.DAY_OF_YEAR, endIndex + 1);
         return calendar.getTime();
     }
 
