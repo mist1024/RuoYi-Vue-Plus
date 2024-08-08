@@ -150,27 +150,58 @@ public class WorkDaysUtils {
             daysArray[i] = (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) ? 1 : 0;
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
-        //todo 更新节假日
-        return updateDaysArray(daysArray, new ArrayList<>());
+
+        // 将工作日设置为休息日（假设用于标记节假日）
+        markWorkdaysAsRestdays(daysArray, new ArrayList<>());
+        // 将休息日设置为工作日（假设用于标记补班的工作日）
+        markRestdaysAsWorkdays(daysArray, new ArrayList<>());
+        return daysArray;
     }
 
     /**
-     * 根据节假日下标更新 daysArray，将对应下标的值改为1
+     * 将工作日设置为休息日（假设用于标记节假日）
      *
      * @param daysArray 原始的天数数组
      * @param holidays  节假日日期列表
      * @return 更新后的天数数组
      */
-    private static Integer[] updateDaysArray(Integer[] daysArray, List<Date> holidays) {
+    private static Integer[] markWorkdaysAsRestdays(Integer[] daysArray, List<Date> holidays) {
+        return updateDaysArray(daysArray, holidays, true);
+    }
+
+    /**
+     * 将休息日设置为工作日（假设用于标记补班的工作日）
+     *
+     * @param daysArray 原始的天数数组
+     * @param holidays  休息日日期列表
+     * @return 更新后的天数数组
+     */
+    private static Integer[] markRestdaysAsWorkdays(Integer[] daysArray, List<Date> holidays) {
+        return updateDaysArray(daysArray, holidays, false);
+    }
+
+    /**
+     * 根据节假日下标更新 daysArray，将对应下标的值改为指定值
+     *
+     * @param daysArray 原始的天数数组
+     * @param holidays  节假日日期列表
+     * @param isHoliday 是否为节假日，如果为 true 则表示节假日；如果为 false 则表示工作日
+     * @return 更新后的天数数组
+     */
+    private static Integer[] updateDaysArray(Integer[] daysArray, List<Date> holidays, Boolean isHoliday) {
         if (holidays == null || holidays.isEmpty()) {
             return daysArray;
         }
+
+        // 节假日用 1，工作日用 0
+        int valueToSet = isHoliday ? 1 : 0;
+
         // 遍历节假日下标数组，将对应的 daysArray 元素设置为1
         for (Date holiday : holidays) {
             int index = getDayOfYearIndex(holiday);
             // 确保下标在有效范围内
             if (index >= 0 && index < daysArray.length) {
-                daysArray[index] = 1;
+                daysArray[index] = valueToSet;
             }
         }
         return daysArray;
