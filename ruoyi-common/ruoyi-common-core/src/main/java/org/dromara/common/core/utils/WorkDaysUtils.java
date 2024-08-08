@@ -16,6 +16,46 @@ public class WorkDaysUtils {
     private static final Map<Integer, Integer[]> DAYS_IN_YEARS = new HashMap<>();
 
     /**
+     * 根据开始日期和工作日数计算截止日期
+     *
+     * @param startDate 开始日期
+     * @param workDays  工作日数
+     * @return 截止日期
+     */
+    public static Date calculateEndDate(Date startDate, int workDays) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        // 获取开始日期的年份
+        int startYear = getYear(startDate);
+        //开始日期年份天
+        Integer[] daysArray = daysInYear(startYear);
+        int startIndex = getDayOfYearIndex(startDate);
+        int endIndex = startIndex;
+        // 循环找到指定的工作日数
+        while (workDays > 0) {
+            // 检查当前日期是否是工作日
+            if (daysArray[endIndex] == 0) {
+                workDays--;
+            }
+            // 结束条件：工作日数为零
+            if (workDays <= 0) {
+                break;
+            }
+            // 移动到下一天
+            endIndex++;
+            // 如果移动到下一年
+            if (endIndex >= daysArray.length) {
+                startYear++;
+                daysArray = daysInYear(startYear);
+                endIndex = 0;
+            }
+        }
+        // 设置截止日期
+        calendar.set(Calendar.DAY_OF_YEAR, endIndex + 1); // +1 因为 Calendar.DAY_OF_YEAR 从 1 开始
+        return calendar.getTime();
+    }
+
+    /**
      * 计算两个日期之间的工作日天数
      *
      * @param start 开始日期
