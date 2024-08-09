@@ -1,12 +1,19 @@
-package org.dromara.common.core.utils;
+package org.dromara.workflow.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import com.baomidou.lock.LockInfo;
+import com.baomidou.lock.LockTemplate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.constant.GlobalConstants;
+import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.redis.utils.RedisUtils;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 工作日工具类
@@ -16,8 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkDaysUtils {
 
-    private static final Map<Integer, Integer[]> DAYS_IN_YEARS = new ConcurrentHashMap<>();
-    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final String DAYS_IN_YEARS_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "DAYS_IN_YEARS:";
+    private static final LockTemplate LOCK_TEMPLATE = SpringUtils.getBean(LockTemplate.class);
     //工作日
     public static final int WORKDAY = 0;
     //休息日
@@ -124,10 +131,10 @@ public class WorkDaysUtils {
     }
 
     /**
-     * 清空所有年份的数据
+     * 删除指定年份的数据
      */
-    public static void clearAllData() {
-        DAYS_IN_YEARS.clear();
+    public static void clearData(Integer year) {
+        RedisUtils.deleteObject(DAYS_IN_YEARS_KEY + year);
     }
 
     /**
@@ -137,25 +144,24 @@ public class WorkDaysUtils {
      * @return 表示一年中每一天的状态数组，0 表示工作日，1 表示周末
      */
     private static Integer[] daysInYear(Integer year) {
-        // 先检查缓存
-        if (DAYS_IN_YEARS.containsKey(year)) {
-            return DAYS_IN_YEARS.get(year);
+        String key = DAYS_IN_YEARS_KEY + year;
+        Integer[] daysInYears = RedisUtils.getCacheObject(key);
+        if (ArrayUtil.isNotEmpty(daysInYears)) {
+            return daysInYears;
         }
-
-        // 如果缓存中不存在，则进行加锁
-        LOCK.lock();
+        LockInfo lock = LOCK_TEMPLATE.lock(key);
         try {
-            // 再次检查缓存，防止在等待锁期间其他线程已经生成了数据
-            if (DAYS_IN_YEARS.containsKey(year)) {
-                return DAYS_IN_YEARS.get(year);
+            // 再次检查缓存，防止缓存穿透
+            daysInYears = RedisUtils.getCacheObject(key);
+            if (ArrayUtil.isNotEmpty(daysInYears)) {
+                return daysInYears;
             }
-
             // 如果年份数据不存在，则生成指定年份的数据
             Integer[] daysArray = generateDaysArray(year);
-            DAYS_IN_YEARS.put(year, daysArray);
+            RedisUtils.setCacheObject(key, daysArray);
             return daysArray;
         } finally {
-            LOCK.unlock();
+            LOCK_TEMPLATE.releaseLock(lock);
         }
     }
 
