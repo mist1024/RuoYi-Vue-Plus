@@ -145,7 +145,7 @@ public class WorkDaysUtils {
      * @param adjustments 个人调休日期列表
      * @return 表示每一天状态的数组，0 表示工作日，1 表示休息日
      */
-    public static Integer[] calculateWorkdays(Integer year, List<Date> overtime, List<Date> adjustments) {
+    public static Integer[] calculateWorkDays(Integer year, List<Date> overtime, List<Date> adjustments) {
         //获取指定年份天数
         Integer[] daysArray = daysInYear(year);
         //设置为工作日（假设用于标记补班的工作日）
