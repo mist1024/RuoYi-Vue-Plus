@@ -138,6 +138,24 @@ public class WorkDaysUtils {
     }
 
     /**
+     * 计算指定年份的工作日数组，标记个人的加班和调休日期
+     *
+     * @param year        指定年份
+     * @param overtime    个人加班日期列表
+     * @param adjustments 个人调休日期列表
+     * @return 表示每一天状态的数组，0 表示工作日，1 表示休息日
+     */
+    public static Integer[] calculateWorkdays(Integer year, List<Date> overtime, List<Date> adjustments) {
+        //获取指定年份天数
+        Integer[] daysArray = daysInYear(year);
+        //设置为工作日（假设用于标记补班的工作日）
+        updateDaysArray(daysArray, overtime, WORKDAY);
+        //设置为休息日（假设用于标记节假日）
+        updateDaysArray(daysArray, adjustments, RESTDAY);
+        return daysArray;
+    }
+
+    /**
      * 获取指定年份的天数数组。如果指定年份的数据不存在，则生成并缓存数据
      *
      * @param year 指定年份
