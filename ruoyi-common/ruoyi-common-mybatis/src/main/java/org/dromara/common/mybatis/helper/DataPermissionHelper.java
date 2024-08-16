@@ -2,14 +2,17 @@ package org.dromara.common.mybatis.helper;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -23,6 +26,8 @@ import java.util.function.Supplier;
 public class DataPermissionHelper {
 
     private static final String DATA_PERMISSION_KEY = "data:permission";
+
+    private static final ThreadLocal<Integer> REENTRANT_IGNORE_PERMISSION = new ThreadLocal<>();
 
     /**
      * 从上下文中获取指定键的变量值，并将其转换为指定的类型
@@ -70,14 +75,50 @@ public class DataPermissionHelper {
      * 开启忽略数据权限(开启后需手动调用 {@link #disableIgnore()} 关闭)
      */
     public static void enableIgnore() {
-        InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().dataPermission(true).build());
+        ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
+        if (Objects.nonNull(ignoreStrategy)) {
+            if (!Boolean.TRUE.equals(ignoreStrategy.getDataPermission())) {
+                ignoreStrategy.setDataPermission(true);
+                REENTRANT_IGNORE_PERMISSION.set(1);
+            } else {
+                Integer count = REENTRANT_IGNORE_PERMISSION.get();
+                REENTRANT_IGNORE_PERMISSION.set(count + 1);
+            }
+        } else {
+            InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().dataPermission(true).build());
+            REENTRANT_IGNORE_PERMISSION.set(1);
+        }
     }
 
     /**
      * 关闭忽略数据权限
      */
     public static void disableIgnore() {
-        InterceptorIgnoreHelper.clearIgnoreStrategy();
+        ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
+        if (Objects.nonNull(ignoreStrategy)) {
+            Integer count = REENTRANT_IGNORE_PERMISSION.get();
+            boolean hasCount = count.compareTo(1) > 0;
+            if (ignoreStrategy.getBlockAttack() == null && ignoreStrategy.getDynamicTableName() == null && ignoreStrategy.getTenantLine() == null && ignoreStrategy.getIllegalSql() == null && CollectionUtil.isEmpty(ignoreStrategy.getOthers())) {
+                if (!hasCount) {
+                    InterceptorIgnoreHelper.clearIgnoreStrategy();
+                }
+            } else {
+                if (!hasCount) {
+                    if (count.compareTo(1) == 0) {
+                        ignoreStrategy.setDataPermission(null);
+                        REENTRANT_IGNORE_PERMISSION.remove();
+                    }
+                }
+            }
+            if (hasCount) {
+                REENTRANT_IGNORE_PERMISSION.set(count - 1);
+            }
+        } else {
+            InterceptorIgnoreHelper.clearIgnoreStrategy();
+            REENTRANT_IGNORE_PERMISSION.remove();
+        }
     }
 
     /**

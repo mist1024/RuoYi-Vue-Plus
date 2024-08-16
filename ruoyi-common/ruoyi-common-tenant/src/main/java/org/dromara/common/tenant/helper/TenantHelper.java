@@ -1,6 +1,7 @@
 package org.dromara.common.tenant.helper;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
@@ -11,9 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -29,6 +32,8 @@ public class TenantHelper {
 
     private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new TransmittableThreadLocal<>();
 
+    private static final ThreadLocal<Integer> REENTRANT_IGNORE_TENANT = new ThreadLocal<>();
+
     /**
      * 租户功能是否启用
      */
@@ -40,14 +45,50 @@ public class TenantHelper {
      * 开启忽略租户(开启后需手动调用 {@link #disableIgnore()} 关闭)
      */
     public static void enableIgnore() {
-        InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+        ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
+        if (Objects.nonNull(ignoreStrategy)) {
+            if (!Boolean.TRUE.equals(ignoreStrategy.getTenantLine())) {
+                ignoreStrategy.setTenantLine(true);
+                REENTRANT_IGNORE_TENANT.set(1);
+            } else {
+                Integer count = REENTRANT_IGNORE_TENANT.get();
+                REENTRANT_IGNORE_TENANT.set(count + 1);
+            }
+        } else {
+            InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+            REENTRANT_IGNORE_TENANT.set(1);
+        }
     }
 
     /**
      * 关闭忽略租户
      */
     public static void disableIgnore() {
-        InterceptorIgnoreHelper.clearIgnoreStrategy();
+        ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
+        if (Objects.nonNull(ignoreStrategy)) {
+            Integer count = REENTRANT_IGNORE_TENANT.get();
+            boolean hasCount = count.compareTo(1) > 0;
+            if (ignoreStrategy.getBlockAttack() == null && ignoreStrategy.getDynamicTableName() == null && ignoreStrategy.getIllegalSql() == null && ignoreStrategy.getDataPermission() == null && CollectionUtil.isEmpty(ignoreStrategy.getOthers())) {
+                if (!hasCount) {
+                    InterceptorIgnoreHelper.clearIgnoreStrategy();
+                }
+            } else {
+                if (!hasCount) {
+                    if (count.compareTo(1) == 0) {
+                        ignoreStrategy.setTenantLine(null);
+                        REENTRANT_IGNORE_TENANT.remove();
+                    }
+                }
+            }
+            if (hasCount) {
+                REENTRANT_IGNORE_TENANT.set(count - 1);
+            }
+        } else {
+            InterceptorIgnoreHelper.clearIgnoreStrategy();
+            REENTRANT_IGNORE_TENANT.remove();
+        }
     }
 
     /**
