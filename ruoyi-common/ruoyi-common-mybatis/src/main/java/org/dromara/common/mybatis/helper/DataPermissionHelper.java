@@ -13,6 +13,7 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.function.Supplier;
 
 /**
@@ -27,7 +28,7 @@ public class DataPermissionHelper {
 
     private static final String DATA_PERMISSION_KEY = "data:permission";
 
-    private static final ThreadLocal<Integer> REENTRANT_IGNORE_PERMISSION = new ThreadLocal<>();
+    private static final Stack<Integer> REENTRANT_IGNORE_PERMISSION_STACK = new Stack<>();
 
     /**
      * 从上下文中获取指定键的变量值，并将其转换为指定的类型
@@ -77,17 +78,19 @@ public class DataPermissionHelper {
     public static void enableIgnore() {
         ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
-        if (Objects.nonNull(ignoreStrategy)) {
-            if (!Boolean.TRUE.equals(ignoreStrategy.getDataPermission())) {
-                ignoreStrategy.setDataPermission(true);
-                REENTRANT_IGNORE_PERMISSION.set(1);
-            } else {
-                Integer count = REENTRANT_IGNORE_PERMISSION.get();
-                REENTRANT_IGNORE_PERMISSION.set(count + 1);
-            }
-        } else {
+        if (ignoreStrategy == null) {
             InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().dataPermission(true).build());
-            REENTRANT_IGNORE_PERMISSION.set(1);
+            REENTRANT_IGNORE_PERMISSION_STACK.push(1);
+        } else {
+            if (Boolean.TRUE.equals(ignoreStrategy.getDataPermission())) {
+                if (REENTRANT_IGNORE_PERMISSION_STACK.isEmpty()) {
+                    throw new IllegalStateException("ignore data permission error");
+                }
+                REENTRANT_IGNORE_PERMISSION_STACK.push(REENTRANT_IGNORE_PERMISSION_STACK.peek() + 1);
+            } else {
+                ignoreStrategy.setDataPermission(true);
+                REENTRANT_IGNORE_PERMISSION_STACK.push(1);
+            }
         }
     }
 
@@ -97,27 +100,31 @@ public class DataPermissionHelper {
     public static void disableIgnore() {
         ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
-        if (Objects.nonNull(ignoreStrategy)) {
-            Integer count = REENTRANT_IGNORE_PERMISSION.get();
-            boolean hasCount = count.compareTo(1) > 0;
-            if (ignoreStrategy.getBlockAttack() == null && ignoreStrategy.getDynamicTableName() == null && ignoreStrategy.getTenantLine() == null && ignoreStrategy.getIllegalSql() == null && CollectionUtil.isEmpty(ignoreStrategy.getOthers())) {
-                if (!hasCount) {
+        if (ignoreStrategy != null) {
+            boolean empty = REENTRANT_IGNORE_PERMISSION_STACK.isEmpty();
+            int pop = empty ? 1 : REENTRANT_IGNORE_PERMISSION_STACK.pop();
+            boolean shouldClear = !Boolean.TRUE.equals(ignoreStrategy.getTenantLine())
+                && !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
+                && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
+                && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())
+                && CollectionUtil.isEmpty(ignoreStrategy.getOthers());
+            if (shouldClear) {
+                if (empty) {
                     InterceptorIgnoreHelper.clearIgnoreStrategy();
+                } else {
+                    if (pop == 1) {
+                        InterceptorIgnoreHelper.clearIgnoreStrategy();
+                    }
                 }
             } else {
-                if (!hasCount) {
-                    if (count.compareTo(1) == 0) {
-                        ignoreStrategy.setDataPermission(null);
-                        REENTRANT_IGNORE_PERMISSION.remove();
+                if (empty) {
+                    ignoreStrategy.setDataPermission(false);
+                } else {
+                    if (pop == 1) {
+                        ignoreStrategy.setDataPermission(false);
                     }
                 }
             }
-            if (hasCount) {
-                REENTRANT_IGNORE_PERMISSION.set(count - 1);
-            }
-        } else {
-            InterceptorIgnoreHelper.clearIgnoreStrategy();
-            REENTRANT_IGNORE_PERMISSION.remove();
         }
     }
 

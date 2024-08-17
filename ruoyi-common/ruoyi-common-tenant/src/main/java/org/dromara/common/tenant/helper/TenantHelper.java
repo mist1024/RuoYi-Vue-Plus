@@ -16,7 +16,7 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 
-import java.util.Objects;
+import java.util.Stack;
 import java.util.function.Supplier;
 
 /**
@@ -32,7 +32,7 @@ public class TenantHelper {
 
     private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new TransmittableThreadLocal<>();
 
-    private static final ThreadLocal<Integer> REENTRANT_IGNORE_TENANT = new ThreadLocal<>();
+    private static final Stack<Integer> REENTRANT_IGNORE_TENANT_STACK = new Stack<>();
 
     /**
      * 租户功能是否启用
@@ -47,17 +47,19 @@ public class TenantHelper {
     public static void enableIgnore() {
         ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
-        if (Objects.nonNull(ignoreStrategy)) {
-            if (!Boolean.TRUE.equals(ignoreStrategy.getTenantLine())) {
-                ignoreStrategy.setTenantLine(true);
-                REENTRANT_IGNORE_TENANT.set(1);
-            } else {
-                Integer count = REENTRANT_IGNORE_TENANT.get();
-                REENTRANT_IGNORE_TENANT.set(count + 1);
-            }
-        } else {
+        if (ignoreStrategy == null) {
             InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
-            REENTRANT_IGNORE_TENANT.set(1);
+            REENTRANT_IGNORE_TENANT_STACK.push(1);
+        } else {
+            if (Boolean.TRUE.equals(ignoreStrategy.getTenantLine())) {
+                if (REENTRANT_IGNORE_TENANT_STACK.isEmpty()) {
+                    throw new IllegalStateException("ignore tenant error");
+                }
+                REENTRANT_IGNORE_TENANT_STACK.push(REENTRANT_IGNORE_TENANT_STACK.peek() + 1);
+            } else {
+                ignoreStrategy.setTenantLine(true);
+                REENTRANT_IGNORE_TENANT_STACK.push(1);
+            }
         }
     }
 
@@ -67,27 +69,31 @@ public class TenantHelper {
     public static void disableIgnore() {
         ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
-        if (Objects.nonNull(ignoreStrategy)) {
-            Integer count = REENTRANT_IGNORE_TENANT.get();
-            boolean hasCount = count.compareTo(1) > 0;
-            if (ignoreStrategy.getBlockAttack() == null && ignoreStrategy.getDynamicTableName() == null && ignoreStrategy.getIllegalSql() == null && ignoreStrategy.getDataPermission() == null && CollectionUtil.isEmpty(ignoreStrategy.getOthers())) {
-                if (!hasCount) {
+        if (ignoreStrategy != null) {
+            boolean empty = REENTRANT_IGNORE_TENANT_STACK.isEmpty();
+            int pop = empty ? 1 : REENTRANT_IGNORE_TENANT_STACK.pop();
+            boolean shouldClear = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
+                && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
+                && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())
+                && !Boolean.TRUE.equals(ignoreStrategy.getDataPermission())
+                && CollectionUtil.isEmpty(ignoreStrategy.getOthers());
+            if (shouldClear) {
+                if (empty) {
                     InterceptorIgnoreHelper.clearIgnoreStrategy();
+                } else {
+                    if (pop == 1) {
+                        InterceptorIgnoreHelper.clearIgnoreStrategy();
+                    }
                 }
             } else {
-                if (!hasCount) {
-                    if (count.compareTo(1) == 0) {
-                        ignoreStrategy.setTenantLine(null);
-                        REENTRANT_IGNORE_TENANT.remove();
+                if (empty) {
+                    ignoreStrategy.setTenantLine(false);
+                } else {
+                    if (pop == 1) {
+                        ignoreStrategy.setTenantLine(false);
                     }
                 }
             }
-            if (hasCount) {
-                REENTRANT_IGNORE_TENANT.set(count - 1);
-            }
-        } else {
-            InterceptorIgnoreHelper.clearIgnoreStrategy();
-            REENTRANT_IGNORE_TENANT.remove();
         }
     }
 
