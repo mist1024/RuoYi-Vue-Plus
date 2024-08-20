@@ -16,6 +16,7 @@ import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 
+import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Supplier;
 
@@ -32,8 +33,24 @@ public class TenantHelper {
 
     private static final ThreadLocal<String> TEMP_DYNAMIC_TENANT = new TransmittableThreadLocal<>();
 
-    private static final Stack<Integer> REENTRANT_IGNORE_TENANT_STACK = new Stack<>();
 
+    private static final ThreadLocal<Stack<Integer>> REENTRANT_IGNORE_TENANT = new ThreadLocal<>();
+
+    private static Stack<Integer> getReentrantIgnoreTenantStack() {
+        return Optional.ofNullable(REENTRANT_IGNORE_TENANT.get()).orElseGet(() -> {
+            REENTRANT_IGNORE_TENANT.set(new Stack<>());
+            return REENTRANT_IGNORE_TENANT.get();
+        });
+    }
+
+    private static void clearReentrantIgnore() {
+        REENTRANT_IGNORE_TENANT.remove();
+    }
+
+    private static void reentrantIgnoreIncrement() {
+        Stack<Integer> reentrantStack = getReentrantIgnoreTenantStack();
+        reentrantStack.push(reentrantStack.size() + 1);
+    }
     /**
      * 租户功能是否启用
      */
@@ -49,18 +66,12 @@ public class TenantHelper {
         IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
         if (ignoreStrategy == null) {
             InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
-            REENTRANT_IGNORE_TENANT_STACK.push(1);
         } else {
-            if (Boolean.TRUE.equals(ignoreStrategy.getTenantLine())) {
-                if (REENTRANT_IGNORE_TENANT_STACK.isEmpty()) {
-                    throw new IllegalStateException("ignore tenant error");
-                }
-                REENTRANT_IGNORE_TENANT_STACK.push(REENTRANT_IGNORE_TENANT_STACK.peek() + 1);
-            } else {
+            if (!Boolean.TRUE.equals(ignoreStrategy.getTenantLine())) {
                 ignoreStrategy.setTenantLine(true);
-                REENTRANT_IGNORE_TENANT_STACK.push(1);
             }
         }
+        reentrantIgnoreIncrement();
     }
 
     /**
@@ -70,29 +81,19 @@ public class TenantHelper {
         ThreadLocal<IgnoreStrategy> IGNORE_STRATEGY_LOCAL = (ThreadLocal<IgnoreStrategy>) ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         IgnoreStrategy ignoreStrategy = IGNORE_STRATEGY_LOCAL.get();
         if (ignoreStrategy != null) {
-            boolean empty = REENTRANT_IGNORE_TENANT_STACK.isEmpty();
-            int pop = empty ? 1 : REENTRANT_IGNORE_TENANT_STACK.pop();
-            boolean shouldClear = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
+            boolean noOtherIgnoreStrategy = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
                 && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
                 && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())
                 && !Boolean.TRUE.equals(ignoreStrategy.getDataPermission())
                 && CollectionUtil.isEmpty(ignoreStrategy.getOthers());
-            if (shouldClear) {
-                if (empty) {
-                    InterceptorIgnoreHelper.clearIgnoreStrategy();
-                } else {
-                    if (pop == 1) {
-                        InterceptorIgnoreHelper.clearIgnoreStrategy();
-                    }
-                }
-            } else {
-                if (empty) {
-                    ignoreStrategy.setTenantLine(false);
-                } else {
-                    if (pop == 1) {
-                        ignoreStrategy.setTenantLine(false);
-                    }
-                }
+            Stack<Integer> reentrantStack = getReentrantIgnoreTenantStack();
+            boolean empty = reentrantStack.isEmpty() || reentrantStack.pop() == 1;
+            if (noOtherIgnoreStrategy && empty) {
+                InterceptorIgnoreHelper.clearIgnoreStrategy();
+                clearReentrantIgnore();
+            } else if (empty) {
+                ignoreStrategy.setDataPermission(false);
+                clearReentrantIgnore();
             }
         }
     }
