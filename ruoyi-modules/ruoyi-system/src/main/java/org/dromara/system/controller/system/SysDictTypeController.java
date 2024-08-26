@@ -1,18 +1,29 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.system.domain.bo.SysDictDataBo;
 import org.dromara.system.domain.bo.SysDictTypeBo;
+import org.dromara.system.domain.bo.SysTenantBo;
+import org.dromara.system.domain.vo.SysDictDataVo;
 import org.dromara.system.domain.vo.SysDictTypeVo;
+import org.dromara.system.domain.vo.SysTenantVo;
+import org.dromara.system.service.ISysDictDataService;
 import org.dromara.system.service.ISysDictTypeService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.dromara.system.service.ISysTenantService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +41,8 @@ import java.util.List;
 public class SysDictTypeController extends BaseController {
 
     private final ISysDictTypeService dictTypeService;
+    private final ISysDictDataService dictDataService;
+    private final ISysTenantService tenantService;
 
     /**
      * 查询字典类型列表
@@ -121,5 +134,34 @@ public class SysDictTypeController extends BaseController {
     public R<List<SysDictTypeVo>> optionselect() {
         List<SysDictTypeVo> dictTypes = dictTypeService.selectDictTypeAll();
         return R.ok(dictTypes);
+    }
+
+    /**
+     * 同步租户字典
+     */
+    @GetMapping("asyncTenantDict")
+    @Log(title = "同步租户字典", businessType = BusinessType.INSERT)
+    @Transactional(rollbackFor = Exception.class)
+    @SaCheckRole("superadmin")
+    public R<Void> asyncTenantDict(String tenantId) {
+        if (TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
+            throw new ServiceException("超级管理员无须同步字典");
+        }
+        //查询超管所有字典类型
+        List<SysDictTypeVo> typeVos = TenantHelper.dynamic(TenantConstants.DEFAULT_TENANT_ID, dictTypeService::selectDictTypeAll);
+        //查询超管所有字典data
+        List<SysDictDataVo> dictDataVos = TenantHelper.dynamic(TenantConstants.DEFAULT_TENANT_ID, () -> dictDataService.selectDictDataList(new SysDictDataBo()));
+        SysTenantBo sysTenantBo = new SysTenantBo();
+        sysTenantBo.setTenantId(tenantId);
+        List<SysTenantVo> sysTenantVos = tenantService.queryList(sysTenantBo);
+        for (SysTenantVo sysTenantVo : sysTenantVos) {
+            for (SysDictTypeVo typeVo : typeVos) {
+                TenantHelper.dynamic(sysTenantVo.getTenantId(), () -> {
+                    //如果不存在则插入
+                    dictTypeService.insertIfNotExist(typeVo, dictDataVos);
+                });
+            }
+        }
+        return R.ok("同步租户字典成功");
     }
 }

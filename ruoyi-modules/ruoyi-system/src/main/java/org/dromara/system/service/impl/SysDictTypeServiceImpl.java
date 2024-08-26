@@ -1,5 +1,6 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -255,4 +256,25 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         return StreamUtils.toMap(list, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
     }
 
+    @Override
+    public void insertIfNotExist(SysDictTypeVo typeVo, List<SysDictDataVo> dictDataVos) {
+        SysDictTypeVo sysDictTypeVo = selectDictTypeByType(typeVo.getDictType());
+        if (ObjectUtil.isNull(sysDictTypeVo)) {
+            SysDictTypeBo typeBo = BeanUtil.toBean(typeVo, SysDictTypeBo.class);
+            typeBo.setDictId(null);
+            typeBo.setCreateTime(null);
+            typeBo.setUpdateTime(null);
+            insertDictType(typeBo);
+            //筛选出dictType对应的data
+            List<SysDictData> dataVos = StreamUtils.toList(StreamUtils.filter(dictDataVos,
+                    sysDictDataVo -> typeVo.getDictType().equals(sysDictDataVo.getDictType())),
+                sysDictDataVo -> {
+                    //设置字典编码为null
+                    sysDictDataVo.setDictCode(null);
+                    sysDictDataVo.setCreateTime(null);
+                    return MapstructUtils.convert(sysDictDataVo, SysDictData.class);
+                });
+            dictDataMapper.insertBatch(dataVos);
+        }
+    }
 }
