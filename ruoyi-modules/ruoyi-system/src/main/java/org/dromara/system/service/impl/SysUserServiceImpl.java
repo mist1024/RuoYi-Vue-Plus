@@ -11,12 +11,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.config.RuoYiConfig;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.SpringUtils;
@@ -59,6 +64,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     private final SysPostMapper postMapper;
     private final SysUserRoleMapper userRoleMapper;
     private final SysUserPostMapper userPostMapper;
+    private final GoogleAuthenticator googleAuthenticator;
+    private final RuoYiConfig ruoYiConfig;
 
     @Override
     public TableDataInfo<SysUserVo> selectPageUserList(SysUserBo user, PageQuery pageQuery) {
@@ -304,6 +311,13 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
     @Transactional(rollbackFor = Exception.class)
     public int insertUser(SysUserBo user) {
         SysUser sysUser = MapstructUtils.convert(user, SysUser.class);
+
+        GoogleAuthenticatorKey credentials = googleAuthenticator.createCredentials();
+        String otpAuthTotpURL = GoogleAuthenticatorQRGenerator
+            .getOtpAuthTotpURL(ruoYiConfig.getName(), sysUser.getNickName(), credentials);
+        sysUser.setOtpSecret(credentials.getKey());
+        sysUser.setOtpUrl(otpAuthTotpURL);
+
         // 新增用户信息
         int rows = baseMapper.insert(sysUser);
         user.setUserId(sysUser.getUserId());
@@ -410,6 +424,30 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             new LambdaUpdateWrapper<SysUser>()
                 .set(SysUser::getAvatar, avatar)
                 .eq(SysUser::getUserId, userId)) > 0;
+    }
+
+    /**
+     * 重置用户OTP秘钥
+     *
+     * @param userId 用户ID
+     * @return 结果
+     */
+    @Override
+    public int resetOtpSecret(Long userId) {
+        SysUser sysUser = baseMapper.selectById(userId);
+        if (ObjectUtil.isNull(sysUser)) {
+            throw new UserException("user.not.exists", userId);
+        }
+
+        GoogleAuthenticatorKey credentials = googleAuthenticator.createCredentials();
+        String otpAuthTotpURL = GoogleAuthenticatorQRGenerator
+            .getOtpAuthTotpURL(ruoYiConfig.getName(), sysUser.getNickName(), credentials);
+
+        return baseMapper.update(null,
+            new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getOtpSecret, credentials.getKey())
+                .set(SysUser::getOtpUrl, otpAuthTotpURL)
+                .eq(SysUser::getUserId, userId));
     }
 
     /**

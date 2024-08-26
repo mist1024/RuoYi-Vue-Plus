@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
@@ -46,6 +47,7 @@ public class PasswordAuthStrategy implements IAuthStrategy {
     private final CaptchaProperties captchaProperties;
     private final SysLoginService loginService;
     private final SysUserMapper userMapper;
+    private final GoogleAuthenticator googleAuthenticator;
 
     @Override
     public LoginVo login(String body, SysClientVo client) {
@@ -65,6 +67,13 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         LoginUser loginUser = TenantHelper.dynamic(tenantId, () -> {
             SysUserVo user = loadUserByUsername(username);
             loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));
+
+            // 校验otp code
+            boolean otpAuthorize = googleAuthenticator.authorize(user.getOtpSecret(), loginBody.getOtpCode());
+            if (!otpAuthorize) {
+                throw new UserException("user.password.otp.code.error");
+            }
+
             // 此处可根据登录用户的数据不同 自行创建 loginUser
             return loginService.buildLoginUser(user);
         });
