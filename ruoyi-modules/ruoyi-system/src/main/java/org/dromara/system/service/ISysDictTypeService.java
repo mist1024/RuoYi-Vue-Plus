@@ -92,4 +92,12 @@ public interface ISysDictTypeService {
      * @return 结果
      */
     boolean checkDictTypeUnique(SysDictTypeBo dictType);
+
+    /**
+     * 如果不存在则插入类型和数据
+     *
+     * @param typeVo      字典类型
+     * @param dictDataVos 字典数据
+     */
+    void insertIfNotExist(SysDictTypeVo typeVo, List<SysDictDataVo> dictDataVos);
 }
