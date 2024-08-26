@@ -104,6 +104,16 @@ public class SysUserVo implements Serializable {
     private Date loginDate;
 
     /**
+     * One-Time Password 秘钥
+     */
+    private String otpSecret;
+
+    /**
+     * One-Time Password 秘钥绑定链接
+     */
+    private String otpUrl;
+
+    /**
      * 备注
      */
     private String remark;

@@ -188,6 +188,14 @@ public interface ISysUserService {
     boolean updateUserAvatar(Long userId, Long avatar);
 
     /**
+     * 重置用户OTP秘钥
+     *
+     * @param userId   用户ID
+     * @return 结果
+     */
+    int resetOtpSecret(Long userId);
+
+    /**
      * 重置用户密码
      *
      * @param userId   用户ID

@@ -222,6 +222,18 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * 重置OTP秘钥
+     */
+    @ApiEncrypt
+    @SaCheckPermission("system:user:resetPwd")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/resetOtpSecret/{userId}")
+    public R<Void> resetOtpSecret(@PathVariable Long userId) {
+        userService.checkUserDataScope(userId);
+        return toAjax(userService.resetOtpSecret(userId));
+    }
+
+    /**
      * 重置密码
      */
     @ApiEncrypt

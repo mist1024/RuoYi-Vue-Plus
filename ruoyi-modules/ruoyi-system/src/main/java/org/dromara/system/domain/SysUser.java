@@ -103,6 +103,15 @@ public class SysUser extends TenantEntity {
      */
     private String remark;
 
+    /**
+     * One-Time Password 秘钥
+     */
+    private String otpSecret;
+
+    /**
+     * One-Time Password 秘钥绑定链接
+     */
+    private String otpUrl;
 
     public SysUser(Long userId) {
         this.userId = userId;

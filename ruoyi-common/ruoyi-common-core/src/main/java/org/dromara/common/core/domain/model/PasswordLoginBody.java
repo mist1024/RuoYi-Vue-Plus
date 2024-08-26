@@ -1,6 +1,7 @@
 package org.dromara.common.core.domain.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
@@ -29,5 +30,11 @@ public class PasswordLoginBody extends LoginBody {
     @NotBlank(message = "{user.password.not.blank}")
     @Length(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH, message = "{user.password.length.valid}")
     private String password;
+
+    /**
+     * OTP验证码
+     */
+    @NotNull(message = "{user.password.otp.code.not.blank}")
+    private Integer otpCode;
 
 }
