@@ -139,13 +139,16 @@ public class SysDictTypeController extends BaseController {
     /**
      * 同步租户字典
      */
-    @GetMapping("asyncTenantDict")
+    @GetMapping("syncTenantDict")
     @Log(title = "同步租户字典", businessType = BusinessType.INSERT)
     @Transactional(rollbackFor = Exception.class)
-    @SaCheckRole("superadmin")
-    public R<Void> asyncTenantDict(String tenantId) {
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    public R<Void> syncTenantDict(String tenantId) {
+        if (!TenantHelper.isEnable()) {
+            return R.fail("当前未开启租户模式");
+        }
         if (TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
-            throw new ServiceException("超级管理员无须同步字典");
+            return R.fail("超级管理员无须同步字典");
         }
         //查询超管所有字典类型
         List<SysDictTypeVo> typeVos = TenantHelper.dynamic(TenantConstants.DEFAULT_TENANT_ID, dictTypeService::selectDictTypeAll);
