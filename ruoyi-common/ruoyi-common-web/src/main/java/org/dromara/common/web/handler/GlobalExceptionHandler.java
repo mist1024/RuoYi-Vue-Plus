@@ -156,4 +156,17 @@ public class GlobalExceptionHandler {
         return R.fail(message);
     }
 
+    /**
+     * 拦截空指针异常异常
+     */
+    @ExceptionHandler(NullPointerException.class)
+    public R<Void> handleNullPointerException(NullPointerException e) {
+        log.error(e.getMessage());
+        String message = e.getMessage();
+        if (message.contains("because \"loginUser\" is null")) {
+            return R.fail(HttpStatus.HTTP_UNAUTHORIZED, "认证失败，无法访问系统资源");
+        }
+        return R.fail(message);
+    }
+
 }
