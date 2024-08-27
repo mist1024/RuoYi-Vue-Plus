@@ -1,8 +1,12 @@
 package org.dromara.common.satoken.core.service;
 
 import cn.dev33.satoken.stp.StpInterface;
+import cn.hutool.http.HttpStatus;
+import org.apache.commons.lang3.ObjectUtils;
+import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.satoken.utils.LoginHelper;
 
 import java.util.ArrayList;
