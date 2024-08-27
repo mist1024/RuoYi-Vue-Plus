@@ -562,7 +562,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @param userId 用户ID
      * @return 用户账户
      */
-    @Cacheable(cacheNames = CacheNames.SYS_USER_NAME, key = "#userId")
+    @Cacheable(cacheNames = CacheNames.SYS_USER_NAME, key = "#userId", unless = "#result == null")
     @Override
     public String selectUserNameById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
@@ -577,7 +577,7 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
      * @return 用户账户
      */
     @Override
-    @Cacheable(cacheNames = CacheNames.SYS_NICKNAME, key = "#userId")
+    @Cacheable(cacheNames = CacheNames.SYS_NICKNAME, key = "#userId", unless = "#result == null")
     public String selectNicknameById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getNickName).eq(SysUser::getUserId, userId));

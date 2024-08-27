@@ -155,7 +155,7 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
      * @param ossId 文件在数据库中的唯一标识
      * @return SysOssVo 对象，包含文件信息
      */
-    @Cacheable(cacheNames = CacheNames.SYS_OSS, key = "#ossId")
+    @Cacheable(cacheNames = CacheNames.SYS_OSS, key = "#ossId", unless = "#result == null")
     @Override
     public SysOssVo getById(Long ossId) {
         return baseMapper.selectVoById(ossId);
