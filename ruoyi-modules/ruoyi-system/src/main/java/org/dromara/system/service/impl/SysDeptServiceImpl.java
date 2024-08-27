@@ -127,7 +127,7 @@ public class SysDeptServiceImpl implements ISysDeptService, DeptService {
      * @param deptId 部门ID
      * @return 部门信息
      */
-    @Cacheable(cacheNames = CacheNames.SYS_DEPT, key = "#deptId")
+    @Cacheable(cacheNames = CacheNames.SYS_DEPT, key = "#deptId", unless = "#result == null")
     @Override
     public SysDeptVo selectDeptById(Long deptId) {
         SysDeptVo dept = baseMapper.selectVoById(deptId);

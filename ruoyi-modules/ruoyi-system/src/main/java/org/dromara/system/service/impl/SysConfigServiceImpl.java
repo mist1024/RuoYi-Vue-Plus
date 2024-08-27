@@ -67,7 +67,7 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
      * @param configKey 参数key
      * @return 参数键值
      */
-    @Cacheable(cacheNames = CacheNames.SYS_CONFIG, key = "#configKey")
+    @Cacheable(cacheNames = CacheNames.SYS_CONFIG, key = "#configKey", unless = "#result == null")
     @Override
     public String selectConfigByKey(String configKey) {
         SysConfig retConfig = baseMapper.selectOne(new LambdaQueryWrapper<SysConfig>()
