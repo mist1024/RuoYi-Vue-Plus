@@ -44,6 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_TIME;
+
 /**
  * 用户 业务层处理
  *
@@ -86,8 +89,8 @@ public class SysUserServiceImpl implements ISysUserService, UserService {
             .like(StringUtils.isNotBlank(user.getUserName()), "u.user_name", user.getUserName())
             .eq(StringUtils.isNotBlank(user.getStatus()), "u.status", user.getStatus())
             .like(StringUtils.isNotBlank(user.getPhonenumber()), "u.phonenumber", user.getPhonenumber())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                "u.create_time", params.get("beginTime"), params.get("endTime"))
+               .between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+                   "u.create_time", params.get(BEGIN_TIME), params.get(END_TIME))
             .and(ObjectUtil.isNotNull(user.getDeptId()), w -> {
                 List<SysDept> deptList = deptMapper.selectList(new LambdaQueryWrapper<SysDept>()
                     .select(SysDept::getDeptId)

@@ -20,6 +20,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_CREATE_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_CREATE_TIME;
+
 /**
  * 测试单表Service业务层处理
  *
@@ -64,8 +67,8 @@ public class TestDemoServiceImpl implements ITestDemoService {
         LambdaQueryWrapper<TestDemo> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getTestKey()), TestDemo::getTestKey, bo.getTestKey());
         lqw.eq(StringUtils.isNotBlank(bo.getValue()), TestDemo::getValue, bo.getValue());
-        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-            TestDemo::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        lqw.between(params.get(BEGIN_CREATE_TIME) != null && params.get(END_CREATE_TIME) != null,
+            TestDemo::getCreateTime, params.get(BEGIN_CREATE_TIME), params.get(END_CREATE_TIME));
         lqw.orderByAsc(TestDemo::getId);
         return lqw;
     }

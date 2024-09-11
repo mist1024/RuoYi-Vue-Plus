@@ -2,6 +2,7 @@ package org.dromara.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.demo.domain.TestTree;
@@ -9,12 +10,14 @@ import org.dromara.demo.domain.bo.TestTreeBo;
 import org.dromara.demo.domain.vo.TestTreeVo;
 import org.dromara.demo.mapper.TestTreeMapper;
 import org.dromara.demo.service.ITestTreeService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_CREATE_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_CREATE_TIME;
 
 /**
  * 测试树表Service业务层处理
@@ -45,8 +48,8 @@ public class TestTreeServiceImpl implements ITestTreeService {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<TestTree> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getTreeName()), TestTree::getTreeName, bo.getTreeName());
-        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-            TestTree::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        lqw.between(params.get(BEGIN_CREATE_TIME) != null && params.get(END_CREATE_TIME) != null,
+            TestTree::getCreateTime, params.get(BEGIN_CREATE_TIME), params.get(END_CREATE_TIME));
         lqw.orderByAsc(TestTree::getId);
         return lqw;
     }
