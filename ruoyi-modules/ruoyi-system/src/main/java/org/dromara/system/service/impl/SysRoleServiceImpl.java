@@ -38,6 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_TIME;
+
 /**
  * 角色 业务层处理
  *
@@ -77,8 +80,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
             .like(StringUtils.isNotBlank(bo.getRoleName()), "r.role_name", bo.getRoleName())
             .eq(StringUtils.isNotBlank(bo.getStatus()), "r.status", bo.getStatus())
             .like(StringUtils.isNotBlank(bo.getRoleKey()), "r.role_key", bo.getRoleKey())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                "r.create_time", params.get("beginTime"), params.get("endTime"))
+               .between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+                   "r.create_time", params.get(BEGIN_TIME), params.get(END_TIME))
             .orderByAsc("r.role_sort").orderByAsc("r.create_time");
         return wrapper;
     }

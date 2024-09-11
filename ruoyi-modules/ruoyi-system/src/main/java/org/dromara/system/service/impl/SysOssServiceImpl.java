@@ -41,6 +41,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_CREATE_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_CREATE_TIME;
+
 /**
  * 文件上传 服务层实现
  *
@@ -141,8 +144,8 @@ public class SysOssServiceImpl implements ISysOssService, OssService {
         lqw.like(StringUtils.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
         lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
         lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
-        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-            SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
+        lqw.between(params.get(BEGIN_CREATE_TIME) != null && params.get(END_CREATE_TIME) != null,
+            SysOss::getCreateTime, params.get(BEGIN_CREATE_TIME), params.get(END_CREATE_TIME));
         lqw.eq(ObjectUtil.isNotNull(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
         lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
         lqw.orderByAsc(SysOss::getOssId);

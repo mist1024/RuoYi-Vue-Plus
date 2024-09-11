@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_TIME;
+
 /**
  * 字典 业务层处理
  *
@@ -72,8 +75,8 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
         LambdaQueryWrapper<SysDictType> lqw = Wrappers.lambdaQuery();
         lqw.like(StringUtils.isNotBlank(bo.getDictName()), SysDictType::getDictName, bo.getDictName());
         lqw.like(StringUtils.isNotBlank(bo.getDictType()), SysDictType::getDictType, bo.getDictType());
-        lqw.between(params.get("beginTime") != null && params.get("endTime") != null,
-            SysDictType::getCreateTime, params.get("beginTime"), params.get("endTime"));
+        lqw.between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+            SysDictType::getCreateTime, params.get(BEGIN_TIME), params.get(END_TIME));
         lqw.orderByAsc(SysDictType::getDictId);
         return lqw;
     }

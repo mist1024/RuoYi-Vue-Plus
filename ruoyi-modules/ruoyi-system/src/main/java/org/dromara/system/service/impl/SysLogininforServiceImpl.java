@@ -33,6 +33,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_TIME;
+
 /**
  * 系统访问日志情况信息 服务层处理
  *
@@ -115,8 +118,8 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
             .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
             .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
             .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysLogininfor::getLoginTime, params.get("beginTime"), params.get("endTime"));
+            .between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+                SysLogininfor::getLoginTime, params.get(BEGIN_TIME), params.get(END_TIME));
         if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
             pageQuery.setOrderByColumn("info_id");
             pageQuery.setIsAsc("desc");
@@ -150,8 +153,8 @@ public class SysLogininforServiceImpl implements ISysLogininforService {
             .like(StringUtils.isNotBlank(logininfor.getIpaddr()), SysLogininfor::getIpaddr, logininfor.getIpaddr())
             .eq(StringUtils.isNotBlank(logininfor.getStatus()), SysLogininfor::getStatus, logininfor.getStatus())
             .like(StringUtils.isNotBlank(logininfor.getUserName()), SysLogininfor::getUserName, logininfor.getUserName())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysLogininfor::getLoginTime, params.get("beginTime"), params.get("endTime"))
+            .between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+                SysLogininfor::getLoginTime, params.get(BEGIN_TIME), params.get(END_TIME))
             .orderByDesc(SysLogininfor::getInfoId));
     }
 

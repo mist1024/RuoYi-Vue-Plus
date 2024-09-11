@@ -50,6 +50,9 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_TIME;
+
 /**
  * 业务 服务层实现
  *
@@ -105,8 +108,8 @@ public class GenTableServiceImpl implements IGenTableService {
             .eq(StringUtils.isNotEmpty(genTable.getDataName()), "data_name", genTable.getDataName())
             .like(StringUtils.isNotBlank(genTable.getTableName()), "lower(table_name)", StringUtils.lowerCase(genTable.getTableName()))
             .like(StringUtils.isNotBlank(genTable.getTableComment()), "lower(table_comment)", StringUtils.lowerCase(genTable.getTableComment()))
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                "create_time", params.get("beginTime"), params.get("endTime"));
+            .between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+                "create_time", params.get(BEGIN_TIME), params.get(END_TIME));
         return wrapper;
     }
 

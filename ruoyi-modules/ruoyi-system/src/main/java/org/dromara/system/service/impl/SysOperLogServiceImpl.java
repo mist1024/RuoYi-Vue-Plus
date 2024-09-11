@@ -24,6 +24,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.dromara.common.core.constant.QueryConstants.BEGIN_TIME;
+import static org.dromara.common.core.constant.QueryConstants.END_TIME;
+
 /**
  * 操作日志 服务层处理
  *
@@ -75,8 +78,8 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
             .eq(operLog.getStatus() != null,
                 SysOperLog::getStatus, operLog.getStatus())
             .like(StringUtils.isNotBlank(operLog.getOperName()), SysOperLog::getOperName, operLog.getOperName())
-            .between(params.get("beginTime") != null && params.get("endTime") != null,
-                SysOperLog::getOperTime, params.get("beginTime"), params.get("endTime"));
+            .between(params.get(BEGIN_TIME) != null && params.get(END_TIME) != null,
+                SysOperLog::getOperTime, params.get(BEGIN_TIME), params.get(END_TIME));
     }
 
     /**
