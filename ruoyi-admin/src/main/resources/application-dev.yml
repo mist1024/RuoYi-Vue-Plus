@@ -2,14 +2,14 @@
 spring.boot.admin.client:
   # 增加客户端开关
   enabled: true
-  url: @admin.server@
+  url: http://localhost:9090/admin
   instance:
     service-host-type: IP
     metadata:
       username: ${spring.boot.admin.client.username}
       userpassword: ${spring.boot.admin.client.password}
-  username: @admin.username@
-  password: @admin.password@
+  username: @monitor.username@
+  password: @monitor.password@
 
 --- # snail-job 配置
 snail-job:

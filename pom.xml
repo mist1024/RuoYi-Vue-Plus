@@ -69,9 +69,8 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>local</profiles.active>
                 <logging.level>info</logging.level>
-                <admin.server>http://localhost:9090/admin</admin.server>
-                <admin.username>ruoyi</admin.username>
-                <admin.password>123456</admin.password>
+                <monitor.username>ruoyi</monitor.username>
+                <monitor.password>123456</monitor.password>
             </properties>
         </profile>
         <profile>
@@ -80,9 +79,8 @@
                 <!-- 环境标识，需要与配置文件的名称相对应 -->
                 <profiles.active>dev</profiles.active>
                 <logging.level>info</logging.level>
-                <admin.server>http://localhost:9090/admin</admin.server>
-                <admin.username>ruoyi</admin.username>
-                <admin.password>123456</admin.password>
+                <monitor.username>ruoyi</monitor.username>
+                <monitor.password>123456</monitor.password>
             </properties>
             <activation>
                 <!-- 默认环境 -->
@@ -94,9 +92,8 @@
             <properties>
                 <profiles.active>prod</profiles.active>
                 <logging.level>warn</logging.level>
-                <admin.server>http://localhost:9090/admin</admin.server>
-                <admin.username>ruoyi</admin.username>
-                <admin.password>123456</admin.password>
+                <monitor.username>ruoyi</monitor.username>
+                <monitor.password>123456</monitor.password>
             </properties>
         </profile>
     </profiles>
