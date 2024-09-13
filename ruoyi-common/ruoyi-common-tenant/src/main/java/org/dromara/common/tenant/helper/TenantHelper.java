@@ -130,7 +130,7 @@ public class TenantHelper {
         if (!isEnable()) {
             return;
         }
-        if (!isLogin() || !global) {
+        if (!StpUtil.isLogin() || !global) {
             TEMP_DYNAMIC_TENANT.set(tenantId);
             return;
         }
@@ -147,7 +147,7 @@ public class TenantHelper {
         if (!isEnable()) {
             return null;
         }
-        if (!isLogin()) {
+        if (!StpUtil.isLogin()) {
             return TEMP_DYNAMIC_TENANT.get();
         }
         // 如果线程内有值 优先返回
@@ -167,7 +167,7 @@ public class TenantHelper {
         if (!isEnable()) {
             return;
         }
-        if (!isLogin()) {
+        if (!StpUtil.isLogin()) {
             TEMP_DYNAMIC_TENANT.remove();
             return;
         }
@@ -216,15 +216,6 @@ public class TenantHelper {
             tenantId = LoginHelper.getTenantId();
         }
         return tenantId;
-    }
-
-    private static boolean isLogin() {
-        try {
-            StpUtil.checkLogin();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 }
