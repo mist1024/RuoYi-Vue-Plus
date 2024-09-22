@@ -1,0 +1,17 @@
+export function useDialog() {
+    const dialog = ref({
+        visible: false,
+        title: '',
+        isEdit: false
+    })
+
+    const openDialog = (title: string, isEdit: boolean) => {
+        dialog.value = { visible: true, title, isEdit }
+    }
+
+    const closeDialog = () => {
+        dialog.value.visible = false
+    }
+
+    return { dialog, openDialog, closeDialog }
+}

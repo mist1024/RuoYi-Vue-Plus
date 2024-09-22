@@ -50,6 +50,11 @@ public class GenTableColumn extends BaseEntity {
     private String columnType;
 
     /**
+     *  字符最大长度
+     */
+    private Integer columnMaxLength;
+
+    /**
      * JAVA类型
      */
     private String javaType;

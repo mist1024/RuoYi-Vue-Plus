@@ -42,6 +42,12 @@ public class ${ClassName}Bo extends BaseEntity {
     @NotNull(message = "$column.columnComment不能为空", groups = { $Group })
 #end
 #end
+## 字符长度判断
+#if($column.columnMaxLength && $column.columnMaxLength != -1)
+@Size(max = $column.columnMaxLength, message = "字符长度不能超过$column.columnMaxLength个字符")
+#elseif($column.columnMaxLength == -1)
+@Size(max = 4294967295, message = "字符长度不能超过4294967295个字符")
+#end
     private $column.javaType $column.javaField;
 
 #end

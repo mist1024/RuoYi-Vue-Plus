@@ -131,6 +131,11 @@ public class VelocityUtils {
         templates.add("vm/ts/types.ts.vm");
         if (GenConstants.TPL_CRUD.equals(tplCategory)) {
             templates.add("vm/vue/index.vue.vm");
+            // 新增模板
+            templates.add("vm/vue/useTable.ts.vm");
+            templates.add("vm/vue/form.vue.vm");
+            templates.add("vm/vue/useDialog.ts.vm");
+            templates.add("vm/vue/useForm.ts.vm");
         } else if (GenConstants.TPL_TREE.equals(tplCategory)) {
             templates.add("vm/vue/index-tree.vue.vm");
         }
@@ -183,6 +188,16 @@ public class VelocityUtils {
             fileName = StringUtils.format("{}/api/{}/{}/types.ts", vuePath, moduleName, businessName);
         } else if (template.contains("index.vue.vm")) {
             fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
+        }
+        // 新增的模板
+        else if (template.contains("useTable.ts.vm")) {
+            fileName = StringUtils.format("{}/views/{}/{}/hooks/use" + className + "Table.ts", vuePath, moduleName, businessName);
+        } else if (template.contains("form.vue.vm")) {
+            fileName = StringUtils.format("{}/views/{}/{}/modules/form.vue", vuePath, moduleName, businessName);
+        } else if (template.contains("useDialog.ts.vm")) {
+            fileName = StringUtils.format("{}/views/{}/{}/hooks/useDialog.ts", vuePath, moduleName, businessName);
+        } else if (template.contains("useForm.ts.vm")) {
+            fileName = StringUtils.format("{}/views/{}/{}/hooks/use" + className + "Form.ts", vuePath, moduleName, businessName);
         } else if (template.contains("index-tree.vue.vm")) {
             fileName = StringUtils.format("{}/views/{}/{}/index.vue", vuePath, moduleName, businessName);
         }

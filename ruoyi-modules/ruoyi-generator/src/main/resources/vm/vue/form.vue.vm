@@ -1,0 +1,97 @@
+<template>
+    <!-- 添加或修改${functionName}对话框 -->
+    <rex-drawer :title="props.title" v-model="modelValue" append-to-body @close="close()">
+        <el-form ref="${businessName}FormRef" :model="form" :rules="rules" label-width="auto" v-loading="loading">
+            <el-row :gutter="10">
+                #foreach($column in $columns)
+                    #set($field=$column.javaField)
+                    #if(($column.insert || $column.edit) && !$column.pk)
+                        #set($parentheseIndex=$column.columnComment.indexOf("（"))
+                        #if($parentheseIndex != -1)
+                            #set($comment=$column.columnComment.substring(0, $parentheseIndex))
+                        #else
+                            #set($comment=$column.columnComment)
+                        #end
+                        #set($dictType=$column.dictType)
+                        #if($column.htmlType == "input")
+                            <rex-input label="${comment}" prop="${field}" v-model="form.${field}" maxlength="$column.columnMaxLength" show-word-limit  />
+                        #elseif($column.htmlType == "imageUpload")
+                            <rex-image-upload label="${comment}" prop="${field}" v-model="form.${field}" />
+                        #elseif($column.htmlType == "fileUpload")
+                            <rex-file-upload label="${comment}" prop="${field}" v-model="form.${field}" />
+                        #elseif($column.htmlType == "editor")
+                            <rex-editor label="${comment}" prop="${field}" v-model="form.${field}" :min-height="192" />
+                        #elseif($column.htmlType == "select" && "" != $dictType)
+                            <rex-select label="${comment}" prop="${field}" v-model="form.${field}" placeholder="请选择${comment}" :dicts="${dictType}" />
+                        #elseif($column.htmlType == "select" && $dictType)
+                            <el-form-item label="${comment}" prop="${field}">
+                                <el-select v-model="form.${field}" placeholder="请选择${comment}">
+                                    <el-option label="请选择字典生成" value="" />
+                                </el-select>
+                            </el-form-item>
+                        #elseif($column.htmlType == "checkbox" && "" != $dictType)
+                            <rex-checkbox label="${comment}" prop="${field}" v-model="form.${field}" :dicts="${dictType}" />
+                        #elseif($column.htmlType == "checkbox" && $dictType)
+                            <el-form-item label="${comment}" prop="${field}">
+                                <el-checkbox-group v-model="form.${field}">
+                                    <el-checkbox>请选择字典生成</el-checkbox>
+                                </el-checkbox-group>
+                            </el-form-item>
+                        #elseif($column.htmlType == "radio" && "" != $dictType)
+                            <rex-radio label="${comment}" prop="${field}" v-model="form.${field}" :dicts="${dictType}" />
+                        #elseif($column.htmlType == "radio" && $dictType)
+                            <el-form-item label="${comment}" prop="${field}">
+                                <el-radio-group v-model="form.${field}">
+                                    <el-radio label="1">请选择字典生成</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        #elseif($column.htmlType == "datetime")
+                            <rex-date-picker label="${comment}" prop="${field}" v-model="form.${field}" type="datetime" value-format="YYYY-MM-DD"  placeholder="请选择${comment}" />
+                        #elseif($column.htmlType == "textarea")
+                            <rex-input label="${comment}" prop="${field}" v-model="form.${field}" type="textarea" maxlength="$column.columnMaxLength" show-word-limit />
+                        #end
+                    #end
+                #end
+            </el-row>
+        </el-form>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button :loading="loading" type="primary" @click="submitForm">确 定</el-button>
+                <el-button @click="close">取 消</el-button>
+            </div>
+        </template>
+    </rex-drawer>
+</template>
+
+<script lang="ts" setup>
+    import { use${BusinessName}Form } from '../hooks/use${BusinessName}Form'
+    import { useVModel } from '@vueuse/core'
+
+    const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+        #if(${dicts} != '')
+            #set($dictsNoSymbol=$dicts.replace("'", ""))
+        const ${dictsNoSymbol} = toRef(proxy?.useDict(${dicts}), ${dicts});
+        #end
+    const props = defineProps<{
+        modelValue: boolean
+        title: string
+        isEdit: boolean
+        id?: string | number
+    }>()
+
+    const emit = defineEmits(['update:modelValue', 'refresh'])
+    const modelValue = useVModel(props, 'modelValue', emit)
+    const { form, rules, loading, ${businessName}FormRef, submitForm, close, loadData } = use${BusinessName}Form({
+        props,
+        emit,
+        proxy,
+        onSuccess: () => emit('refresh'),
+        onClose: () => emit('close'),
+    })
+
+    watchEffect(async () => {
+        if (props.isEdit && modelValue.value) {
+            await loadData(props.id as string | number)
+        }
+    })
+</script>
