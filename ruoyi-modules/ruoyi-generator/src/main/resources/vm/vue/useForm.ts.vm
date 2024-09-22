@@ -1,0 +1,107 @@
+import { ${BusinessName}Form } from '@/api/${moduleName}/${businessName}/types'
+import { update${BusinessName}, add${BusinessName}, get${BusinessName} } from '@/api/${moduleName}/${businessName}';
+
+interface UseFormOptions {
+    props: any
+    emit: any
+    proxy: any
+    onSuccess?: () => void
+    onClose?: () => void
+}
+
+export function use${BusinessName}Form({ emit, proxy, onSuccess, onClose }: UseFormOptions) {
+    const loading = ref(false)
+    const form = reactive<${BusinessName}Form>({
+        #foreach ($column in $columns)
+        #if($column.insert || $column.edit)
+        #if($column.htmlType == "checkbox")
+        $column.javaField: []#if($foreach.count != $columns.size()),#end
+        #else
+        $column.javaField: undefined#if($foreach.count != $columns.size()),#end
+        #end
+        #end
+    #end
+    });
+
+    const rules = {
+        #foreach ($column in $columns)
+            #if($column.insert || $column.edit)
+                #if($column.required)
+                    #set($parentheseIndex=$column.columnComment.indexOf("（"))
+                    #if($parentheseIndex != -1)
+                        #set($comment=$column.columnComment.substring(0, $parentheseIndex))
+                    #else
+                        #set($comment=$column.columnComment)
+                    #end
+                        $column.javaField: [
+                        { required: true, message: "$comment不能为空", trigger: ['change', 'blur']},
+                        #if($column.columnMaxLength)
+                            { max: $column.columnMaxLength, message: "字符长度不能超过$column.columnMaxLength个字符", trigger: ['change', 'blur']}
+                        #end
+                    ]
+                    #if($foreach.count != $columns.size()),#end
+                #else
+                    #if($column.columnMaxLength)
+                            $column.javaField: [
+                            { max: $column.columnMaxLength, message: "字符长度不能超过$column.columnMaxLength个字符", trigger: ['change', 'blur']}
+                        ],
+                    #end
+                #end
+            #end
+        #end
+    }
+
+    const ${businessName}FormRef = ref<ElFormInstance>()
+
+    const close = () => {
+        reset()
+        form.id = undefined
+        emit('update:modelValue', false)
+        onClose?.()
+    }
+
+    const reset = () => {
+            ${businessName}FormRef.value?.resetFields()
+    }
+
+    const submitForm = async () => {
+        try {
+            await ${businessName}FormRef.value?.validate()
+            loading.value = true
+            if (form.id) {
+                await update${BusinessName}(form)
+            } else {
+                await add${BusinessName}(form)
+            }
+            proxy?.$modal.msgSuccess('操作成功')
+            close()
+            onSuccess?.()
+        } catch (error) {
+            console.error('Form submission error:', error)
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const loadData = async (id: string | number) => {
+        loading.value = true
+        try {
+            const res = await get${BusinessName}(id)
+            Object.assign(form, res.data)
+        } catch (error) {
+            console.error('Error fetching project data:', error)
+        } finally {
+            loading.value = false
+        }
+    }
+
+    return {
+        form,
+        rules,
+        loading,
+        ${businessName}FormRef,
+        submitForm,
+        close,
+        loadData
+    }
+}

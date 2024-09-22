@@ -1,0 +1,79 @@
+import { list${BusinessName}, del${BusinessName} } from '@/api/${moduleName}/${businessName}';
+import { ${BusinessName}VO, ${BusinessName}Query } from '@/api/${moduleName}/${businessName}/types';
+
+export function use${BusinessName}Table(proxy) {
+    const projectsList = ref<${BusinessName}VO[]>([]);
+    const loading = ref(true);
+    const total = ref(0);
+    const ids = ref<Array<string | number>>([]);
+    const single = ref(true);
+    const multiple = ref(true);
+    const clearSelection = ref(false)
+
+    const queryParams = reactive<${BusinessName}Query>({
+        pageNum: 1,
+        pageSize: 10,
+        #foreach ($column in $columns)
+            #if($column.query)
+                #if($column.htmlType != "datetime" || $column.queryType != "BETWEEN")
+        $column.javaField: undefined,
+                #end
+            #end
+        #end
+        params: {
+            #foreach ($column in $columns)
+                #if($column.query)
+                    #if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+        $column.javaField: undefined#if($foreach.count != $columns.size()),#end
+                    #end
+                #end
+            #end
+        }
+    });
+
+    const getList = async () => {
+        loading.value = true;
+        try {
+            const res = await list${BusinessName}(queryParams);
+            projectsList.value = res.rows;
+            total.value = res.total;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const handleSelectionChange = (selection: ${BusinessName}VO[]) => {
+        ids.value = selection.map((item) => item.id);
+        single.value = selection.length !== 1;
+        multiple.value = !selection.length;
+    };
+
+    const handleDelete = async (row?: ${BusinessName}VO) => {
+        const _ids = row?.id || ids.value;
+
+        try {
+            await proxy.$modal.confirm('是否确认删除项目编号为"' + _ids + '"的数据项？');
+            await del${BusinessName}(_ids);
+            proxy.$modal.msgSuccess('删除成功');
+            getList();
+        } catch (error) {
+            console.log('删除操作已取消')
+        } finally {
+            clearSelection.value = true
+        }
+    };
+
+    return {
+        ${businessName}List,
+        loading,
+        total,
+        ids,
+        single,
+        multiple,
+        queryParams,
+        getList,
+        handleSelectionChange,
+        handleDelete,
+        clearSelection
+    };
+}
